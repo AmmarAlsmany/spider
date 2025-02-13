@@ -13,7 +13,22 @@ class client extends Authenticatable
     protected $guard = 'client';
 
     protected $table = 'clients';
-    protected $fillable = ['name', 'email', 'password', 'phone', 'zip_code', "tax_number", 'address', 'city', 'state', 'role', 'last_login_at', 'last_login_ip'];
+    protected $fillable = [
+        'name', 
+        'email', 
+        'password', 
+        'phone',
+        'mobile', 
+        'zip_code',
+        'tax_number',
+        'address', 
+        'city', 
+        'state', 
+        'role',
+        'sales_id',
+        'last_login_at', 
+        'last_login_ip'
+    ];
     protected $hidden = ['password'];
 
     public function contracts()

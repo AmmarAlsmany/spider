@@ -71,6 +71,8 @@ Route::middleware(['auth', 'role:sales'])->group(function () {
     Route::get('/sales/To-Do', [sales::class, 'toDoList'])->name('sales.todo');
     Route::post('/sales/Create-New-Contract', [ContractsController::class, 'index'])->name('contract.index');
     Route::post('/sales/Create-Contract', [ContractsController::class, 'create'])->name('contract.create');
+    Route::get('/equipment-contract/create', [ContractsController::class, 'createEquipmentContract'])->name('equipment.contract.create');
+    Route::post('/equipment-contract/store', [ContractsController::class, 'storeEquipmentContract'])->name('equipment.contract.store');
     Route::get('/sales/Show Active contracts', [ContractsController::class, 'show'])->name('contract.show');
     Route::get('/sales/Show contracts Details/{id}', [ContractsController::class, 'showcontractDetails'])->name('contract.show.details');
     Route::get('/sales/Show Contract Visit Details/{id}', [ContractsController::class, 'showContractVisitDetails'])->name('view.contract.visit');

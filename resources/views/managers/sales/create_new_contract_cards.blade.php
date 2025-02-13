@@ -41,8 +41,16 @@
                 </div>
                 <div class="card-body">
                     <h5 class="mb-3 card-title fw-bold">{{ $type->name }}</h5>
-                    <p class="text-muted mb-4">{{ $type->description ?? 'Create a new contract with ' . $type->name }}</p>
-                    <div class="d-flex justify-content-center gap-2">
+                    <p class="mb-4 text-muted">{{ $type->description ?? 'Create a new contract with ' . $type->name }}</p>
+                    <div class="gap-2 d-flex justify-content-center">
+                        @if($type->name == 'Buy equipment')
+                        <a href="{{ route('equipment.contract.create') }}" class="btn btn-primary flex-grow-1">
+                            <i class="bi bi-person-plus me-2"></i>New Client
+                        </a>
+                        <a href="{{ route('equipment.contract.create') }}?existing=true" class="btn btn-outline-primary flex-grow-1">
+                            <i class="bi bi-person-check me-2"></i>Existing Client
+                        </a>
+                        @else
                         <button class="btn btn-primary flex-grow-1" data-bs-toggle="modal"
                             data-bs-target="#newClientModal{{ $type->id }}">
                             <i class="bi bi-person-plus me-2"></i>New Client
@@ -51,11 +59,13 @@
                             data-bs-target="#existingClientModal{{ $type->id }}">
                             <i class="bi bi-person-check me-2"></i>Existing Client
                         </button>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
 
+        @if($type->name != 'Buy Equipment')
         <!-- New Client Modal -->
         <div class="modal fade" id="newClientModal{{ $type->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -140,6 +150,7 @@
                 </div>
             </div>
         </div>
+        @endif
         @endforeach
     </div>
 </div>

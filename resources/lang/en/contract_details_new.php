@@ -42,6 +42,7 @@ return [
     'contract_info_status' => 'Status',
     'contract_info_months' => 'Months',
     'contract_info_visits_count' => 'Visits',
+    'contract_info_description' => 'Contract Description',
 
     // Client Information
     'client_info_title' => 'Client Information',

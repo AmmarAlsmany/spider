@@ -42,6 +42,7 @@ return [
     'contract_info_status' => 'الحالة',
     'contract_info_months' => 'شهور',
     'contract_info_visits_count' => 'زيارات',
+    'contract_info_description' => 'وصف العقد',
 
     // Client Information
     'client_info_title' => 'معلومات العميل',

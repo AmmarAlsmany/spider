@@ -11,6 +11,7 @@ use App\Models\contracts_types;
 use App\Models\payments;
 use App\Models\PostponementRequest;
 use App\Models\VisitSchedule;
+use App\Models\EquipmentContract; // Add the EquipmentContract model import
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -123,21 +124,21 @@ class ContractsController extends Controller
                 $this->create_new_contract($request, $client_info);
             } else {
                 #create a new client info
-                $client_info = new client();
-                $client_info->name = $request->clientName;
-                $client_info->email = $request->clientEmail;
-                $client_info->phone = $request->clientPhone;
-                $client_info->mobile = $request->clientMobile;
-                $client_info->password = Hash::make($request->clientPhone);
-                $client_info->address = $request->clientAddress;
-                $client_info->city = $request->client_city;
-                $client_info->zip_code = $request->client_zipcode;
-                $client_info->tax_number = $request->client_tax_number;
-                $client_info->sales_id = Auth::user()->id;
-                $client_info->save();
+                $client = new client();
+                $client->name = $request->clientName;
+                $client->email = $request->clientEmail;
+                $client->phone = $request->clientPhone;
+                $client->mobile = $request->clientMobile;
+                $client->password = Hash::make($request->clientPhone);
+                $client->address = $request->clientAddress;
+                $client->city = $request->client_city;
+                $client->zip_code = $request->client_zipcode;
+                $client->tax_number = $request->client_tax_number;
+                $client->sales_id = Auth::user()->id;
+                $client->save();
 
                 #create a new contract
-                $this->create_new_contract($request, $client_info);
+                $this->create_new_contract($request, $client);
             }
 
             DB::commit();
@@ -289,6 +290,180 @@ class ContractsController extends Controller
         $payment->save();
     }
 
+    public function createEquipmentContract(Request $request)
+    {
+        // Get all clients for the dropdown if viewing existing clients form
+        $clients = [];
+        if ($request->has('existing')) {
+            $clients = client::all();
+        }
+
+        // Get contract number
+        $contract_number = $this->generator_contract_number();
+
+        return view('managers.sales.create_equipment_contract', compact('clients', 'contract_number'));
+    }
+
+    public function storeEquipmentContract(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Validate the request
+            $rules = [
+                'equipment_type' => 'required|string',
+                'equipment_model' => 'required|string',
+                'equipment_quantity' => 'required|integer|min:1',
+                'equipment_description' => 'required|string',
+                'financial_amount' => 'required|numeric|min:0',
+                'vat_percentage' => 'required|numeric',
+                'payment_type' => 'required|in:cash,installment',
+                'contract_number' => 'required|string|unique:contracts,contract_number',
+                'warranty_type' => 'required|in:none,standard,extended',
+            ];
+
+            if ($request->warranty_type !== 'none') {
+                $rules['warranty_period'] = 'required|integer|min:1|max:60';
+            }
+
+            if (!$request->has('client_id')) {
+                $rules['customer_name'] = 'required|string';
+                $rules['customer_mobile'] = 'required|string';
+                $rules['customer_email'] = 'required|email';
+            } else {
+                $rules['client_id'] = 'required|exists:clients,id';
+            }
+
+            $request->validate($rules);
+
+            // Handle client creation/selection
+            if ($request->has('client_id')) {
+                $client = client::find($request->client_id);
+            } else {
+                // Create new client
+                $client = new client();
+                $client->name = $request->customer_name;
+                $client->email = $request->customer_email;
+                $client->phone = $request->customer_mobile; // Use mobile number as phone
+                $client->mobile = $request->customer_mobile;
+                $client->address = $request->customer_address;
+                $client->city = $request->customer_city;
+                $client->zip_code = $request->customer_zip_code;
+                $client->tax_number = $request->customer_tax_number;
+                $client->password = Hash::make($request->customer_mobile);
+                $client->sales_id = Auth::user()->id;
+                $client->save();
+            }
+
+            // Calculate amounts
+            $unit_price = floatval($request->financial_amount);
+            $total_price = $unit_price * $request->equipment_quantity;
+            $vat_amount = $total_price * ($request->vat_percentage / 100);
+            $total_with_vat = $total_price + $vat_amount;
+
+            // Create base contract
+            $contract = new contracts();
+            $contract->customer_id = $client->id;
+            $contract->sales_id = Auth::user()->id;
+            $contract->contract_number = $request->contract_number;
+            $contract->contract_start_date = now();
+            $contract->contract_end_date = now()->addYear(); // Default 1 year warranty
+            $contract->Property_type = 'Buy equipment';
+            $contract->contract_type = contracts_types::where('name', 'Buy equipment')->first()->id;
+            $contract->contract_price = $total_with_vat;
+            $contract->payment_type = $request->payment_type; // Updated to match model
+            $contract->contract_status = 'pending'; // Add default status
+            $contract->is_multi_branch = 'no'; // Equipment contracts don't have multiple branches
+            $contract->contract_description = $request->equipment_description; // Use equipment description
+
+            // Add warranty information
+            if ($request->warranty_type !== 'none') {
+                $contract->warranty = $request->warranty_period;
+            } else {
+                $contract->warranty = null;
+            }
+
+            $contract->save();
+
+            // Create equipment contract details
+            $equipmentContract = new EquipmentContract([
+                'contract_id' => $contract->id,
+                'equipment_type' => $request->equipment_type,
+                'equipment_model' => $request->equipment_model,
+                'equipment_quantity' => $request->equipment_quantity,
+                'equipment_description' => $request->equipment_description,
+                'unit_price' => $unit_price,
+                'total_price' => $total_price,
+                'vat_amount' => $vat_amount,
+                'total_with_vat' => $total_with_vat
+            ]);
+            $equipmentContract->save();
+
+            // Create payment record(s)
+            if ($request->payment_type === 'cash') {
+                // Create single payment for cash
+                $payment = new payments([
+                    'customer_id' => $client->id,
+                    'contract_id' => $contract->id,
+                    'due_date' => now(),
+                    'payment_amount' => $total_with_vat,
+                    'payment_method' => 'cash',
+                    'payment_status' => 'pending',
+                    'payment_description' => 'Full payment for equipment purchase',
+                    'invoice_number' => $contract->contract_number . '-1'
+                ]);
+                $payment->save();
+            } else if ($request->payment_type === 'installment') {
+                // Default to 3 installments if not specified
+                $number_of_installments = $request->number_of_installments ?? 3;
+                $installment_amount = ceil($total_with_vat / $number_of_installments);
+                
+                for ($i = 0; $i < $number_of_installments; $i++) {
+                    $payment = new payments([
+                        'customer_id' => $client->id,
+                        'contract_id' => $contract->id,
+                        'due_date' => now()->addMonths($i),
+                        'payment_amount' => $installment_amount,
+                        'payment_method' => 'installment',
+                        'payment_status' => 'pending',
+                        'payment_description' => 'Installment ' . ($i + 1) . ' of ' . $number_of_installments,
+                        'invoice_number' => $contract->contract_number . '-' . ($i + 1)
+                    ]);
+                    $payment->save();
+                }
+            }
+
+            DB::commit();
+
+            // Send notification
+            $notificationData = [
+                'title' => 'New Equipment Contract Created',
+                'message' => 'Equipment Purchase Contract ' . $contract->contract_number . ' has been created.',
+                'type' => 'info',
+                'url' => "#",
+                'priority' => 'normal'
+            ];
+
+            $this->notifyRoles(['technical', 'sales_manager'], $notificationData);
+
+            return redirect()->route('sales.dashboard')
+                ->with('success', 'Equipment Purchase Contract Created Successfully');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Equipment contract creation error: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'request' => $request->except(['password']),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return back()
+                ->with('error', 'Error creating contract: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
     public function showcontractDetails($id)
     {
         $contract = contracts::find($id);
@@ -347,21 +522,46 @@ class ContractsController extends Controller
             'Mecca',
             'Medina',
             'Dammam',
-            'Khobar',
-            'Dhahran',
-            'Tabuk',
-            'Abha',
             'Taif',
-            'Khamis Mushait',
+            'Tabuk',
             'Buraidah',
-            'Jubail',
-            'Yanbu',
-            'Najran',
-            'Jizan',
-            'Hail',
+            'Khamis Mushait',
+            'Abha',
+            'Al-Khobar',
             'Al-Ahsa',
+            'Najran',
+            'Yanbu',
             'Al-Qatif',
-            'Al-Kharj'
+            'Al-Jubail',
+            "Ha'il",
+            'Al-Hofuf',
+            'Al-Mubarraz',
+            'Kharj',
+            'Qurayyat',
+            'Hafr Al-Batin',
+            'Al-Kharj',
+            'Arar',
+            'Sakaka',
+            'Jizan',
+            'Al-Qunfudhah',
+            'Bisha',
+            'Al-Bahah',
+            'Unaizah',
+            'Rafha',
+            'Dawadmi',
+            'Ar Rass',
+            "Al Majma'ah",
+            'Tarut',
+            'Baljurashi',
+            'Shaqra',
+            'Al-Zilfi',
+            'Ar Rayn',
+            'Wadi ad-Dawasir',
+            'Badr',
+            'Al Ula',
+            'Tharmada',
+            'Turabah',
+            'Tayma'
         ];
 
         return view('contracts.edit_contract', compact('contract', 'contract_type', 'saudiCities'));
@@ -375,7 +575,7 @@ class ContractsController extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             $contract = contracts::findOrFail($id);
             $contract->update($request->all());
 
@@ -386,11 +586,11 @@ class ContractsController extends Controller
             // Send notifications to relevant roles
             if (Auth::user()->role === 'technical') {
                 $url = route('technical.contract.show', $contract->id);
-            }elseif(Auth::user()->role === 'sales'){
+            } elseif (Auth::user()->role === 'sales') {
                 $url = route('contract.show.details', $contract->id);
-            }elseif(Auth::user()->role === 'sales_manager'){
+            } elseif (Auth::user()->role === 'sales_manager') {
                 $url = route('sales_manager.contract.view', $contract->id);
-            }elseif(Auth::user()->role === 'client'){
+            } elseif (Auth::user()->role === 'client') {
                 $url = route('client.payment.details', $contract->id);
             }
 
@@ -420,9 +620,9 @@ class ContractsController extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             $contract = contracts::findOrFail($id);
-            
+
             // Send notifications before deletion
             $notificationData = [
                 'title' => 'Contract Deleted',
@@ -434,7 +634,7 @@ class ContractsController extends Controller
             ];
 
             $this->notifyRoles(['sales_manager', 'technical'], $notificationData);
-            
+
             $contract->delete();
             DB::commit();
 
@@ -972,7 +1172,7 @@ class ContractsController extends Controller
                 'priority' => 'high',
             ];
 
-            $this->notifyRoles(['sales_manager', 'technical', 'client','team_leader',], $notificationData);
+            $this->notifyRoles(['sales_manager', 'technical', 'client', 'team_leader',], $notificationData);
 
             return redirect()->route('contract.show.details', $contract->id)
                 ->with('success', 'Annex deleted successfully');

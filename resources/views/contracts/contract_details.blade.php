@@ -153,26 +153,44 @@
                                     <th class="bg-light">
                                         {{ __('contract_details_new.client_info_email') }}
                                     </th>
-                                    <td><a href="mailto:{{ $contract->customer->email }}">{{ $contract->customer->email }}</a></td>
+                                    <td><a href="mailto:{{ $contract->customer->email }}">{{ $contract->customer->email
+                                            }}</a></td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light">
                                         {{ __('contract_details_new.client_info_phone') }}
                                     </th>
-                                    <td><a href="tel:{{ $contract->customer->phone }}">{{ $contract->customer->phone }}</a></td>
+                                    <td><a href="tel:{{ $contract->customer->phone }}">{{ $contract->customer->phone
+                                            }}</a></td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light">
                                         {{ __('contract_details_new.client_info_address') }}
                                     </th>
-                                    <td><a href="https://www.google.com/maps/search/?api=1&query={{ $contract->customer->address }}" target="_blank">{{ $contract->customer->address }}</a></td>
+                                    <td><a href="https://www.google.com/maps/search/?api=1&query={{ $contract->customer->address }}"
+                                            target="_blank">{{ $contract->customer->address }}</a></td>
                                 </tr>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                @if ($contract->branchs->count() > 0  )
+                <!-- Contract Description Section -->
+                <div class="mt-4 row">
+                    <div class="col-md-12">
+                        <div class="contract-info-card h-100">
+                            <h4 class="pb-2 mb-4 border-bottom text-primary">
+                                <i class="bx bx-info-circle me-2"></i>
+                                {{ __('contract_details_new.contract_info_description') }}
+                            </h4>
+                            <div class="p-3">
+                                <p class="mb-0">{{ $contract->contract_description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if ($contract->branchs->count() > 0 )
                 <div class="mt-4 row">
                     <div class="col-md-12">
                         <h4 class="pb-2 mb-4 border-bottom text-primary">
@@ -205,8 +223,12 @@
                                     <tr>
                                         <td>{{ $branch->branch_name }}</td>
                                         <td>{{ $branch->branch_manager_name }}</td>
-                                        <td class="d-none d-md-table-cell"><a href="tel:{{ $branch->branch_manager_phone }}" target="_blank">{{ $branch->branch_manager_phone }}</a></td>
-                                        <td class="d-none d-md-table-cell"><a href="https://www.google.com/maps/search/?api=1&query={{ $branch->branch_address }}" target="_blank">{{ $branch->branch_address }}</a></td>
+                                        <td class="d-none d-md-table-cell"><a
+                                                href="tel:{{ $branch->branch_manager_phone }}" target="_blank">{{
+                                                $branch->branch_manager_phone }}</a></td>
+                                        <td class="d-none d-md-table-cell"><a
+                                                href="https://www.google.com/maps/search/?api=1&query={{ $branch->branch_address }}"
+                                                target="_blank">{{ $branch->branch_address }}</a></td>
                                         <td>
                                             <div class="gap-2 d-flex">
                                                 <button class="btn btn-sm btn-primary"
@@ -338,8 +360,7 @@
                                         <td>{{ number_format($request->payment->payment_amount, 2) }} SAR</td>
                                         <td>{{ \Carbon\Carbon::parse($request->requested_date)->format('M d, Y') }}</td>
                                         <td>
-                                            <span
-                                                class="badge bg-{{ 
+                                            <span class="badge bg-{{ 
                                                     $request->status == 'approved' ? 'success' : 
                                                     ($request->status == 'pending' ? 'warning' : 'danger') 
                                                 }} px-3 py-2">

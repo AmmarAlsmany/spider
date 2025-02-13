@@ -19,6 +19,7 @@
     </div>
     <div class="container">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
 
@@ -196,6 +197,26 @@
                 <h1 class="mb-2 text-2xl font-bold text-center">فاتورة ضريبة</h1>
                 <h1 class="mb-2 text-xl font-bold text-center">Tax Invoice</h1>
                 <p class="text-lg">رقم الفاتورة / Invoice Number: {{ $payment->invoice_number }}</p>
+                
+                <!-- Add QR Code Container -->
+                <div class="flex justify-center mt-4 mb-4">
+                    <div id="qrcode"></div>
+                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Generate the URL for the QR view
+                        var qrUrl = '{{ route("payment.qr.view", ["id" => $payment->id]) }}';
+                        
+                        new QRCode(document.getElementById("qrcode"), {
+                            text: qrUrl,
+                            width: 128,
+                            height: 128,
+                            colorDark : "#000000",
+                            colorLight : "#ffffff",
+                            correctLevel : QRCode.CorrectLevel.H
+                        });
+                    });
+                </script>
                 <p class="text-sm">تاريخ الفاتورة / Invoice Date: {{ $payment->created_at->format('Y-m-d') }}</p>
             </div>
 

@@ -41,6 +41,9 @@ Route::middleware(['auth:web,client'])->group(function () {
     Route::post('/update-user-password', [shared::class, 'updateUserpassword'])->name('update.user.password');
 });
 
+// Payment QR View Route - Publicly accessible
+Route::get('/payment/qr/{id}', [PaymentsController::class, 'qrView'])->name('payment.qr.view');
+
 // Notification Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'getNotifications'])->name('notifications.get');

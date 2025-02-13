@@ -20,6 +20,18 @@ class PaymentsController extends Controller
     }
 
     /**
+     * Display the QR code view of the payment
+     *
+     * @param int $id
+     * @return \Illuminate\View\View
+     */
+    public function qrView($id)
+    {
+        $payment = payments::with('customer')->findOrFail($id);
+        return view('payments.qr_view', compact('payment'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

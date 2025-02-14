@@ -44,6 +44,9 @@ Route::middleware(['auth:web,client'])->group(function () {
 // Payment QR View Route - Publicly accessible
 Route::get('/payment/qr/{id}', [PaymentsController::class, 'qrView'])->name('payment.qr.view');
 
+// Contract PDF Download Route
+Route::get('/contract/{id}/pdf', [ContractsController::class, 'downloadPDF'])->name('contract.pdf.download');
+
 // Notification Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'getNotifications'])->name('notifications.get');

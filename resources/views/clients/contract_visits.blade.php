@@ -126,12 +126,12 @@
                             <td>
                                 <span class="d-flex align-items-center">
                                     <i class="bx bx-map-pin me-1"></i>
-                                    {{ $visit->branch->branch_name ?? __('visits.location.not_specified') }}
+                                    {{ $visit->branch->branch_name ??__('visits.location.not_specified') }}
                                 </span>
                             </td>
                             <td>
                                 <small class="text-muted">
-                                    {{ $visit->branch->branch_address ?? __('visits.address.not_specified') }}
+                                    {{ $visit->branch->branch_address ?? $visit->contract->customer->address }}
                                 </small>
                             </td>
                             <td>

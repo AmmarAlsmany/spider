@@ -46,4 +46,9 @@ class VisitSchedule extends Model
     {
         return $this->hasOne(VisitReport::class, 'visit_id');
     }
+
+    public function changeRequest()
+    {
+        return $this->hasOne(VisitChangeRequest::class, 'visit_id');
+    }
 }

@@ -1184,4 +1184,34 @@ class ContractsController extends Controller
                 ->withInput();
         }
     }
+
+    /**
+     * Download contract as PDF
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function downloadPDF($id)
+    {
+        try {
+            $contract = contracts::with('client')->findOrFail($id);
+            
+            // Generate PDF using Laravel's built-in View to String conversion
+            $pdf_content = view('contracts.contract_pdf', compact('contract'))->render();
+            
+            // Set response headers for PDF download
+            $headers = [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="contract_' . $contract->contract_number . '.pdf"',
+            ];
+            
+            // For now, we'll return the HTML view until we implement the PDF package
+            return response($pdf_content, 200, [
+                'Content-Type' => 'text/html',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error generating contract PDF: ' . $e->getMessage());
+            return back()->with('error', 'Unable to generate PDF at this time.');
+        }
+    }
 }

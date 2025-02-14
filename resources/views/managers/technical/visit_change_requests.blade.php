@@ -58,8 +58,8 @@
                                 <div>Time: {{ $visit->visit_time }}</div>
                             </td>
                             <td>
-                                <div>Date: {{ $visit->requested_date }}</div>
-                                <div>Time: {{ $visit->requested_time }}</div>
+                                <div>Date: {{ $visit->changeRequest->visit_date }}</div>
+                                <div>Time: {{ $visit->changeRequest->visit_time }}</div>
                             </td>
                             <td>
                                 <a href="{{ route('technical.contract.show', $visit->contract_id) }}"
@@ -75,8 +75,8 @@
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="visit_id" value="{{ $visit->id }}">
-                                        <input type="hidden" name="visit_date" value="{{ $visit->requested_date }}">
-                                        <input type="hidden" name="visit_time" value="{{ $visit->requested_time }}">
+                                        <input type="hidden" name="visit_date" value="{{ $visit->changeRequest->visit_date }}">
+                                        <input type="hidden" name="visit_time" value="{{ $visit->changeRequest->visit_time }}">
                                         <input type="hidden" name="status" value="approved">
                                         <button type="submit" class="btn btn-sm btn-success">
                                             <i class="bx bx-check"></i> Approve
@@ -88,8 +88,8 @@
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="visit_id" value="{{ $visit->id }}">
-                                        <input type="hidden" name="visit_date" value="{{ $visit->visit_date }}">
-                                        <input type="hidden" name="visit_time" value="{{ $visit->visit_time }}">
+                                        <input type="hidden" name="visit_date" value="{{ $visit->changeRequest->visit_date }}">
+                                        <input type="hidden" name="visit_time" value="{{ $visit->changeRequest->visit_time }}">
                                         <input type="hidden" name="status" value="rejected">
                                         <button type="submit" class="btn btn-sm btn-danger">
                                             <i class="bx bx-x"></i> Reject

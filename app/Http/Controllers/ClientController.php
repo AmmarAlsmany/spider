@@ -6,14 +6,14 @@ use App\Models\client;
 use App\Http\Controllers\Controller;
 use App\Models\contracts;
 use App\Models\tikets;
-use App\Models\ContractUpdateRequest; // Added this line
+use App\Models\ContractUpdateRequest; 
 use App\Models\payments;
+use App\Models\VisitChangeRequest;
+use App\Models\VisitSchedule;
 use App\Services\VisitScheduleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use App\Models\VisitSchedule;
-use App\Notifications\ContractChangeNotification;
 use App\Traits\NotificationDispatcher;
 
 class ClientController extends Controller
@@ -425,7 +425,7 @@ class ClientController extends Controller
         $request->validate([
             'visit_id' => 'required|exists:visit_schedules,id',
             'visit_date' => 'required|date',
-            'visit_time' => 'required|date_format:H:i:s',
+            'visit_time' => 'required|date_format:H:i',
         ]);
 
         $visit = VisitSchedule::find($request->visit_id);
@@ -437,6 +437,15 @@ class ClientController extends Controller
         $visit->status = 'pending';
         $visit->change_requested_at = now();
         $visit->update();
+
+
+        // save visit change request
+        $visitChangeRequest = new VisitChangeRequest();
+        $visitChangeRequest->visit_id = $visit->id;
+        $visitChangeRequest->client_id = Auth::guard('client')->user()->id;
+        $visitChangeRequest->visit_date = $request->visit_date;
+        $visitChangeRequest->visit_time = $request->visit_time;
+        $visitChangeRequest->save();
 
         // notify technical managers
         $data = [
@@ -460,16 +469,24 @@ class ClientController extends Controller
         ]);
 
         $visit = VisitSchedule::find($request->visit_id);
+        // data from visit change request
+        $visitChangeRequest = VisitChangeRequest::where('visit_id', $request->visit_id)->first();
+        if (!$visitChangeRequest) {
+            return redirect()->back()->with('error', 'Visit change request not found.');
+        }
 
         // Only update the schedule if the request is approved
         if ($request->status === 'approved') {
-            $visit->visit_date = $visit->visit_date;
-            $visit->visit_time = $visit->visit_time;
+            $visit->visit_date = $visitChangeRequest->visit_date;
+            $visit->visit_time = $visitChangeRequest->visit_time;
             $visit->status = 'scheduled'; // Set back to scheduled after approval
         } else if ($request->status === 'rejected') {
             $visit->status = 'scheduled'; // Set back to scheduled if rejected
         }
         $visit->update();
+
+        // delete visit change request
+        $visitChangeRequest->delete();
 
         // Prepare notification message based on status
         $message = $request->status === 'approved'

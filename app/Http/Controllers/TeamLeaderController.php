@@ -10,9 +10,11 @@ use App\Models\VisitReport;
 use App\Models\contracts;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\NotificationDispatcher;
 
 class TeamLeaderController extends Controller
 {
+    use NotificationDispatcher;
     public function dashboard()
     {
         // Get the authenticated team leader's team
@@ -121,6 +123,15 @@ class TeamLeaderController extends Controller
         $visit->status = 'completed';
         $visit->save();
 
+        // Notify sales manager,sales representative about visit completion
+        $data = [
+            'title' => "Visit Completed: " . $visit->contract->contract_number,
+            'message' => 'Your visit has been completed',
+            'url' => '#',
+        ];
+
+        $this->notifyRoles(['sales', 'sales_manager', 'technical'], $data);
+
         // Redirect to create report
         return redirect()->route('team-leader.visit.report.create', $visit->id)
             ->with('success', 'Visit marked as completed. Please fill out the visit report.');
@@ -147,6 +158,15 @@ class TeamLeaderController extends Controller
             return redirect()->route('team-leader.visit.show', $visit->id)
                 ->with('error', 'Report already exists for this visit.');
         }
+
+        // Notify sales manager,sales representative about visit report creation
+        $data = [
+            'title' => "Visit Report Created: " . $visit->contract->contract_number,
+            'message' => 'Your visit has been completed and report is ready to download',
+            'url' => '#',
+        ];
+
+        $this->notifyRoles(['sales', 'sales_manager', 'technical'], $data);
 
         return view('managers.team-leader.create-report', compact('visit'));
     }

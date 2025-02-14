@@ -164,8 +164,8 @@ class ClientController extends Controller
 
         // Notify sales manager,sales representative about contract change request
         $data = [
-            'title' => $contract->contract_number,
-            'message' => $request->request_details,
+            'title' => "Update Request for Contract " . $contract->contract_number,
+            'message' =>$contract->customer->name ."Ask for update on contract". $request->request_details,
             'url' => '#',
         ];
 
@@ -218,7 +218,7 @@ class ClientController extends Controller
 
             // Notify sales manager,sales representative about contract approval
             $data = [
-                'title' => $contract->contract_number,
+                'title' => "Contract Approved: " . $contract->contract_number,
                 'message' => 'Your contract has been approved',
                 'url' => '#',
             ];
@@ -247,7 +247,7 @@ class ClientController extends Controller
 
             // Notify sales manager,sales representative about contract rejection
             $data = [
-                'title' => $contract->contract_number,
+                'title' => "Contract Rejection: " . $contract->contract_number,
                 'message' => 'Your contract has been rejected',
                 'url' => '#',
             ];
@@ -281,7 +281,7 @@ class ClientController extends Controller
 
             // Notify sales manager and sales representative about contract change request
             $data = [
-                'title' => $contract->contract_number,
+                'title' => "Update Request for Contract " . $contract->contract_number,
                 'message' => $updateRequest->request_details,
                 'url' => '#',
             ];
@@ -404,7 +404,7 @@ class ClientController extends Controller
 
         // Notify sales manager , sales representative, finance about payment postponement
         $data = [
-            'title' => $contract->contract_number,
+            'title' => "Payment Postponement Request for Contract " . $contract->contract_number,
             'message' => "Payment of {$payment->payment_amount} SAR requested to be postponed from " .
                 Carbon::parse($payment->due_date)->format('M d, Y') .
                 " to " . Carbon::parse($request->requested_date)->format('M d, Y'),
@@ -449,7 +449,7 @@ class ClientController extends Controller
 
         // notify technical managers
         $data = [
-            'title' => $visit->team->name,
+            'title' => "Visit Change Request for " . $visit->team->name . " - " . $visit->team->client->name,
             'message' => "Visit on " . Carbon::parse($visit->visit_date)->format('M d, Y') . " at " . $visit->visit_time . " the client has requested a change.",
             'url' => "#",
         ];
@@ -495,7 +495,7 @@ class ClientController extends Controller
 
         // Notify the client
         $data = [
-            'title' => "Visit Change Request for " . $visit->contract->customer->name,
+            'title' => "Visit Change Request for" . $visit->contract->customer->name . " - " . $visit->contract->customer->name,
             'message' => $message,
             'url' =>"#",
         ];

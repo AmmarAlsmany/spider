@@ -70,7 +70,7 @@ class TiketsController extends Controller
 
         // Notify technical,sales and sales managers about the new complaint
         $data = [
-            'title' => $ticket->tiket_number,
+            'title' => "New Ticket Created: " . $ticket->tiket_number . "from " . Auth::guard('client')->user()->name,
             'message' => $ticket->tiket_title,
             'url' => '#',
         ];
@@ -98,6 +98,15 @@ class TiketsController extends Controller
             'user_id' => Auth::guard('client')->user()->id
         ]);
 
+        // Notify technical,sales and sales managers about the new reply
+        $data = [
+            'title' => "New Reply: " . $ticket->tiket_number . "from " . Auth::guard('client')->user()->name,
+            'message' => $request->reply,
+            'url' => '#',
+        ];
+
+        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data);
+
         return redirect()->back()->with('success', 'Reply added successfully');
     }
 
@@ -114,6 +123,15 @@ class TiketsController extends Controller
             $ticket->solver_id = Auth::id();
         }
         $ticket->save();
+
+        // Notify technical,sales and sales managers about the status update
+        $data = [
+            'title' => "Ticket Status Updated: " . $ticket->tiket_number . "from " . Auth::guard('client')->user()->name,
+            'message' => 'Status changed to ' . $request->status,
+            'url' => '#',
+        ];
+
+        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data);
 
         return redirect()->back()->with('success', 'Ticket status updated successfully');
     }

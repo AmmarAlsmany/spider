@@ -516,53 +516,7 @@ class ContractsController extends Controller
     {
         $contract = contracts::find($id);
         $contract_type = contracts_types::all();
-        $saudiCities = [
-            'Riyadh',
-            'Jeddah',
-            'Mecca',
-            'Medina',
-            'Dammam',
-            'Taif',
-            'Tabuk',
-            'Buraidah',
-            'Khamis Mushait',
-            'Abha',
-            'Al-Khobar',
-            'Al-Ahsa',
-            'Najran',
-            'Yanbu',
-            'Al-Qatif',
-            'Al-Jubail',
-            "Ha'il",
-            'Al-Hofuf',
-            'Al-Mubarraz',
-            'Kharj',
-            'Qurayyat',
-            'Hafr Al-Batin',
-            'Al-Kharj',
-            'Arar',
-            'Sakaka',
-            'Jizan',
-            'Al-Qunfudhah',
-            'Bisha',
-            'Al-Bahah',
-            'Unaizah',
-            'Rafha',
-            'Dawadmi',
-            'Ar Rass',
-            "Al Majma'ah",
-            'Tarut',
-            'Baljurashi',
-            'Shaqra',
-            'Al-Zilfi',
-            'Ar Rayn',
-            'Wadi ad-Dawasir',
-            'Badr',
-            'Al Ula',
-            'Tharmada',
-            'Turabah',
-            'Tayma'
-        ];
+        $saudiCities = $this->getSaudiCities();
 
         return view('contracts.edit_contract', compact('contract', 'contract_type', 'saudiCities'));
     }
@@ -595,10 +549,10 @@ class ContractsController extends Controller
             }
 
             $notificationData = [
-                'title' => 'Contract Updated',
+                'title' => 'Contract Updated Successfully',
                 'message' => 'Contract ' . $contract->contract_number . ' has been updated.',
                 'type' => 'info',
-                'url' => "#",
+                'url' => $url,
                 'priority' => 'normal',
             ];
 
@@ -625,7 +579,7 @@ class ContractsController extends Controller
 
             // Send notifications before deletion
             $notificationData = [
-                'title' => 'Contract Deleted',
+                'title' => 'Contract Deleted Successfully',
                 'message' => 'Contract ' . $contract->contract_number . ' has been deleted.',
                 'type' => 'info',
                 'url' => "#",
@@ -854,8 +808,8 @@ class ContractsController extends Controller
 
             // Notify the team leader,client,sales manager,technical
             $notificationData = [
-                'title' => 'Annex Created',
-                'message' => "Annex {$annex->annex_number} has been created",
+                'title' => 'New Annex Created',
+                'message' => "Annex {$annex->annex_number} has been created for contract {$contract->contract_number}",
                 'type' => 'info',
                 'url' => "#",
                 'priority' => 'high',
@@ -1005,7 +959,7 @@ class ContractsController extends Controller
             // Notify relevant parties
             $notificationData = [
                 'title' => 'Annex Rejected',
-                'message' => "Annex {$annex->annex_number} has been rejected",
+                'message' => "Annex {$annex->annex_number} has been rejected for contract {$annex->contract->contract_number}",
                 'type' => 'info',
                 'url' => "#",
                 'client' => $annex->contract->customer,
@@ -1019,7 +973,7 @@ class ContractsController extends Controller
             // Notify the team leader,client,sales manager,technical
             $notificationData = [
                 'title' => 'Annex Rejected',
-                'message' => "Annex {$annex->annex_number} has been rejected",
+                'message' => "Annex {$annex->annex_number} has been rejected for contract {$annex->contract->contract_number}",
                 'type' => 'info',
                 'url' => "#",
                 'priority' => 'high',
@@ -1119,7 +1073,7 @@ class ContractsController extends Controller
             // Notify the team leader,client,sales manager,technical
             $notificationData = [
                 'title' => 'Annex Updated',
-                'message' => "Annex {$annex->annex_number} has been updated",
+                'message' => "Annex {$annex->annex_number} has been updated for contract {$contract->contract_number}",
                 'type' => 'info',
                 'url' => "#",
                 'priority' => 'high',
@@ -1166,7 +1120,7 @@ class ContractsController extends Controller
             // Notify the team leader,client,sales manager,technical
             $notificationData = [
                 'title' => 'Annex Deleted',
-                'message' => "Annex {$annex->annex_number} has been deleted",
+                'message' => "Annex {$annex->annex_number} has been deleted for contract {$contract->contract_number}",
                 'type' => 'info',
                 'url' => "#",
                 'priority' => 'high',

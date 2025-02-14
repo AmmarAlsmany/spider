@@ -7,9 +7,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Traits\NotificationDispatcher;
+
 
 class PaymentsController extends Controller
 {
+    use NotificationDispatcher;
 
     /**
      * Display a listing of the resource.
@@ -122,11 +125,21 @@ class PaymentsController extends Controller
                 $invoice->payment_date = now()->format('Y-m-d'); // Update payment date
                 $invoice->save();
             }
+            // notify the client, sales and finance
+            $notificationData = [
+                'title' => 'Payment Marked as Paid',
+                'message' => 'Payment of ' . $payment->payment_amount . ' SAR has been paid',
+                'type' => 'info',
+                'url' => "#",
+                'priority' => 'normal',
+            ];
+            $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $payment->customer_id, $payment->sales_id);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Payment marked as paid successfully'
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

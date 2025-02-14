@@ -153,7 +153,7 @@ class ContractsController extends Controller
                 'priority' => 'normal'
             ];
 
-            $this->notifyRoles(['technical', 'sales_manager'], $notificationData);
+            $this->notifyRoles(['technical', 'sales_manager', 'client'], $notificationData, $contract->customer_id, $contract->sales_id);
 
             return redirect()->route('sales.dashboard')
                 ->with('success', 'New Contract Created Successfully');
@@ -444,7 +444,7 @@ class ContractsController extends Controller
                 'priority' => 'normal'
             ];
 
-            $this->notifyRoles(['technical', 'sales_manager'], $notificationData);
+            $this->notifyRoles(['technical', 'sales_manager'], $notificationData, $contract->customer_id, $contract->sales_id);
 
             return redirect()->route('sales.dashboard')
                 ->with('success', 'Equipment Purchase Contract Created Successfully');
@@ -556,7 +556,7 @@ class ContractsController extends Controller
                 'priority' => 'normal',
             ];
 
-            $this->notifyRoles(['client', 'sales', 'sales_manager', 'technical'], $notificationData);
+            $this->notifyRoles(['client', 'sales', 'sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id);
 
             return redirect('/sales/Show contracts Details/' . $contract->id)
                 ->with('success', 'Contract updated successfully');
@@ -587,7 +587,7 @@ class ContractsController extends Controller
                 'client' => $contract->customer
             ];
 
-            $this->notifyRoles(['sales_manager', 'technical'], $notificationData);
+            $this->notifyRoles(['sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id);
 
             $contract->delete();
             DB::commit();
@@ -635,7 +635,7 @@ class ContractsController extends Controller
             'priority' => 'normal',
         ];
 
-        $this->notifyRoles(['sales', 'financial', 'client'], $notificationData);
+        $this->notifyRoles(['sales', 'financial', 'client'], $notificationData, $payment->customer_id, $payment->sales_id);
 
         return back()->with('status', 'Payment postponement request approved successfully');
     }
@@ -656,7 +656,7 @@ class ContractsController extends Controller
             'priority' => 'normal',
         ];
 
-        $this->notifyRoles(['sales', 'financial', 'client'], $notificationData);
+        $this->notifyRoles(['sales', 'financial', 'client'], $notificationData, $postponement->payment->customer_id, $postponement->payment->sales_id);
 
         return back()->with('status', 'Payment postponement request rejected successfully');
     }
@@ -815,7 +815,7 @@ class ContractsController extends Controller
                 'priority' => 'high',
             ];
 
-            $this->notifyRoles(['team_leader', 'client', 'sales_manager', 'technical'], $notificationData);
+            $this->notifyRoles(['team_leader', 'client', 'sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id);
 
             DB::commit();
 
@@ -921,7 +921,7 @@ class ContractsController extends Controller
                 'priority' => 'normal'
             ];
 
-            $this->notifyRoles(['client', 'sales', 'sales_manager', 'technical'], $notificationData);
+            $this->notifyRoles(['client', 'sales', 'sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id);
 
             DB::commit();
 
@@ -966,7 +966,7 @@ class ContractsController extends Controller
                 'priority' => 'normal'
             ];
 
-            $this->notifyRoles(['client', 'sales', 'sales_manager', 'technical'], $notificationData);
+            $this->notifyRoles(['client', 'sales', 'sales_manager', 'technical'], $notificationData, $annex->contract->customer_id, $annex->contract->sales_id);
 
             DB::commit();
 
@@ -979,7 +979,7 @@ class ContractsController extends Controller
                 'priority' => 'high',
             ];
 
-            $this->notifyRoles(['team_leader', 'client', 'sales_manager', 'technical'], $notificationData);
+            $this->notifyRoles(['team_leader', 'client', 'sales_manager', 'technical'], $notificationData, $annex->contract->customer_id, $annex->contract->sales_id);
 
             return back()->with('success', 'Annex rejected successfully');
         } catch (\Exception $e) {
@@ -1079,7 +1079,7 @@ class ContractsController extends Controller
                 'priority' => 'high',
             ];
 
-            $this->notifyRoles(['team_leader', 'client', 'sales_manager', 'technical'], $notificationData);
+            $this->notifyRoles(['team_leader', 'client', 'sales_manager', 'technical'], $notificationData, $annex->contract->customer_id, $annex->contract->sales_id);
 
             return redirect()->route('contract.show.details', $contract->id)
                 ->with('success', 'Contract annex updated successfully');
@@ -1126,7 +1126,7 @@ class ContractsController extends Controller
                 'priority' => 'high',
             ];
 
-            $this->notifyRoles(['sales_manager', 'technical', 'client', 'team_leader',], $notificationData);
+            $this->notifyRoles(['sales_manager', 'technical', 'client', 'team_leader',], $notificationData, $annex->contract->customer_id, $annex->contract->sales_id);
 
             return redirect()->route('contract.show.details', $contract->id)
                 ->with('success', 'Annex deleted successfully');

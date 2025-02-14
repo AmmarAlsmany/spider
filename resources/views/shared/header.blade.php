@@ -35,23 +35,29 @@
                     <li class="nav-item dropdown dropdown-large">
                         <a class="nav-link dropdown-toggle dropdown-toggle-nocaret position-relative" href="#" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="alert-count" id="notification-count">0</span>
+                            <span class="alert-count animate__animated animate__pulse animate__infinite" id="notification-count">0</span>
                             <i class='bx bx-bell'></i>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-end">
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
                             <a href="javascript:;">
                                 <div class="msg-header">
-                                    <p class="msg-header-title">Notifications</p>
+                                    <p class="msg-header-title">{{ __('messages.notifications') }}</p>
                                     <p class="msg-header-badge" id="unread-count">0 New</p>
                                 </div>
                             </a>
-                            <div class="header-notifications-list" id="notifications-container">
+                            <div class="header-notifications-list custom-scrollbar" id="notifications-container">
                                 <div class="text-center p-3">
-                                    <p class="text-muted">Loading notifications...</p>
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="text-muted mt-2">Loading notifications...</p>
                                 </div>
                             </div>
-                            <a href="javascript:;" onclick="markAllAsRead()" id="mark-all-read" style="display: none;">
-                                <div class="text-center msg-footer">Mark All As Read</div>
+                            <a href="javascript:;" onclick="markAllAsRead()" id="mark-all-read" class="mark-all-read-btn" style="display: none;">
+                                <div class="text-center msg-footer">
+                                    <i class='bx bx-check-double me-1'></i>
+                                    Mark All As Read
+                                </div>
                             </a>
                         </div>
                     </li>
@@ -133,6 +139,8 @@
         </nav>
     </div>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="{{ asset('css/notifications.css') }}">
     <script src="{{ asset('js/notifications.js') }}"></script>
 </header>
 

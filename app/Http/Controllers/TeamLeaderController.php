@@ -130,7 +130,7 @@ class TeamLeaderController extends Controller
             'url' => '#',
         ];
 
-        $this->notifyRoles(['sales', 'sales_manager', 'technical'], $data);
+        $this->notifyRoles(['sales', 'sales_manager', 'technical'], $data, $visit->contract->customer_id, $visit->contract->sales_id);
 
         // Redirect to create report
         return redirect()->route('team-leader.visit.report.create', $visit->id)
@@ -166,7 +166,7 @@ class TeamLeaderController extends Controller
             'url' => '#',
         ];
 
-        $this->notifyRoles(['sales', 'sales_manager', 'technical'], $data);
+        $this->notifyRoles(['sales', 'sales_manager', 'technical'], $data, $visit->contract->customer_id, $visit->contract->sales_id);
 
         return view('managers.team-leader.create-report', compact('visit'));
     }

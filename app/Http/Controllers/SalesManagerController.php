@@ -14,9 +14,12 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Traits\NotificationDispatcher;
+
 
 class SalesManagerController extends Controller
 {
+    use NotificationDispatcher;
     /**
      * Display a listing of the resource.
      */
@@ -617,6 +620,17 @@ class SalesManagerController extends Controller
             ]);
 
             DB::commit();
+
+            // notify the client, sales and finance
+            $notificationData = [
+                'title' => 'Payment Postponement Request Approved',
+                'message' => 'Payment postponement request has been approved.',
+                'type' => 'info',
+                'url' => "#",
+                'priority' => 'normal',
+            ];
+            $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $postponementRequest->payment->customer_id, $postponementRequest->payment->sales_id);
+
             return redirect()->back()->with('success', 'Payment postponement request has been approved.');
         } catch (\Exception $e) {
             DB::rollback();
@@ -635,6 +649,16 @@ class SalesManagerController extends Controller
                 'rejected_by' => Auth::user()->id,
                 'rejected_at' => now()
             ]);
+
+            // notify the client, sales and finance
+            $notificationData = [
+                'title' => 'Payment Postponement Request Rejected',
+                'message' => 'Payment postponement request has been rejected.',
+                'type' => 'info',
+                'url' => "#",
+                'priority' => 'normal',
+            ];
+            $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $postponementRequest->payment->customer_id, $postponementRequest->payment->sales_id);
 
             return redirect()->back()->with('success', 'Payment postponement request has been rejected.');
         } catch (\Exception $e) {

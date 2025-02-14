@@ -411,7 +411,7 @@ class ClientController extends Controller
             'url' => '#',
         ];
 
-        $this->notifyRoles(['sales', 'sales_manager', 'financial'], $data);
+        $this->notifyRoles(['sales', 'sales_manager', 'finance'], $data);
 
         return redirect()->back()->with('success', 'Payment postponement request has been submitted successfully.');
     }
@@ -493,14 +493,17 @@ class ClientController extends Controller
             ? 'Your visit change request has been approved. The visit has been rescheduled.'
             : 'Your visit change request has been rejected. The original schedule remains unchanged.';
 
-        // Notify the client
+        // Get the sales agent ID from the contract
+        $salesId = $visit->contract->sales_id;
+
+        // Notify the client and relevant team members
         $data = [
-            'title' => "Visit Change Request for" . $visit->contract->customer->name . " - " . $visit->contract->customer->name,
+            'title' => "Visit Change Request for " . $visit->contract->customer->name,
             'message' => $message,
             'url' =>"#",
         ];
 
-        $this->notifyRoles(['client','team_leader'], $data);
+        $this->notifyRoles(['client', 'team_leader', 'sales'], $data, $visit->contract->customer_id, $salesId);
 
         $statusMessage = $request->status === 'approved'
             ? 'Visit rescheduled and client notified successfully.'

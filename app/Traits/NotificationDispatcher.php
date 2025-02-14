@@ -21,7 +21,7 @@ trait NotificationDispatcher
         return Auth::user()->role;
     }
 
-    protected function notifyByRole(string $role, array $data)
+    protected function notifyByRole(string $role, array $data, $specificUserId = null)
     {
         // Ensure data has required fields
         $data = array_merge([
@@ -39,7 +39,7 @@ trait NotificationDispatcher
             'technical' => TechnicalNotification::class,
             'team_leader' => TeamLeaderNotification::class,
             'admin' => AdminNotification::class,
-            'financial' => FinancialNotification::class,
+            'finance' => FinancialNotification::class,
             default => null
         };
 
@@ -47,16 +47,31 @@ trait NotificationDispatcher
             return;
         }
 
-        User::where('role', $role)->each(function ($user) use ($data, $notificationClass) {
+        $query = User::where('role', $role);
+        if ($specificUserId) {
+            if ($role === 'client') {
+                $query->where('id', $specificUserId);
+            } elseif ($role === 'sales') {
+                $query->where('id', $specificUserId);
+            }
+        }
+
+        $query->each(function ($user) use ($data, $notificationClass) {
             $user->notify(new $notificationClass($data));
         });
     }
 
     // Helper method to notify multiple roles at once
-    protected function notifyRoles(array $roles, array $data)
+    protected function notifyRoles(array $roles, array $data, $specificClientId = null, $specificSalesId = null)
     {
         foreach ($roles as $role) {
-            $this->notifyByRole($role, $data);
+            $specificUserId = null;
+            if ($role === 'client' && $specificClientId) {
+                $specificUserId = $specificClientId;
+            } elseif ($role === 'sales' && $specificSalesId) {
+                $specificUserId = $specificSalesId;
+            }
+            $this->notifyByRole($role, $data, $specificUserId);
         }
     }
 

@@ -75,7 +75,7 @@ class TiketsController extends Controller
             'url' => '#',
         ];
 
-        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data);
+        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data, $ticket->customer_id, $ticket->created_by);
 
         return redirect()->route('client.tikets')->with('success', 'Ticket created successfully');
     }
@@ -105,7 +105,7 @@ class TiketsController extends Controller
             'url' => '#',
         ];
 
-        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data);
+        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data, $ticket->customer_id, $ticket->created_by);
 
         return redirect()->back()->with('success', 'Reply added successfully');
     }
@@ -131,7 +131,7 @@ class TiketsController extends Controller
             'url' => '#',
         ];
 
-        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data);
+        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data, $ticket->customer_id, $ticket->created_by);
 
         return redirect()->back()->with('success', 'Ticket status updated successfully');
     }

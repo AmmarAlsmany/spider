@@ -10,6 +10,11 @@
                         <div>
                             <h6 class="mb-0">Client Information</h6>
                         </div>
+                        <div class="ms-auto">
+                            <a href="{{ route('sales.clients.edit', $client->id) }}" class="btn btn-sm btn-primary">
+                                <i class='bx bx-edit-alt'></i> Edit Information
+                            </a>
+                        </div>
                     </div>
                     <div class="mt-3 client-info">
                         <div class="mb-3">
@@ -69,7 +74,7 @@
                         </div>
                         <div class="col">
                             <div class="p-3">
-                                <h5 class="mb-0">{{ $client->contracts->where('status', 'active')->count() }}</h5>
+                                <h5 class="mb-0">{{ $client->contracts->where('contract_status', 'approved')->count() }}</h5>
                                 <small class="mb-0">Active Contracts</small>
                             </div>
                         </div>

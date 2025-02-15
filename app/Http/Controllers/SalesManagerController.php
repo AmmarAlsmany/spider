@@ -709,6 +709,43 @@ class SalesManagerController extends Controller
         return view('managers.sales Manager.client_details', compact('client'));
     }
 
+    public function editClient($id)
+    {
+        $client = client::findOrFail($id);
+        return view('managers.sales Manager.edit_client', compact('client'));
+    }
+
+    public function updateClient(Request $request, $id)
+    {
+        $client = client::findOrFail($id);
+        
+        // Validate request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:clients,email,' . $id,
+            'phone' => 'required|string|max:20',
+            'status' => 'required|in:active,inactive',
+            'password' => $request->has('change_password') ? 'required|min:6|confirmed' : 'nullable',
+        ]);
+
+        // Update client information
+        $client->name = $request->name;
+        $client->email = $request->email;
+        $client->phone = $request->phone;
+        $client->status = $request->status;
+
+        // Update password if requested
+        if ($request->has('change_password') && $request->filled('password')) {
+            $client->password = bcrypt($request->password);
+        }
+
+        $client->save();
+
+        return redirect()
+            ->route('sales_manager.client.details', $client->id)
+            ->with('success', 'Client information updated successfully');
+    }
+
     public function dashboard()
     {
         return redirect()->route('sales-manager.index');

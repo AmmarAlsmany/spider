@@ -31,78 +31,101 @@ class LoginController extends Controller
             'password' => 'required'
         ]);
 
-        // Check if user exists and is active
-        $user = \App\Models\User::where('email', $request->email)->first();
-        if ($user && $user->status !== 'active') {
-            RateLimiter::hit($throttleKey);
-            return back()->withErrors([
-                'email' => 'Your account is not active. Please contact the administrator.',
-            ]);
-        }
+        try {
+            // First, try to find the user regardless of type
+            $user = \App\Models\User::where('email', $request->email)->first();
+            $client = \App\Models\Client::where('email', $request->email)->first();
 
-        // If user is a client, check client status
-        if ($user && $user->role === 'client') {
-            $client = \App\Models\Client::where('user_id', $user->id)->first();
-            if (!$client || $client->status !== 'active') {
-                RateLimiter::hit($throttleKey);
-                return back()->withErrors([
-                    'email' => 'Your client account is not active. Please contact your sales representative.',
-                ]);
+            // Handle user authentication
+            if ($user) {
+                if ($user->status !== 'active') {
+                    throw new \Exception('Your account is not active. Please contact the administrator.');
+                }
+
+                if ($user->role === 'client') {
+                    $clientProfile = \App\Models\Client::where('user_id', $user->id)->first();
+                    if (!$clientProfile || $clientProfile->status !== 'active') {
+                        throw new \Exception('Your client account is not active. Please contact your sales representative.');
+                    }
+                }
+
+                if (Auth::guard('web')->attempt($credentials)) {
+                    return $this->handleSuccessfulLogin($request, $user, 'web');
+                }
             }
+            // Handle client authentication
+            elseif ($client) {
+                if ($client->status !== 'active') {
+                    throw new \Exception('Your client account is not active. Please contact your sales representative.');
+                }
+
+                if (Auth::guard('client')->attempt($credentials)) {
+                    return $this->handleSuccessfulLogin($request, $client, 'client');
+                }
+            }
+
+            throw new \Exception('The provided credentials do not match our records.');
+        } catch (\Exception $e) {
+            RateLimiter::hit($throttleKey);
+            return back()->withErrors(['email' => $e->getMessage()])->withInput($request->only('email'));
+        }
+    }
+
+    private function handleSuccessfulLogin(Request $request, $user, string $guard)
+    {
+        RateLimiter::clear($throttleKey = strtolower($user->email) . '|' . $request->ip());
+        $request->session()->regenerate();
+
+        // Update last login information
+        $user->last_login_at = Carbon::now();
+        $user->last_login_ip = $request->ip();
+        $user->save();
+
+        // Get the appropriate dashboard URL based on user type
+        $dashboardUrl = $this->getDashboardUrl($user, $guard);
+
+        return redirect()->intended($dashboardUrl);
+    }
+
+    private function getDashboardUrl($user, string $guard): string
+    {
+        if ($guard === 'client') {
+            return route('client.dashboard', absolute: false);
         }
 
-        // Try to authenticate as user
-        if (Auth::guard('web')->attempt($credentials)) {
-            RateLimiter::clear($throttleKey);
-            $request->session()->regenerate();
-
-            // Update last login timestamp
-            $user = Auth::user();
-            $user->last_login_at = Carbon::now();
-            $user->last_login_ip = $request->ip();
-            $user->save();
-
-            $url = match ($user->role) {
-                'admin' => route('admin.dashboard', absolute: false),
-                'finance' => route('finance.dashboard', absolute: false),
-                'sales_manager' => route('sales_manager.dashboard', absolute: false),
-                'technical' => route('technical.dashboard', absolute: false),
-                'team_leader' => route('team-leader.dashboard', absolute: false),
-                'sales' => route('sales.dashboard', absolute: false),
-                default => route('/', absolute: false),
-            };
-            return redirect()->intended($url);
-        }
-        // If user authentication fails, try client authentication
-        elseif (Auth::guard('client')->attempt($credentials)) {
-            RateLimiter::clear($throttleKey);
-            $request->session()->regenerate();
-
-            $client = Auth::guard('client')->user();
-            $client->last_login_at = Carbon::now();
-            $client->last_login_ip = $request->ip();
-            $client->save();
-
-            return redirect()->intended('client/dashboard');
-        }
-
-        RateLimiter::hit($throttleKey);
-
-        // If both fail, return with error
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->withInput($request->only('email'));
+        return match ($user->role) {
+            'admin' => route('admin.dashboard', absolute: false),
+            'finance' => route('finance.dashboard', absolute: false),
+            'sales_manager' => route('sales_manager.dashboard', absolute: false),
+            'technical' => route('technical.dashboard', absolute: false),
+            'team_leader' => route('team-leader.dashboard', absolute: false),
+            'sales' => route('sales.dashboard', absolute: false),
+            default => route('home', absolute: false),
+        };
     }
 
     public function logout(Request $request)
     {
-
         Auth::guard('web')->logout();
         Auth::guard('client')->logout();
 
+        // Invalidate the session
         $request->session()->invalidate();
+
+        // Regenerate the CSRF token
         $request->session()->regenerateToken();
 
-        return redirect('/login')->with('status', 'You have been successfully logged out.');
+        // Clear and invalidate cookies
+        $cookie = cookie()->forget('laravel_session');
+        
+        $response = redirect()->route('login')
+            ->withCookie($cookie);
+
+        // Add cache control headers to prevent back/forward navigation
+        return $response
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Cache-Control', 'post-check=0, pre-check=0', false)
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', 'Sun, 02 Jan 1990 00:00:00 GMT');
     }
 }

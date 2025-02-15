@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AlertController;
+use App\Http\Middleware\PreventBackHistory;
 use App\Http\Middleware\Role;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\Throttle;
@@ -17,7 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->alias(['role' => Role::class, 'throttle' => Throttle::class]);
+        $middleware->alias(['role' => Role::class, 'throttle' => Throttle::class, 'prevent-back-history' => PreventBackHistory::class]);
         $middleware->web(SetLocale::class);
     })
     ->withSchedule(function (Schedule $schedule) {

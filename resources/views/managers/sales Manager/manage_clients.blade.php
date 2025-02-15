@@ -89,10 +89,16 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="{{ route('sales_manager.client.details', $client->id) }}" 
-                                   class="btn btn-sm btn-primary">
-                                    <i class="bx bx-show"></i> View Details
-                                </a>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ route('sales_manager.client.details', $client->id) }}" 
+                                       class="btn btn-sm btn-primary">
+                                        <i class="bx bx-show"></i> View
+                                    </a>
+                                    <a href="{{ route('sales.clients.edit', $client->id) }}" 
+                                       class="btn btn-sm btn-warning">
+                                        <i class="bx bx-edit-alt"></i> Edit
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                         @empty

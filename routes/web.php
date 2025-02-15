@@ -32,9 +32,9 @@ Route::controller(LoginController::class)->group(function () {
     Route::get('/login', 'showLoginForm')->name('login');
     Route::post('/login', 'login')->name('login.submit');
     Route::post('/logout', 'logout')->name('logout');
-})->middleware('throttle:5,1', 'auth:web,client');
+})->middleware('throttle:5,1', 'auth:web,client', 'prevent-back-history');
 
-Route::middleware(['auth:web,client'])->group(function () {
+Route::middleware(['auth:web,client', 'prevent-back-history'])->group(function () {
     Route::get('/change-user-profile', [shared::class, 'changeUserProfile'])->name('change.user.profile');
     Route::post('/update-user-profile', [shared::class, 'updateUserProfile'])->name('update.user.profile');
     Route::get('/change-user-password', [shared::class, 'changeUserpassword'])->name('change.user.password');
@@ -42,7 +42,7 @@ Route::middleware(['auth:web,client'])->group(function () {
 });
 
 // Notification Routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'getNotifications'])->name('notifications.get');
     Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
@@ -56,7 +56,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Admin Routes
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin', 'prevent-back-history'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::resource('managers', ManagerController::class)->names([
         'index' => 'admin.managers.index',
@@ -68,7 +68,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 });
 
 // Sales Routes
-Route::middleware(['auth', 'role:sales'])->group(function () {
+Route::middleware(['auth', 'role:sales', 'prevent-back-history'])->group(function () {
     Route::get('/sales/dashboard', [sales::class, 'index'])->name('sales.dashboard');
     Route::get('/sales/generate-report', [sales::class, 'generateReport'])->name('sales.generate-report');
     Route::get('/sales/Create-New-Contract', [sales::class, 'contractTypeCards'])->name('sales.contract.type.cards');
@@ -117,7 +117,7 @@ Route::middleware(['auth', 'role:sales'])->group(function () {
 });
 
 // Sales Manager Routes
-Route::middleware(['auth', 'role:sales_manager'])->group(function () {
+Route::middleware(['auth', 'role:sales_manager', 'prevent-back-history'])->group(function () {
     Route::get('/sales-manager/dashboard', [SalesManagerController::class, 'index'])->name('sales_manager.dashboard');
     Route::get('/sales-manager/agents', [SalesManagerController::class, 'manageAgents'])->name('sales_manager.manage_agents');
     Route::post('/sales-manager/agents', [SalesManagerController::class, 'storeAgent'])->name('sales_manager.store_agent');
@@ -161,6 +161,9 @@ Route::middleware(['auth', 'role:sales_manager'])->group(function () {
         ->name('sales_manager.manage_clients');
     Route::get('/sales-manager/client/{id}', [SalesManagerController::class, 'clientDetails'])
         ->name('sales_manager.client.details');
+    Route::get('/sales-manager/clients/{id}/edit', [SalesManagerController::class, 'editClient'])->name('sales.clients.edit');
+    Route::put('/sales-manager/clients/{id}', [SalesManagerController::class, 'updateClient'])->name('sales.clients.update');
+
     // Contract Annex Routes
 
     Route::post('/contracts/annex/{annex}/approve', [ContractsController::class, 'approveAnnex'])->name('contracts.annex.approve');
@@ -170,7 +173,7 @@ Route::middleware(['auth', 'role:sales_manager'])->group(function () {
 });
 
 // Finance Routes
-Route::middleware(['auth', 'role:finance'])->group(function () {
+Route::middleware(['auth', 'role:finance', 'prevent-back-history'])->group(function () {
     Route::get('/finance/dashboard', [FinanceController::class, 'dashboard'])->name('finance.dashboard');
     Route::get('/finance/payments', [FinanceController::class, 'payments'])->name('finance.payments');
     Route::get('/finance/payments/pending', [FinanceController::class, 'pendingPayments'])->name('finance.payments.pending');
@@ -182,7 +185,7 @@ Route::middleware(['auth', 'role:finance'])->group(function () {
 });
 
 // Technical Routes
-Route::middleware(['auth', 'role:technical'])->group(function () {
+Route::middleware(['auth', 'role:technical', 'prevent-back-history'])->group(function () {
     Route::get('/technical/dashboard', [TechnicalController::class, 'dashboard'])->name('technical.dashboard');
     // Team management Routes
     Route::get('/teams', [TechnicalController::class, 'index'])->name('teams.index');
@@ -243,7 +246,7 @@ Route::middleware(['auth', 'role:technical'])->group(function () {
 });
 
 // Team Leader Routes
-Route::middleware(['auth', 'role:team_leader'])->group(function () {
+Route::middleware(['auth', 'role:team_leader', 'prevent-back-history'])->group(function () {
     // Dashboard
     Route::get('/team-leader/dashboard', [TeamLeaderController::class, 'dashboard'])
         ->name('team-leader.dashboard');
@@ -268,7 +271,7 @@ Route::middleware(['auth', 'role:team_leader'])->group(function () {
 });
 
 // Client Routes
-Route::middleware(['role:client'])->group(function () {
+Route::middleware(['role:client', 'prevent-back-history'])->group(function () {
     // Dashboard & Contract Routes
     Route::get('/client/dashboard', [ClientController::class, 'index'])->name('client.dashboard');
     Route::get('/client/Show Contracts', [ClientController::class, 'show'])->name('client.show');
@@ -301,7 +304,7 @@ Route::middleware(['role:client'])->group(function () {
 });
 
 // Alert Routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');
     Route::get('/alerts/{id}/mark-as-read', [AlertController::class, 'markAsRead'])->name('alerts.mark-as-read');
     Route::post('/alerts/mark-all-as-read', [AlertController::class, 'markAllAsRead'])->name('alerts.mark-all-as-read');

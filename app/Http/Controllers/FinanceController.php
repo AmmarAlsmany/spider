@@ -63,24 +63,95 @@ class FinanceController extends Controller
 
     public function generateFinancialReport(Request $request)
     {
-        $startDate = $request->input('start_date', Carbon::now()->startOfMonth());
-        $endDate = $request->input('end_date', Carbon::now());
+        $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : Carbon::now()->startOfMonth();
+        $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date')) : Carbon::now();
+        $contractNumber = $request->input('contract_number');
+
+        // Base query for payments with contract filter
+        $paymentsQuery = payments::query()
+            ->when($contractNumber, function($query) use ($contractNumber) {
+                $query->whereHas('contract', function($q) use ($contractNumber) {
+                    $q->where('contract_number', 'like', '%' . $contractNumber . '%');
+                });
+            });
 
         $report = [
-            'total_revenue' => payments::whereBetween('due_date', [$startDate, $endDate])
-                ->sum('payment_amount'),
-            'pending_payments' => payments::where('payment_status', 'overdue')
-                ->orWhere('payment_status', 'unpaid')
-                ->orWhere('payment_status', "pending")
-                ->sum('payment_amount'),
-            'monthly_revenue' => payments::whereMonth('due_date', Carbon::now()->month)
-                ->sum('payment_amount'),
-            'payment_history' => payments::with(['contract', 'customer'])
+            'total_revenue' => (clone $paymentsQuery)
                 ->whereBetween('due_date', [$startDate, $endDate])
-                ->paginate(10)
+                ->where('payment_status', 'paid')
+                ->sum('payment_amount'),
+            'pending_payments' => (clone $paymentsQuery)
+                ->whereIn('payment_status', ['pending', 'unpaid'])
+                ->whereBetween('due_date', [$startDate, $endDate])
+                ->sum('payment_amount'),
+            'overdue_amount' => (clone $paymentsQuery)
+                ->where('payment_status', 'overdue')
+                ->whereBetween('due_date', [$startDate, $endDate])
+                ->sum('payment_amount'),
+            'monthly_revenue' => (clone $paymentsQuery)
+                ->whereMonth('due_date', Carbon::now()->month)
+                ->where('payment_status', 'paid')
+                ->sum('payment_amount'),
+            'payment_history' => $paymentsQuery
+                ->with(['contract', 'customer'])
+                ->whereBetween('due_date', [$startDate, $endDate])
+                ->orderBy('due_date', 'desc')
+                ->paginate(15)
         ];
 
         return view('managers.finance.reports.financial', compact('report'));
+    }
+
+    private function calculateCollectionRate($startDate, $endDate)
+    {
+        $totalDue = payments::whereBetween('due_date', [$startDate, $endDate])->sum('payment_amount');
+        $totalCollected = payments::whereBetween('due_date', [$startDate, $endDate])
+            ->where('payment_status', 'paid')
+            ->sum('payment_amount');
+
+        return $totalDue > 0 ? ($totalCollected / $totalDue) * 100 : 0;
+    }
+
+    private function getMonthlyBreakdown($startDate, $endDate)
+    {
+        $months = [];
+        $currentDate = Carbon::parse($startDate);
+        
+        while ($currentDate <= $endDate) {
+            $monthStart = $currentDate->copy()->startOfMonth();
+            $monthEnd = $currentDate->copy()->endOfMonth();
+            
+            $months[] = [
+                'month' => $currentDate->format('M Y'),
+                'revenue' => payments::whereBetween('due_date', [$monthStart, $monthEnd])
+                    ->where('payment_status', 'paid')
+                    ->sum('payment_amount'),
+                'pending' => payments::whereBetween('due_date', [$monthStart, $monthEnd])
+                    ->whereIn('payment_status', ['pending', 'unpaid'])
+                    ->sum('payment_amount'),
+                'overdue' => payments::whereBetween('due_date', [$monthStart, $monthEnd])
+                    ->where('payment_status', 'overdue')
+                    ->sum('payment_amount')
+            ];
+            
+            $currentDate->addMonth();
+        }
+        
+        return $months;
+    }
+
+    private function getPaymentStatusDistribution($startDate, $endDate)
+    {
+        $statuses = ['paid', 'pending', 'unpaid', 'overdue'];
+        $distribution = [];
+        
+        foreach ($statuses as $status) {
+            $distribution[$status] = payments::whereBetween('due_date', [$startDate, $endDate])
+                ->where('payment_status', $status)
+                ->count();
+        }
+        
+        return $distribution;
     }
 
     public function pendingPayments()

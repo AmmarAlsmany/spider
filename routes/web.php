@@ -41,17 +41,18 @@ Route::middleware(['auth:web,client'])->group(function () {
     Route::post('/update-user-password', [shared::class, 'updateUserpassword'])->name('update.user.password');
 });
 
-// Payment QR View Route - Publicly accessible
-Route::get('/payment/qr/{id}', [PaymentsController::class, 'qrView'])->name('payment.qr.view');
-
-// Contract PDF Download Route
-Route::get('/contract/{id}/pdf', [ContractsController::class, 'downloadPDF'])->name('contract.pdf.download');
-
 // Notification Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'getNotifications'])->name('notifications.get');
     Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    // Payment QR View Route - Publicly accessible
+    Route::get('/payment/qr/{id}', [PaymentsController::class, 'qrView'])->name('payment.qr.view');
+    // Payment Details Route
+    Route::get('/Payment/view Payment Details/{id}', [PaymentsController::class, 'show'])->name('payment.show');
+
+    // Contract PDF Download Route
+    Route::get('/contract/{id}/pdf', [ContractsController::class, 'downloadPDF'])->name('contract.pdf.download');
 });
 
 // Admin Routes
@@ -96,7 +97,6 @@ Route::middleware(['auth', 'role:sales'])->group(function () {
     // Postponement Request Routes
     Route::get('/postponement-requests', [ContractsController::class, 'postponement_requests'])
         ->name('postponement.requests');
-    Route::get('/Payment/view Payment Details/{id}', [PaymentsController::class, 'show'])->name('payment.show');
     Route::patch('/Payments/{id}/mark-as-paid', [PaymentsController::class, 'markAsPaid'])->name('payments.markAsPaid');
     Route::get('/Payments/{id}/details', [PaymentsController::class, 'getDetails'])->name('payments.details');
 

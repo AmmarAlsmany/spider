@@ -16,6 +16,7 @@
                         <tr>
                             <th>Invoice #</th>
                             <th>Client</th>
+                            <th>Sales Agent</th>
                             <th>Contract</th>
                             <th>Amount</th>
                             <th>Status</th>
@@ -28,6 +29,7 @@
                         <tr>
                             <td>{{ $invoice->invoice_number }}</td>
                             <td>{{ $invoice->customer->name }}</td>
+                            <td>{{ $invoice->contract->salesRepresentative->name }}</td>
                             <td>{{ $invoice->contract->contract_number }}</td>
                             <td>{{ number_format($invoice->payment_amount, 2) }} SAR</td>
                             <td>
@@ -37,7 +39,7 @@
                             </td>
                             <td>{{ $invoice->due_date }}</td>
                             <td>
-                                <a href="{{ route('finance.invoices.show', $invoice->id) }}" class="btn btn-primary btn-sm">View</a>
+                                <a href="{{ route('payment.show', $invoice->id) }}" class="btn btn-primary btn-sm">View</a>
                             </td>
                         </tr>
                         @endforeach

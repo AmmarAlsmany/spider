@@ -19,6 +19,7 @@
                         <tr>
                             <th>Invoice #</th>
                             <th>Client</th>
+                            <th>Sales Agent</th>
                             <th>Contract</th>
                             <th>Amount</th>
                             <th>Due Date</th>
@@ -32,6 +33,7 @@
                         <tr>
                             <td>{{ $payment->invoice_number }}</td>
                             <td>{{ $payment->customer->name }}</td>
+                            <td>{{ $payment->contract->salesRepresentative->name }}</td>
                             <td>{{ $payment->contract->contract_number }}</td>
                             <td>{{ number_format($payment->payment_amount, 2) }} ASR</td>
                             <td>
@@ -46,7 +48,7 @@
                             </td>
                             <td>
                                 <div class="gap-2 d-flex">
-                                    <a href="{{ route('finance.invoices.show', $payment->id) }}" class="btn btn-primary btn-sm">View Invoice</a>
+                                    <a href="{{ route('payment.show', $payment->id) }}" class="btn btn-primary btn-sm">View Invoice</a>
                                     {{-- <form action="{{ route('finance.payments.update-status', $payment->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('PATCH')

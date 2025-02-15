@@ -6,10 +6,15 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="p-0 mb-0 breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('client.dashboard') }}"><i class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('client.show') }}">{{ __('payment_details.breadcrumb.contracts') }}</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('client.contract.details', $contract->id) }}">{{ __('payment_details.breadcrumb.contract_number', ['number' => $contract->contract_number]) }}</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ __('payment_details.breadcrumb.payments') }}</li>
+                    <li class="breadcrumb-item"><a href="{{ route('client.dashboard') }}"><i
+                                class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('client.show') }}">{{
+                            __('payment_details.breadcrumb.contracts') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('client.contract.details', $contract->id) }}">{{
+                            __('payment_details.breadcrumb.contract_number', ['number' => $contract->contract_number])
+                            }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('payment_details.breadcrumb.payments')
+                        }}</li>
                 </ol>
             </nav>
         </div>
@@ -23,27 +28,40 @@
                     <div class="d-flex align-items-center">
                         <div>
                             <p class="mb-0 text-secondary">{{ __('payment_details.summary.total_value') }}</p>
-                            <h4 class="my-1">{{ number_format($contract->contract_price, 2) }} {{ __('payment_details.summary.currency') }}</h4>
-                            <p class="mb-0 font-13">{{ __('payment_details.summary.contract_number', ['number' => $contract->contract_number]) }}</p>
+                            <h4 class="my-1">{{ number_format($contract->contract_price, 2) }} {{
+                                __('payment_details.summary.currency') }}</h4>
+                            <p class="mb-0 font-13">{{ __('payment_details.summary.contract_number', ['number' =>
+                                $contract->contract_number]) }}</p>
                         </div>
                         <div class="ms-auto">
                             <div class="row g-3">
                                 <div class="col-auto">
                                     <div class="text-end">
                                         <p class="mb-0 text-success">{{ __('payment_details.summary.paid_amount') }}</p>
-                                        <h5 class="my-1 text-success">{{ number_format($contract->payments->where('payment_status', 'paid')->sum('payment_amount'), 2) }} {{ __('payment_details.summary.currency') }}</h5>
+                                        <h5 class="my-1 text-success">{{
+                                            number_format($contract->payments->where('payment_status',
+                                            'paid')->sum('payment_amount'), 2) }} {{
+                                            __('payment_details.summary.currency') }}</h5>
                                     </div>
                                 </div>
                                 <div class="col-auto">
                                     <div class="text-end">
-                                        <p class="mb-0 text-warning">{{ __('payment_details.summary.pending_amount') }}</p>
-                                        <h5 class="my-1 text-warning">{{ number_format($contract->payments->where('payment_status', 'unpaid')->sum('payment_amount'), 2) }} {{ __('payment_details.summary.currency') }}</h5>
+                                        <p class="mb-0 text-warning">{{ __('payment_details.summary.pending_amount') }}
+                                        </p>
+                                        <h5 class="my-1 text-warning">{{
+                                            number_format($contract->payments->where('payment_status',
+                                            'unpaid')->sum('payment_amount'), 2) }} {{
+                                            __('payment_details.summary.currency') }}</h5>
                                     </div>
                                 </div>
                                 <div class="col-auto">
                                     <div class="text-end">
-                                        <p class="mb-0 text-danger">{{ __('payment_details.summary.overdue_amount') }}</p>
-                                        <h5 class="my-1 text-danger">{{ number_format($contract->payments->where('payment_status', 'unpaid')->where('due_date', '<', now())->sum('payment_amount'), 2) }} {{ __('payment_details.summary.currency') }}</h5>
+                                        <p class="mb-0 text-danger">{{ __('payment_details.summary.overdue_amount') }}
+                                        </p>
+                                        <h5 class="my-1 text-danger">{{
+                                            number_format($contract->payments->where('payment_status',
+                                            'unpaid')->where('due_date', '<', now())->sum('payment_amount'), 2) }} {{
+                                                __('payment_details.summary.currency') }}</h5>
                                     </div>
                                 </div>
                             </div>
@@ -61,21 +79,21 @@
                 <div class="card-body">
                     <h5 class="mb-3">{{ __('payment_details.payment_progress.title') }}</h5>
                     @php
-                        $totalAmount = $contract->payments->sum('payment_amount');
-                        $paidAmount = $contract->payments->where('payment_status', 'paid')->sum('payment_amount');
-                        $progressPercentage = $totalAmount > 0 ? ($paidAmount / $totalAmount) * 100 : 0;
+                    $totalAmount = $contract->payments->sum('payment_amount');
+                    $paidAmount = $contract->payments->where('payment_status', 'paid')->sum('payment_amount');
+                    $progressPercentage = $totalAmount > 0 ? ($paidAmount / $totalAmount) * 100 : 0;
                     @endphp
                     <div class="progress" style="height: 24px;">
-                        <div class="progress-bar bg-success" role="progressbar" 
-                             style="width: {{ $progressPercentage }}%;" 
-                             aria-valuenow="{{ $progressPercentage }}" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100">
+                        <div class="progress-bar bg-success" role="progressbar"
+                            style="width: {{ $progressPercentage }}%;" aria-valuenow="{{ $progressPercentage }}"
+                            aria-valuemin="0" aria-valuemax="100">
                             {{ number_format($progressPercentage, 1) }}%
                         </div>
                     </div>
                     <div class="mt-2 text-muted">
-                        {{ number_format($paidAmount, 2) }} {{ __('payment_details.summary.currency') }} {{ __('payment_details.payment_progress.paid_out_of') }} {{ number_format($totalAmount, 2) }} {{ __('payment_details.summary.currency') }}
+                        {{ number_format($paidAmount, 2) }} {{ __('payment_details.summary.currency') }} {{
+                        __('payment_details.payment_progress.paid_out_of') }} {{ number_format($totalAmount, 2) }} {{
+                        __('payment_details.summary.currency') }}
                     </div>
                 </div>
             </div>
@@ -104,52 +122,63 @@
                                 @forelse($contract->payments->sortBy('due_date') as $payment)
                                 <tr>
                                     <td>{{ \Carbon\Carbon::parse($payment->due_date)->format('M d, Y') }}</td>
-                                    <td>{{ number_format($payment->payment_amount, 2) }} {{ __('payment_details.summary.currency') }}</td>
+                                    <td>{{ number_format($payment->payment_amount, 2) }} {{
+                                        __('payment_details.summary.currency') }}</td>
                                     <td>
                                         <span class="badge bg-{{ 
                                             $payment->payment_status == 'paid' ? 'success' : 
                                             ($payment->payment_status == 'pending' ? 'warning' : 
                                             ($payment->payment_status == 'overdue' ? 'danger' : 'secondary')) 
                                         }}">
-                                            {{ __('payment_details.payment_schedule.status.' . $payment->payment_status) }}
+                                            {{ __('payment_details.payment_schedule.status.' . $payment->payment_status)
+                                            }}
                                         </span>
                                     </td>
                                     <td>
                                         @if($payment->payment_status != 'paid')
-                                            @php
-                                                $hasPendingRequest = $payment->postponementRequests()->where('status', 'pending')->exists();
-                                                $lastRequest = $payment->postponementRequests()->latest()->first();
-                                            @endphp
-                                            <div class="gap-2 d-flex align-items-center">
-                                                @if($lastRequest)
-                                                    <div class="small text-muted">
-                                                        <i class="bx bx-info-circle"></i>
-                                                        {{ __('payment_details.payment_schedule.last_request') }}: {{ $lastRequest->status }}
-                                                        @if($lastRequest->status === 'approved')
-                                                            {{ __('payment_details.payment_schedule.approved_on') }} {{ \Carbon\Carbon::parse($lastRequest->approved_at)->format('M d, Y') }}
-                                                        @elseif($lastRequest->status === 'rejected')
-                                                            ({{ $lastRequest->reason }})
-                                                        @endif
-                                                    </div>
+                                        @php
+                                        $hasPendingRequest = $payment->postponementRequests()->where('status',
+                                        'pending')->exists();
+                                        $lastRequest = $payment->postponementRequests()->latest()->first();
+                                        @endphp
+                                        <div class="gap-2 d-flex align-items-center">
+                                            @if($lastRequest)
+                                            <div class="small text-muted">
+                                                <i class="bx bx-info-circle"></i>
+                                                {{ __('payment_details.payment_schedule.last_request') }}: {{
+                                                $lastRequest->status }}
+                                                @if($lastRequest->status === 'approved')
+                                                {{ __('payment_details.payment_schedule.approved_on') }} {{
+                                                \Carbon\Carbon::parse($lastRequest->approved_at)->format('M d, Y') }}
+                                                @elseif($lastRequest->status === 'rejected')
+                                                ({{ $lastRequest->reason }})
                                                 @endif
-                                                <button type="button" 
-                                                        class="btn btn-sm btn-warning" 
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#postponePaymentModal" 
-                                                        data-payment-id="{{ $payment->id }}"
-                                                        data-current-date="{{ $payment->due_date }}"
-                                                        data-payment-amount="{{ $payment->payment_amount }}"
-                                                        {{ $hasPendingRequest ? 'disabled' : '' }}
-                                                        title="{{ $hasPendingRequest ? __('payment_details.payment_schedule.request_pending') : __('payment_details.payment_schedule.request_postpone') }}">
-                                                    <i class="bx bx-time"></i> {{ $hasPendingRequest ? __('payment_details.payment_schedule.request_pending') : __('payment_details.payment_schedule.request_postpone') }}
-                                                </button>
                                             </div>
+                                            @endif
+                                            <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                data-bs-target="#postponePaymentModal"
+                                                data-payment-id="{{ $payment->id }}"
+                                                data-current-date="{{ $payment->due_date }}"
+                                                data-payment-amount="{{ $payment->payment_amount }}" {{
+                                                $hasPendingRequest ? 'disabled' : '' }}
+                                                title="{{ $hasPendingRequest ? __('payment_details.payment_schedule.request_pending') : __('payment_details.payment_schedule.request_postpone') }}">
+                                                <i class="bx bx-time"></i> {{ $hasPendingRequest ?
+                                                __('payment_details.payment_schedule.request_pending') :
+                                                __('payment_details.payment_schedule.request_postpone') }}
+                                            </button>
+                                        </div>
                                         @endif
-                                        <button type="button" class="btn btn-sm btn-info" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#paymentDetailsModal" 
-                                                data-payment-id="{{ $payment->id }}">
-                                            <i class="bx bx-info-circle"></i> {{ __('payment_details.payment_schedule.details') }}
+                                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
+                                            data-bs-target="#paymentDetailsModal" data-payment-id="{{ $payment->id }}">
+                                            <i class="bx bx-info-circle"></i> {{
+                                            __('payment_details.payment_schedule.details') }}
+                                        </button>
+                                        {{-- view the invoice --}}
+                                        <button class="gap-1 btn btn-sm btn-warning d-flex align-items-center"
+                                            onclick="viewInvoice({{ $payment->id }})">
+                                            <i class="bx bx-receipt"></i> <span class="d-none d-sm-inline">
+                                                {{ __('contract_details_new.button_view_invoice') }}
+                                            </span>
                                         </button>
                                     </td>
                                 </tr>
@@ -195,8 +224,8 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ __('payment_details.postpone_modal.new_date') }}</label>
-                        <input type="date" class="form-control" name="requested_date" required 
-                               min="{{ date('Y-m-d') }}">
+                        <input type="date" class="form-control" name="requested_date" required
+                            min="{{ date('Y-m-d') }}">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ __('payment_details.postpone_modal.reason') }}</label>
@@ -204,8 +233,10 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('payment_details.postpone_modal.cancel') }}</button>
-                    <button type="submit" class="btn btn-warning">{{ __('payment_details.postpone_modal.submit') }}</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{
+                        __('payment_details.postpone_modal.cancel') }}</button>
+                    <button type="submit" class="btn btn-warning">{{ __('payment_details.postpone_modal.submit')
+                        }}</button>
                 </div>
             </form>
         </div>
@@ -226,7 +257,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('payment_details.payment_details_modal.close') }}</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{
+                    __('payment_details.payment_details_modal.close') }}</button>
             </div>
         </div>
     </div>
@@ -234,7 +266,7 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
     // Handle Postpone Payment Modal
     const postponePaymentModal = document.getElementById('postponePaymentModal');
     if (postponePaymentModal) {
@@ -272,6 +304,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function viewInvoice(paymentId) {
+        window.location.href = `/Payment/view Payment Details/${paymentId}`;
+    }
 </script>
 @endpush
 @endsection

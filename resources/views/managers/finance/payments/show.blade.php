@@ -40,7 +40,7 @@
                     <h6 class="mb-3">Related Information</h6>
                     <div class="mb-2">
                         <strong>Invoice Number:</strong> 
-                        <a href="{{ route('finance.invoices.show', $payment->id) }}">
+                        <a href="{{ route('payment.show', $payment->id) }}">
                             {{ $payment->invoice_number }}
                         </a>
                     </div>

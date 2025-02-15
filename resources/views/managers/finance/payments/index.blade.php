@@ -19,6 +19,7 @@
                         <tr>
                             <th>Payment ID</th>
                             <th>Invoice #</th>
+                            <th>Sales Agent</th>
                             <th>Contract</th>
                             <th>Amount</th>
                             <th>Created Date</th>
@@ -31,6 +32,7 @@
                         <tr>
                             <td>{{ $payment->id }}</td>
                             <td>{{ $payment->invoice_number }}</td>
+                            <td>{{ $payment->contract->salesRepresentative->name }}</td>
                             <td>{{ $payment->contract->contract_number }}</td>
                             <td>{{ number_format($payment->payment_amount, 2) }} ASR</td>
                             <td>{{ $payment->created_at->format('Y-m-d') }}</td>
@@ -40,7 +42,7 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="{{ route('finance.payments.show', $payment->id) }}" class="btn btn-primary btn-sm">View</a>
+                                <a href="{{ route('payment.show', $payment->id) }}" class="btn btn-primary btn-sm">View</a>
                             </td>
                         </tr>
                         @endforeach

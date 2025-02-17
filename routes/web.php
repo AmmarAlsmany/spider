@@ -91,8 +91,8 @@ Route::middleware(['auth', 'role:sales', 'prevent-back-history'])->group(functio
     Route::delete('/sales/delete-contract/{id}', [ContractsController::class, 'destroy'])->name('contract.delete');
     Route::get('/sales/Show All Completed Contract', [ContractsController::class, 'view_completed_contracts'])->name('completed.show.all');
     Route::get('/sales/Show All Stopped Contract', [ContractsController::class, 'view_stopped_contract'])->name('stopped.show.all');
-    Route::patch('/sales/return-contract/{id}', [ContractsController::class, 'return_contract'])->name('contract.return');
     Route::get('/sales/Show All canceled Contract', [ContractsController::class, 'view_cancelled_contracts'])->name('canceled.show.all');
+    Route::patch('/sales/return-contract/{id}', [ContractsController::class, 'return_contract'])->name('contract.return');
     Route::get('/sales/show Tikets', [TiketsController::class, 'index'])->name('sales.tikets');
     // Postponement Request Routes
     Route::get('/postponement-requests', [ContractsController::class, 'postponement_requests'])

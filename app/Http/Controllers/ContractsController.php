@@ -669,6 +669,36 @@ class ContractsController extends Controller
         return view('contracts.view_contract_visit', compact('contract', 'visits'));
     }
 
+    public function view_completed_contracts()
+    {
+        $contracts = contracts::where('sales_id', Auth::user()->id)
+            ->where('contract_status', 'completed')
+            ->with('customer') // Eager load customer relationship
+            ->get();
+
+        return view('managers.sales.completed_contract', compact('contracts'));
+    }
+
+    public function view_stopped_contract()
+    {
+        $contracts = contracts::where('sales_id', Auth::user()->id)
+            ->where('contract_status', 'stopped')
+            ->with('customer') // Eager load customer relationship
+            ->get();
+
+        return view('managers.sales.stoped_contract', compact('contracts'));
+    }
+
+    public function view_cancelled_contracts()
+    {
+        $contracts = contracts::where('sales_id', Auth::user()->id)
+            ->where('contract_status', 'cancelled')
+            ->with('customer') // Eager load customer relationship
+            ->get();
+
+        return view('managers.sales.canceled_contract', compact('contracts'));
+    }
+
     /**
      * Display the visit report for a specific visit.
      */

@@ -49,6 +49,61 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 - **[byte5](https://byte5.de)**
 - **[OP.GG](https://op.gg)**
 
+## Deployment Instructions
+
+### Setting up Automatic Contract Status Checker
+
+1. After deploying to your server, set up the Laravel scheduler in your server's crontab:
+
+```bash
+# Open crontab editor
+crontab -e
+
+# Add this line
+* * * * * cd /path/to/your/project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+2. Test the contract status checker manually:
+```bash
+php artisan contracts:check-status
+```
+
+3. Make sure your server's timezone is correctly set in `config/app.php`:
+```php
+'timezone' => 'Asia/Riyadh',  // Adjust this to your timezone
+```
+
+### Deployment Steps
+
+1. Upload your project to the server:
+```bash
+git add .
+git commit -m "Added contract status checker"
+git push origin main
+```
+
+2. On the server:
+```bash
+# Pull the latest changes
+git pull origin main
+
+# Install dependencies
+composer install --optimize-autoloader --no-dev
+
+# Clear caches
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# Run migrations if any
+php artisan migrate --force
+```
+
+3. Verify the scheduler is running:
+```bash
+php artisan schedule:list
+```
+
 ## Contributing
 
 Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).

@@ -4,12 +4,12 @@ namespace App\Services;
 
 use App\Models\payments;
 use Carbon\Carbon;
-use App\Notifications\PaymentDueNotification;
+use App\Traits\NotificationDispatcher;
 use App\Traits\NotificationHelpers;
 
 class PaymentService
 {
-    use NotificationHelpers;
+    use NotificationDispatcher;
 
     /**
      * Update payment statuses based on due dates
@@ -36,7 +36,14 @@ class PaymentService
                 $payment->save();
                 
                 // Send overdue payment notification to customer
-                $payment->customer->notify(new PaymentDueNotification($payment, true));
+                $customer = $payment->customer;
+                $this->notifyRoles(['client','finance','sales'], [
+                    'title' => 'Overdue Payment',
+                    'message' => 'Your payment of ' . $payment->payment_amount . ' SAR is overdue. Please make the payment as soon as possible.',
+                    'type' => 'info',
+                    'url' => "#",
+                    'priority' => 'normal',
+                ], $customer->id, $payment->sales_id);
                 
                 $updatedCount++;
             }

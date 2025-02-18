@@ -1,4 +1,3 @@
-
 /*
 Template Name: Rocker Admin
 Author: codervent
@@ -2685,5 +2684,50 @@ input::placeholder {
 	.chat-footer-menu,
 	.chat-top-header-menu {
 		display: none
+	}
+}
+
+.overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.6);
+	z-index: 10;
+	cursor: pointer;
+	transition: all .2s ease-out;
+}
+
+.overlay.show {
+	display: block;
+}
+
+@media screen and (max-width:1024px) {
+	.topbar {
+		left: 0!important
+	}
+	
+	.mobile-toggle-menu {
+		display: block
+	}
+	.sidebar-wrapper {
+		left: -300px;
+		box-shadow: none;
+		transition: all .2s ease-out;
+	}
+	.page-wrapper {
+		margin-left: 0
+	}
+	.page-footer {
+		left: 0
+	}
+
+	.wrapper.toggled .sidebar-wrapper {
+		left: 0
+	}
+	.wrapper.toggled .page-wrapper {
+		margin-left: 0
 	}
 }

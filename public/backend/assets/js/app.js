@@ -1,112 +1,158 @@
 $(function() {
 	"use strict";
-	new PerfectScrollbar(".header-message-list"), new PerfectScrollbar(".header-notifications-list"),
+	
+	// Initialize PerfectScrollbar only if elements exist
+	if ($(".header-message-list").length) {
+		new PerfectScrollbar(".header-message-list");
+	}
+	if ($(".header-notifications-list").length) {
+		new PerfectScrollbar(".header-notifications-list");
+	}
 
+	// Mobile menu toggle
+	$(".mobile-toggle-menu, .overlay").on("click", function() {
+		$(".wrapper").toggleClass("toggled");
+		$(".overlay").toggleClass("show");
+	});
 
-	    $(".mobile-search-icon").on("click", function() {
-			$(".search-bar").addClass("full-search-bar")
-		}),
-
-		$(".search-close").on("click", function() {
-			$(".search-bar").removeClass("full-search-bar")
-		}),
-
-		$(".mobile-toggle-menu").on("click", function() {
-			$(".wrapper").addClass("toggled")
-		}),
-		
-
-
-
-		$(".dark-mode").on("click", function() {
-
-			if($(".dark-mode-icon i").attr("class") == 'bx bx-sun') {
-				$(".dark-mode-icon i").attr("class", "bx bx-moon");
-				$("html").attr("class", "light-theme")
+	// Desktop sidebar toggle
+	$(".toggle-icon").on("click", function() {
+		if ($(window).width() >= 1025) {
+			$(".wrapper").toggleClass("toggled");
+			
+			if ($(".wrapper").hasClass("toggled")) {
+				$(".sidebar-wrapper").css("width", "70px");
+				$(".sidebar-header").css("width", "70px");
+				$(".sidebar-wrapper .sidebar-header .logo-text").hide();
 			} else {
-				$(".dark-mode-icon i").attr("class", "bx bx-sun");
-				$("html").attr("class", "dark-theme")
+				$(".sidebar-wrapper").css("width", "250px");
+				$(".sidebar-header").css("width", "250px");
+				$(".sidebar-wrapper .sidebar-header .logo-text").show();
 			}
 
-		}), 
+			// Setup hover effects
+			$(".sidebar-wrapper").hover(
+				function() {
+					if ($(".wrapper").hasClass("toggled")) {
+						$(this).css("width", "250px");
+						$(".sidebar-header").css("width", "250px");
+						$(".sidebar-wrapper .sidebar-header .logo-text").show();
+						$(".wrapper").addClass("sidebar-hovered");
+					}
+				},
+				function() {
+					if ($(".wrapper").hasClass("toggled")) {
+						$(this).css("width", "70px");
+						$(".sidebar-header").css("width", "70px");
+						$(".sidebar-wrapper .sidebar-header .logo-text").hide();
+						$(".wrapper").removeClass("sidebar-hovered");
+					}
+				}
+			);
+		}
+	});
 
-		
-		$(".toggle-icon").click(function() {
-			$(".wrapper").hasClass("toggled") ? ($(".wrapper").removeClass("toggled"), $(".sidebar-wrapper").unbind("hover")) : ($(".wrapper").addClass("toggled"), $(".sidebar-wrapper").hover(function() {
-				$(".wrapper").addClass("sidebar-hovered")
-			}, function() {
-				$(".wrapper").removeClass("sidebar-hovered")
-			}))
-		}),
-		$(document).ready(function() {
-			$(window).on("scroll", function() {
-				$(this).scrollTop() > 300 ? $(".back-to-top").fadeIn() : $(".back-to-top").fadeOut()
-			}), $(".back-to-top").on("click", function() {
-				return $("html, body").animate({
-					scrollTop: 0
-				}, 600), !1
-			})
-		}),
-		
-		$(function() {
-			for (var e = window.location, o = $(".metismenu li a").filter(function() {
-					return this.href == e
-				}).addClass("").parent().addClass("mm-active"); o.is("li");) o = o.parent("").addClass("mm-show").parent("").addClass("mm-active")
-		}),
-		
-		
-		$(function() {
-			$("#menu").metisMenu()
-		}), 
-		
-		$(".chat-toggle-btn").on("click", function() {
-			$(".chat-wrapper").toggleClass("chat-toggled")
-		}), $(".chat-toggle-btn-mobile").on("click", function() {
-			$(".chat-wrapper").removeClass("chat-toggled")
-		}),
+	// Handle window resize
+	$(window).on('resize', function() {
+		if ($(window).width() < 1025) {
+			$(".sidebar-wrapper").css("width", "");
+			$(".sidebar-header").css("width", "");
+			$(".sidebar-wrapper .sidebar-header .logo-text").show();
+			$(".sidebar-wrapper").off("mouseenter mouseleave");
+			$(".overlay").removeClass("show");
+		}
+	});
 
+	$(".mobile-search-icon").on("click", function() {
+		$(".search-bar").addClass("full-search-bar")
+	}),
 
-		$(".email-toggle-btn").on("click", function() {
-			$(".email-wrapper").toggleClass("email-toggled")
-		}), $(".email-toggle-btn-mobile").on("click", function() {
-			$(".email-wrapper").removeClass("email-toggled")
-		}), $(".compose-mail-btn").on("click", function() {
-			$(".compose-mail-popup").show()
-		}), $(".compose-mail-close").on("click", function() {
-			$(".compose-mail-popup").hide()
-		}), 
-		
-		
-		$(".switcher-btn").on("click", function() {
-			$(".switcher-wrapper").toggleClass("switcher-toggled")
-		}), $(".close-switcher").on("click", function() {
-			$(".switcher-wrapper").removeClass("switcher-toggled")
-		}), $("#lightmode").on("click", function() {
+	$(".search-close").on("click", function() {
+		$(".search-bar").removeClass("full-search-bar")
+	}),
+
+	$(".dark-mode").on("click", function() {
+
+		if($(".dark-mode-icon i").attr("class") == 'bx bx-sun') {
+			$(".dark-mode-icon i").attr("class", "bx bx-moon");
 			$("html").attr("class", "light-theme")
-		}), $("#darkmode").on("click", function() {
+		} else {
+			$(".dark-mode-icon i").attr("class", "bx bx-sun");
 			$("html").attr("class", "dark-theme")
-		}), $("#semidark").on("click", function() {
-			$("html").attr("class", "semi-dark")
-		}), $("#minimaltheme").on("click", function() {
-			$("html").attr("class", "minimal-theme")
-		}), $("#headercolor1").on("click", function() {
-			$("html").addClass("color-header headercolor1"), $("html").removeClass("headercolor2 headercolor3 headercolor4 headercolor5 headercolor6 headercolor7 headercolor8")
-		}), $("#headercolor2").on("click", function() {
-			$("html").addClass("color-header headercolor2"), $("html").removeClass("headercolor1 headercolor3 headercolor4 headercolor5 headercolor6 headercolor7 headercolor8")
-		}), $("#headercolor3").on("click", function() {
-			$("html").addClass("color-header headercolor3"), $("html").removeClass("headercolor1 headercolor2 headercolor4 headercolor5 headercolor6 headercolor7 headercolor8")
-		}), $("#headercolor4").on("click", function() {
-			$("html").addClass("color-header headercolor4"), $("html").removeClass("headercolor1 headercolor2 headercolor3 headercolor5 headercolor6 headercolor7 headercolor8")
-		}), $("#headercolor5").on("click", function() {
-			$("html").addClass("color-header headercolor5"), $("html").removeClass("headercolor1 headercolor2 headercolor4 headercolor3 headercolor6 headercolor7 headercolor8")
-		}), $("#headercolor6").on("click", function() {
-			$("html").addClass("color-header headercolor6"), $("html").removeClass("headercolor1 headercolor2 headercolor4 headercolor5 headercolor3 headercolor7 headercolor8")
-		}), $("#headercolor7").on("click", function() {
-			$("html").addClass("color-header headercolor7"), $("html").removeClass("headercolor1 headercolor2 headercolor4 headercolor5 headercolor6 headercolor3 headercolor8")
-		}), $("#headercolor8").on("click", function() {
-			$("html").addClass("color-header headercolor8"), $("html").removeClass("headercolor1 headercolor2 headercolor4 headercolor5 headercolor6 headercolor7 headercolor3")
+		}
+
+	}), 
+
+	
+	$(document).ready(function() {
+		$(window).on("scroll", function() {
+			$(this).scrollTop() > 300 ? $(".back-to-top").fadeIn() : $(".back-to-top").fadeOut()
+		}), $(".back-to-top").on("click", function() {
+			return $("html, body").animate({
+				scrollTop: 0
+			}, 600), !1
 		})
+	}),
+	
+	$(function() {
+		for (var e = window.location, o = $(".metismenu li a").filter(function() {
+				return this.href == e
+			}).addClass("").parent().addClass("mm-active"); o.is("li");) o = o.parent("").addClass("mm-show").parent("").addClass("mm-active")
+	}),
+	
+	
+	$(function() {
+		$("#menu").metisMenu()
+	}), 
 		
+	$(".chat-toggle-btn").on("click", function() {
+		$(".chat-wrapper").toggleClass("chat-toggled")
+	}), $(".chat-toggle-btn-mobile").on("click", function() {
+		$(".chat-wrapper").removeClass("chat-toggled")
+	}),
+
+
+	$(".email-toggle-btn").on("click", function() {
+		$(".email-wrapper").toggleClass("email-toggled")
+	}), $(".email-toggle-btn-mobile").on("click", function() {
+		$(".email-wrapper").removeClass("email-toggled")
+	}), $(".compose-mail-btn").on("click", function() {
+		$(".compose-mail-popup").show()
+	}), $(".compose-mail-close").on("click", function() {
+		$(".compose-mail-popup").hide()
+	}), 
+	
+	
+	$(".switcher-btn").on("click", function() {
+		$(".switcher-wrapper").toggleClass("switcher-toggled")
+	}), $(".close-switcher").on("click", function() {
+		$(".switcher-wrapper").removeClass("switcher-toggled")
+	}), $("#lightmode").on("click", function() {
+		$("html").attr("class", "light-theme")
+	}), $("#darkmode").on("click", function() {
+		$("html").attr("class", "dark-theme")
+	}), $("#semidark").on("click", function() {
+		$("html").attr("class", "semi-dark")
+	}), $("#minimaltheme").on("click", function() {
+		$("html").attr("class", "minimal-theme")
+	}), $("#headercolor1").on("click", function() {
+		$("html").addClass("color-header headercolor1"), $("html").removeClass("headercolor2 headercolor3 headercolor4 headercolor5 headercolor6 headercolor7 headercolor8")
+	}), $("#headercolor2").on("click", function() {
+		$("html").addClass("color-header headercolor2"), $("html").removeClass("headercolor1 headercolor3 headercolor4 headercolor5 headercolor6 headercolor7 headercolor8")
+	}), $("#headercolor3").on("click", function() {
+		$("html").addClass("color-header headercolor3"), $("html").removeClass("headercolor1 headercolor2 headercolor4 headercolor5 headercolor6 headercolor7 headercolor8")
+	}), $("#headercolor4").on("click", function() {
+		$("html").addClass("color-header headercolor4"), $("html").removeClass("headercolor1 headercolor2 headercolor3 headercolor5 headercolor6 headercolor7 headercolor8")
+	}), $("#headercolor5").on("click", function() {
+		$("html").addClass("color-header headercolor5"), $("html").removeClass("headercolor1 headercolor2 headercolor4 headercolor3 headercolor6 headercolor7 headercolor8")
+	}), $("#headercolor6").on("click", function() {
+		$("html").addClass("color-header headercolor6"), $("html").removeClass("headercolor1 headercolor2 headercolor4 headercolor5 headercolor3 headercolor7 headercolor8")
+	}), $("#headercolor7").on("click", function() {
+		$("html").addClass("color-header headercolor7"), $("html").removeClass("headercolor1 headercolor2 headercolor4 headercolor5 headercolor6 headercolor3 headercolor8")
+	}), $("#headercolor8").on("click", function() {
+		$("html").addClass("color-header headercolor8"), $("html").removeClass("headercolor1 headercolor2 headercolor4 headercolor5 headercolor6 headercolor7 headercolor3")
+	})
+	
 	// sidebar colors 
 	$('#sidebarcolor1').click(theme1);
 	$('#sidebarcolor2').click(theme2);

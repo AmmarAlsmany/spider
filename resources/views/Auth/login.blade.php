@@ -4,6 +4,7 @@
 
 <head>
     <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         body {
@@ -13,6 +14,7 @@
             font-family: 'Tajawal', sans-serif;
             margin: 0;
             padding: 0;
+            min-height: 100vh;
         }
 
         .login-container {
@@ -21,7 +23,7 @@
             border-radius: 1rem;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
             width: 90%;
-            max-width: 400px;
+            max-width: 450px;
             margin: 2rem auto;
         }
 
@@ -35,8 +37,20 @@
         @media (max-width: 768px) {
             .login-container {
                 margin: 1rem auto;
-                padding: 1.5rem;
-                width: 85%;
+                padding: 2rem;
+                width: 90%;
+                max-width: none;
+            }
+
+            input[type="email"],
+            input[type="password"] {
+                font-size: 16px; /* Prevents zoom on mobile */
+                height: 50px;
+            }
+
+            .btn-primary {
+                height: 50px;
+                font-size: 16px;
             }
         }
 
@@ -46,6 +60,8 @@
             border-radius: 30px;
             transition: background-color 0.3s;
             padding: 0.75rem 1.5rem;
+            width: 100%;
+            font-weight: bold;
         }
 
         .btn-primary:hover {
@@ -71,9 +87,10 @@
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 0.75rem;
+            padding: 0.75rem 1rem;
             width: 100%;
             border-radius: 0.5rem;
+            margin-top: 0.5rem;
         }
 
         input[type="email"]:focus,
@@ -87,69 +104,82 @@
             margin-bottom: 0.5rem;
             display: block;
             color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
         }
 
         @media (max-width: 640px) {
             .spider-logo {
-                width: 72px;
-                height: 72px;
+                width: 80px;
+                height: 80px;
             }
 
             h1 {
-                font-size: 1.75rem;
+                font-size: 2rem;
+                margin-top: 1rem;
             }
 
             .login-container {
-                padding: 1.25rem;
+                padding: 1.5rem;
+                margin: 1rem;
+                width: auto;
+            }
+
+            .remember-forgot {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                margin: 1rem 0;
+            }
+
+            input[type="checkbox"] {
+                width: 20px;
+                height: 20px;
             }
         }
     </style>
 </head>
 
-<body>
-    <div class="min-h-screen flex items-center">
-        <div class="login-container">
-            <div class="mb-8 text-center">
-                <img src="/images/spider.webp" alt="Spider Web Logo" class="mx-auto w-24 h-24 spider-logo">
-                <h1 class="mt-4 text-4xl font-bold text-highlight">Spider Web</h1>
-                <p class="text-lg">Pest Control Services</p>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="login-container">
+        <div class="mb-8 text-center">
+            <img src="/images/spider.webp" alt="Spider Web Logo" class="mx-auto spider-logo">
+            <h1 class="mt-4 text-3xl sm:text-4xl font-bold text-highlight">Spider Web</h1>
+            <p class="text-lg mt-2">Pest Control Services</p>
+        </div>
+
+        <form method="POST" action="{{ route('login') }}" class="space-y-6">
+            @csrf
+
+            <div>
+                <label for="email" class="block font-medium">Email</label>
+                <input id="email" name="email" type="email" required
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
             </div>
 
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
+            <div>
+                <label for="password" class="block font-medium">Password</label>
+                <input id="password" name="password" type="password" required
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+            </div>
 
-                <div class="mb-6">
-                    <label for="email" class="block text-sm font-medium">Email</label>
-                    <input id="email" name="email" type="email" required
-                        class="block mt-2 w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+            @if ($errors->any())
+            <div class="text-sm text-red-500">
+                {{ $errors->first() }}
+            </div>
+            @endif
+
+            <div class="remember-forgot flex items-center">
+                <div class="flex items-center">
+                    <input type="checkbox" name="remember" id="remember" class="mr-2">
+                    <label for="remember" class="text-sm">Remember Me</label>
                 </div>
+                <a href="#" class="text-sm text-red-500 hover:underline ml-auto">Forgot Password?</a>
+            </div>
 
-                <div class="mb-6">
-                    <label for="password" class="block text-sm font-medium">Password</label>
-                    <input id="password" name="password" type="password" required
-                        class="block mt-2 w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                </div>
-
-                @if ($errors->any())
-                <div class="mb-4 text-sm text-red-500">
-                    {{ $errors->first() }}
-                </div>
-                @endif
-
-                <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <input type="checkbox" name="remember" id="remember" class="mr-1">
-                        <label for="remember" class="text-sm">Remember Me</label>
-                    </div>
-                    <a href="#" class="text-sm text-red-500 hover:underline">Forgot Password?</a>
-                </div>
-
-                <button type="submit"
-                    class="flex justify-center px-4 py-2 w-full text-sm font-medium text-white btn-primary">
-                    Login
-                </button>
-            </form>
-        </div>
+            <button type="submit" class="btn-primary flex items-center justify-center">
+                Login
+            </button>
+        </form>
     </div>
 </body>
 

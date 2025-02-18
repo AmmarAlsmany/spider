@@ -42,10 +42,10 @@ Route::middleware(['auth:web,client', 'prevent-back-history'])->group(function (
 });
 
 // Notification Routes
-Route::middleware(['auth', 'prevent-back-history'])->group(function () {
+Route::middleware(['prevent-back-history', 'auth:web,client'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'getNotifications'])->name('notifications.get');
-    Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
-    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::post('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
     // Payment QR View Route - Publicly accessible
     Route::get('/payment/qr/{id}', [PaymentsController::class, 'qrView'])->name('payment.qr.view');
     // Payment Details Route

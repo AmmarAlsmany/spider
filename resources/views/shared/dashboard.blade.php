@@ -82,6 +82,11 @@
     <!-- Core JS -->
     <script src="{{ asset('backend/assets/js/jquery.min.js') }}"></script>
     <script src="{{ asset('backend/assets/js/bootstrap.bundle.min.js') }}"></script>
+    
+    <!-- DataTables -->
+    <script src="{{ asset('backend/assets/plugins/datatable/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('backend/assets/plugins/datatable/js/dataTables.bootstrap5.min.js') }}"></script>
+    
     <!--plugins-->
     <script src="{{ asset('backend/assets/plugins/simplebar/js/simplebar.min.js') }}"></script>
     <script src="{{ asset('backend/assets/plugins/metismenu/js/metisMenu.min.js') }}"></script>
@@ -93,8 +98,15 @@
     <script src="{{ asset('backend/assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js') }}"></script>
     <script src="{{ asset('backend/assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js') }}"></script>
     <script>
-        $(document).ready(function() {
+        $(window).on('load', function() {
             if ($('#world-map').length) {
+                // Ensure the container has dimensions
+                $('#world-map').css({
+                    'width': '100%',
+                    'height': '350px'  // You can adjust this value as needed
+                });
+                
+                // Initialize the map
                 $('#world-map').vectorMap({
                     map: 'world_mill_en',
                     backgroundColor: 'transparent',

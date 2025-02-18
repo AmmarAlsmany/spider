@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Services\VisitScheduleService;
 use App\Traits\NotificationDispatcher;
+use Exception;
 
 class ContractsController extends Controller
 {
@@ -528,12 +529,118 @@ class ContractsController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            // Validate the request
+            $validated = $request->validate([
+                'contract_number' => 'required|string',
+                'contract_type' => 'required|exists:contracts_types,id',
+                'contract_description' => 'required|string',
+                'warranty' => 'required|integer|min:0',
+                'contract_start_date' => 'required|date',
+                'contract_end_date' => 'required|date|after:contract_start_date',
+                'contract_price' => 'required|numeric|min:0',
+                'payment_type' => 'required|string',
+                'number_Payments' => 'nullable|integer|min:1',
+                'branch_name.*' => 'required_if:is_multi_branch,yes|string',
+                'branch_manager_name.*' => 'required_if:is_multi_branch,yes|string',
+                'branch_manager_phone.*' => 'required_if:is_multi_branch,yes|string',
+                'branch_address.*' => 'required_if:is_multi_branch,yes|string',
+                'branch_city.*' => 'required_if:is_multi_branch,yes|string',
+                'payment_amount.*' => 'required|numeric|min:0',
+                'payment_date.*' => 'required|date|after_or_equal:contract_start_date'
+            ]);
+
             DB::beginTransaction();
 
             $contract = contracts::findOrFail($id);
-            $contract->update($request->all());
 
-            // dd($contract);
+            // Update the contract with validated data
+            try {
+                $contract->update($validated);
+            } catch (Exception $e) {
+                Log::error($e->getMessage());
+                return redirect()->back()->with('error', 'Failed to update contract');
+            }
+
+            // Handle branch updates if needed
+            if ($request->has('branch_name')) {
+                // Get arrays of branch data
+                $branchNames = $request->input('branch_name');
+                $branchManagerNames = $request->input('branch_manager_name');
+                $branchManagerPhones = $request->input('branch_manager_phone');
+                $branchAddresses = $request->input('branch_address');
+                $branchCities = $request->input('branch_city');
+                $branchIds = $request->input('branch_id', []);
+
+                // Update or create branches
+                foreach ($branchNames as $index => $branchName) {
+                    $branchData = [
+                        'branch_name' => $branchName,
+                        'branch_manager_name' => $branchManagerNames[$index],
+                        'branch_manager_phone' => $branchManagerPhones[$index],
+                        'branch_address' => $branchAddresses[$index],
+                        'branch_city' => $branchCities[$index],
+                        'contract_id' => $contract->id
+                    ];
+
+                    // If branch_id exists, update existing branch
+                    if (isset($branchIds[$index])) {
+                        $branch = branchs::find($branchIds[$index]);
+                        if ($branch) {
+                            try{
+                                $branch->update($branchData);
+                            }catch(Exception $e){
+                                Log::error($e->getMessage());
+                            }
+                        }
+                    } else {
+                        // Create new branch
+                        try{
+                            branchs::create($branchData);
+                        }catch(Exception $e){
+                            Log::error($e->getMessage());
+                        }
+                    }
+                }
+            }
+
+            // Handle payment updates if needed
+            if ($request->has('payment_amount')) {
+                // Get arrays of payment data
+                $paymentAmounts = $request->input('payment_amount');
+                $paymentDates = $request->input('payment_date');
+
+                // Get existing payments to preserve invoice numbers
+                $existingPayments = payments::where('contract_id', $contract->id)->get()->keyBy('id');
+                $paymentIds = $request->input('payment_id', []);
+
+                // Delete payments that are no longer in the form
+                payments::where('contract_id', $contract->id)
+                    ->whereNotIn('id', $paymentIds)
+                    ->delete();
+
+                // Create or update payments
+                foreach ($paymentAmounts as $index => $amount) {
+                    $paymentId = isset($paymentIds[$index]) ? $paymentIds[$index] : null;
+                    $paymentData = [
+                        'contract_id' => $contract->id,
+                        'customer_id' => $contract->customer_id,
+                        'payment_amount' => $amount,
+                        'due_date' => $paymentDates[$index],
+                        'payment_status' => 'pending',
+                    ];
+
+                    if ($paymentId && isset($existingPayments[$paymentId])) {
+                        // Update existing payment
+                        $existingPayment = $existingPayments[$paymentId];
+                        $paymentData['invoice_number'] = $existingPayment->invoice_number;
+                        $existingPayment->update($paymentData);
+                    } else {
+                        // Create new payment with new invoice number
+                        $paymentData['invoice_number'] = $this->generateInvoiceNumber();
+                        payments::create($paymentData);
+                    }
+                }
+            }
 
             DB::commit();
 
@@ -564,40 +671,6 @@ class ContractsController extends Controller
             DB::rollback();
             Log::error('Contract update error: ' . $e->getMessage());
             return back()->with('error', 'Error updating contract: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        try {
-            DB::beginTransaction();
-
-            $contract = contracts::findOrFail($id);
-
-            // Send notifications before deletion
-            $notificationData = [
-                'title' => 'Contract Deleted Successfully',
-                'message' => 'Contract ' . $contract->contract_number . ' has been deleted.',
-                'type' => 'info',
-                'url' => "#",
-                'priority' => 'normal',
-                'client' => $contract->customer
-            ];
-
-            $this->notifyRoles(['sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id);
-
-            $contract->delete();
-            DB::commit();
-
-            return redirect()->route('sales.dashboard')
-                ->with('success', 'Contract deleted successfully');
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error('Contract deletion error: ' . $e->getMessage());
-            return back()->with('error', 'Error deleting contract: ' . $e->getMessage());
         }
     }
 
@@ -947,7 +1020,6 @@ class ContractsController extends Controller
                 'message' => "Annex {$annex->annex_number} has been approved and visits scheduled for " . $newBranches->count() . " new branches",
                 'type' => 'info',
                 'url' => "#",
-                'client' => $contract->customer,
                 'priority' => 'normal'
             ];
 
@@ -992,7 +1064,6 @@ class ContractsController extends Controller
                 'message' => "Annex {$annex->annex_number} has been rejected for contract {$annex->contract->contract_number}",
                 'type' => 'info',
                 'url' => "#",
-                'client' => $annex->contract->customer,
                 'priority' => 'normal'
             ];
 
@@ -1070,14 +1141,16 @@ class ContractsController extends Controller
                 if (isset($branchData['id'])) {
                     // Update existing branch
                     $branch = branchs::findOrFail($branchData['id']);
-                    $branch->update([
-                        'branch_name' => $branchData['branch_name'],
-                        'branch_manager_name' => $branchData['branch_manager_name'],
-                        'branch_manager_phone' => $branchData['branch_manager_phone'],
-                        'branch_address' => $branchData['branch_address'],
-                        'branch_city' => $branchData['branch_city']
-                    ]);
-                    $existingBranchIds[] = $branch->id;
+                    if ($branch) {
+                        $branch->update([
+                            'branch_name' => $branchData['branch_name'],
+                            'branch_manager_name' => $branchData['branch_manager_name'],
+                            'branch_manager_phone' => $branchData['branch_manager_phone'],
+                            'branch_address' => $branchData['branch_address'],
+                            'branch_city' => $branchData['branch_city']
+                        ]);
+                        $existingBranchIds[] = $branch->id;
+                    }
                 } else {
                     // Create new branch
                     $branch = new branchs([

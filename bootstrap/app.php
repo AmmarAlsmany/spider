@@ -10,6 +10,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Log;
+use App\Services\ContractService;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -56,6 +57,17 @@ return Application::configure(basePath: dirname(__DIR__))
             ->onFailure(function () {
                 Log::error('Failed to update overdue payments');
             });
+
+        // Check and update completed contracts daily
+        $schedule->call(function () {
+            app(ContractService::class)->checkAndUpdateCompletedContracts();
+        })
+        ->daily()
+        ->name('check-completed-contracts')
+        ->onFailure(function () {
+            Log::error('Failed to check and update completed contracts');
+        });
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -80,6 +80,16 @@
     }
 </style>
 <div class="page-content">
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
     <div class="mb-4 page-breadcrumb d-flex align-items-center">
         <div class="breadcrumb-title pe-3 fw-bold">Sales Profile</div>
         <div class="ps-3">
@@ -100,89 +110,119 @@
             <fieldset class="mb-4">
                 <legend>Contract Information</legend>
                 <div class="form-group">
-                    <label for="contractnumber">Contract Number</label>
-                    <input type="text" class="form-control" id="contractnumber" name="contract_number" 
+                    <label for="contract_number">Contract Number</label>
+                    <input type="text" class="form-control" id="contract_number" name="contract_number" 
                         value="{{ $contract->contract_number }}" required readonly>
                     <div class="invalid-feedback">Please provide a valid contract number.</div>
                 </div>
                 <div class="form-group">
                     <label for="Property_type">Property Type <span data-toggle="tooltip"
                             title="Select the type of property">(?)</span></label>
-                    <select type="text" class="form-select" name="Property_type" id="Property_type">
-                        <option disabled>Select One</option>
-                        <option value="Residential">Residential</option>
-                        <option value="Commercial">Commercial</option>
+                    <select class="form-select @error('Property_type') is-invalid @enderror" 
+                        name="Property_type" id="Property_type" required>
+                        <option value="" disabled {{ old('Property_type', $contract->Property_type) ? '' : 'selected' }}>Select One</option>
+                        <option value="Residential" {{ old('Property_type', $contract->Property_type) == 'Residential' ? 'selected' : '' }}>Residential</option>
+                        <option value="Commercial" {{ old('Property_type', $contract->Property_type) == 'Commercial' ? 'selected' : '' }}>Commercial</option>
                     </select>
-                    <div class="invalid-feedback">Please select a property type.</div>
+                    @error('Property_type')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
                 {{-- warranty --}}
                 <div class="form-group">
                     <label for="warrantyperiod">Warranty Period (Months) <span data-toggle="tooltip"
                             title="Enter the warranty period in months">(?)</span></label>
-                    <input type="number" class="form-control" id="warrantyperiod" name="warrantyperiod" min="0"
-                        value="{{ $contract->warranty }}" required>
-                    <div class="invalid-feedback">Please enter a valid warranty period.</div>
+                    <input type="number" class="form-control @error('warranty') is-invalid @enderror" 
+                        id="warrantyperiod" name="warranty" min="0"
+                        value="{{ old('warranty', $contract->warranty) }}" required>
+                    @error('warranty')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
                 {{-- number of visits --}}
                 <div class="form-group">
                     <label for="number_of_visits">Number of Visits <span data-toggle="tooltip"
                             title="Enter the number of visits">(?)</span></label>
-                    <input type="number" class="form-control" id="number_of_visits" name="number_of_visits" min="0"
-                        value="{{ $contract->number_of_visits }}" required>
-                    <div class="invalid-feedback">Please enter a valid number of visits.</div>
+                    <input type="number" class="form-control @error('number_of_visits') is-invalid @enderror" 
+                        id="number_of_visits" name="number_of_visits" min="1"
+                        value="{{ old('number_of_visits', $contract->number_of_visits) }}" required>
+                    @error('number_of_visits')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="form-group">
-                    <label for="contracttype">Contract Type <span data-toggle="tooltip"
+                    <label for="contract_type">Contract Type <span data-toggle="tooltip"
                             title="Select the type of contract">(?)</span></label>
-                    <select class="form-control" id="contracttype" name="contract_type" required>
+                    <select class="form-select @error('contract_type') is-invalid @enderror" 
+                        id="contract_type" name="contract_type" required>
+                        <option value="" disabled {{ old('contract_type', $contract->contract_type) ? '' : 'selected' }}>Select One</option>
                         @foreach ($contract_type as $type)
-                        <option value="{{ $type->id }}" {{ $contract->contract_type == $type->id ? 'selected' : '' }}>
+                        <option value="{{ $type->id }}" 
+                            {{ old('contract_type', $contract->contract_type) == $type->id ? 'selected' : '' }}>
                             {{ $type->name }} {{ $type->type }}
                         </option>
                         @endforeach
                     </select>
-                    <div class="invalid-feedback">Please select a contract type.</div>
+                    @error('contract_type')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="form-group">
-                    <label for="contractDescription">Contract Description <span data-toggle="tooltip"
+                    <label for="contract_description">Contract Description <span data-toggle="tooltip"
                             title="Enter a brief description of the contract">(?)</span></label>
-                    <textarea class="form-control" id="contractDescription" name="contract_description" rows="3"
-                        required>{{ $contract->contract_description }}</textarea>
-                    <div class="invalid-feedback">Please provide a valid contract description.</div>
+                    <textarea class="form-control @error('contract_description') is-invalid @enderror" 
+                        id="contract_description" name="contract_description" rows="3"
+                        required>{{ old('contract_description', $contract->contract_description) }}</textarea>
+                    @error('contract_description')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="form-group">
-                    <label for="contractstartdate">Start Date <span data-toggle="tooltip"
+                    <label for="contract_start_date">Start Date <span data-toggle="tooltip"
                             title="Select the start date of the contract">(?)</span></label>
-                    <input type="date" class="form-control" id="contractstartdate" name="contract_start_date"
-                        value="{{ $contract->contract_start_date }}" required>
-                    <div class="invalid-feedback">Please select a start date.</div>
+                    <input type="date" class="form-control @error('contract_start_date') is-invalid @enderror" 
+                        id="contract_start_date" name="contract_start_date"
+                        value="{{ old('contract_start_date', $contract->contract_start_date) }}" required>
+                    @error('contract_start_date')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="form-group">
-                    <label for="totalAmount">Contract Amount <span data-toggle="tooltip"
+                    <label for="contract_end_date">End Date <span data-toggle="tooltip"
+                            title="Select the end date of the contract">(?)</span></label>
+                    <input type="date" class="form-control @error('contract_end_date') is-invalid @enderror" 
+                        id="contract_end_date" name="contract_end_date"
+                        value="{{ old('contract_end_date', $contract->contract_end_date) }}" required>
+                    @error('contract_end_date')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="form-group">
+                    <label for="contract_price">Contract Amount <span data-toggle="tooltip"
                             title="Enter the total amount of the contract">(?)</span></label>
                     <div class="input-group">
-                        <input type="number" class="form-control" id="totalAmount" name="contract_price"
-                            value="{{ $contract->contract_price }}" required>
+                        <input type="number" class="form-control @error('contract_price') is-invalid @enderror" 
+                            id="contract_price" name="contract_price"
+                            value="{{ old('contract_price', $contract->contract_price) }}" required>
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="includeTax" name="include_tax">
+                                    <input class="form-check-input" type="checkbox" id="includeTax" 
+                                        name="include_tax" {{ old('include_tax') ? 'checked' : '' }}>
                                     <label class="form-check-label" for="includeTax">
                                         Include Tax (15%)
                                     </label>
                                 </div>
                             </div>
                         </div>
+                        @error('contract_price')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                    <small class="text-muted">
-                        Amount before tax: <span id="amountBeforeTax">{{ $contract->contract_price }}</span> SAR<br>
-                        Tax amount (15%): <span id="taxAmount">0</span> SAR<br>
-                        Total amount: <span id="finalAmount">{{ $contract->contract_price }}</span> SAR
-                    </small>
                 </div>
                 <div class="form-group">
-                    <label for="paymenttype">Payment Type</label>
-                    <select class="form-control" id="paymenttype" name="Payment_type" required>
+                    <label for="payment_type">Payment Type</label>
+                    <select class="form-select" id="payment_type" name="payment_type" required>
                         <option value="prepaid" {{ $contract->payment_type == 'prepaid' ? 'selected' : '' }}>
                             Prepaid</option>
                         <option value="postpaid" {{ $contract->payment_type == 'postpaid' ? 'selected' : '' }}>
@@ -193,16 +233,16 @@
 
                 <div class="form-group" id="paymentScheduleSection" style="{{ $contract->payment_type == 'postpaid' ? '' : 'display: none;' }}">
                     <label for="payment_schedule">Payment Schedule</label>
-                    <select class="form-control" id="payment_schedule" name="payment_schedule">
+                    <select class="form-select" id="payment_schedule" name="payment_schedule">
                         <option value="monthly" {{ $contract->payment_schedule == 'monthly' ? 'selected' : '' }}>Monthly (Automatic)</option>
                         <option value="custom" {{ $contract->payment_schedule == 'custom' ? 'selected' : '' }}>Custom Dates</option>
                     </select>
                     <div class="invalid-feedback">Please select a payment schedule.</div>
                 </div>
                 <div class="form-group">
-                    <label for="contractenddate">End Date <span data-toggle="tooltip"
+                    <label for="contract_end_date">End Date <span data-toggle="tooltip"
                             title="Select the end date of the contract">(?)</span></label>
-                    <input type="date" class="form-control" id="contractenddate" name="contract_end_date"
+                    <input type="date" class="form-control" id="contract_end_date" name="contract_end_date"
                         value="{{ $contract->contract_end_date }}" required>
                     <div class="invalid-feedback">Please select an end date.</div>
                 </div>
@@ -212,32 +252,32 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="clientName">Client Name</label>
-                            <input type="text" class="form-control" id="clientName" name="clientName"
+                            <label for="client_name">Client Name</label>
+                            <input type="text" class="form-control" id="client_name" name="client_name"
                                 value="{{ $contract->customer->name }}" required>
                             <div class="invalid-feedback">Please provide a valid client name.</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="clientEmail">Client Email</label>
-                            <input type="email" class="form-control" id="clientEmail" name="clientEmail"
+                            <label for="client_email">Client Email</label>
+                            <input type="email" class="form-control" id="client_email" name="client_email"
                                 value="{{ $contract->customer->email }}" required>
                             <div class="invalid-feedback">Please provide a valid client email.</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="clientPhone">Phone</label>
-                            <input type="text" class="form-control" id="clientPhone" name="clientPhone"
+                            <label for="client_phone">Phone</label>
+                            <input type="text" class="form-control" id="client_phone" name="client_phone"
                                 value="{{ $contract->customer->phone }}" required>
                             <div class="invalid-feedback">Please provide a valid phone number.</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="clientMobile">Mobile</label>
-                            <input type="text" class="form-control" id="clientMobile" name="clientMobile"
+                            <label for="client_mobile">Mobile</label>
+                            <input type="text" class="form-control" id="client_mobile" name="client_mobile"
                                 value="{{ $contract->customer->mobile }}" required>
                             <div class="invalid-feedback">Please provide a valid mobile number.</div>
                         </div>
@@ -273,8 +313,8 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="clientAddress">Address</label>
-                            <input type="text" class="form-control" id="clientAddress" name="clientAddress"
+                            <label for="client_address">Address</label>
+                            <input type="text" class="form-control" id="client_address" name="client_address"
                                 value="{{ $contract->customer->address }}" required>
                             <div class="invalid-feedback">Please provide a valid address.</div>
                         </div>
@@ -292,24 +332,24 @@
                             <div class="col-md-6">
                                 <input type="text" name="branch_id[]" value="{{ $branch->id }}" hidden readonly>
                                 <div class="form-group">
-                                    <label for="branchName{{ $index }}">Branch Name <span data-toggle="tooltip"
+                                    <label for="branch_name{{ $index }}">Branch Name <span data-toggle="tooltip"
                                             title="Enter the name of the branch">(?)</span></label>
-                                    <input type="text" class="form-control" id="branchName{{ $index }}"
+                                    <input type="text" class="form-control" id="branch_name{{ $index }}"
                                         name="branch_name[]" value="{{ $branch->branch_name }}" required>
                                     <div class="invalid-feedback">Please provide a valid branch name.</div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="branchmanager{{ $index }}">Branch Manager <span data-toggle="tooltip"
+                                    <label for="branch_manager_name{{ $index }}">Branch Manager <span data-toggle="tooltip"
                                             title="Enter the name of the branch manager">(?)</span></label>
-                                    <input type="text" class="form-control" id="branchmanager{{ $index }}"
+                                    <input type="text" class="form-control" id="branch_manager_name{{ $index }}"
                                         name="branch_manager_name[]" value="{{ $branch->branch_manager_name }}"
                                         required>
                                     <div class="invalid-feedback">Please provide a valid branch manager.</div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="branchphone{{ $index }}">Branch Phone <span data-toggle="tooltip"
+                                    <label for="branch_manager_phone{{ $index }}">Branch Phone <span data-toggle="tooltip"
                                             title="Enter the phone number of the branch">(?)</span></label>
-                                    <input type="text" class="form-control" id="branchphone{{ $index }}"
+                                    <input type="text" class="form-control" id="branch_manager_phone{{ $index }}"
                                         name="branch_manager_phone[]" value="{{ $branch->branch_manager_phone }}"
                                         required>
                                     <div class="invalid-feedback">Please provide a valid branch phone.</div>
@@ -317,16 +357,16 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="branchadress{{ $index }}">Branch Address <span data-toggle="tooltip"
+                                    <label for="branch_address{{ $index }}">Branch Address <span data-toggle="tooltip"
                                             title="Enter the address of the branch">(?)</span></label>
-                                    <input type="text" class="form-control" id="branchadress{{ $index }}"
+                                    <input type="text" class="form-control" id="branch_address{{ $index }}"
                                         name="branch_address[]" value="{{ $branch->branch_address }}" required>
                                     <div class="invalid-feedback">Please provide a valid branch address.</div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="branchcity{{ $index }}">Branch City <span data-toggle="tooltip"
+                                    <label for="branch_city{{ $index }}">Branch City <span data-toggle="tooltip"
                                             title="Enter the city of the branch">(?)</span></label>
-                                    <input type="text" class="form-control" id="branchcity{{ $index }}"
+                                    <input type="text" class="form-control" id="branch_city{{ $index }}"
                                         name="branch_city[]" value="{{ $branch->branch_city }}" required>
                                     <div class="invalid-feedback">Please provide a valid branch city.</div>
                                 </div>
@@ -344,6 +384,7 @@
                     <div class="card-body" id="payments-container">
                         @foreach ($contract->payments as $index => $payment)
                         <div class="mb-3 row payment-row" data-payment-id="{{ $index + 1 }}">
+                            <input type="hidden" name="payment_id[]" value="{{ $payment->id }}">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="payment_amount{{ $index }}">Payment Amount <span data-toggle="tooltip"
@@ -386,7 +427,7 @@
     document.addEventListener('DOMContentLoaded', function() {
             const paymentsContainer = document.getElementById('payments-container');
             const addPaymentBtn = document.getElementById('add-payment');
-            const paymentTypeSelect = document.getElementById('paymenttype');
+            const paymentTypeSelect = document.getElementById('payment_type');
 
             // Function to update the visibility of the add payment button
             function updateAddPaymentButtonVisibility() {
@@ -415,7 +456,7 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="payment_amount${newIndex}">Payment Amount <span data-toggle="tooltip" title="Enter the amount of the payment">(?)</span></label>
-                        <input type="number" min="0" class="form-control" id="payment_amount${newIndex}" name="payment_amount[]" required>
+                        <input type="number" class="form-control" id="payment_amount${newIndex}" name="payment_amount[]" required>
                         <div class="invalid-feedback">Please provide a valid payment amount.</div>
                     </div>
                 </div>
@@ -471,30 +512,30 @@
                     <div class="col-md-6">
                         <input type="text" name="branch_id[]" value="" hidden readonly>
                         <div class="form-group">
-                            <label for="branchName${newIndex}">Branch Name <span data-toggle="tooltip" title="Enter the name of the branch">(?)</span></label>
-                            <input type="text" class="form-control" id="branchName${newIndex}" name="branch_name[]" required>
+                            <label for="branch_name${newIndex}">Branch Name <span data-toggle="tooltip" title="Enter the name of the branch">(?)</span></label>
+                            <input type="text" class="form-control" id="branch_name${newIndex}" name="branch_name[]" required>
                             <div class="invalid-feedback">Please provide a valid branch name.</div>
                         </div>
                         <div class="form-group">
-                            <label for="branchmanager${newIndex}">Branch Manager <span data-toggle="tooltip" title="Enter the name of the branch manager">(?)</span></label>
-                            <input type="text" class="form-control" id="branchmanager${newIndex}" name="branch_manager_name[]" required>
+                            <label for="branch_manager_name${newIndex}">Branch Manager <span data-toggle="tooltip" title="Enter the name of the branch manager">(?)</span></label>
+                            <input type="text" class="form-control" id="branch_manager_name${newIndex}" name="branch_manager_name[]" required>
                             <div class="invalid-feedback">Please provide a valid branch manager.</div>
                         </div>
                         <div class="form-group">
-                            <label for="branchphone${newIndex}">Branch Phone <span data-toggle="tooltip" title="Enter the phone number of the branch">(?)</span></label>
-                            <input type="text" class="form-control" id="branchphone${newIndex}" name="branch_manager_phone[]" required>
+                            <label for="branch_manager_phone${newIndex}">Branch Phone <span data-toggle="tooltip" title="Enter the phone number of the branch">(?)</span></label>
+                            <input type="text" class="form-control" id="branch_manager_phone${newIndex}" name="branch_manager_phone[]" required>
                             <div class="invalid-feedback">Please provide a valid branch phone.</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="branchadress${newIndex}">Branch Address <span data-toggle="tooltip" title="Enter the address of the branch">(?)</span></label>
-                            <input type="text" class="form-control" id="branchadress${newIndex}" name="branch_address[]" required>
+                            <label for="branch_address${newIndex}">Branch Address <span data-toggle="tooltip" title="Enter the address of the branch">(?)</span></label>
+                            <input type="text" class="form-control" id="branch_address${newIndex}" name="branch_address[]" required>
                             <div class="invalid-feedback">Please provide a valid branch address.</div>
                         </div>
                         <div class="form-group">
-                            <label for="branchcity${newIndex}">Branch City <span data-toggle="tooltip" title="Enter the city of the branch">(?)</span></label>
-                            <input type="text" class="form-control" id="branchcity${newIndex}" name="branch_city[]" required>
+                            <label for="branch_city${newIndex}">Branch City <span data-toggle="tooltip" title="Enter the city of the branch">(?)</span></label>
+                            <input type="text" class="form-control" id="branch_city${newIndex}" name="branch_city[]" required>
                             <div class="invalid-feedback">Please provide a valid branch city.</div>
                         </div>
                     </div>
@@ -530,7 +571,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const totalAmountInput = document.getElementById('totalAmount');
+        const totalAmountInput = document.getElementById('contract_price');
         const includeTaxCheckbox = document.getElementById('includeTax');
         const amountBeforeTaxSpan = document.getElementById('amountBeforeTax');
         const taxAmountSpan = document.getElementById('taxAmount');
@@ -572,11 +613,10 @@
     });
 </script>
 
-@section('scripts')
 <script>
     $(document).ready(function() {
         // Handle payment type change
-        $('#paymenttype').change(function() {
+        $('#payment_type').change(function() {
             if ($(this).val() === 'postpaid') {
                 $('#paymentScheduleSection').show();
             } else {

@@ -10,6 +10,12 @@
                 </div>
             </div>
             <hr>
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
             <div class="table-responsive">
                 <table class="table mb-0 align-middle">
                     <thead class="table-light">
@@ -42,7 +48,7 @@
                             </td>
                             <td>{{ $alert->message }}</td>
                             <td>
-                                @if($alert->status === 'unread')
+                                @if(!$alert->is_read)
                                     <span class="badge bg-danger">Unread</span>
                                 @else
                                     <span class="badge bg-success">Read</span>
@@ -50,21 +56,27 @@
                             </td>
                             <td>{{ $alert->created_at->format('Y-m-d H:i') }}</td>
                             <td>
-                                @if($alert->status === 'unread')
-                                    <a href="{{ route('alerts.mark-as-read', $alert->id) }}" 
-                                       class="btn btn-sm btn-primary">Mark as Read</a>
-                                @endif
-                                @if($alert->contract_id)
-                                    <a href="{{ url('contract.view') }}" 
-                                       class="btn btn-sm btn-info">View Contract</a>
-                                @endif
+                                <div class="d-flex">
+                                    @if(!$alert->is_read)
+                                        <a href="{{ route('alerts.mark-as-read', $alert->id) }}" class="btn btn-sm btn-primary me-2">
+                                            <i class="bx bx-check"></i> Mark as Read
+                                        </a>
+                                    @endif
+                                    {{-- <form action="{{ route('alerts.destroy', $alert->id) }}" method="POST" class="delete-form">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="bx bx-trash"></i> Delete
+                                        </button>
+                                    </form> --}}
+                                </div>
                             </td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
-            <div class="mt-3 d-flex justify-content-center">
+            <div class="mt-3">
                 {{ $alerts->links() }}
             </div>
         </div>

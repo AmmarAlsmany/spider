@@ -7,7 +7,6 @@ use App\Models\contracts;
 use App\Models\payments;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 
 class AlertController extends Controller
 {

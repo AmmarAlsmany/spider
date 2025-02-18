@@ -47,7 +47,7 @@ class SalesManagerController extends Controller
 
         $sales_agents = User::where('role', 'sales')->get();
 
-        return view('managers.sales Manager.dashboard', compact(
+        return view('managers.sales manager.dashboard', compact(
             'totalAgents',
             'activeAgents',
             'totalClients',
@@ -124,7 +124,7 @@ class SalesManagerController extends Controller
         }
 
         $sales_agents = $query->get();
-        return view('managers.sales Manager.manage_agents', compact('sales_agents'));
+        return view('managers.sales manager.manage_agents', compact('sales_agents'));
     }
 
     /**
@@ -243,7 +243,7 @@ class SalesManagerController extends Controller
         $rejected = $contracts->where('contract_status', 'rejected')->count();
 
         return view(
-            'managers.sales Manager.reports.contracts',
+            'managers.sales manager.reports.contracts',
             compact('contracts', 'total', 'approved', 'pending', 'rejected')
         );
     }
@@ -252,7 +252,6 @@ class SalesManagerController extends Controller
     {
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
-
         $collections = payments::when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
             return $query->whereBetween('paid_at', [$startDate, $endDate]);
         })
@@ -263,7 +262,7 @@ class SalesManagerController extends Controller
         $total = $collections->sum('payment_amount');
 
         return view(
-            'managers.sales Manager.reports.collections',
+            'managers.sales manager.reports.collections',
             compact('collections', 'total')
         );
     }
@@ -283,7 +282,7 @@ class SalesManagerController extends Controller
         $total = $remainingPayments->sum('payment_amount');
 
         return view(
-            'managers.sales Manager.reports.payments',
+            'managers.sales manager.reports.payments',
             compact('remainingPayments', 'total')
         );
     }
@@ -304,7 +303,7 @@ class SalesManagerController extends Controller
         $remaining = $total - $collected;
 
         return view(
-            'managers.sales Manager.reports.invoices',
+            'managers.sales manager.reports.invoices',
             compact('invoices', 'total', 'collected', 'remaining')
         );
     }
@@ -339,7 +338,7 @@ class SalesManagerController extends Controller
         $contracts = $query->orderBy('created_at', 'desc')->get();
         $salesAgents = User::where('role', 'sales')->get();
 
-        return view('managers.sales Manager.manage_contracts', compact('contracts', 'salesAgents'));
+        return view('managers.sales manager.manage_contracts', compact('contracts', 'salesAgents'));
     }
 
     public function deleteContract($id)
@@ -419,14 +418,14 @@ class SalesManagerController extends Controller
                 $performanceData[] = $this->getAgentStats($agent->id, $month, $year, $status);
             }
 
-            return view('managers.sales Manager.agent_performance', compact('performanceData', 'month', 'year', 'status'));
+            return view('managers.sales manager.agent_performance', compact('performanceData', 'month', 'year', 'status'));
         }
 
         // If ID provided, get specific agent's performance
         $agent = User::findOrFail($id);
         $performanceData = [$this->getAgentStats($id, $month, $year, $status)];
 
-        return view('managers.sales Manager.agent_performance', compact('performanceData', 'month', 'year', 'status'));
+        return view('managers.sales manager.agent_performance', compact('performanceData', 'month', 'year', 'status'));
     }
 
     public function agentContracts($id)
@@ -445,13 +444,13 @@ class SalesManagerController extends Controller
         }
 
         $contracts = $query->orderBy('created_at', 'desc')->get();
-        return view('managers.sales Manager.agent_contracts', compact('agent', 'contracts'));
+        return view('managers.sales manager.agent_contracts', compact('agent', 'contracts'));
     }
 
     public function viewContract($id)
     {
         $contract = contracts::with(['customer'])->findOrFail($id);
-        return view('managers.sales Manager.view_contract', compact('contract'));
+        return view('managers.sales manager.view_contract', compact('contract'));
     }
 
     private function getAgentStats($agentId, $month, $year, $status = null)
@@ -563,7 +562,7 @@ class SalesManagerController extends Controller
             ->limit(10)
             ->get();
 
-        return view('managers.sales Manager.single_agent_performance', compact(
+        return view('managers.sales manager.single_agent_performance', compact(
             'agent',
             'stats',
             'monthlyStats',
@@ -597,7 +596,7 @@ class SalesManagerController extends Controller
         }
 
         $requests = $query->orderBy('created_at', 'desc')->get();
-        return view('managers.sales Manager.postponement_requests', compact('requests'));
+        return view('managers.sales manager.postponement_requests', compact('requests'));
     }
 
     public function approvePostponement(Request $request)
@@ -696,7 +695,7 @@ class SalesManagerController extends Controller
         $salesAgents = User::where('role', 'sales')->get();
         $clients = $query->paginate(10);
 
-        return view('managers.sales Manager.manage_clients', compact('clients', 'salesAgents'));
+        return view('managers.sales manager.manage_clients', compact('clients', 'salesAgents'));
     }
 
     public function clientDetails($id)
@@ -706,13 +705,13 @@ class SalesManagerController extends Controller
             ->withSum('contracts', 'contract_price')
             ->findOrFail($id);
 
-        return view('managers.sales Manager.client_details', compact('client'));
+        return view('managers.sales manager.client_details', compact('client'));
     }
 
     public function editClient($id)
     {
         $client = client::findOrFail($id);
-        return view('managers.sales Manager.edit_client', compact('client'));
+        return view('managers.sales manager.edit_client', compact('client'));
     }
 
     public function updateClient(Request $request, $id)
@@ -794,7 +793,7 @@ class SalesManagerController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('managers.sales Manager.reports.contacts', compact('customers'));
+        return view('managers.sales manager.reports.contacts', compact('customers'));
     }
 
     public function pendingAnnexes()
@@ -804,6 +803,6 @@ class SalesManagerController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('managers.sales Manager.pending_annexes', compact('annexes'));
+        return view('managers.sales manager.pending_annexes', compact('annexes'));
     }
 }

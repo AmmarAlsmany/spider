@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\client;
 
 class LoginController extends Controller
 {
@@ -33,8 +35,8 @@ class LoginController extends Controller
 
         try {
             // First, try to find the user regardless of type
-            $user = \App\Models\User::where('email', $request->email)->first();
-            $client = \App\Models\Client::where('email', $request->email)->first();
+            $user = User::where('email', $request->email)->first();
+            $client = client::where('email', $request->email)->first();
 
             // Handle user authentication
             if ($user) {
@@ -43,7 +45,7 @@ class LoginController extends Controller
                 }
 
                 if ($user->role === 'client') {
-                    $clientProfile = \App\Models\Client::where('user_id', $user->id)->first();
+                    $clientProfile = client::where('user_id', $user->id)->first();
                     if (!$clientProfile || $clientProfile->status !== 'active') {
                         throw new \Exception('Your client account is not active. Please contact your sales representative.');
                     }

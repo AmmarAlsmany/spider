@@ -148,7 +148,7 @@ $property_types = [
                         <div class="step-trigger" role="tab" id="stepper1trigger3" aria-controls="test-l-3">
                             <div class="bs-stepper-circle">3</div>
                             <div class="">
-                                <h5 class="mb-0 steper-title">Branch information</h5>
+                                <h5 class="mb-1">Branch information</h5>
                                 <p class="mb-0 steper-sub-title">Branch Details</p>
                             </div>
                         </div>
@@ -441,6 +441,13 @@ $property_types = [
                         </div>
 
                         <div class="col-12 col-lg-6">
+                            <label for="first_payment_date" class="form-label">First Payment Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="first_payment_date" id="first_payment_date"
+                                x-model="first_payment_date" required min="{{ date('Y-m-d') }}">
+                            <div class="invalid-feedback">Please select a valid payment date</div>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
                             <label for="payment_type" class="form-label">Payment Type <span class="text-danger">*</span></label>
                             <select class="form-select" name="payment_type" id="payment_type" x-model="payment_type" required>
                                 <option value="prepaid">Prepaid (Full Amount)</option>
@@ -455,15 +462,6 @@ $property_types = [
                                 <input type="number" class="form-control" name="number_of_payments" id="number_of_payments"
                                     x-model="numberOfPayments" required min="1" max="24">
                                 <div class="invalid-feedback">Please enter a valid number of payments (1-24)</div>
-                            </div>
-                        </template>
-
-                        <template x-if="payment_type === 'prepaid'">
-                            <div class="col-12 col-lg-6">
-                                <label for="first_payment_date" class="form-label">Payment Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" name="first_payment_date" id="first_payment_date"
-                                    x-model="first_payment_date" required min="{{ date('Y-m-d') }}">
-                                <div class="invalid-feedback">Please select a valid payment date</div>
                             </div>
                         </template>
 
@@ -652,6 +650,7 @@ $property_types = [
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bs-stepper/dist/js/bs-stepper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script>
     var stepper;
     var currentStep = 0;

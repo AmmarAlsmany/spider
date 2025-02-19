@@ -87,7 +87,7 @@ class ContractsController extends Controller
             $rules = [
                 'clientName' => 'required|string',
                 'clientEmail' => 'required|email',
-                'clientPhone' => 'required|string|size:10',
+                'clientPhone' => 'required|string',
                 'clientMobile' => 'required|string',
                 'clientAddress' => 'required|string',
                 'client_zipcode' => 'nullable|numeric|min:0',

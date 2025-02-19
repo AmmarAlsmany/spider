@@ -223,7 +223,7 @@ class ContractsController extends Controller
         $contract->payment_type = $request->payment_type;
 
         if ($request->payment_type === 'postpaid') {
-            $contract->number_of_payments = $request->number_of_payments;
+            $contract->number_Payments = $request->number_of_payments;
         }
 
         if ($request->is_multi_branch == "yes") {

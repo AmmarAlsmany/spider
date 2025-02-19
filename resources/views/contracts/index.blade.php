@@ -458,6 +458,15 @@ $property_types = [
                             </div>
                         </template>
 
+                        <template x-if="payment_type === 'prepaid'">
+                            <div class="col-12 col-lg-6">
+                                <label for="first_payment_date" class="form-label">Payment Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="first_payment_date" id="first_payment_date"
+                                    x-model="first_payment_date" required min="{{ date('Y-m-d') }}">
+                                <div class="invalid-feedback">Please select a valid payment date</div>
+                            </div>
+                        </template>
+
                         <template x-if="payment_type === 'postpaid'">
                             <div class="col-12 col-lg-6">
                                 <label for="payment_schedule" class="form-label">Payment Schedule <span class="text-danger">*</span></label>
@@ -466,15 +475,6 @@ $property_types = [
                                     <option value="custom">Custom Dates</option>
                                 </select>
                                 <div class="invalid-feedback">Please select a payment schedule</div>
-                            </div>
-                        </template>
-
-                        <template x-if="payment_type === 'prepaid'">
-                            <div class="col-12 col-lg-6">
-                                <label for="first_payment_date" class="form-label">Payment Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" name="first_payment_date" id="first_payment_date"
-                                    x-model="first_payment_date" required min="{{ date('Y-m-d') }}">
-                                <div class="invalid-feedback">Please select a valid payment date</div>
                             </div>
                         </template>
 
@@ -530,7 +530,7 @@ $property_types = [
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h5 class="card-title mb-4">Contract Summary</h5>
+                                    <h5 class="mb-4 card-title">Contract Summary</h5>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <h6 class="mb-3">Client Information</h6>
@@ -583,7 +583,7 @@ $property_types = [
                                             </table>
                                         </div>
                                     </div>
-                                    <div class="row mt-4">
+                                    <div class="mt-4 row">
                                         <div class="col-md-6">
                                             <h6 class="mb-3">Payment Information</h6>
                                             <table class="table table-borderless">
@@ -611,6 +611,17 @@ $property_types = [
                                                     <tr>
                                                         <td><strong>Total Amount:</strong></td>
                                                         <td id="summary-total-amount"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>First Payment Date:</strong></td>
+                                                        <td id="summary-first-payment-date"></td>
+                                                    </tr>
+                                                    <tr id="summary-payment-dates-row" style="display: none;">
+                                                        <td colspan="2">
+                                                            <strong>Payment Schedule:</strong>
+                                                            <div id="summary-payment-dates" class="mt-2">
+                                                            </div>
+                                                        </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -1030,18 +1041,44 @@ $property_types = [
 
             // Payment Information
             const paymentType = getInputValue('payment_type');
-            const paymentSchedule = document.querySelector('input[name="payment_schedule"]:checked')?.value || 'monthly';
-            const numberOfPayments = getInputValue('numberOfPayments');
+            const paymentSchedule = document.querySelector('[name="payment_schedule"]')?.value || 'monthly';
+            const numberOfPayments = getInputValue('number_of_payments');
             const contractAmount = parseFloat(getInputValue('Contractamount')) || 0;
             const vatAmount = contractAmount * 0.15;
             const totalAmount = contractAmount * 1.15;
 
             document.getElementById('summary-payment-type').textContent = paymentType.charAt(0).toUpperCase() + paymentType.slice(1);
             document.getElementById('summary-payment-schedule').textContent = paymentSchedule.charAt(0).toUpperCase() + paymentSchedule.slice(1);
-            document.getElementById('summary-number-payments').textContent = numberOfPayments;
+            document.getElementById('summary-number-payments').textContent = numberOfPayments || '1';
             document.getElementById('summary-contract-amount').textContent = contractAmount.toFixed(2) + ' SAR';
             document.getElementById('summary-vat-amount').textContent = vatAmount.toFixed(2) + ' SAR';
             document.getElementById('summary-total-amount').textContent = totalAmount.toFixed(2) + ' SAR';
+            
+            // Payment Dates
+            const firstPaymentDate = getInputValue('first_payment_date');
+            document.getElementById('summary-first-payment-date').textContent = firstPaymentDate;
+
+            // Handle payment schedule dates
+            const paymentDatesRow = document.getElementById('summary-payment-dates-row');
+            const paymentDatesContainer = document.getElementById('summary-payment-dates');
+            
+            if (paymentType === 'postpaid' && paymentSchedule === 'custom' && numberOfPayments > 1) {
+                let paymentDatesHtml = '<ul class="mb-0 list-unstyled">';
+                paymentDatesHtml += `<li>Payment 1: ${firstPaymentDate}</li>`;
+                
+                for (let i = 1; i < parseInt(numberOfPayments); i++) {
+                    const date = getInputValue(`payment_date_${i + 1}`);
+                    if (date) {
+                        paymentDatesHtml += `<li>Payment ${i + 1}: ${date}</li>`;
+                    }
+                }
+                
+                paymentDatesHtml += '</ul>';
+                paymentDatesContainer.innerHTML = paymentDatesHtml;
+                paymentDatesRow.style.display = 'table-row';
+            } else {
+                paymentDatesRow.style.display = 'none';
+            }
 
             // Branch Information (if applicable)
             const branchsNumber = parseInt(getInputValue('branchs_number')) || 0;
@@ -1085,34 +1122,6 @@ $property_types = [
                         existingBranchInfo.remove();
                     }
                     summaryContainer.appendChild(branchInfo);
-                }
-            }
-
-            // Payment Dates
-            const paymentDatesList = document.getElementById('payment-dates-list');
-            if (paymentDatesList) {
-                paymentDatesList.innerHTML = '';
-
-                if (paymentSchedule === 'custom') {
-                    const dates = [];
-                    for (let i = 1; i <= numberOfPayments; i++) {
-                        const dateInput = document.getElementById(`payment_date_${i}`);
-                        if (dateInput && dateInput.value) {
-                            dates.push(`<div class="mb-2">Payment ${i}: ${dateInput.value}</div>`);
-                        }
-                    }
-                    paymentDatesList.innerHTML = dates.join('');
-                } else if (paymentSchedule === 'monthly') {
-                    const firstPaymentDate = getInputValue('first_payment_date');
-                    if (firstPaymentDate) {
-                        const startDate = new Date(firstPaymentDate);
-                        for (let i = 0; i < numberOfPayments; i++) {
-                            const paymentDate = new Date(startDate);
-                            paymentDate.setMonth(startDate.getMonth() + i);
-                            const dateString = paymentDate.toISOString().split('T')[0];
-                            paymentDatesList.innerHTML += `<div class="mb-2">Payment ${i + 1}: ${dateString}</div>`;
-                        }
-                    }
                 }
             }
         } catch (error) {
@@ -1268,6 +1277,44 @@ $property_types = [
         } else {
             // Clear custom date fields if not using custom schedule
             document.getElementById('custom-payment-dates').innerHTML = '';
+        }
+    }
+
+    function generateCustomPaymentDateFields(numberOfPayments) {
+        const container = document.getElementById('custom-payment-dates');
+        const firstPaymentDate = document.getElementById('first_payment_date').value;
+        
+        if (!firstPaymentDate) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'First Payment Date Required',
+                text: 'Please select the first payment date before setting custom dates'
+            });
+            return;
+        }
+
+        container.innerHTML = '';
+        
+        for (let i = 1; i < numberOfPayments; i++) {
+            const dateGroup = document.createElement('div');
+            dateGroup.className = 'mb-3';
+            
+            const label = document.createElement('label');
+            label.className = 'form-label';
+            label.htmlFor = `payment_date_${i + 1}`;
+            label.innerHTML = `Payment Date ${i + 1} <span class="text-danger">*</span>`;
+            
+            const input = document.createElement('input');
+            input.type = 'date';
+            input.className = 'form-control';
+            input.name = `payment_date_${i + 1}`;
+            input.id = `payment_date_${i + 1}`;
+            input.required = true;
+            input.min = firstPaymentDate;
+            
+            dateGroup.appendChild(label);
+            dateGroup.appendChild(input);
+            container.appendChild(dateGroup);
         }
     }
 </script>

@@ -260,7 +260,7 @@ class ContractsController extends Controller
                 $branch->branch_name = $branch_name;
                 $branch->branch_manager_name = $request->input("branchmanager{$i}");
                 $branch->branch_manager_phone = $phone;
-                $branch->branch_address = $request->input("branchadress{$i}");
+                $branch->branch_address = $request->input("branchAddress{$i}");
                 $branch->branch_city = $city;
                 $branch->contracts_id = $contract->id;
                 $branch->save();

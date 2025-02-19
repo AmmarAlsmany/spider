@@ -795,6 +795,7 @@ class ContractsController extends Controller
     {
         $contracts = contracts::where('sales_id', Auth::user()->id)
             ->where('contract_status', 'cancelled')
+            ->orWhere('contract_status', 'Not approved')
             ->with('customer') // Eager load customer relationship
             ->get();
 

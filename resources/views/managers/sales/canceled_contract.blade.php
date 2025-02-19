@@ -1,6 +1,16 @@
 @extends('shared.dashboard')
 @section('content')
     <div class="page-content">
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
         <div class="mb-4 page-breadcrumb d-flex align-items-center">
             <div class="pe-3 breadcrumb-title d-flex align-items-center">
                 <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">

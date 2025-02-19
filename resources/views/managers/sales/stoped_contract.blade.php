@@ -102,7 +102,7 @@
                                     <i class="bi bi-eye"></i> View
                                 </a>
                                 <button type="button" class="btn btn-sm btn-success" 
-                                    onclick="setContractId('{{ $contract->id }}')" 
+                                    onclick="setReturnContractId('{{ $contract->id }}')" 
                                     data-bs-toggle="modal" 
                                     data-bs-target="#returnContractModal">
                                     <i class="bi bi-arrow-clockwise"></i> Return Contract
@@ -150,111 +150,54 @@
 
 @push('scripts')
 <script>
-    function setContractId(id) {
+    function setReturnContractId(id) {
         document.getElementById('returnContractForm').action = "{{ route('contract.return', ['id' => ':id']) }}".replace(':id', id);
     }
 </script>
+<script>
+    $(document).ready(function() {
+        $('#example2').DataTable({
+            lengthChange: false,
+            pageLength: 10,
+            dom: '<"row"<"col-md-6"B><"col-md-6"f>>rtip',
+            buttons: [
+                {
+                    extend: 'copy',
+                    className: 'btn btn-light shadow-sm'
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn btn-light shadow-sm'
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-light shadow-sm'
+                },
+                {
+                    extend: 'print',
+                    className: 'btn btn-light shadow-sm'
+                }
+            ]
+        });
+    });
+</script>
 @endpush
 
+@push('styles')
 <style>
     .card {
         border: none;
         border-radius: 10px;
-        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .table {
-        border-radius: 10px;
-        overflow: hidden;
-        border: 1px solid #eee;
-    }
-
-    .table thead {
-        background-color: #f8f9fa;
-    }
-
-    .table thead th {
-        border-bottom: none;
+    .table th {
         font-weight: 600;
-        color: #444;
-        padding: 1rem 0.75rem;
-    }
-
-    .table td {
-        padding: 1rem 0.75rem;
-    }
-
-    .table tbody tr {
-        transition: all 0.2s ease;
-    }
-
-    .table tbody tr:hover {
         background-color: #f8f9fa;
     }
 
-    .client-icon {
-        width: 40px;
-        height: 40px;
-        background: #e9ecef;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .client-icon i {
-        font-size: 24px;
-        color: #6c757d;
-    }
-
-    .btn {
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-    }
-
-    .btn:hover {
-        transform: translateY(-2px);
-    }
-
-    .badge {
-        font-weight: 500;
-        letter-spacing: 0.5px;
+    .btn-sm {
+        padding: 5px 10px;
     }
 </style>
-
-<!-- DataTables Scripts -->
-<script src="{{ asset('backend/assets/plugins/datatable/js/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('backend/assets/plugins/datatable/js/dataTables.bootstrap5.min.js') }}"></script>
-<script>
-    $(document).ready(function() {
-            $('#example2').DataTable({
-                lengthChange: false,
-                pageLength: 10,
-                dom: '<"row"<"col-md-6"B><"col-md-6"f>>rtip',
-                buttons: [
-                    {
-                        extend: 'copy',
-                        className: 'btn btn-light shadow-sm'
-                    },
-                    {
-                        extend: 'excel',
-                        className: 'btn btn-light shadow-sm'
-                    },
-                    {
-                        extend: 'pdf',
-                        className: 'btn btn-light shadow-sm'
-                    },
-                    {
-                        extend: 'print',
-                        className: 'btn btn-light shadow-sm'
-                    }
-                ]
-            });
-        });
-</script>
+@endpush

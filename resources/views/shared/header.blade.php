@@ -147,29 +147,36 @@
 @push('scripts')
 <script>
     // Dark mode functionality
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', () => {
         const darkModeToggle = document.getElementById('darkModeToggle');
         const html = document.documentElement;
+
+        function setDarkMode(enabled) {
+            if (enabled) {
+                html.classList.add('dark-theme');
+                darkModeToggle.querySelector('i').classList.remove('bx-moon');
+                darkModeToggle.querySelector('i').classList.add('bx-sun');
+            } else {
+                html.classList.remove('dark-theme');
+                darkModeToggle.querySelector('i').classList.remove('bx-sun');
+                darkModeToggle.querySelector('i').classList.add('bx-moon');
+            }
+            localStorage.setItem('darkMode', enabled ? 'enabled' : 'disabled');
+
+            // Dispatch a custom event for other components to react
+            const event = new CustomEvent('themeChanged', { detail: { darkMode: enabled } });
+            document.dispatchEvent(event);
+        }
+
         // Check if dark mode was previously enabled
         if (localStorage.getItem('darkMode') === 'enabled') {
-            html.classList.add('dark-theme');
-            darkModeToggle.querySelector('i').classList.remove('bx-moon');
-            darkModeToggle.querySelector('i').classList.add('bx-sun');
+            setDarkMode(true);
         }
 
         // Toggle dark mode
         darkModeToggle.addEventListener('click', () => {
-            if (html.classList.contains('dark-theme')) {
-                html.classList.remove('dark-theme');
-                localStorage.setItem('darkMode', 'disabled');
-                darkModeToggle.querySelector('i').classList.remove('bx-sun');
-                darkModeToggle.querySelector('i').classList.add('bx-moon');
-            } else {
-                html.classList.add('dark-theme');
-                localStorage.setItem('darkMode', 'enabled');
-                darkModeToggle.querySelector('i').classList.remove('bx-moon');
-                darkModeToggle.querySelector('i').classList.add('bx-sun');
-            }
+            const isDarkMode = html.classList.contains('dark-theme');
+            setDarkMode(!isDarkMode);
         });
     });
 

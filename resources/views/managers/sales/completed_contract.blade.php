@@ -105,71 +105,20 @@
         .card {
             border: none;
             border-radius: 10px;
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        .table {
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid #eee;
-        }
-        .table thead {
-            background-color: #f8f9fa;
-        }
-        .table thead th {
-            border-bottom: none;
+
+        .table th {
             font-weight: 600;
-            color: #444;
-            padding: 1rem 0.75rem;
-        }
-        .table td {
-            vertical-align: middle;
-            padding: 1rem 0.75rem;
-        }
-        .table tbody tr {
-            transition: all 0.2s ease;
-        }
-        .table tbody tr:hover {
             background-color: #f8f9fa;
         }
-        .badge {
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-        .btn {
-            padding: 0.5rem 1rem;
-            font-weight: 500;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        .text-decoration-none:hover {
-            color: #0056b3 !important;
-        }
-        .dataTables_wrapper .dataTables_paginate .paginate-button {
-            border-radius: 8px;
-            margin: 0 2px;
-        }
-        .dataTables_wrapper .dataTables_filter input {
-            border-radius: 8px;
-            border: 1px solid #eee;
-            padding: 5px 10px;
-        }
-        .dataTables_wrapper .dataTables_length select {
-            border-radius: 8px;
-            border: 1px solid #eee;
+
+        .btn-sm {
             padding: 5px 10px;
         }
     </style>
 
-    <!-- DataTables Scripts -->
-    <script src="{{ asset('backend/assets/plugins/datatable/js/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('backend/assets/plugins/datatable/js/dataTables.bootstrap5.min.js') }}"></script>
+    @push('scripts')
     <script>
         $(document).ready(function() {
             $('#example2').DataTable({
@@ -179,22 +128,23 @@
                 buttons: [
                     {
                         extend: 'copy',
-                        className: 'btn btn-light shadow-sm'
+                        className: 'btn btn-secondary btn-sm'
                     },
                     {
                         extend: 'excel',
-                        className: 'btn btn-light shadow-sm'
+                        className: 'btn btn-secondary btn-sm'
                     },
                     {
                         extend: 'pdf',
-                        className: 'btn btn-light shadow-sm'
+                        className: 'btn btn-secondary btn-sm'
                     },
                     {
                         extend: 'print',
-                        className: 'btn btn-light shadow-sm'
+                        className: 'btn btn-secondary btn-sm'
                     }
                 ]
             });
         });
     </script>
+    @endpush
 @endsection

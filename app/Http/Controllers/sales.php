@@ -290,4 +290,14 @@ class sales extends Controller
 
         return view('managers.sales.ToDoList', compact('payments', 'filter'));
     }
+
+        // chnage status of the cancled or not approved contracts
+        public function return_contract(Request $request)
+        {
+            $contract = contracts::findOrFail($request->id);
+            $contract->contract_status = $request->status;
+            $contract->rejection_reason = null;
+            $contract->save();
+            return redirect()->back()->with('success', 'Contract status changed successfully');
+        }
 }

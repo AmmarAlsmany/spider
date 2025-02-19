@@ -38,11 +38,13 @@ class ContractsController extends Controller
      */
     public function index(Request $request)
     {
+        $contract_types = contracts_types::all();
+        $property_types = ['Residential', 'Commercial', 'Industrial', 'Government'];
         isset($request->client_id) ? $client_info = client::find($request->client_id) : $client_info = null;
         $branches = $request->branches;
         $contract_type_id = contracts_types::find($request->contract_type_id);
         $contract_number = $this->generator_contract_number();
-        return view('contracts.index', compact('client_info', 'branches', 'contract_type_id', 'contract_number'));
+        return view('contracts.index', compact('client_info', 'branches', 'contract_type_id', 'contract_number', 'contract_types', 'property_types'));
     }
 
     public function generator_contract_number()
@@ -90,32 +92,58 @@ class ContractsController extends Controller
                 'clientAddress' => 'required|string',
                 'client_zipcode' => 'nullable|numeric|min:0',
                 'client_tax_number' => 'nullable|numeric|min:0',
-                'client_city' => 'required|string',
+                'clientCity' => 'required|string',
                 'contractnumber' => 'required|string|unique:contracts,contract_number',
                 'contractstartdate' => 'required|date|after_or_equal:today',
                 'contractenddate' => 'required|date|after:contractstartdate',
-                'Property_type' => 'required|string',
+                'Property_type' => 'required|in:Residential,Commercial,Industrial,Government',
                 'contract_type_id' => 'required|exists:contracts_types,id',
+                'contract_description' => 'required|string',
+                'number_of_visits' => 'required|numeric|min:1',
                 'payment_type' => 'required|in:prepaid,postpaid',
                 'contractamount' => 'required|numeric|min:0',
-                'warrantyperiod' => 'required|numeric|min:0',
-                'number_of_visits' => 'required|numeric|min:0',
+                'warranty' => 'required|numeric|min:0',
+                'number_of_payments' => 'required_if:payment_type,postpaid|numeric|min:1',
+                'payment_schedule' => 'required_if:payment_type,postpaid|in:monthly,custom',
+                'payment_date_*' => 'required_if:payment_schedule,custom|date|after_or_equal:today'
             ];
 
-            if ($request->payment_type === 'postpaid') {
-                $rules['number_of_payments'] = 'required|integer|min:1';
-                $rules['first_payment_date'] = 'required|date|after_or_equal:today';
-                $rules['payment_schedule'] = 'required|in:monthly,custom';
+            $customMessages = [
+                'clientName.required' => 'The client name field is required.',
+                'clientEmail.required' => 'The client email field is required.',
+                'clientEmail.email' => 'Please enter a valid email address.',
+                'clientPhone.required' => 'The client phone field is required.',
+                'clientPhone.size' => 'The phone number must be exactly 10 digits.',
+                'clientMobile.required' => 'The client mobile field is required.',
+                'clientAddress.required' => 'The client address field is required.',
+                'clientCity.required' => 'The client city field is required.',
+                'contractnumber.required' => 'The contract number field is required.',
+                'contractnumber.unique' => 'This contract number is already in use.',
+                'contractstartdate.required' => 'The contract start date is required.',
+                'contractstartdate.after_or_equal' => 'The start date must be today or a future date.',
+                'contractenddate.required' => 'The contract end date is required.',
+                'contractenddate.after' => 'The end date must be after the start date.',
+                'Property_type.required' => 'The property type field is required.',
+                'contract_description.required' => 'The contract description field is required.',
+                'number_of_visits.required' => 'The number of visits field is required.',
+                'number_of_visits.numeric' => 'The number of visits must be a number.',
+                'number_of_visits.min' => 'The number of visits must be at least 1.',
+                'payment_type.required' => 'The payment type field is required.',
+                'contractamount.required' => 'The contract amount field is required.',
+                'contractamount.numeric' => 'The contract amount must be a number.',
+                'contractamount.min' => 'The contract amount must be greater than 0.',
+                'warranty.required' => 'The warranty period field is required.',
+                'warranty.numeric' => 'The warranty period must be a number.',
+                'warranty.min' => 'The warranty period must be 0 or greater.',
+                'number_of_payments.required_if' => 'The number of payments is required for postpaid payment type.',
+                'number_of_payments.numeric' => 'The number of payments must be a number.',
+                'number_of_payments.min' => 'The number of payments must be at least 1.',
+                'payment_schedule.required_if' => 'The payment schedule is required for postpaid payment type.',
+                'payment_date_*.required_if' => 'All payment dates are required for custom payment schedule.',
+                'payment_date_*.after_or_equal' => 'Payment dates must be today or future dates.'
+            ];
 
-                if ($request->payment_schedule === 'custom') {
-                    // Skip payment_date_1 since it uses first_payment_date
-                    for ($i = 2; $i <= $request->number_of_payments; $i++) {
-                        $rules["payment_date_$i"] = 'required|date|after_or_equal:first_payment_date';
-                    }
-                }
-            }
-
-            $request->validate($rules);
+            $request->validate($rules, $customMessages);
 
             #check the user already registered or not
             $client_info = client::where('email', $request->clientEmail)->first();
@@ -132,7 +160,7 @@ class ContractsController extends Controller
                 $client->mobile = $request->clientMobile;
                 $client->password = Hash::make($request->clientPhone);
                 $client->address = $request->clientAddress;
-                $client->city = $request->client_city;
+                $client->city = $request->clientCity;
                 $client->zip_code = $request->client_zipcode;
                 $client->tax_number = $request->client_tax_number;
                 $client->sales_id = Auth::user()->id;
@@ -179,6 +207,7 @@ class ContractsController extends Controller
         $amount = floatval($request->contractamount);
         $vat = $amount * 0.15;
         $total_amount = $amount + $vat;
+
         $contract = new contracts();
         $contract->customer_id = $client_info->id;
         $contract->sales_id = Auth::user()->id;
@@ -186,15 +215,15 @@ class ContractsController extends Controller
         $contract->contract_start_date = $request->contractstartdate;
         $contract->contract_end_date = $request->contractenddate;
         $contract->Property_type = $request->Property_type;
-        $contract->contract_type = $request->contract_type_id;
+        $contract->contract_type = $request->contract_type_id; // Use contract_type_id instead of contracttype
         $contract->contract_description = $request->contract_description;
         $contract->contract_price = $total_amount;
-        $contract->warranty = $request->warrantyperiod;
+        $contract->warranty = $request->warranty;
         $contract->number_of_visits = $request->number_of_visits;
         $contract->payment_type = $request->payment_type;
 
-        if ($request->number_of_payments) {
-            $contract->number_Payments = $request->number_of_payments;
+        if ($request->payment_type === 'postpaid') {
+            $contract->number_of_payments = $request->number_of_payments;
         }
 
         if ($request->is_multi_branch == "yes") {
@@ -244,7 +273,7 @@ class ContractsController extends Controller
         $total_amount = $amount + $vat;
 
         if ($request->payment_type === 'prepaid') {
-            $this->create_payment($contract->id, $client_info->id, $total_amount, now());
+            $this->create_payment($contract->id, $client_info->id, $total_amount, $request->first_payment_date);
         } else {
             $payment_amount = $total_amount / intval($request->number_of_payments);
 

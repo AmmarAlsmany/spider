@@ -16,13 +16,13 @@ return new class extends Migration
             $table->string('contract_number')->unique();
             $table->foreignId('customer_id')->constrained('clients')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('sales_id')->constrained("users")->onDelete('cascade')->onUpdate('cascade');
-            $table->string('Property_type');
+            $table->enum('Property_type',["Residential","Commercial","Industrial","Government"])->nullable();
             $table->foreignId('contract_type')->constrained('contracts_types')->onDelete('cascade')->onUpdate('cascade');
             $table->string('contract_price');
             $table->enum('contract_status',["approved","pending","Not approved","completed","stopped","canceled"])->default("pending");
             $table->string('rejection_reason')->nullable();
             $table->string('contract_description');
-            $table->string('Payment_type');
+            $table->enum('Payment_type',["postpaid","prepaid"])->default("postpaid");
             $table->integer('number_Payments')->nullable();
             $table->enum('is_multi_branch',["yes","no"])->default("no");
             $table->enum('is_finish',["1","0"])->default("0");

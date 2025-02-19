@@ -19,7 +19,7 @@ class TeamLeaderController extends Controller
     {
         // Get the authenticated team leader's team
         $team = Team::where('team_leader_id', Auth::id())->first();
-        
+
         if (!$team) {
             return redirect()->back()->with('error', 'No team assigned.');
         }

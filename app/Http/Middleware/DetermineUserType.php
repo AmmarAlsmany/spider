@@ -17,12 +17,27 @@ class DetermineUserType
     {
         if (auth()->guard('web')->check()) {
             // User is logged in as regular user
-            return redirect()->route('usr.dashboard');
+            $user = auth()->user()->role;
+            if($user === 'admin'){
+                return redirect()->route('admin.dashboard');
+            }elseif($user === 'team_leader'){
+                return redirect()->route('team-leader.dashboard');
+            }elseif($user === 'sales_manager'){
+                return redirect()->route('sales_manager.dashboard');
+            }elseif($user === 'technical'){
+                return redirect()->route('technical.dashboard');
+            }elseif($user === 'sales'){
+                return redirect()->route('sales.dashboard');
+            }elseif($user === 'finance'){
+                return redirect()->route('finance.dashboard');
+            }else{
+                return redirect()->route('login');
+            }
         }
 
         if (auth()->guard('client')->check()) {
             // User is logged in as client
-            return redirect()->route('cli.dashboard');
+            return redirect()->route('client.dashboard');
         }
 
         return $next($request);

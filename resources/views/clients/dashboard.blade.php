@@ -228,6 +228,7 @@
                                         <thead class="table-light">
                                             <tr>
                                                 <th>Date</th>
+                                                <th>Time</th>
                                                 <th>Status</th>
                                                 <th>Actions</th>
                                             </tr>
@@ -236,6 +237,8 @@
                                             @foreach($visits as $visit)
                                             <tr>
                                                 <td>{{ $visit->visit_date }}</td>
+                                                <td>{{ $visit->visit_time }}</td>
+                                                
                                                 <td>
                                                     <span class="badge {{ 
                                                         $visit->status == 'scheduled' ? 'bg-info' : 
@@ -271,6 +274,7 @@
                                                         </div>
                                                         <div class="modal-body">
                                                             <p><strong>Visit Date:</strong> {{ $visit->visit_date }}</p>
+                                                            <p><strong>Visit Time:</strong> {{ $visit->visit_time }}</p>
                                                             <p><strong>Status:</strong> 
                                                                 <span class="badge {{ 
                                                                     $visit->status == 'scheduled' ? 'bg-info' : 
@@ -281,8 +285,8 @@
                                                                 </span>
                                                             </p>
                                                             <div class="mt-3">
-                                                                <h6>Notes:</h6>
-                                                                <p class="text-muted">{{ $visit->notes ?: 'No notes available.' }}</p>
+                                                                <h6>Team Notes:</h6>
+                                                                <p class="text-muted">{{ $visit->report && $visit->report->recommendations ? $visit->report->recommendations : 'No notes available.' }}</p>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">

@@ -2,27 +2,30 @@
 @section('content')
 <div class="page-content">
     @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bx bx-check-circle me-1"></i>
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bx bx-check-circle me-1"></i>
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @endif
     @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bx bx-error-circle me-1"></i>
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bx bx-error-circle me-1"></i>
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @endif
     <div class="mb-3 page-breadcrumb d-none d-sm-flex align-items-center">
         <div class="breadcrumb-title pe-3">{{ __('visits.contract_visits') }}</div>
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="p-0 mb-0 breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('client.dashboard') }}"><i class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('client.show') }}">{{ __('visits.contracts') }}</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ __('visits.contract_number', ['number' => $contract->contract_number]) }}</li>
+                    <li class="breadcrumb-item"><a href="{{ route('client.dashboard') }}"><i
+                                class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('client.show') }}">{{ __('visits.contracts') }}</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('visits.contract_number', ['number' =>
+                        $contract->contract_number]) }}</li>
                 </ol>
             </nav>
         </div>
@@ -49,11 +52,13 @@
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <span>{{ __('visits.details.start_date') }}</span>
-                                    <strong>{{ \Carbon\Carbon::parse($contract->contract_start_date)->format('M d, Y') }}</strong>
+                                    <strong>{{ \Carbon\Carbon::parse($contract->contract_start_date)->format('M d, Y')
+                                        }}</strong>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <span>{{ __('visits.details.end_date') }}</span>
-                                    <strong>{{ \Carbon\Carbon::parse($contract->contract_end_date)->format('M d, Y') }}</strong>
+                                    <strong>{{ \Carbon\Carbon::parse($contract->contract_end_date)->format('M d, Y')
+                                        }}</strong>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <span>{{ __('visits.details.type') }}</span>
@@ -61,7 +66,8 @@
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <span>{{ __('visits.details.warranty') }}</span>
-                                    <strong>{{ __('visits.details.warranty_months', ['months' => $contract->warranty]) }}</strong>
+                                    <strong>{{ __('visits.details.warranty_months', ['months' => $contract->warranty])
+                                        }}</strong>
                                 </li>
                             </ul>
                         </div>
@@ -74,7 +80,8 @@
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <span>{{ __('visits.details.status') }}</span>
-                                    <span class="badge bg-{{ $contract->contract_status == 'approved' ? 'success' : 'warning' }}">
+                                    <span
+                                        class="badge bg-{{ $contract->contract_status == 'approved' ? 'success' : 'warning' }}">
                                         {{ ucfirst($contract->contract_status) }}
                                     </span>
                                 </li>
@@ -84,7 +91,8 @@
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <span>{{ __('visits.details.completed_visits') }}</span>
-                                    <strong>{{ $contract->visitSchedules->where('status', 'completed')->count() }}</strong>
+                                    <strong>{{ $contract->visitSchedules->where('status', 'completed')->count()
+                                        }}</strong>
                                 </li>
                             </ul>
                         </div>
@@ -103,89 +111,64 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table mb-0 align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>{{ __('visits.table.number') }}</th>
-                            <th>{{ __('visits.table.date') }}</th>
-                            <th>{{ __('visits.table.time') }}</th>
-                            <th>{{ __('visits.table.location') }}</th>
-                            <th>{{ __('visits.table.address') }}</th>
-                            <th>{{ __('visits.table.status') }}</th>
-                            <th>{{ __('visits.table.team') }}</th>
-                            <th>{{ __('visits.table.actions') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($contract->visitSchedules as $index => $visit)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ \Carbon\Carbon::parse($visit->visit_date)->format('M d, Y') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($visit->visit_time)->format('h:i A') }}</td>
-                            <td>
-                                <span class="d-flex align-items-center">
-                                    <i class="bx bx-map-pin me-1"></i>
-                                    {{ $visit->branch->branch_name ??__('visits.location.not_specified') }}
-                                </span>
-                            </td>
-                            <td>
-                                <small class="text-muted">
-                                    {{ $visit->branch->branch_address ?? $visit->contract->customer->address }}
-                                </small>
-                            </td>
-                            <td>
-                                @if($visit->status == 'completed')
-                                    <span class="badge bg-success">{{ __('visits.status.completed') }}</span>
-                                @elseif($visit->status == 'scheduled')
-                                    <span class="badge bg-info">{{ __('visits.status.scheduled') }}</span>
-                                @elseif($visit->status == 'cancelled')
-                                    <span class="badge bg-danger">{{ __('visits.status.cancelled') }}</span>
-                                @else
-                                    <span class="badge bg-secondary">{{ ucfirst($visit->status) }}</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if($visit->team)
-                                    <span class="d-flex align-items-center">
-                                        <i class="bx bx-group me-1"></i>
-                                        {{ $visit->team->name }}
-                                    </span>
-                                @else
-                                    <span class="text-muted">{{ __('visits.team.not_assigned') }}</span>
-                                @endif
-                            </td>
-                            <td>
-                                <div class="gap-2 d-flex">
-                                    @if($visit->status == 'completed')
-                                        <a href="{{ route('client.visit.details', $visit->id) }}" 
-                                           class="gap-1 btn btn-sm btn-primary d-flex align-items-center">
-                                            <i class="bx bx-file"></i>
-                                            {{ __('visits.actions.view_report') }}
-                                        </a>
-                                    @else
-                                        <button type="button" 
-                                                class="gap-1 btn btn-sm btn-secondary d-flex align-items-center"
-                                                onclick="editVisit('{{ $visit->id }}', '{{ $visit->visit_date }}', '{{ $visit->visit_time }}')">
-                                            <i class="bx bx-edit"></i>
-                                            {{ __('visits.actions.reschedule') }}
-                                        </button>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="8" class="py-4 text-center">
-                                <div class="text-muted">
-                                    <i class="bx bx-calendar-x fs-1"></i>
-                                    <p class="mt-2">{{ __('visits.no_visits') }}</p>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+            <div class="row g-3">
+                @php
+                $visitsByLocation = $contract->visitSchedules->groupBy('branch.branch_name');
+                @endphp
+
+                @foreach($visitsByLocation as $location => $visits)
+                <div class="col-lg-6">
+                    <div class="border card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="bx bx-map-pin me-2"></i>{{ $location }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table mb-0 align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>{{ __('visits.table.number') }}</th>
+                                            <th>{{ __('visits.table.date') }}</th>
+                                            <th>{{ __('visits.table.time') }}</th>
+                                            <th>{{ __('visits.table.status') }}</th>
+                                            <th>{{ __('visits.table.actions') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($visits as $visit)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($visit->visit_date)->format('M d, Y') }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($visit->visit_time)->format('h:i A') }}</td>
+                                            <td>
+                                                <span class="badge bg-{{ $visit->status == 'completed' ? 'success' : ($visit->status == 'scheduled' ? 'primary' : 'warning') }}">
+                                                    {{ ucfirst($visit->status) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if($visit->status == 'scheduled')
+                                                    <button type="button" class="btn btn-sm btn-outline-primary edit-visit"
+                                                        data-bs-toggle="modal" data-bs-target="#editVisitModal"
+                                                        data-visit-id="{{ $visit->id }}"
+                                                        data-visit-date="{{ $visit->visit_date }}"
+                                                        data-visit-time="{{ $visit->visit_time }}">
+                                                        <i class="bx bx-edit-alt me-1"></i>{{ __('visits.actions.edit') }}
+                                                    </button>
+                                                @elseif($visit->status == 'completed' && $visit->report)
+                                                    <a href="{{ route('client.visit.details', $visit->id) }}" class="btn btn-sm btn-info">
+                                                        <i class="bx bx-show me-1"></i>View
+                                                    </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
             </div>
         </div>
     </div>
@@ -212,7 +195,8 @@
                         <input type="time" name="visit_time" id="visit_time" class="form-control" required>
                     </div>
                     <div class="px-0 pb-0 modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('visits.edit_visit.cancel') }}</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{
+                            __('visits.edit_visit.cancel') }}</button>
                         <button type="submit" class="btn btn-primary">{{ __('visits.edit_visit.update') }}</button>
                     </div>
                 </form>
@@ -223,26 +207,15 @@
 
 @push('scripts')
 <script>
-    function editVisit(visitId, visitDate, visitTime) {
-        document.getElementById('visit_id').value = visitId;
-        document.getElementById('visit_date').value = visitDate;
-        document.getElementById('visit_time').value = visitTime;
-        
-        const modal = new bootstrap.Modal(document.getElementById('editVisitModal'));
-        modal.show();
-    }
+    $(document).ready(function() {
+        $('.edit-visit').on('click', function() {
+            var visitId = $(this).data('visit-id');
+            var visitDate = $(this).data('visit-date');
+            var visitTime = $(this).data('visit-time');
 
-    // Handle modal close properly
-    document.querySelectorAll('[data-bs-dismiss="modal"]').forEach(button => {
-        button.addEventListener('click', () => {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editVisitModal'));
-            if (modal) {
-                modal.hide();
-                // Remove backdrop after modal is hidden
-                setTimeout(() => {
-                    document.querySelector('.modal-backdrop').remove();
-                }, 200);
-            }
+            $('#visit_id').val(visitId);
+            $('#visit_date').val(visitDate);
+            $('#visit_time').val(visitTime);
         });
     });
 </script>

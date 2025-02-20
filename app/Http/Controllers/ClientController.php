@@ -449,7 +449,7 @@ class ClientController extends Controller
 
         // notify technical managers
         $data = [
-            'title' => "Visit Change Request for " . $visit->team->name . " - " . $visit->team->client->name,
+            'title' => "Visit Change Request" . ($visit->team ? " for " . $visit->team->name : "") . " - Contract #" . $visit->contract->contract_number,
             'message' => "Visit on " . Carbon::parse($visit->visit_date)->format('M d, Y') . " at " . $visit->visit_time . " the client has requested a change.",
             'url' => "#",
         ];

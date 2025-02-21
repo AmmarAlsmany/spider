@@ -369,8 +369,19 @@ class TechnicalController extends Controller
 
     public function viewScheduledAppointments(Request $request)
     {
-        $query = VisitSchedule::with(['contract', 'contract.customer', 'team'])
-            ->where('status', 'scheduled');
+        // Base query for visit schedules with relationships
+        $baseQuery = VisitSchedule::with([
+            'contract', 
+            'contract.customer', 
+            'contract.branchs',
+            'team',
+            'branch'
+        ])->whereHas('contract', function($q) {
+            $q->where('contract_status', 'approved');
+        });
+
+        // Clone the base query for filtering
+        $query = clone $baseQuery;
 
         // Filter by date range if provided
         if ($request->has('start_date') && $request->has('end_date')) {
@@ -391,21 +402,32 @@ class TechnicalController extends Controller
                 ->whereYear('visit_date', now()->year);
         }
 
-        // Filter by team if provided
-        if ($request->filled('team_id')) {
-            $query->where('team_id', $request->team_id);
-        }
-
         // Filter by contract number if provided
-        if ($request->filled('contract_number')) {
-            $query->whereHas('contract', function ($q) use ($request) {
+        if ($request->has('contract_number')) {
+            $query->whereHas('contract', function($q) use ($request) {
                 $q->where('contract_number', 'like', '%' . $request->contract_number . '%');
             });
         }
 
-        $visits = $query->orderBy('visit_date', 'asc')
-            ->orderBy('visit_time', 'asc')
-            ->get();
+        // Get all filtered visits
+        $filteredVisits = $query->orderBy('visit_date')->get();
+        
+        // Group visits by contract
+        $groupedVisits = $filteredVisits->groupBy('contract_id');
+        
+        // Paginate the contracts
+        $page = request()->get('page', 1);
+        $perPage = 10;
+        $paginatedContracts = $groupedVisits->forPage($page, $perPage);
+        
+        // Create a new paginator for the contracts
+        $visits = new \Illuminate\Pagination\LengthAwarePaginator(
+            $paginatedContracts,
+            $groupedVisits->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url()]
+        );
 
         // Get teams for assignment
         $teams = Team::all();
@@ -415,7 +437,23 @@ class TechnicalController extends Controller
             $query->where('contract_status', 'approved');
         })->get();
 
-        return view('managers.technical.scheduled_appointments', compact('visits', 'teams', 'clients'));
+        // Calculate today's visits for statistics
+        $todayVisits = $baseQuery->whereDate('visit_date', now()->toDateString())->count();
+
+        // Get total visits count from database without filters
+        $totalVisits = $baseQuery->count();
+
+        // Get filtered visits count
+        $filteredVisitsCount = $filteredVisits->count();
+
+        return view('managers.technical.scheduled_appointments', compact(
+            'visits',
+            'teams', 
+            'clients', 
+            'todayVisits',
+            'totalVisits',
+            'filteredVisitsCount'
+        ));
     }
 
     public function markAppointmentComplete($appointmentId)
@@ -450,8 +488,7 @@ class TechnicalController extends Controller
 
     public function viewCompletedVisits(Request $request)
     {
-        $query = VisitSchedule::with(['contract', 'contract.customer', 'team'])
-            ->where('status', 'completed');
+        $query = VisitSchedule::with(['contract', 'contract.customer', 'team']);
 
         // Filter by date range if provided
         if ($request->filled('start_date')) {
@@ -486,8 +523,7 @@ class TechnicalController extends Controller
 
     public function viewCancelledVisits(Request $request)
     {
-        $query = VisitSchedule::with(['contract', 'contract.customer', 'team'])
-            ->where('status', 'cancelled');
+        $query = VisitSchedule::with(['contract', 'contract.customer', 'team']);
 
         // Filter by date range if provided
         if ($request->filled('start_date')) {

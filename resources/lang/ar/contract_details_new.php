@@ -29,6 +29,7 @@ return [
     'button_save' => 'حفظ التغييرات',
     'button_view_payment_details' => 'تفاصيل الدفعة',
     'button_view_invoice' => 'عرض الفاتورة',
+    'button_view_visit' => 'عرض جدول الزيارات',
 
     // Contract Information
     'contract_info_title' => 'معلومات العقد',

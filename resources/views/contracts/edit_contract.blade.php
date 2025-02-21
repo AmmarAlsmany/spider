@@ -209,7 +209,7 @@
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="includeTax" 
                                         name="include_tax" {{ old('include_tax') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="includeTax">
+                                    <label class="form-check-label" for="includeTax" checked>
                                         Include Tax (15%)
                                     </label>
                                 </div>
@@ -239,13 +239,13 @@
                     </select>
                     <div class="invalid-feedback">Please select a payment schedule.</div>
                 </div>
-                <div class="form-group">
+                {{-- <div class="form-group">
                     <label for="contract_end_date">End Date <span data-toggle="tooltip"
                             title="Select the end date of the contract">(?)</span></label>
                     <input type="date" class="form-control" id="contract_end_date" name="contract_end_date"
                         value="{{ $contract->contract_end_date }}" required>
                     <div class="invalid-feedback">Please select an end date.</div>
-                </div>
+                </div> --}}
             </fieldset>
             <fieldset class="mb-4">
                 <legend>Client Information</legend>

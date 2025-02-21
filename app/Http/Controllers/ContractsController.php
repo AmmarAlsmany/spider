@@ -575,7 +575,10 @@ class ContractsController extends Controller
                 'branch_address.*' => 'required_if:is_multi_branch,yes|string',
                 'branch_city.*' => 'required_if:is_multi_branch,yes|string',
                 'payment_amount.*' => 'required|numeric|min:0',
-                'payment_date.*' => 'required|date|after_or_equal:contract_start_date'
+                'payment_date.*' => 'required|date|after_or_equal:contract_start_date',
+                'number_of_visits' => 'required|integer|min:1',
+                'Property_type' => 'required|string|in:Residential,Commercial,Industrial,Government',
+
             ]);
 
             DB::beginTransaction();
@@ -1100,17 +1103,6 @@ class ContractsController extends Controller
             $this->notifyRoles(['client', 'sales', 'sales_manager', 'technical'], $notificationData, $annex->contract->customer_id, $annex->contract->sales_id);
 
             DB::commit();
-
-            // Notify the team leader,client,sales manager,technical
-            $notificationData = [
-                'title' => 'Annex Rejected',
-                'message' => "Annex {$annex->annex_number} has been rejected for contract {$annex->contract->contract_number}",
-                'type' => 'info',
-                'url' => "#",
-                'priority' => 'high',
-            ];
-
-            $this->notifyRoles(['team_leader', 'client', 'sales_manager', 'technical'], $notificationData, $annex->contract->customer_id, $annex->contract->sales_id);
 
             return back()->with('success', 'Annex rejected successfully');
         } catch (\Exception $e) {

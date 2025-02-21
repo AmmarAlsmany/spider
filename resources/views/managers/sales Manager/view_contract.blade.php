@@ -173,9 +173,9 @@
                         </table>
                     </div>
                     @if($visitSchedules->hasPages())
-                    <div class="d-flex justify-content-end mt-4">
+                    <div class="mt-4 d-flex justify-content-end">
                         <nav>
-                            <ul class="pagination pagination-sm mb-0">
+                            <ul class="mb-0 pagination pagination-sm">
                                 {{-- Previous Page Link --}}
                                 @if ($visitSchedules->onFirstPage())
                                     <li class="page-item disabled">

@@ -45,27 +45,33 @@
                             strtotime($contract->created_at))}}
                         </p>
                     </div>
-                    <div class="gap-2 d-flex">
+                    <div class="gap-2 d-flex flex-column flex-md-row">
                         @if($contract->status !== 'stopped')
-                        <button class="btn btn-danger" onclick="stopContract({{ $contract->id }})">
+                        <button class="btn btn-danger w-100 w-md-auto" onclick="stopContract({{ $contract->id }})">
                             <i class="bx bx-stop-circle me-1"></i>
                             {{ __('contract_details_new.button_stop_contract') }}
                         </button>
                         @endif
-                        <button class="btn btn-success" onclick="generatePDF()">
+                        <button class="btn btn-success w-100 w-md-auto" onclick="generatePDF()">
                             <i class="bx bx-download me-1"></i>
                             {{ __('contract_details_new.button_download_pdf') }}
                         </button>
-                        <a href="{{ route('contract.edit', $contract->id) }}" class="btn btn-warning">
+                        <a href="{{ route('contract.edit', $contract->id) }}" class="btn btn-warning w-100 w-md-auto">
                             <i class="bx bx-edit me-1"></i>
                             {{ __('contract_details_new.button_edit_contract') }}
                         </a>
                         {{-- create annex --}}
-                        <a href="{{ route('contracts.annex.create', $contract->id) }}" class="btn btn-primary">
+                        <a href="{{ route('contracts.annex.create', $contract->id) }}" class="btn btn-primary w-100 w-md-auto">
                             <i class="bx bx-plus me-1"></i>
                             {{ __('contract_details_new.button_add_annex') }}
                         </a>
                         {{-- end create annex --}}
+                        {{-- view the visit schedule --}}
+                        <a href="{{ route('view.contract.visit', $contract->id) }}" class="btn btn-info w-100 w-md-auto">
+                            <i class="bx bx-show me-1"></i>
+                            {{ __('contract_details_new.button_view_visit') }}
+                        </a>
+                        {{-- end view the visit schedule --}}
                     </div>
                 </div>
             </div>

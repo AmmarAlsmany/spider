@@ -92,7 +92,8 @@
                                 <div class="text-white card bg-primary">
                                     <div class="card-body">
                                         <h5 class="card-title">Today's Visits</h5>
-                                        <h3 class="card-text">{{ $visits->where('visit_date', date('Y-m-d'))->count() }}
+                                        <h3 class="card-text">
+                                            {{ $todayVisits }}
                                         </h3>
                                     </div>
                                 </div>
@@ -100,25 +101,13 @@
                             <div class="col-md-3">
                                 <div class="text-white card bg-success">
                                     <div class="card-body">
-                                        <h5 class="card-title">Completed Today</h5>
-                                        <h3 class="card-text">{{ $visits->where('visit_date',
-                                            date('Y-m-d'))->where('status', 'completed')->count() }}</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-white card bg-warning">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Pending</h5>
-                                        <h3 class="card-text">{{ $visits->where('status', 'scheduled')->count() }}</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-white card bg-info">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Total Teams Active</h5>
-                                        <h3 class="card-text">{{ $teams->count() }}</h3>
+                                        <h5 class="card-title">Total Visits</h5>
+                                        <h3 class="card-text">
+                                            {{ $totalVisits }}
+                                        </h3>
+                                        @if($filteredVisitsCount != $totalVisits)
+                                            <small>Showing {{ $filteredVisitsCount }} filtered visits</small>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -126,14 +115,13 @@
 
                         <!-- Appointments Grouped by Contract -->
                         <div class="accordion" id="appointmentsAccordion">
-                            @php
-                            $groupedVisits = $visits->groupBy('contract_id');
-                            @endphp
-                            @foreach($groupedVisits as $contractId => $contractVisits)
+                            @foreach($visits as $contractId => $contractVisits)
                             @php
                             $contract = $contractVisits->first()->contract;
-                            $completedVisits = $contractVisits->where('status', 'completed')->count();
+                            $branchCount = $contract->is_multi_branch ? $contract->branchs->count() : 1;
                             $totalVisits = $contractVisits->count();
+                            $completedVisits = $contractVisits->where('status', 'completed')->count();
+                            $visitsPerBranch = $contract->is_multi_branch ? ceil($totalVisits / $branchCount) : $totalVisits;
                             @endphp
                             <div class="mb-2 accordion-item">
                                 <h2 class="accordion-header" id="heading{{ $contractId }}">
@@ -146,21 +134,27 @@
                                                 <strong>
                                                     Contract #{{ $contract->contract_number }}
                                                     <a href="{{ route('technical.contract.show', $contract->id) }}"
-                                                        class="btn btn-sm btn-outline-primary ms-2"
-                                                        onclick="event.stopPropagation();">
-                                                        <i class="fas fa-external-link-alt me-1"></i>View Details
+                                                        class="text-primary ms-2">
+                                                        <i class="bx bx-link-external"></i>
                                                     </a>
-                                                </strong> -
-                                                {{ $contract->customer->name }}
+                                                </strong>
+                                                <br>
+                                                <small class="text-muted">
+                                                    {{ $contract->customer->name }} - 
+                                                    Completed: {{ $completedVisits }}/{{ $totalVisits }} visits
+                                                    ({{ $totalVisits - $completedVisits }} pending)
+                                                    @if($contract->is_multi_branch)
+                                                    <br>
+                                                    <span class="text-info">{{ $visitsPerBranch }} visits × {{ $branchCount }} branches</span>
+                                                    @endif
+                                                </small>
                                             </div>
                                             <div>
-                                                <span class="badge bg-info me-2">{{ $completedVisits }}/{{
-                                                    $totalVisits }} Visits</span>
+                                                <span class="badge bg-info me-2">{{ $completedVisits }}/{{ $totalVisits }} Visits</span>
                                                 @if($contract->contract_status === 'approved')
                                                 <span class="badge bg-success">Active</span>
                                                 @else
-                                                <span class="badge bg-warning">{{ ucfirst($contract->contract_status)
-                                                    }}</span>
+                                                <span class="badge bg-danger">Inactive</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -169,73 +163,61 @@
                                 <div id="collapse{{ $contractId }}"
                                     class="accordion-collapse collapse {{ request('contract_number') ? 'show' : '' }}"
                                     data-bs-parent="#appointmentsAccordion">
-                                    <div class="accordion-body">
+                                    <div class="accordion-body p-0">
                                         <div class="table-responsive">
-                                            <table class="table table-bordered table-hover">
+                                            <table class="table table-bordered table-hover mb-0">
                                                 <thead class="table-light">
-                                                    <tr>
-                                                        <th>Visit Date</th>
-                                                        <th>Visit Time</th>
-                                                        <th>Team</th>
-                                                        <th>Visit Number</th>
+                                                    <tr class="text-center">
+                                                        <th style="width: 120px;">Visit Date</th>
+                                                        <th style="width: 120px;">Visit Time</th>
+                                                        <th style="width: 150px;">Team</th>
                                                         <th>Location</th>
-                                                        <th>Status</th>
-                                                        <th>Actions</th>
+                                                        <th style="width: 100px;">Status</th>
+                                                        <th style="width: 120px;">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @foreach($contractVisits->sortBy('visit_date') as $visit)
+                                                    @foreach($contractVisits as $visit)
                                                     <tr>
-                                                        <td>{{
-                                                            \Carbon\Carbon::parse($visit->visit_date)->format('Y-m-d')
-                                                            }}</td>
-                                                        <td>{{ $visit->visit_time }}</td>
-                                                        <td>
-                                                            <span class="d-flex align-items-center">
-                                                                <i class="fas fa-users me-2"></i>
+                                                        <td class="text-center">{{ \Carbon\Carbon::parse($visit->visit_date)->format('Y-m-d') }}</td>
+                                                        <td class="text-center">{{ $visit->visit_time }}</td>
+                                                        <td class="text-center">
+                                                            <span class="badge bg-primary">
                                                                 {{ $visit->team->name }}
                                                             </span>
                                                         </td>
-                                                        <td>Visit {{ $visit->visit_number }} of {{ $totalVisits }}</td>
-                                                        <td>{{ $visit->branch->branch_address ??
-                                                            $contract->customer->address }}</td>
-                                                        <td>
-                                                            @if($visit->status === 'completed')
+                                                        <td>{{ $visit->branch->branch_address ?? $contract->customer->address }}</td>
+                                                        <td class="text-center">
+                                                            @if($visit->status === 'scheduled')
+                                                            <span class="badge bg-warning">Scheduled</span>
+                                                            @elseif($visit->status === 'completed')
                                                             <span class="badge bg-success">Completed</span>
-                                                            @elseif($visit->status === 'in_progress')
-                                                            <span class="badge bg-warning">In Progress</span>
-                                                            @elseif($visit->status === 'cancelled')
-                                                            <span class="badge bg-danger">Cancelled</span>
                                                             @else
-                                                            <span class="badge bg-info">Scheduled</span>
+                                                            <span class="badge bg-danger">{{ ucfirst($visit->status) }}</span>
                                                             @endif
                                                         </td>
                                                         <td>
-                                                            @if($visit->status !== 'completed' && $visit->status !==
-                                                            'cancelled')
-                                                            <div class="btn-group">
+                                                            <div class="action-buttons">
+                                                                @if($visit->status === 'scheduled')
                                                                 <button type="button" class="btn btn-primary btn-sm"
-                                                                    onclick="openEditModal({{ $visit->id }}, 
-                                                                                '{{ $visit->visit_date }}', 
-                                                                                '{{ $visit->visit_time }}', 
+                                                                    onclick="editAppointment({{ $visit->id }}, '{{ $visit->visit_date }}',
+                                                                                '{{ $visit->visit_time }}',
                                                                                 {{ $visit->team_id }})">
-                                                                    <i class="fas fa-edit me-1"></i> Edit
+                                                                    <i class="fas fa-edit"></i>
                                                                 </button>
-                                                                {{--
-                                                                @if(\Carbon\Carbon::parse($visit->visit_date)->isToday())
-                                                                <a href="{{ route('technical.appointment.complete', $visit->id) }}"
-                                                                    class="btn btn-success btn-sm"
-                                                                    onclick="return confirm('Are you sure you want to mark this appointment as completed?')">
-                                                                    <i class="fas fa-check me-1"></i> Complete
-                                                                </a>
-                                                                @endif --}}
                                                                 <a href="{{ route('technical.appointment.cancel', $visit->id) }}"
                                                                     class="btn btn-danger btn-sm"
                                                                     onclick="return confirm('Are you sure you want to cancel this appointment?')">
-                                                                    <i class="fas fa-times me-1"></i> Cancel
+                                                                    <i class="fas fa-times"></i>
                                                                 </a>
+                                                                @endif
+                                                                @if($visit->status === 'completed')
+                                                                <a href="{{ route('technical.visit.report.view', $visit->id) }}"
+                                                                    class="btn btn-primary btn-sm">
+                                                                    <i class="fas fa-file"></i>
+                                                                </a>
+                                                                @endif
                                                             </div>
-                                                            @endif
                                                         </td>
                                                     </tr>
                                                     @endforeach
@@ -246,6 +228,11 @@
                                 </div>
                             </div>
                             @endforeach
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="mt-4 d-flex justify-content-center">
+                            {{ $visits->appends(request()->except('page'))->onEachSide(1)->links('vendor.pagination.custom') }}
                         </div>
                     </div>
                 </div>
@@ -393,6 +380,52 @@
             </div>
         </div>
     </div>
+
+    @push('styles')
+    <style>
+        .pagination {
+            margin-bottom: 0;
+        }
+        .page-item.active .page-link {
+            background-color: #556ee6;
+            border-color: #556ee6;
+        }
+        .page-link {
+            color: #556ee6;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        .pagination .page-link span {
+            font-size: 0.75rem;
+        }
+        .pagination svg {
+            width: 12px;
+            height: 12px;
+            vertical-align: -2px;
+        }
+        .table td {
+            vertical-align: middle;
+        }
+        .btn-group-sm .btn,
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+        .badge {
+            padding: 0.5em 0.8em;
+        }
+    </style>
+    @endpush
+
+    @push('css')
+    <style>
+        /* Remove previous pagination styles */
+    </style>
+    @endpush
 
     @push('scripts')
     <script>

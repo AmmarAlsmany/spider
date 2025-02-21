@@ -90,25 +90,62 @@
                                     </td>
                                     <td>
                                         @if($visit->status === 'completed')
-                                            <a href="{{ route('contract.visit.report', $visit->id) }}" class="btn btn-sm btn-primary">
-                                                <i class="bx bx-file me-1"></i>View Report
+                                            <a href="{{ route('contract.visit.report', $visit->id) }}" class="btn btn-sm btn-info">
+                                                <i class="bx bx-file"></i> View Report
                                             </a>
                                         @endif
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="py-4 text-center">
-                                        <div class="text-muted">
-                                            <i class="bx bx-calendar-x fs-1"></i>
-                                            <p class="mt-2">No visits scheduled yet</p>
-                                        </div>
-                                    </td>
+                                    <td colspan="6" class="text-center">No visits scheduled</td>
                                 </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
+                    @if($visits->hasPages())
+                    <div class="mt-4 d-flex justify-content-end">
+                        <nav>
+                            <ul class="mb-0 pagination pagination-sm">
+                                {{-- Previous Page Link --}}
+                                @if ($visits->onFirstPage())
+                                    <li class="page-item disabled">
+                                        <span class="page-link">Previous</span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $visits->previousPageUrl() }}" rel="prev">Previous</a>
+                                    </li>
+                                @endif
+
+                                {{-- Pagination Elements --}}
+                                @foreach ($visits->getUrlRange(1, $visits->lastPage()) as $page => $url)
+                                    @if ($page == $visits->currentPage())
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ $page }}</span>
+                                        </li>
+                                    @else
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                        </li>
+                                    @endif
+                                @endforeach
+
+                                {{-- Next Page Link --}}
+                                @if ($visits->hasMorePages())
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $visits->nextPageUrl() }}" rel="next">Next</a>
+                                    </li>
+                                @else
+                                    <li class="page-item disabled">
+                                        <span class="page-link">Next</span>
+                                    </li>
+                                @endif
+                            </ul>
+                        </nav>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>

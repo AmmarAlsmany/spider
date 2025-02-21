@@ -29,6 +29,7 @@ return [
     'button_save' => 'Save Changes',
     'button_view_payment_details' => 'View Payment Details',
     'button_view_invoice' => 'View Invoice',
+    'button_view_visit' => 'View Visit Schedule',
 
     // Contract Information
     'contract_info_title' => 'Contract Information',

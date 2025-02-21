@@ -41,4 +41,21 @@ class payments extends Model
     {
         return $this->hasMany(PostponementRequest::class, 'payment_id');
     }
+
+    public function getPaymentNumberAttribute()
+    {
+        return $this->where('contract_id', $this->contract_id)
+                    ->where('due_date', '<=', $this->due_date)
+                    ->count();
+    }
+
+    public function getContractNumberAttribute()
+    {
+        return $this->contract ? $this->contract->contract_number : null;
+    }
+
+    public function getTotalPaymentsAttribute()
+    {
+        return $this->where('contract_id', $this->contract_id)->count();
+    }
 }

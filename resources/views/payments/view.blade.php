@@ -196,7 +196,29 @@
             <div class="invoice-header">
                 <h1 class="mb-2 text-2xl font-bold text-center">فاتورة ضريبة</h1>
                 <h1 class="mb-2 text-xl font-bold text-center">Tax Invoice</h1>
-                <p class="text-lg">رقم الفاتورة / Invoice Number: {{ $payment->invoice_number }}</p>
+                
+                <div class="grid grid-cols-1 gap-2 p-4 bg-gray-50 rounded-lg md:grid-cols-2">
+                    <div class="p-2 border-b border-gray-200 md:border-b-0 md:border-r">
+                        <p class="mb-2 text-lg"><strong>معلومات الفاتورة / Invoice Information</strong></p>
+                        <p class="text-md">رقم الفاتورة / Invoice Number: {{ $payment->invoice_number }}</p>
+                        <p class="text-md">رقم الدفعة / Payment Number: {{ $payment->payment_number }}</p>
+                        <p class="text-md">تاريخ الاستحقاق / Due Date: {{ $payment->due_date ? $payment->due_date: 'N/A' }}</p>
+                        <p class="text-md">حالة الدفع / Payment Status: {{ $payment->payment_status }}</p>
+                    </div>
+                    
+                    <div class="p-2">
+                        <p class="mb-2 text-lg"><strong>معلومات العقد / Contract Information</strong></p>
+                        <p class="text-md">رقم العقد / Contract Number: {{ $payment->contract_number }}</p>
+                        {{-- contract amount --}}
+                        <p class="text-md">قيمة العقد / Contract Amount: {{ number_format($payment->contract->contract_price, 2) }} SAR</p>
+                        {{-- payment amount --}}
+                        <p class="text-md">قيمة الدفعة / Payment Amount: {{ number_format($payment->payment_amount, 2) }} SAR</p>
+                        {{-- total payments --}}
+                        <p class="text-md">عدد الدفعات في العقد / Contract Payments: {{ $payment->total_payments }}</p>
+                        {{-- payment method --}}
+                        <p class="text-md">طريقة الدفع / Payment Method: {{ $payment->payment_method }}</p>
+                    </div>
+                </div>
                 
                 <!-- Add QR Code Container -->
                 <div class="flex justify-center mt-4 mb-4">
@@ -254,7 +276,7 @@
                     <tbody>
                         <tr>
                             <td class="text-right">
-                                {{ $payment->payment_description ?: 'Payment for Contract #' . $payment->contract->contract_number }}
+                                {{ $payment->payment_description ?: 'Payment for Invoice #' . $payment->invoice_number }}
                             </td>
                             <td class="text-right">SAR {{ number_format($payment->payment_amount, 2) }}</td>
                         </tr>
@@ -268,7 +290,7 @@
                 <div class="amount-in-words">
                     Amount in words: 
                     @php
-                        function numberToWords($number) {
+                        function numberToWordsEnglish($number) {
                             $ones = array(
                                 0 => "", 1 => "one", 2 => "two", 3 => "three", 4 => "four",
                                 5 => "five", 6 => "six", 7 => "seven", 8 => "eight", 9 => "nine",
@@ -288,7 +310,7 @@
                             $words = "";
                             
                             if ($number >= 1000) {
-                                $words .= numberToWords(floor($number/1000)) . " thousand ";
+                                $words .= numberToWordsEnglish(floor($number/1000)) . " thousand ";
                                 $number %= 1000;
                             }
                             
@@ -309,10 +331,59 @@
                             return trim($words);
                         }
                         
+                        function numberToWordsArabic($number) {
+                            $ones = array(
+                                0 => "", 1 => "واحد", 2 => "اثنان", 3 => "ثلاثة", 4 => "اربعة",
+                                5 => "خمسة", 6 => "ستة", 7 => "سبعة", 8 => "ثمانية", 9 => "تسعة",
+                                10 => "عشرة", 11 => "اثنا عشر", 12 => "ثلاثة عشر", 13 => "اربعة عشر",
+                                14 => "خمسة عشر", 15 => "ستة عشر", 16 => "سبعة عشر", 17 => "ثمانية عشر",
+                                18 => "تسعة عشر", 19 => "عشرة عشر"
+                            );
+                            $tens = array(
+                                2 => "عشرون", 3 => "ثلاثون", 4 => "اربعون", 5 => "خمسون",
+                                6 => "ستون", 7 => "سبعون", 8 => "ثمانون", 9 => "تسعون",
+                                10 => "عشرون", 11 => "اثنا عشر", 12 => "ثلاثون", 13 => "اربعون",
+                                14 => "خمسون", 15 => "ستون", 16 => "سبعون", 17 => "ثمانون",
+                                18 => "تسعون", 19 => "عشرون"
+                            );
+                            
+                            if ($number == 0) {
+                                return "صفر";
+                            }
+                            
+                            $words = "";
+                            
+                            if ($number >= 1000) {
+                                $words .= numberToWordsArabic(floor($number/1000)) . " ألف ";
+                                $number %= 1000;
+                            }
+                            
+                            if ($number >= 100) {
+                                $words .= $ones[floor($number/100)] . " مائة ";
+                                $number %= 100;
+                            }
+                            
+                            if ($number >= 20) {
+                                $words .= $tens[floor($number/10)] . " ";
+                                $number %= 10;
+                            }
+                            
+                            if ($number > 0) {
+                                $words .= $ones[$number];
+                            }
+                            
+                            return trim($words);
+                        }
+                        
                         $amount = (int)$payment->payment_amount;
-                        $words = ucwords(numberToWords($amount));
+                        $words_english = ucwords(numberToWordsEnglish($amount));
+                        $words_arabic = ucwords(numberToWordsArabic($amount));
+                        
                     @endphp
-                    {{ $words }} Saudi Riyals Only
+                    {{ $words_english }} 
+                    <br>
+                    المبلغ بالاحرف:
+                    ({{ $words_arabic }})
                 </div>
             </div>
 

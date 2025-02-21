@@ -261,8 +261,13 @@
                                                         <td class="py-3">
                                                             <div class="text-wrap" style="max-width: 200px;">
                                                                 {{ $visit->branch_id ?
-                                                                $visit->branch->branch_address :
-                                                                $visit->contract->customer->address }}
+                                                                $visit->branch->branch_name :
+                                                                $visit->contract->customer->name }}
+                                                                <small class="d-block text-muted">
+                                                                    {{ $visit->branch_id ?
+                                                                    $visit->branch->branch_address :
+                                                                    $visit->contract->customer->address }}
+                                                                </small>
                                                             </div>
                                                         </td>
                                                         <td class="py-3">

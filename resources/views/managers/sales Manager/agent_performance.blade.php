@@ -4,7 +4,7 @@
     @include('managers.sales Manager.partials.performance_filters')
     
     @foreach($performanceData as $data)
-    <div class="card radius-10 mb-4">
+    <div class="mb-4 card radius-10">
         <div class="card-header">
             <div class="d-flex align-items-center">
                 <div>
@@ -16,7 +16,7 @@
         <div class="card-body">
             <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3">
                 <div class="col">
-                    <div class="card border-primary border-bottom border-3 border-0">
+                    <div class="border-0 card border-primary border-bottom border-3">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div>
@@ -24,7 +24,7 @@
                                     <h4 class="my-1">{{ $data['current_month']['total_new_contracts'] }}</h4>
                                     <p class="mb-0">Value: {{ number_format($data['current_month']['total_contract_value'], 2) }}</p>
                                 </div>
-                                <div class="widget-icon-large bg-gradient-purple text-white ms-auto">
+                                <div class="text-white widget-icon-large bg-gradient-purple ms-auto">
                                     <i class="bx bx-file"></i>
                                 </div>
                             </div>
@@ -32,14 +32,14 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="card border-success border-bottom border-3 border-0">
+                    <div class="border-0 card border-success border-bottom border-3">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div>
                                     <p class="mb-0 text-secondary">Collections (This Month)</p>
                                     <h4 class="my-1">{{ number_format($data['current_month']['total_collections'], 2) }}</h4>
                                 </div>
-                                <div class="widget-icon-large bg-gradient-success text-white ms-auto">
+                                <div class="text-white widget-icon-large bg-gradient-success ms-auto">
                                     <i class="bx bx-money"></i>
                                 </div>
                             </div>
@@ -47,14 +47,14 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="card border-info border-bottom border-3 border-0">
+                    <div class="border-0 card border-info border-bottom border-3">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div>
                                     <p class="mb-0 text-secondary">All Time Contracts</p>
                                     <h4 class="my-1">{{ $data['all_time']['total_contracts'] }}</h4>
                                 </div>
-                                <div class="widget-icon-large bg-gradient-info text-white ms-auto">
+                                <div class="text-white widget-icon-large bg-gradient-info ms-auto">
                                     <i class="bx bx-folder"></i>
                                 </div>
                             </div>
@@ -62,14 +62,14 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="card border-warning border-bottom border-3 border-0">
+                    <div class="border-0 card border-warning border-bottom border-3">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div>
                                     <p class="mb-0 text-secondary">All Time Collections</p>
                                     <h4 class="my-1">{{ number_format($data['all_time']['total_collections'], 2) }}</h4>
                                 </div>
-                                <div class="widget-icon-large bg-gradient-warning text-white ms-auto">
+                                <div class="text-white widget-icon-large bg-gradient-warning ms-auto">
                                     <i class="bx bx-bar-chart"></i>
                                 </div>
                             </div>
@@ -79,7 +79,7 @@
             </div>
 
             <!-- New Contracts Table -->
-            <div class="card radius-10 mt-4">
+            <div class="mt-4 card radius-10">
                 <div class="card-header">
                     <h6 class="mb-0">New Contracts (This Month)</h6>
                 </div>
@@ -120,7 +120,7 @@
             </div>
 
             <!-- Collections Table -->
-            <div class="card radius-10 mt-4">
+            <div class="mt-4 card radius-10">
                 <div class="card-header">
                     <h6 class="mb-0">Collections (This Month)</h6>
                 </div>
@@ -139,7 +139,7 @@
                             <tbody>
                                 @forelse($data['current_month']['collections'] as $payment)
                                 <tr>
-                                    <td>{{ $payment->id }}</td>
+                                    <td>{{ $payment->invoice_number }}</td>
                                     <td>{{ $payment->contract->contract_number }}</td>
                                     <td>{{ $payment->contract->customer->name }}</td>
                                     <td>{{ number_format($payment->payment_amount, 2) }}</td>

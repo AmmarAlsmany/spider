@@ -17,9 +17,6 @@
                 <div class="col-md-6">
                     <h6 class="mb-3">Payment Information</h6>
                     <div class="mb-2">
-                        <strong>Payment ID:</strong> {{ $payment->id }}
-                    </div>
-                    <div class="mb-2">
                         <strong>Amount:</strong> {{ number_format($payment->payment_amount, 2) }} SAR
                     </div>
                     <div class="mb-2">
@@ -28,8 +25,17 @@
                             {{ ucfirst($payment->payment_status) }}
                         </span>
                     </div>
+                    @if ($payment->payment_status == 'paid')
                     <div class="mb-2">
-                        <strong>Payment Date:</strong> {{ $payment->created_at->format('Y-m-d H:i:s') }}
+                        <strong>Paid Date:</strong> {{ $payment->paid_at }}
+                    </div>
+                    @endif
+                    <div class="mb-2">
+                        <strong>Created Date:</strong> {{ $payment->created_at->format('Y-m-d H:i:s') }}
+                    </div>
+                    {{-- due date --}}
+                    <div class="mb-2">
+                        <strong>Due Date:</strong> {{ $payment->due_date}}
                     </div>
                     <div class="mb-2">
                         <strong>Payment Method:</strong> {{ $payment->payment_method }}

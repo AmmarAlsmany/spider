@@ -28,11 +28,14 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            $count = 1;
+                        @endphp
                         @foreach($payments as $payment)
                         <tr>
-                            <td>{{ $payment->id }}</td>
+                            <td>{{ $count++ }}</td>
                             <td>{{ $payment->invoice_number }}</td>
-                            <td>{{ $payment->contract->salesRepresentative->name }}</td>
+                            <td>{{ $payment->contract->salesRepresentative->name }} <small>({{ $payment->contract->salesRepresentative->email }})</small></td>
                             <td>{{ $payment->contract->contract_number }}</td>
                             <td>{{ number_format($payment->payment_amount, 2) }} ASR</td>
                             <td>{{ $payment->created_at->format('Y-m-d') }}</td>

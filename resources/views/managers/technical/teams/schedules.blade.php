@@ -108,7 +108,7 @@
                         <div class="gap-2 d-flex align-items-center">
                             <span class="badge bg-primary">
                                 <i class="bx bx-calendar me-1"></i>
-                                {{ $team->visitSchedules->count() }} Visits
+                                {{ $team->totalSchedules }} Visits
                             </span>
                             <span class="badge bg-success">
                                 <i class="bx bx-check-circle me-1"></i>
@@ -118,7 +118,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    @if($team->visitSchedules->count() > 0)
+                    @if($team->totalSchedules > 0)
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead class="table-light">
@@ -131,12 +131,20 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($team->visitSchedules->sortBy('visit_date') as $schedule)
+                                @foreach($team->paginatedSchedules as $schedule)
                                 <tr>
-                                    <td>{{ $schedule->visit_date }} {{ $schedule->visit_time }}</td>
+                                    <td>{{ date('M d, Y', strtotime($schedule->visit_date)) }} {{ date('h:i A', strtotime($schedule->visit_time)) }}</td>
                                     <td>{{ $schedule->contract->customer->name }}</td>
                                     <td><a href="{{ route('technical.contract.show', ['id' => $schedule->contract->id]) }}">{{ $schedule->contract->contract_number }}</a></td>
-                                    <td>{{ $schedule->status }}</td>
+                                    <td>
+                                        @if($schedule->status == 'completed')
+                                            <span class="badge bg-success">Completed</span>
+                                        @elseif($schedule->status == 'cancelled')
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        @else
+                                            <span class="badge bg-warning">Pending</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         @if(in_array($schedule->status, ['scheduled', 'cancelled']))
                                             <button type="button" class="btn btn-sm btn-primary" onclick="rescheduleVisit({{ $schedule->id }})">
@@ -148,6 +156,9 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-end mt-3">
+                            {{ $team->paginatedSchedules->appends(['page_' . $team->id => request('page_' . $team->id)])->links('pagination::bootstrap-4') }}
+                        </div>
                     </div>
                     @else
                     <div class="py-4 text-center">

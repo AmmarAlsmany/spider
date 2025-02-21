@@ -357,7 +357,7 @@ class ContractsController extends Controller
             }
 
             if (!$request->has('client_id')) {
-                $rules['customer_name'] = 'required|string';
+                $rules['customer_name'] ='required|string';
                 $rules['customer_mobile'] = 'required|string';
                 $rules['customer_email'] = 'required|email';
             } else {
@@ -767,7 +767,7 @@ class ContractsController extends Controller
     {
         $contract = contracts::findOrFail($id);
         $contract->load('customer'); // Eager load customer relationship
-        $visits = $contract->visitSchedules;
+        $visits = $contract->visitSchedules()->paginate(10); // Paginate visits, 10 per page
         return view('contracts.view_contract_visit', compact('contract', 'visits'));
     }
 

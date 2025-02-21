@@ -27,23 +27,7 @@
                             <h5 class="mb-0">Visit Details</h5>
                             <p class="mb-0 text-muted">Visit #{{ $visit->id }}</p>
                         </div>
-                        <div class="ms-auto">
-                            <a href="{{ route('team-leader.visits') }}" class="btn btn-secondary btn-sm">
-                                <i class="bx bx-arrow-back me-1"></i>Back to Visits
-                            </a>
-                            @if($visit->status != 'completed' && date('Y-m-d') == $visit->visit_date)
-                            <form action="{{ route('team-leader.visit.complete', $visit->id) }}" method="POST"
-                                class="d-inline">
-                                @csrf
-                                <button type="submit" class="btn btn-success btn-sm"
-                                    onclick="return confirm('Are you sure you want to mark this visit as completed?')">
-                                    <i class="bx bx-check-circle me-1"></i>Mark as Completed
-                                </button>
-                            </form>
-                            @endif
-                        </div>
                     </div>
-
                     <!-- Visit Information -->
                     <div class="row">
                         <div class="col-md-6">

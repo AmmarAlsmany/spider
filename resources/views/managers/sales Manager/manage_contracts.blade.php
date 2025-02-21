@@ -78,8 +78,8 @@
                     <tbody>
                         @forelse($contracts as $contract)
                         <tr>
-                            <td>{{ $contract->contract_number }}</td>
-                            <td>{{ $contract->customer->name }}</td>
+                            <td><a href="{{ route('sales_manager.contract.view', $contract->id) }}">{{ $contract->contract_number }}</a></td>
+                            <td><a href="{{ route('sales_manager.client.details', $contract->customer->id) }}">{{ $contract->customer->name }}</a></td>
                             <td>{{ $contract->salesRepresentative->name }}</td>
                             <td>{{ number_format($contract->contract_price, 2) }}</td>
                             <td>

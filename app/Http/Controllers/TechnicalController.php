@@ -640,10 +640,26 @@ class TechnicalController extends Controller
      */
     public function teamSchedules(Request $request)
     {
-        $teams = Team::with(['visitSchedules' => function ($query) {
-            $query->where('status', '!=', 'completed')
+        $teams = Team::with(['leader'])->get();
+
+        // Transform the teams collection to include paginated visit schedules
+        $teams = $teams->map(function ($team) use ($request) {
+            $query = VisitSchedule::where('team_id', $team->id)
+                ->with(['contract.customer'])
                 ->orderBy('visit_date', 'asc');
-        }, 'visitSchedules.contract.customer'])->get();
+
+            if ($request->has('month') && $request->has('year')) {
+                $query->whereMonth('visit_date', $request->month)
+                      ->whereYear('visit_date', $request->year);
+            }
+            if ($request->has('date')) {
+                $query->whereDate('visit_date', $request->date);
+            }
+
+            $team->paginatedSchedules = $query->paginate(10, ['*'], 'page_'.$team->id);
+            $team->totalSchedules = $query->count();
+            return $team;
+        });
 
         // Get all active clients with approved contracts
         $clients = client::whereHas('contracts', function ($query) {
@@ -731,14 +747,11 @@ class TechnicalController extends Controller
         return view('managers.technical.visit_report', compact('visit'));
     }
 
-    public function viewContractDetails($contractId)
+    public function viewContractDetails($id)
     {
-        // Fetch contract details from the database or service
-        $contract = contracts::find($contractId);
-        if (!$contract) {
-            return response()->json(['error' => 'Contract not found'], 404);
-        }
-        return view('managers.technical.contract_details', compact('contract'));
+        $contract = contracts::with('type')->findOrFail($id);
+        $visitSchedules = $contract->visitSchedules()->paginate(10);
+        return view('managers.technical.contract_details', compact('contract', 'visitSchedules'));
     }
 
     /**

@@ -9,7 +9,6 @@ Contracts Report {{ request('start_date') && request('end_date') ? '(' . request
     <table class="table mb-0 align-middle">
         <thead class="table-light">
             <tr>
-                <th>Contract ID</th>
                 <th>Contract Number</th>
                 <th>Client</th>
                 <th>Sales Agent</th>
@@ -21,9 +20,8 @@ Contracts Report {{ request('start_date') && request('end_date') ? '(' . request
         <tbody>
             @forelse($contracts as $contract)
             <tr>
-                <td>{{ $contract->id }}</td>
-                <td>{{ $contract->contract_number }}</td>
-                <td>{{ $contract->customer->name }}</td>
+                <td><a href="{{ route('sales_manager.contract.view', $contract->id) }}">{{ $contract->contract_number }}</a></td>
+                <td><a href="{{ route('sales_manager.client.details', $contract->customer->id) }}">{{ $contract->customer->name }}</a></td>
                 <td>{{ $contract->salesRepresentative->name }}</td>
                 <td>{{ number_format($contract->contract_price, 2) }}</td>
                 <td>{{ $contract->created_at ? date('Y-m-d', strtotime($contract->created_at)) : 'Not set' }}</td>

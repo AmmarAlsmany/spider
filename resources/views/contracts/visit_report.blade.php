@@ -92,6 +92,13 @@
                                         <img src="{{ $visit->report->customer_signature }}" alt="Customer Signature" class="img-fluid" style="max-height: 100px;">
                                     </div>
                                 </div>
+                                {{-- signature client phone --}}
+                                <div class="mt-4 row">
+                                    <div class="col-md-6">
+                                        <h6>Customer Signature Phone</h6>
+                                        <p class="mb-1">{{ $visit->report->phone_signature }}</p>
+                                    </div>
+                                </div>
                                 @endif
                             </div>
                             <div class="col-md-6">

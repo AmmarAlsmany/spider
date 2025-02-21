@@ -34,6 +34,16 @@
                                     <td>{{ date('M d, Y', strtotime($contract->contract_start_date)) }}</td>
                                 </tr>
                                 <tr>
+                                    <th>End Date</th>
+                                    <td>{{ date('M d, Y', strtotime($contract->contract_end_date)) }}</td>
+                                </tr>
+                                {{-- contract type --}}
+                                <tr>
+                                    <th>Contract Type</th>
+                                    <td>{{ $contract->type->name }}</td>
+                                </tr>
+                                {{-- contract status --}}
+                                <tr>
                                     <th>Status</th>
                                     <td>
                                         @if($contract->contract_status == 'approved')
@@ -126,7 +136,7 @@
                             <h6 class="mb-0">Visit Schedule</h6>
                         </div>
                         <div class="card-body">
-                            @if($contract->visitSchedules->count() > 0)
+                            @if($visitSchedules->count() > 0)
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead>
@@ -139,7 +149,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($contract->visitSchedules as $visit)
+                                        @foreach($visitSchedules as $visit)
                                         <tr>
                                             <td>{{ date('M d, Y', strtotime($visit->visit_date)) }}</td>
                                             <td>{{ date('h:i A', strtotime($visit->visit_time)) }}</td>
@@ -151,7 +161,7 @@
                                                     Main Location
                                                 @endif
                                             </td>
-                                           <td>{{ $visit->contract->type->name }}</td>
+                                           <td>{{ $contract->type->name }}</td>
                                             <td>
                                                 @if($visit->status == 'completed')
                                                     <span class="badge bg-success">Completed</span>
@@ -165,6 +175,9 @@
                                         @endforeach
                                     </tbody>
                                 </table>
+                                <div class="d-flex justify-content-end mt-3">
+                                    {{ $visitSchedules->links('pagination::bootstrap-4') }}
+                                </div>
                             </div>
                             @else
                             <div class="py-4 text-center">

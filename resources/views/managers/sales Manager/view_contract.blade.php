@@ -15,7 +15,8 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="row">
+            <!-- Basic Information -->
+            <div class="mb-4 row">
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Contract Number</label>
@@ -26,8 +27,16 @@
                         <p>{{ $contract->customer ? $contract->customer->name : 'N/A' }}</p>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label fw-bold">Sales Representative</label>
+                        <p>{{ $contract->salesRepresentative ? $contract->salesRepresentative->name : 'N/A' }}</p>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label fw-bold">Start Date</label>
                         <p>{{ $contract->contract_start_date }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">End Date</label>
+                        <p>{{ $contract->contract_end_date ?? 'N/A' }}</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Status</label>
@@ -59,15 +68,208 @@
                         <label class="form-label fw-bold">Number of Payments</label>
                         <p>{{ $contract->number_Payments ? $contract->number_Payments : '1' }}</p>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Property Type</label>
+                        <p>{{ $contract->Property_type }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Number of Visits</label>
+                        <p>{{ $contract->number_of_visits }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Warranty</label>
+                        <p>{{ $contract->warranty }}</p>
+                    </div>
                 </div>
             </div>
 
+            <!-- Description -->
             @if($contract->contract_description)
-            <div class="mt-3 row">
-                <div class="col-12">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Description</label>
-                        <p>{{ $contract->contract_description }}</p>
+            <div class="mb-4 card">
+                <div class="card-header">
+                    <h6 class="mb-0">Description</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ $contract->contract_description }}</p>
+                </div>
+            </div>
+            @endif
+
+            <!-- Payment Schedule -->
+            <div class="mb-4 card">
+                <div class="card-header">
+                    <h6 class="mb-0">Payment Schedule</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Payment #</th>
+                                    <th>Due Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Paid Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($contract->payments as $payment)
+                                <tr>
+                                    <td>{{ $payment->invoice_number }}</td>
+                                    <td>{{ $payment->due_date }}</td>
+                                    <td>${{ number_format($payment->payment_amount, 2) }}</td>
+                                    <td>
+                                        <span class="badge {{ $payment->payment_status == 'paid' ? 'bg-success' : 'bg-warning' }}">
+                                            {{ ucfirst($payment->payment_status) }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $payment->paid_at ?? '-' }}</td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="5" class="text-center">No payment schedule available</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visit Schedules -->
+            <div class="mb-4 card">
+                <div class="card-header">
+                    <h6 class="mb-0">Visit Schedules</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Visit Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $visitSchedules = $contract->visitSchedules()->paginate(10);
+                                @endphp
+                                @forelse($visitSchedules as $visit)
+                                <tr>
+                                    <td>{{ $visit->visit_date }}</td>
+                                    <td>
+                                        <span class="badge {{ $visit->status == 'completed' ? 'bg-success' : 
+                                            ($visit->status == 'scheduled' ? 'bg-info' : 'bg-warning') }}">
+                                            {{ ucfirst($visit->status) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="2" class="text-center">No visit schedules available</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    @if($visitSchedules->hasPages())
+                    <div class="d-flex justify-content-end mt-4">
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                {{-- Previous Page Link --}}
+                                @if ($visitSchedules->onFirstPage())
+                                    <li class="page-item disabled">
+                                        <span class="page-link">Previous</span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $visitSchedules->previousPageUrl() }}" rel="prev">Previous</a>
+                                    </li>
+                                @endif
+
+                                {{-- Pagination Elements --}}
+                                @foreach ($visitSchedules->getUrlRange(1, $visitSchedules->lastPage()) as $page => $url)
+                                    @if ($page == $visitSchedules->currentPage())
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ $page }}</span>
+                                        </li>
+                                    @else
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                        </li>
+                                    @endif
+                                @endforeach
+
+                                {{-- Next Page Link --}}
+                                @if ($visitSchedules->hasMorePages())
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $visitSchedules->nextPageUrl() }}" rel="next">Next</a>
+                                    </li>
+                                @else
+                                    <li class="page-item disabled">
+                                        <span class="page-link">Next</span>
+                                    </li>
+                                @endif
+                            </ul>
+                        </nav>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Contract History -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Contract History</h6>
+                </div>
+                <div class="card-body">
+                    <div class="timeline-vertical">
+                        @forelse($contract->history as $history)
+                        <div class="timeline-item">
+                            <div class="timeline-point"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">{{ $history->action }}</h6>
+                                <p class="mb-0">{{ $history->description }}</p>
+                                <small class="text-muted">
+                                    By {{ $history->user->name }} on {{ $history->created_at->format('M d, Y H:i') }}
+                                </small>
+                            </div>
+                        </div>
+                        @empty
+                        <p class="text-center">No history available</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            @if($contract->is_multi_branch)
+            <!-- Branches -->
+            <div class="mt-4 card">
+                <div class="card-header">
+                    <h6 class="mb-0">Contract Branches</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Branch Name</th>
+                                    <th>Location</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($contract->branchs as $branch)
+                                <tr>
+                                    <td>{{ $branch->branch_name }}</td>
+                                    <td>{{ $branch->branch_address }}</td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="2" class="text-center">No branches found</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

@@ -63,7 +63,7 @@ Invoices Report {{ request('start_date') && request('end_date') ? '(' . request(
         <tbody>
             @forelse($invoices as $invoice)
             <tr>
-                <td>{{ $invoice->id }}</td>
+                <td>{{ $invoice->invoice_number }}</td>
                 <td>{{ $invoice->contract->contract_number }}</td>
                 <td>{{ $invoice->contract->customer->name }}</td>
                 <td>{{ $invoice->contract->salesRepresentative->name }}</td>

@@ -19,6 +19,59 @@
     @endif
 
     <div class="container-fluid">
+        <div class="mb-4 row">
+            <div class="col-md-4">
+                <div class="border-0 shadow-sm card hover-shadow">
+                    <div class="p-4 card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3">
+                                <div class="avatar-md rounded-circle bg-soft-primary d-flex align-items-center justify-content-center">
+                                    <i class="bx bx-time-five text-primary font-size-24"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h4 class="mb-1">{{ $pendingVisits }}</h4>
+                                <p class="mb-0 text-muted font-size-14">Pending Visits</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border-0 shadow-sm card hover-shadow">
+                    <div class="p-4 card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3">
+                                <div class="avatar-md rounded-circle bg-soft-success d-flex align-items-center justify-content-center">
+                                    <i class="bx bx-calendar-check text-success font-size-24"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h4 class="mb-1">{{ $todayVisits }}</h4>
+                                <p class="mb-0 text-muted font-size-14">Today's Visits</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border-0 shadow-sm card hover-shadow">
+                    <div class="p-4 card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3">
+                                <div class="avatar-md rounded-circle bg-soft-info d-flex align-items-center justify-content-center">
+                                    <i class="bx bx-check-circle text-info font-size-24"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h4 class="mb-1">{{ $todayCompletedVisits }}</h4>
+                                <p class="mb-0 text-muted font-size-14">Completed Today</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-12">
                 <div class="card">
@@ -85,137 +138,151 @@
                                 </div>
                             </div>
                         </form>
-
-                        <!-- Statistics Cards -->
-                        <div class="mb-4 row">
-                            <div class="col-md-3">
-                                <div class="text-white card bg-primary">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Today's Visits</h5>
-                                        <h3 class="card-text">
-                                            {{ $todayVisits }}
-                                        </h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-white card bg-success">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Total Visits</h5>
-                                        <h3 class="card-text">
-                                            {{ $totalVisits }}
-                                        </h3>
-                                        @if($filteredVisitsCount != $totalVisits)
-                                            <small>Showing {{ $filteredVisitsCount }} filtered visits</small>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Appointments Grouped by Contract -->
-                        <div class="accordion" id="appointmentsAccordion">
-                            @foreach($visits as $contractId => $contractVisits)
-                            @php
-                            $contract = $contractVisits->first()->contract;
-                            $branchCount = $contract->is_multi_branch ? $contract->branchs->count() : 1;
-                            $totalVisits = $contractVisits->count();
-                            $completedVisits = $contractVisits->where('status', 'completed')->count();
-                            $visitsPerBranch = $contract->is_multi_branch ? ceil($totalVisits / $branchCount) : $totalVisits;
-                            @endphp
-                            <div class="mb-2 accordion-item">
-                                <h2 class="accordion-header" id="heading{{ $contractId }}">
-                                    <button
-                                        class="accordion-button {{ !request('contract_number') ? 'collapsed' : '' }}"
-                                        type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapse{{ $contractId }}">
-                                        <div class="d-flex justify-content-between w-100 align-items-center">
-                                            <div>
-                                                <strong>
-                                                    Contract #{{ $contract->contract_number }}
-                                                    <a href="{{ route('technical.contract.show', $contract->id) }}"
-                                                        class="text-primary ms-2">
-                                                        <i class="bx bx-link-external"></i>
-                                                    </a>
-                                                </strong>
-                                                <br>
-                                                <small class="text-muted">
-                                                    {{ $contract->customer->name }} - 
-                                                    Completed: {{ $completedVisits }}/{{ $totalVisits }} visits
-                                                    ({{ $totalVisits - $completedVisits }} pending)
-                                                    @if($contract->is_multi_branch)
-                                                    <br>
-                                                    <span class="text-info">{{ $visitsPerBranch }} visits × {{ $branchCount }} branches</span>
-                                                    @endif
-                                                </small>
-                                            </div>
-                                            <div>
-                                                <span class="badge bg-info me-2">{{ $completedVisits }}/{{ $totalVisits }} Visits</span>
-                                                @if($contract->contract_status === 'approved')
-                                                <span class="badge bg-success">Active</span>
-                                                @else
-                                                <span class="badge bg-danger">Inactive</span>
-                                                @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="border-0 shadow-sm card">
+                    <div class="p-0 card-body">
+                        <div class="accordion custom-accordion" id="contractAccordion">
+                            @foreach($contracts as $contract)
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#contract-{{ $contract->id }}">
+                                        <div class="contract-info w-100">
+                                            <div class="flex-wrap d-flex justify-content-between align-items-start w-100">
+                                                <div class="contract-main-info">
+                                                    <h5 class="gap-2 contract-title d-flex align-items-center">
+                                                        <i class="bx bx-buildings me-1 text-primary"></i>
+                                                        {{ $contract->customer->name }}
+                                                        <a href="{{ route('technical.contract.show', $contract->id) }}" 
+                                                           class="p-0 btn btn-link btn-sm text-muted view-contract-btn"
+                                                           data-bs-toggle="tooltip"
+                                                           title="View Contract Details">
+                                                            <i class="bx bx-info-circle"></i>
+                                                        </a>
+                                                    </h5>
+                                                    <div class="contract-details">
+                                                        <span class="contract-detail-item">
+                                                            <i class="bx bx-hash"></i>
+                                                            {{ $contract->contract_number }}
+                                                        </span>
+                                                        <span class="contract-detail-item">
+                                                            <i class="bx bx-git-branch"></i>
+                                                            {{ $contract->branchs->count() }} {{ Str::plural('Branch', $contract->branchs->count()) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-wrap gap-2 visit-stats d-flex">
+                                                    @php
+                                                        $totalVisits = $contract->visitSchedules->count();
+                                                        $completedVisits = $contract->visitSchedules->where('status', 'completed')->count();
+                                                        $pendingVisits = $contract->visitSchedules->where('status', 'scheduled')->count();
+                                                        $cancelledVisits = $contract->visitSchedules->where('status', 'cancelled')->count();
+                                                    @endphp
+                                                    <div class="visit-stat-item">
+                                                        <span class="stat-label">Total Visits</span>
+                                                        <span class="stat-value text-primary">{{ $totalVisits }}</span>
+                                                    </div>
+                                                    <div class="visit-stat-item">
+                                                        <span class="stat-label">Completed</span>
+                                                        <span class="stat-value text-success">{{ $completedVisits }}</span>
+                                                    </div>
+                                                    <div class="visit-stat-item">
+                                                        <span class="stat-label">Pending</span>
+                                                        <span class="stat-value text-warning">{{ $pendingVisits }}</span>
+                                                    </div>
+                                                    <div class="visit-stat-item">
+                                                        <span class="stat-label">Cancelled</span>
+                                                        <span class="stat-value text-danger">{{ $cancelledVisits }}</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </button>
                                 </h2>
-                                <div id="collapse{{ $contractId }}"
-                                    class="accordion-collapse collapse {{ request('contract_number') ? 'show' : '' }}"
-                                    data-bs-parent="#appointmentsAccordion">
-                                    <div class="accordion-body p-0">
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered table-hover mb-0">
-                                                <thead class="table-light">
-                                                    <tr class="text-center">
-                                                        <th style="width: 120px;">Visit Date</th>
-                                                        <th style="width: 120px;">Visit Time</th>
-                                                        <th style="width: 150px;">Team</th>
-                                                        <th>Location</th>
-                                                        <th style="width: 100px;">Status</th>
-                                                        <th style="width: 120px;">Actions</th>
+                                <div id="contract-{{ $contract->id }}" class="accordion-collapse collapse"
+                                    aria-labelledby="heading{{ $contract->id }}" data-bs-parent="#contractAccordion">
+                                    <div class="accordion-body">
+                                        <div class="table-responsive visits-table">
+                                            <table class="table mb-0 align-middle table-borderless">
+                                                <thead>
+                                                    <tr class="table-light">
+                                                        <th class="px-3 py-3 fw-semibold">Visit Details</th>
+                                                        <th class="px-3 py-3 fw-semibold">Branch</th>
+                                                        <th class="px-3 py-3 fw-semibold">Team</th>
+                                                        <th class="px-3 py-3 fw-semibold">Status</th>
+                                                        <th class="px-3 py-3 fw-semibold text-end">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @foreach($contractVisits as $visit)
-                                                    <tr>
-                                                        <td class="text-center">{{ \Carbon\Carbon::parse($visit->visit_date)->format('Y-m-d') }}</td>
-                                                        <td class="text-center">{{ $visit->visit_time }}</td>
-                                                        <td class="text-center">
-                                                            <span class="badge bg-primary">
-                                                                {{ $visit->team->name }}
-                                                            </span>
+                                                    @foreach($contractVisits[$contract->id] as $visit)
+                                                    <tr class="border-bottom">
+                                                        <td class="px-3 py-3">
+                                                            <div class="d-flex flex-column">
+                                                                <span class="mb-1 text-dark fw-medium">
+                                                                    {{ \Carbon\Carbon::parse($visit->visit_date)->format('M d, Y') }}
+                                                                </span>
+                                                                <span class="text-muted font-size-13">
+                                                                    {{ \Carbon\Carbon::parse($visit->visit_time)->format('h:i A') }}
+                                                                </span>
+                                                            </div>
                                                         </td>
-                                                        <td>{{ $visit->branch->branch_address ?? $contract->customer->address }}</td>
-                                                        <td class="text-center">
-                                                            @if($visit->status === 'scheduled')
-                                                            <span class="badge bg-warning">Scheduled</span>
-                                                            @elseif($visit->status === 'completed')
-                                                            <span class="badge bg-success">Completed</span>
-                                                            @else
-                                                            <span class="badge bg-danger">{{ ucfirst($visit->status) }}</span>
+                                                        <td class="px-3 py-3">
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="bx bx-map-pin me-2 text-muted"></i>
+                                                                <span>{{ $visit->branch->branch_name ?? $visit->customer->city }} 
+                                                                    <small class="text-muted">{{ $visit->branch->branch_address ?? $visit->customer->address }}</small>
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-3 py-3">
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="bx bx-group me-2 text-muted"></i>
+                                                                <span>{{ $visit->team ? $visit->team->name : 'Not Assigned' }}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-3 py-3">
+                                                            @if($visit->status == 'scheduled')
+                                                                <div class="px-2 py-1 d-inline-flex rounded-pill bg-soft-warning">
+                                                                    <i class="bx bx-time-five text-warning me-1"></i>
+                                                                    <span class="stat-label">Scheduled</span>
+                                                                </div>
+                                                            @elseif($visit->status == 'completed')
+                                                                <div class="px-2 py-1 d-inline-flex rounded-pill bg-soft-success">
+                                                                    <i class="bx bx-check-circle text-success me-1"></i>
+                                                                    <span class="stat-label">Completed</span>
+                                                                </div>
+                                                            @elseif($visit->status == 'cancelled')
+                                                                <div class="px-2 py-1 d-inline-flex rounded-pill bg-soft-danger">
+                                                                    <i class="bx bx-x-circle text-danger me-1"></i>
+                                                                    <span class="stat-label">Cancelled</span>
+                                                                </div>
                                                             @endif
                                                         </td>
-                                                        <td>
-                                                            <div class="action-buttons">
-                                                                @if($visit->status === 'scheduled')
-                                                                <button type="button" class="btn btn-primary btn-sm"
-                                                                    onclick="editAppointment({{ $visit->id }}, '{{ $visit->visit_date }}',
-                                                                                '{{ $visit->visit_time }}',
-                                                                                {{ $visit->team_id }})">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </button>
-                                                                <a href="{{ route('technical.appointment.cancel', $visit->id) }}"
-                                                                    class="btn btn-danger btn-sm"
-                                                                    onclick="return confirm('Are you sure you want to cancel this appointment?')">
-                                                                    <i class="fas fa-times"></i>
-                                                                </a>
+                                                        <td class="px-3 py-3 text-end">
+                                                            <div class="btn-group">
+                                                                @if($visit->status == 'scheduled')
+                                                                    <button type="button" 
+                                                                            class="px-3 btn btn-soft-primary btn-sm" 
+                                                                            onclick="openEditModal({{ $visit->id }}, '{{ $visit->visit_date }}', '{{ $visit->visit_time }}', {{ $visit->team_id }})">
+                                                                        <i class="bx bx-edit-alt me-1"></i> Edit
+                                                                    </button>
+                                                                    <button type="button" 
+                                                                            class="px-3 btn btn-soft-danger btn-sm" 
+                                                                            onclick="cancelAppointment({{ $visit->id }})">
+                                                                        <i class="bx bx-x me-1"></i> Cancel
+                                                                    </button>
                                                                 @endif
-                                                                @if($visit->status === 'completed')
-                                                                <a href="{{ route('technical.visit.report.view', $visit->id) }}"
-                                                                    class="btn btn-primary btn-sm">
-                                                                    <i class="fas fa-file"></i>
-                                                                </a>
+                                                                @if($visit->status == 'completed')
+                                                                    <button type="button" 
+                                                                            class="px-3 btn btn-soft-info btn-sm" 
+                                                                            onclick="window.location.href='/technical/visit/{{ $visit->id }}/report'">
+                                                                        <i class="bx bx-file me-1"></i> View Report
+                                                                    </button>
                                                                 @endif
                                                             </div>
                                                         </td>
@@ -224,15 +291,78 @@
                                                 </tbody>
                                             </table>
                                         </div>
+                                        @if($contractVisits[$contract->id]->hasPages())
+                                            <div class="px-3 mt-3 d-flex justify-content-end">
+                                                <nav>
+                                                    <ul class="pagination">
+                                                        {{-- Previous Page Link --}}
+                                                        @if ($contractVisits[$contract->id]->onFirstPage())
+                                                            <li class="page-item disabled">
+                                                                <span class="page-link">Prev</span>
+                                                            </li>
+                                                        @else
+                                                            <li class="page-item">
+                                                                <a class="page-link" href="{{ $contractVisits[$contract->id]->previousPageUrl() }}" rel="prev">Prev</a>
+                                                            </li>
+                                                        @endif
+
+                                                        @php
+                                                            $currentPage = $contractVisits[$contract->id]->currentPage();
+                                                            $lastPage = $contractVisits[$contract->id]->lastPage();
+                                                            $delta = 1; // Number of pages to show before and after current page
+                                                        @endphp
+
+                                                        {{-- First Page --}}
+                                                        @if($currentPage > ($delta + 2))
+                                                            <li class="page-item">
+                                                                <a class="page-link" href="{{ $contractVisits[$contract->id]->url(1) }}">1</a>
+                                                            </li>
+                                                            <li class="page-item disabled">
+                                                                <span class="page-link dots">...</span>
+                                                            </li>
+                                                        @endif
+
+                                                        {{-- Page Numbers --}}
+                                                        @foreach (range(max(1, $currentPage - $delta), min($lastPage, $currentPage + $delta)) as $page)
+                                                            @if ($page == $currentPage)
+                                                                <li class="page-item active">
+                                                                    <span class="page-link">{{ $page }}</span>
+                                                                </li>
+                                                            @else
+                                                                <li class="page-item">
+                                                                    <a class="page-link" href="{{ $contractVisits[$contract->id]->url($page) }}">{{ $page }}</a>
+                                                                </li>
+                                                            @endif
+                                                        @endforeach
+
+                                                        {{-- Last Page --}}
+                                                        @if($currentPage < ($lastPage - $delta - 1))
+                                                            <li class="page-item disabled">
+                                                                <span class="page-link dots">...</span>
+                                                            </li>
+                                                            <li class="page-item">
+                                                                <a class="page-link" href="{{ $contractVisits[$contract->id]->url($lastPage) }}">{{ $lastPage }}</a>
+                                                            </li>
+                                                        @endif
+
+                                                        {{-- Next Page Link --}}
+                                                        @if ($contractVisits[$contract->id]->hasMorePages())
+                                                            <li class="page-item">
+                                                                <a class="page-link" href="{{ $contractVisits[$contract->id]->nextPageUrl() }}" rel="next">Next</a>
+                                                            </li>
+                                                        @else
+                                                            <li class="page-item disabled">
+                                                                <span class="page-link">Next</span>
+                                                            </li>
+                                                        @endif
+                                                    </ul>
+                                                </nav>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
                             @endforeach
-                        </div>
-
-                        <!-- Pagination -->
-                        <div class="mt-4 d-flex justify-content-center">
-                            {{ $visits->appends(request()->except('page'))->onEachSide(1)->links('vendor.pagination.custom') }}
                         </div>
                     </div>
                 </div>
@@ -383,53 +513,405 @@
 
     @push('styles')
     <style>
-        .pagination {
-            margin-bottom: 0;
+        /* Mobile Responsiveness */
+        @media (max-width: 767.98px) {
+            /* Table Adjustments */
+            .table-responsive {
+                margin: 0 -1rem;
+            }
+            .table td, .table th {
+                padding: 0.75rem 0.5rem;
+                white-space: normal;
+            }
+            
+            /* Status Badge Adjustments */
+            .d-inline-flex {
+                font-size: 0.75rem;
+            }
+            
+            /* Action Buttons */
+            .btn-group {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .btn-group .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            /* Accordion Header */
+            .accordion-button {
+                padding: 0.75rem;
+            }
+            .accordion-button h5 {
+                font-size: 0.9rem;
+                margin-bottom: 0.25rem !important;
+            }
+            .accordion-button .font-size-13 {
+                font-size: 0.75rem;
+            }
+            .badge {
+                font-size: 0.75rem;
+            }
+            
+            /* Visit Details */
+            .d-flex.flex-column .text-dark {
+                font-size: 0.875rem;
+            }
+            .d-flex.flex-column .text-muted {
+                font-size: 0.75rem;
+            }
+            
+            /* Pagination */
+            .pagination {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .page-link {
+                padding: 0.25rem 0.5rem;
+                min-width: 24px;
+                height: 24px;
+                font-size: 0.75rem;
+            }
+            
+            /* Table Headers */
+            thead th {
+                font-size: 0.8rem;
+            }
+            
+            /* Hide Less Important Columns on Small Screens */
+            @media (max-width: 575.98px) {
+                .table td:nth-child(3),
+                .table th:nth-child(3) {
+                    display: none;
+                }
+                
+                .accordion-button .d-flex.align-items-center > div:last-child {
+                    display: none;
+                }
+            }
         }
-        .page-item.active .page-link {
-            background-color: #556ee6;
-            border-color: #556ee6;
+
+        /* Existing Styles */
+        .accordion-button:not(.collapsed) .bx-chevron-down {
+            transform: rotate(-180deg);
+        }
+        .transition-transform {
+            transition: transform 0.2s ease-in-out;
+        }
+        .table > :not(caption) > * > * {
+            background-color: transparent;
+        }
+        .pagination {
+            margin: 0;
+            gap: 4px;
+        }
+        .page-item {
+            margin: 0;
+        }
+        .page-item:first-child .page-link,
+        .page-item:last-child .page-link {
+            border-radius: 4px;
         }
         .page-link {
-            color: #556ee6;
-            padding: 0.375rem 0.75rem;
-            font-size: 0.875rem;
-        }
-        .pagination .page-link span {
-            font-size: 0.75rem;
-        }
-        .pagination svg {
-            width: 12px;
-            height: 12px;
-            vertical-align: -2px;
-        }
-        .table td {
-            vertical-align: middle;
-        }
-        .btn-group-sm .btn,
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-        }
-        .action-buttons {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8125rem;
+            min-width: 28px;
+            height: 28px;
             display: flex;
-            gap: 0.5rem;
-            justify-content: flex-end;
+            align-items: center;
+            justify-content: center;
+            color: var(--bs-primary);
+            border: 1px solid #dee2e6;
+            margin: 0;
+            border-radius: 4px;
+            background-color: #fff;
         }
-        .badge {
-            padding: 0.5em 0.8em;
+        .page-item.active .page-link {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+            color: #fff;
+            font-weight: 500;
+        }
+        .page-item.disabled .page-link {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+            color: #6c757d;
+        }
+        .page-link:hover {
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+            color: var(--bs-primary);
+        }
+        .page-item.active .page-link:hover {
+            background-color: var(--bs-primary);
+            color: #fff;
+        }
+        .btn-soft-primary {
+            color: var(--bs-primary);
+            background-color: rgba(var(--bs-primary-rgb), 0.1);
+            border-color: transparent;
+        }
+        .btn-soft-danger {
+            color: var(--bs-danger);
+            background-color: rgba(var(--bs-danger-rgb), 0.1);
+            border-color: transparent;
+        }
+        .btn-soft-info {
+            color: var(--bs-info);
+            background-color: rgba(var(--bs-info-rgb), 0.1);
+            border-color: transparent;
+        }
+        .btn-soft-primary:hover {
+            color: #fff;
+            background-color: var(--bs-primary);
+        }
+        .btn-soft-danger:hover {
+            color: #fff;
+            background-color: var(--bs-danger);
+        }
+        .btn-soft-info:hover {
+            color: #fff;
+            background-color: var(--bs-info);
+        }
+        
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-item {
+            margin: 0;
+            list-style: none;
+        }
+
+        .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: var(--bs-primary);
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .page-link:hover {
+            color: var(--bs-primary);
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
+            z-index: 2;
+        }
+
+        .page-item.active .page-link {
+            color: #fff;
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+            box-shadow: 0 2px 4px rgba(var(--bs-primary-rgb), 0.15);
+        }
+
+        .page-item.disabled .page-link {
+            color: #94a3b8;
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
+            cursor: not-allowed;
+        }
+
+        .page-link.dots {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            pointer-events: none;
+            padding: 0 4px;
+            min-width: 24px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 767.98px) {
+            .pagination {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .page-link {
+                min-width: 28px;
+                height: 28px;
+                font-size: 0.8125rem;
+            }
+            
+            .page-link.dots {
+                min-width: 20px;
+            }
         }
     </style>
-    @endpush
-
-    @push('css')
     <style>
-        /* Remove previous pagination styles */
+        /* Contract Info Styles */
+        .contract-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .contract-main-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .contract-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .contract-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .contract-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        /* Visit Stats Styles */
+        .visit-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 0.5rem 0;
+        }
+
+        .visit-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem 1rem;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            min-width: 100px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 767.98px) {
+            .contract-info {
+                gap: 0.75rem;
+            }
+
+            .visit-stats {
+                width: 100%;
+                justify-content: space-between;
+                gap: 0.5rem;
+            }
+
+            .visit-stat-item {
+                flex: 1;
+                min-width: calc(50% - 0.5rem);
+                padding: 0.375rem 0.5rem;
+            }
+
+            .stat-label {
+                font-size: 0.7rem;
+            }
+
+            .stat-value {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .visit-stat-item {
+                min-width: calc(50% - 0.25rem);
+            }
+        }
+    </style>
+    <style>
+        /* Contract Header Styles */
+        .view-contract-btn {
+            font-size: 1.1rem;
+            line-height: 1;
+            transition: all 0.2s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none !important;
+        }
+
+        .view-contract-btn:hover {
+            color: var(--bs-primary) !important;
+            transform: scale(1.1);
+        }
+
+        .contract-title {
+            position: relative;
+            padding-right: 2rem;
+        }
+
+        /* Prevent button click from triggering accordion */
+        .view-contract-btn {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 767.98px) {
+            .view-contract-btn {
+                font-size: 1rem;
+            }
+            
+            .contract-title {
+                padding-right: 1.5rem;
+            }
+        }
     </style>
     @endpush
 
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Prevent contract details button from triggering accordion
+            document.querySelectorAll('.view-contract-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            });
+
             // Client selection change handler
             document.getElementById('client_select').addEventListener('change', function() {
                 const clientId = this.value;
@@ -534,15 +1016,191 @@
             }
         }
 
-        //call edit modal
-        function openEditModal(visitId, visitDate, visitTime, teamId) {
-            const form = document.getElementById('editForm');
-            form.action = `/technical/visit/${visitId}/update`;
-            document.getElementById('edit_visit_date').value = visitDate;
-            document.getElementById('edit_visit_time').value = visitTime;
-            document.getElementById('edit_team_id').value = teamId;
-            $('#editModal').modal('show');
+        // Edit Appointment Functions
+        function openEditModal(appointmentId, currentDate, currentTime, currentTeamId) {
+            // Set form action
+            document.getElementById('editForm').action = `/technical/appointments/${appointmentId}/edit`;
+            
+            // Set current values
+            document.getElementById('edit_visit_date').value = currentDate;
+            document.getElementById('edit_visit_time').value = currentTime;
+            document.getElementById('edit_team_id').value = currentTeamId;
+            
+            // Show modal
+            new bootstrap.Modal(document.getElementById('editModal')).show();
         }
+
+        // Cancel Appointment Function
+        function cancelAppointment(appointmentId) {
+            if (confirm('Are you sure you want to cancel this appointment?')) {
+                window.location.href = "{{ route('technical.appointment.cancel', ['appointment' => ':id']) }}".replace(':id', appointmentId);
+            }
+        }
+        
+        // Schedule warnings check
     </script>
     @endpush
     @endsection
+
+    <style>
+        .accordion-button:not(.collapsed) .bx-chevron-down {
+            transform: rotate(-180deg);
+        }
+        .transition-transform {
+            transition: transform 0.2s ease-in-out;
+        }
+        .table > :not(caption) > * > * {
+            background-color: transparent;
+        }
+        .pagination {
+            margin: 0;
+            gap: 4px;
+        }
+        .page-item {
+            margin: 0;
+        }
+        .page-item:first-child .page-link,
+        .page-item:last-child .page-link {
+            border-radius: 4px;
+        }
+        .page-link {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8125rem;
+            min-width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bs-primary);
+            border: 1px solid #dee2e6;
+            margin: 0;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+        .page-item.active .page-link {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+            color: #fff;
+            font-weight: 500;
+        }
+        .page-item.disabled .page-link {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+            color: #6c757d;
+        }
+        .page-link:hover {
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+            color: var(--bs-primary);
+        }
+        .page-item.active .page-link:hover {
+            background-color: var(--bs-primary);
+            color: #fff;
+        }
+        .btn-soft-primary {
+            color: var(--bs-primary);
+            background-color: rgba(var(--bs-primary-rgb), 0.1);
+            border-color: transparent;
+        }
+        .btn-soft-danger {
+            color: var(--bs-danger);
+            background-color: rgba(var(--bs-danger-rgb), 0.1);
+            border-color: transparent;
+        }
+        .btn-soft-info {
+            color: var(--bs-info);
+            background-color: rgba(var(--bs-info-rgb), 0.1);
+            border-color: transparent;
+        }
+        .btn-soft-primary:hover {
+            color: #fff;
+            background-color: var(--bs-primary);
+        }
+        .btn-soft-danger:hover {
+            color: #fff;
+            background-color: var(--bs-danger);
+        }
+        .btn-soft-info:hover {
+            color: #fff;
+            background-color: var(--bs-info);
+        }
+        
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-item {
+            margin: 0;
+            list-style: none;
+        }
+
+        .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: var(--bs-primary);
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .page-link:hover {
+            color: var(--bs-primary);
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
+            z-index: 2;
+        }
+
+        .page-item.active .page-link {
+            color: #fff;
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+            box-shadow: 0 2px 4px rgba(var(--bs-primary-rgb), 0.15);
+        }
+
+        .page-item.disabled .page-link {
+            color: #94a3b8;
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
+            cursor: not-allowed;
+        }
+
+        .page-link.dots {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            pointer-events: none;
+            padding: 0 4px;
+            min-width: 24px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 767.98px) {
+            .pagination {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .page-link {
+                min-width: 28px;
+                height: 28px;
+                font-size: 0.8125rem;
+            }
+            
+            .page-link.dots {
+                min-width: 20px;
+            }
+        }
+    </style>

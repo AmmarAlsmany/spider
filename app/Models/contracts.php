@@ -48,6 +48,11 @@ class contracts extends Model
         return $this->hasMany(branchs::class, 'contracts_id');
     }
 
+    public function visitSchedules()
+    {
+        return $this->hasMany(VisitSchedule::class, 'contract_id');
+    }
+
     public function payments()
     {
         return $this->hasMany(payments::class, 'contract_id');
@@ -68,7 +73,7 @@ class contracts extends Model
         return $this->hasMany(ContractHistory::class, 'contract_id')->orderBy('created_at', 'desc');
     }
 
-    public function visitSchedules()
+    public function visits()
     {
         return $this->hasMany(VisitSchedule::class, 'contract_id');
     }

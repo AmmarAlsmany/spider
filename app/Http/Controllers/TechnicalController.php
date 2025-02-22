@@ -402,32 +402,35 @@ class TechnicalController extends Controller
                 ->whereYear('visit_date', now()->year);
         }
 
-        // Filter by contract number if provided
-        if ($request->has('contract_number')) {
-            $query->whereHas('contract', function($q) use ($request) {
-                $q->where('contract_number', 'like', '%' . $request->contract_number . '%');
-            });
-        }
+        // Get today's date
+        $today = now()->toDateString();
 
-        // Get all filtered visits
-        $filteredVisits = $query->orderBy('visit_date')->get();
-        
-        // Group visits by contract
-        $groupedVisits = $filteredVisits->groupBy('contract_id');
-        
-        // Paginate the contracts
-        $page = request()->get('page', 1);
-        $perPage = 10;
-        $paginatedContracts = $groupedVisits->forPage($page, $perPage);
-        
-        // Create a new paginator for the contracts
-        $visits = new \Illuminate\Pagination\LengthAwarePaginator(
-            $paginatedContracts,
-            $groupedVisits->count(),
-            $perPage,
-            $page,
-            ['path' => request()->url()]
-        );
+        // Get pending visits count
+        $pendingVisits = VisitSchedule::where('status', 'scheduled')
+            ->count();
+
+        // Get today's total visits
+        $todayVisits = VisitSchedule::whereDate('visit_date', $today)->count();
+
+        // Get today's completed visits
+        $todayCompletedVisits = VisitSchedule::whereDate('visit_date', $today)
+            ->where('status', 'completed')
+            ->count();
+
+        // Get contracts with their visits
+        $contracts = contracts::with(['customer', 'branchs'])
+            ->where('contract_status', 'approved')
+            ->whereHas('visitSchedules')
+            ->get();
+
+        // Get paginated visits for each contract
+        $contractVisits = [];
+        foreach ($contracts as $contract) {
+            $contractVisits[$contract->id] = VisitSchedule::with(['team', 'branch'])
+                ->where('contract_id', $contract->id)
+                ->orderBy('visit_date', 'desc')
+                ->paginate(5, ['*'], 'contract_' . $contract->id . '_page');
+        }
 
         // Get teams for assignment
         $teams = Team::all();
@@ -437,22 +440,14 @@ class TechnicalController extends Controller
             $query->where('contract_status', 'approved');
         })->get();
 
-        // Calculate today's visits for statistics
-        $todayVisits = $baseQuery->whereDate('visit_date', now()->toDateString())->count();
-
-        // Get total visits count from database without filters
-        $totalVisits = $baseQuery->count();
-
-        // Get filtered visits count
-        $filteredVisitsCount = $filteredVisits->count();
-
         return view('managers.technical.scheduled_appointments', compact(
-            'visits',
-            'teams', 
-            'clients', 
+            'contracts',
+            'contractVisits',
+            'pendingVisits',
             'todayVisits',
-            'totalVisits',
-            'filteredVisitsCount'
+            'todayCompletedVisits',
+            'teams',
+            'clients'
         ));
     }
 

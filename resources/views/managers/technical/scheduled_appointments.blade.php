@@ -234,8 +234,8 @@
                                                         <td class="px-3 py-3">
                                                             <div class="d-flex align-items-center">
                                                                 <i class="bx bx-map-pin me-2 text-muted"></i>
-                                                                <span>{{ $visit->branch->branch_name ?? $visit->customer->city }} 
-                                                                    <small class="text-muted">{{ $visit->branch->branch_address ?? $visit->customer->address }}</small>
+                                                                <span>{{ $visit->branch->branch_name ?? $visit->contract->customer->city }} 
+                                                                    <small class="text-muted">{{ $visit->branch->branch_address ?? $visit->contract->customer->address }}</small>
                                                                 </span>
                                                             </div>
                                                         </td>

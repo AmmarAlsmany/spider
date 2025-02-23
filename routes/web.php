@@ -18,6 +18,7 @@ use App\Http\Controllers\shared;
 use App\Http\Controllers\TeamLeaderController;
 use App\Http\Controllers\TechnicalController;
 use App\Http\Controllers\TiketsController;
+use App\Http\Controllers\ValidationController;
 use Illuminate\Support\Facades\Route;
 
 // Language Switching Route
@@ -330,3 +331,5 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::get('/alerts/{id}/mark-as-read', [AlertController::class, 'markAsRead'])->name('alerts.mark-as-read');
     Route::delete('/alerts/{alert}', [AlertController::class, 'destroy'])->name('alerts.destroy');
 });
+
+Route::get('/check-duplicate', [ValidationController::class, 'checkDuplicate'])->name('check.duplicate');

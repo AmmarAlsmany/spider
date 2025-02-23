@@ -112,9 +112,12 @@ class ContractsController extends Controller
                 'clientName.required' => 'The client name field is required.',
                 'clientEmail.required' => 'The client email field is required.',
                 'clientEmail.email' => 'Please enter a valid email address.',
+                'clientEmail.unique' => 'This email is already in use.',
                 'clientPhone.required' => 'The client phone field is required.',
+                'clientPhone.unique' => 'This phone number is already in use.',
                 'clientPhone.size' => 'The phone number must be exactly 10 digits.',
                 'clientMobile.required' => 'The client mobile field is required.',
+                'clientMobile.unique' => 'This mobile number is already in use.',
                 'clientAddress.required' => 'The client address field is required.',
                 'clientCity.required' => 'The client city field is required.',
                 'contractnumber.required' => 'The contract number field is required.',
@@ -359,7 +362,7 @@ class ContractsController extends Controller
             if (!$request->has('client_id')) {
                 $rules['customer_name'] ='required|string';
                 $rules['customer_mobile'] = 'required|string';
-                $rules['customer_email'] = 'required|email';
+                $rules['customer_email'] = 'required|email|unique:client,email';
             } else {
                 $rules['client_id'] = 'required|exists:clients,id';
             }

@@ -149,7 +149,7 @@ $property_types = [
                             <div class="bs-stepper-circle">3</div>
                             <div class="">
                                 <h5 class="mb-1">Branch information</h5>
-                                <p class="mb-0 steper-sub-title">Branch Details</p>
+                                <p class="mb-4">Informing the company of branch information</p>
                             </div>
                         </div>
                     </div>
@@ -656,6 +656,34 @@ $property_types = [
     var currentStep = 0;
     var branchCount = document.getElementById('branchs_number')?.value || 0;
 
+    // Add function to check for duplicates
+    async function checkDuplicateField(field, value) {
+        try {
+            const response = await fetch(`{{ route('check.duplicate') }}?field=${field}&value=${encodeURIComponent(value)}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.exists;
+        } catch (error) {
+            console.error('Error checking duplicate:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'There was an error checking for duplicate entries. Please try again.'
+            });
+            return false;
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         stepper = new Stepper(document.querySelector('.bs-stepper'), {
             linear: true,
@@ -663,7 +691,7 @@ $property_types = [
         });
     });
 
-    function validateClientInfo() {
+    async function validateClientInfo() {
         const form = document.getElementById('contractForm');
         const requiredFields = [
             { name: 'clientName', id: 'FullName', pattern: /.+/, message: 'Please enter client\'s full name' },
@@ -676,19 +704,25 @@ $property_types = [
         ];
 
         let isValid = true;
+        let errorMessages = [];
 
         // Reset validation state
         requiredFields.forEach(field => {
             const element = document.getElementById(field.id);
             if (element) {
                 element.classList.remove('is-invalid', 'is-valid');
+                // Remove any existing error message
+                const nextElement = element.nextElementSibling;
+                if (nextElement && nextElement.classList.contains('invalid-feedback')) {
+                    nextElement.textContent = '';
+                }
             }
         });
 
         // Validate each field
-        requiredFields.forEach(field => {
+        for (const field of requiredFields) {
             const element = document.getElementById(field.id);
-            if (!element) return;
+            if (!element) continue;
 
             const value = element.value.trim();
             if (!value || !field.pattern.test(value)) {
@@ -700,18 +734,63 @@ $property_types = [
                 if (feedback && feedback.classList.contains('invalid-feedback')) {
                     feedback.textContent = field.message;
                 }
+                errorMessages.push(field.message);
             } else {
                 element.classList.add('is-valid');
             }
-        });
+        }
 
+        // If basic validation fails, show error message and return
         if (!isValid) {
             Swal.fire({
                 icon: 'error',
                 title: 'Validation Error',
-                text: 'Please check all client information fields are filled correctly',
-                confirmButtonText: 'OK'
+                html: errorMessages.join('<br>')
             });
+            return false;
+        }
+
+        // If basic validation passes, check for duplicates
+        try {
+            const email = document.getElementById('Email').value;
+            const phone = document.getElementById('Phone').value;
+            const mobile = document.getElementById('Mobile').value;
+
+            const duplicateChecks = [
+                { field: 'email', value: email, element: 'Email', message: 'This email is already registered' },
+                { field: 'phone', value: phone, element: 'Phone', message: 'This phone number is already registered' },
+                { field: 'mobile', value: mobile, element: 'Mobile', message: 'This mobile number is already registered' }
+            ];
+
+            let duplicateErrors = [];
+
+            for (const check of duplicateChecks) {
+                const isDuplicate = await checkDuplicateField(check.field, check.value);
+                if (isDuplicate) {
+                    const element = document.getElementById(check.element);
+                    element.classList.remove('is-valid');
+                    element.classList.add('is-invalid');
+                    duplicateErrors.push(check.message);
+                    isValid = false;
+                }
+            }
+
+            if (duplicateErrors.length > 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Duplicate Entry',
+                    html: duplicateErrors.join('<br>')
+                });
+                return false;
+            }
+        } catch (error) {
+            console.error('Error in duplicate check:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'There was an error validating the form. Please try again.'
+            });
+            return false;
         }
 
         return isValid;
@@ -1007,6 +1086,203 @@ $property_types = [
         return isValid;
     }
 
+    async function handleNextStep() {
+        let isValid = true;
+        const paymentStep = branchCount > 1 ? 3 : 2;
+        
+        switch(currentStep) {
+            case 0:
+                isValid = await validateClientInfo();
+                break;
+            case 1:
+                isValid = validateContractDetails();
+                break;
+            case 2:
+                if (branchCount > 1) {
+                    isValid = validateBranchInfo();
+                } else {
+                    isValid = validatePaymentInfo();
+                }
+                break;
+            case 3:
+                if (branchCount > 1) {
+                    isValid = validatePaymentInfo();
+                }
+                break;
+        }
+
+        if (isValid) {
+            if (currentStep === paymentStep) {
+                updateSummary(); // Update summary before showing the final step
+            }
+            stepper.next();
+            currentStep++;
+        }
+    }
+
+    function handlePreviousStep() {
+        currentStep--;
+        stepper.previous();
+    }
+
+    async function validateForm(event) {
+        event.preventDefault();
+        
+        try {
+            // Validate client info first (this includes duplicate checks)
+            const clientInfoValid = await validateClientInfo();
+            if (!clientInfoValid) {
+                stepper.to(0); // Go to client info step
+                return false;
+            }
+
+            // Validate contract details
+            const contractDetailsValid = validateContractDetails();
+            if (!contractDetailsValid) {
+                stepper.to(1); // Go to contract details step
+                return false;
+            }
+
+            // Validate branch info if applicable
+            if (branchCount > 1) {
+                const branchInfoValid = validateBranchInfo();
+                if (!branchInfoValid) {
+                    stepper.to(2); // Go to branch info step
+                    return false;
+                }
+            }
+
+            // Validate payment info
+            const paymentInfoValid = validatePaymentInfo();
+            if (!paymentInfoValid) {
+                stepper.to(branchCount > 1 ? 3 : 2); // Go to payment info step
+                return false;
+            }
+
+            // If all validations pass, show confirmation dialog
+            Swal.fire({
+                title: 'Confirm Contract Submission',
+                text: 'Are you sure you want to submit this contract?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, submit it!',
+                cancelButtonText: 'No, review again'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit the form
+                    document.getElementById('contractForm').submit();
+                }
+            });
+        } catch (error) {
+            console.error('Validation error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred during validation. Please try again.'
+            });
+            return false;
+        }
+
+        return false; // Prevent form submission until confirmation
+    }
+
+    function cancelContract() {
+        Swal.fire({
+            title: 'Cancel Contract?',
+            text: 'Are you sure you want to cancel this contract? All entered data will be lost.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'No, keep editing'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Reset the form
+                document.getElementById('contractForm').reset();
+                
+                // Reset the stepper to the first step
+                currentStep = 0;
+                stepper.to(1);
+                
+                // Clear any validation messages or errors
+                clearValidationMessages();
+                
+                // Clear the contract summary if it exists
+                const summaryDiv = document.getElementById('contract-summary');
+                if (summaryDiv) {
+                    summaryDiv.innerHTML = '';
+                }
+
+                Swal.fire(
+                    'Cancelled!',
+                    'Your contract has been cancelled.',
+                    'success'
+                );
+            }
+        });
+    }
+
+    function handlePaymentScheduleChange() {
+        const paymentSchedule = document.querySelector('[name="payment_schedule"]');
+        const numberOfPayments = document.querySelector('[name="number_of_payments"]');
+        const customDatesContainer = document.getElementById('custom-payment-dates');
+        
+        if (!customDatesContainer) {
+            // Create the container if it doesn't exist
+            const container = document.createElement('div');
+            container.id = 'custom-payment-dates';
+            paymentSchedule.parentElement.after(container);
+        }
+
+        if (paymentSchedule.value === 'custom' && numberOfPayments.value) {
+            generateCustomPaymentDateFields(parseInt(numberOfPayments.value));
+        } else {
+            // Clear custom date fields if not using custom schedule
+            document.getElementById('custom-payment-dates').innerHTML = '';
+        }
+    }
+
+    function generateCustomPaymentDateFields(numberOfPayments) {
+        const container = document.getElementById('custom-payment-dates');
+        const firstPaymentDate = document.getElementById('first_payment_date').value;
+        
+        if (!firstPaymentDate) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'First Payment Date Required',
+                text: 'Please select the first payment date before setting custom dates'
+            });
+            return;
+        }
+
+        container.innerHTML = '';
+        
+        for (let i = 1; i < numberOfPayments; i++) {
+            const dateGroup = document.createElement('div');
+            dateGroup.className = 'mb-3';
+            
+            const label = document.createElement('label');
+            label.className = 'form-label';
+            label.htmlFor = `payment_date_${i + 1}`;
+            label.innerHTML = `Payment Date ${i + 1} <span class="text-danger">*</span>`;
+            
+            const input = document.createElement('input');
+            input.type = 'date';
+            input.className = 'form-control';
+            input.name = `payment_date_${i + 1}`;
+            input.id = `payment_date_${i + 1}`;
+            input.required = true;
+            input.min = firstPaymentDate;
+            
+            dateGroup.appendChild(label);
+            dateGroup.appendChild(input);
+            container.appendChild(dateGroup);
+        }
+    }
+
     function updateSummary() {
         try {
             // Helper function to safely get input value
@@ -1130,190 +1406,6 @@ $property_types = [
                 title: 'Error',
                 text: 'There was an error updating the summary. Please try again.'
             });
-        }
-    }
-
-    function handleNextStep() {
-        let isValid = true;
-        const paymentStep = branchCount > 1 ? 3 : 2;
-        
-        switch(currentStep) {
-            case 0:
-                isValid = validateClientInfo();
-                break;
-            case 1:
-                isValid = validateContractDetails();
-                break;
-            case 2:
-                if (branchCount > 1) {
-                    isValid = validateBranchInfo();
-                } else {
-                    isValid = validatePaymentInfo();
-                }
-                break;
-            case 3:
-                if (branchCount > 1) {
-                    isValid = validatePaymentInfo();
-                }
-                break;
-        }
-
-        if (isValid) {
-            if (currentStep === paymentStep) {
-                updateSummary(); // Update summary before showing the final step
-            }
-            stepper.next();
-            currentStep++;
-        }
-    }
-
-    function handlePreviousStep() {
-        currentStep--;
-        stepper.previous();
-    }
-
-    function validateForm(event) {
-        event.preventDefault();
-        
-        // Validate all sections
-        const validations = [
-            validateClientInfo(),
-            validateContractDetails(),
-            branchCount > 1 ? validateBranchInfo() : true,
-            validatePaymentInfo()
-        ];
-
-        if (validations.every(v => v === true)) {
-            Swal.fire({
-                title: 'Confirm Contract Submission',
-                text: 'Are you sure you want to submit this contract?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, submit it!',
-                cancelButtonText: 'No, review again'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Submitting Contract',
-                        text: 'Please wait while we process your contract...',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        showConfirmButton: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                            document.getElementById('contractForm').submit();
-                        }
-                    });
-                }
-            });
-            return false;
-        }
-
-        Swal.fire({
-            icon: 'error',
-            title: 'Form Validation Failed',
-            text: 'Please check all sections are filled correctly',
-            confirmButtonText: 'OK'
-        });
-
-        return false;
-    }
-
-    function cancelContract() {
-        Swal.fire({
-            title: 'Cancel Contract?',
-            text: 'Are you sure you want to cancel this contract? All entered data will be lost.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, cancel it!',
-            cancelButtonText: 'No, keep editing'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Reset the form
-                document.getElementById('contractForm').reset();
-                
-                // Reset the stepper to the first step
-                currentStep = 0;
-                stepper.to(1);
-                
-                // Clear any validation messages or errors
-                clearValidationMessages();
-                
-                // Clear the contract summary if it exists
-                const summaryDiv = document.getElementById('contract-summary');
-                if (summaryDiv) {
-                    summaryDiv.innerHTML = '';
-                }
-
-                Swal.fire(
-                    'Cancelled!',
-                    'Your contract has been cancelled.',
-                    'success'
-                );
-            }
-        });
-    }
-
-    function handlePaymentScheduleChange() {
-        const paymentSchedule = document.querySelector('[name="payment_schedule"]');
-        const numberOfPayments = document.querySelector('[name="number_of_payments"]');
-        const customDatesContainer = document.getElementById('custom-payment-dates');
-        
-        if (!customDatesContainer) {
-            // Create the container if it doesn't exist
-            const container = document.createElement('div');
-            container.id = 'custom-payment-dates';
-            paymentSchedule.parentElement.after(container);
-        }
-
-        if (paymentSchedule.value === 'custom' && numberOfPayments.value) {
-            generateCustomPaymentDateFields(parseInt(numberOfPayments.value));
-        } else {
-            // Clear custom date fields if not using custom schedule
-            document.getElementById('custom-payment-dates').innerHTML = '';
-        }
-    }
-
-    function generateCustomPaymentDateFields(numberOfPayments) {
-        const container = document.getElementById('custom-payment-dates');
-        const firstPaymentDate = document.getElementById('first_payment_date').value;
-        
-        if (!firstPaymentDate) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'First Payment Date Required',
-                text: 'Please select the first payment date before setting custom dates'
-            });
-            return;
-        }
-
-        container.innerHTML = '';
-        
-        for (let i = 1; i < numberOfPayments; i++) {
-            const dateGroup = document.createElement('div');
-            dateGroup.className = 'mb-3';
-            
-            const label = document.createElement('label');
-            label.className = 'form-label';
-            label.htmlFor = `payment_date_${i + 1}`;
-            label.innerHTML = `Payment Date ${i + 1} <span class="text-danger">*</span>`;
-            
-            const input = document.createElement('input');
-            input.type = 'date';
-            input.className = 'form-control';
-            input.name = `payment_date_${i + 1}`;
-            input.id = `payment_date_${i + 1}`;
-            input.required = true;
-            input.min = firstPaymentDate;
-            
-            dateGroup.appendChild(label);
-            dateGroup.appendChild(input);
-            container.appendChild(dateGroup);
         }
     }
 </script>

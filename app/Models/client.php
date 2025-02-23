@@ -50,4 +50,9 @@ class client extends Authenticatable
     {
         return $this->hasMany(Alert::class);
     }
+
+    public function payments()
+    {
+        return $this->hasMany(payments::class, 'customer_id');
+    }
 }

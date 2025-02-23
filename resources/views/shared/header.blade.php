@@ -46,11 +46,11 @@
                                 </div>
                             </a>
                             <div class="header-notifications-list custom-scrollbar" id="notifications-container">
-                                <div class="text-center p-3">
+                                <div class="p-3 text-center">
                                     <div class="spinner-border text-primary" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>
-                                    <p class="text-muted mt-2">Loading notifications...</p>
+                                    <p class="mt-2 text-muted">Loading notifications...</p>
                                 </div>
                             </div>
                             <a href="javascript:;" onclick="markAllAsRead()" id="mark-all-read" class="mark-all-read-btn" style="display: none;">
@@ -96,7 +96,7 @@
                     <li>
                         @if (Auth::check())
                         @if (Auth::user()->role === 'admin')
-                        <a class="dropdown-item d-flex align-items-center" href="{{ url('admin.dashboard') }}">
+                        <a class="dropdown-item d-flex align-items-center" href="{{ route('admin.dashboard') }}">
                             <i class="bx bx-home-circle fs-5"></i>
                             <span>Dashboard</span>
                         </a>

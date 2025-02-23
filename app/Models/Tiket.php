@@ -44,4 +44,9 @@ class Tiket extends Model
     {
         return $this->hasMany(TicketReply::class, 'ticket_id');
     }
+
+    public function ticketReplies(): HasMany
+    {
+        return $this->hasMany(TicketReply::class, 'ticket_id');
+    }
 }

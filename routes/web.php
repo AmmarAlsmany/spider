@@ -64,7 +64,28 @@ Route::middleware(['auth', 'role:admin', 'prevent-back-history'])->group(functio
         'store' => 'admin.managers.store',
         'edit' => 'admin.managers.edit',
         'update' => 'admin.managers.update',
+        'destroy' => 'admin.managers.destroy',
     ]);
+
+    Route::get('/admin/contracts/reports', [DashboardController::class, 'reports'])->name('admin.contracts.reports');
+    Route::get('/admin/contracts/reports/data', [DashboardController::class, 'getReportsData'])->name('admin.contracts.reports.data');
+    Route::get('/admin/contracts/{contract}/show', [DashboardController::class, 'show'])->name('admin.contracts.show');
+    Route::get('/admin/contracts/{status}', [DashboardController::class, 'contractsIndex'])->name('admin.contracts.status');
+    Route::get('/admin/contracts', [DashboardController::class, 'contractsIndex'])->name('admin.contracts.index');
+    Route::get('/admin/tickets', [DashboardController::class, 'ticketsIndex'])->name('admin.tickets.index');
+    Route::get('/admin/tickets/{ticket}/show', [DashboardController::class, 'ticketShow'])->name('admin.tickets.show');
+    Route::post('/admin/tickets/{ticket}/reply', [DashboardController::class, 'ticketReply'])->name('admin.tickets.reply');
+    Route::get('/admin/tickets/reports', [DashboardController::class, 'ticketsReports'])->name('admin.tickets.reports');
+    Route::get('/admin/tickets/reports/data', [DashboardController::class, 'getTicketsReportsData'])->name('admin.tickets.reports.data');
+    
+    // Payment Routes
+    Route::get('/admin/payments', [DashboardController::class, 'paymentsIndex'])->name('admin.payments.index');
+    Route::get('/admin/payments/{payment}/show', [DashboardController::class, 'paymentShow'])->name('admin.payments.show');
+    Route::post('/admin/payments/{payment}/status', [DashboardController::class, 'updatePaymentStatus'])->name('admin.payments.status.update');
+    Route::get('/admin/payments/reports', [DashboardController::class, 'paymentsReports'])->name('admin.payments.reports');
+    Route::get('/admin/payments/reports/data', [DashboardController::class, 'getPaymentsReportsData'])->name('admin.payments.reports.data');
+    Route::get('/admin/reports/general', [DashboardController::class, 'generalReport'])->name('admin.reports.general');
+    Route::get('/admin/reports/general/data', [DashboardController::class, 'getGeneralReportData'])->name('admin.reports.general.data');
 });
 
 // Sales Routes

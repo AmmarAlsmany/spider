@@ -12,40 +12,81 @@
     <!--navigation-->
     <ul class="metismenu" id="menu">
         <li>
-            <a href="{{ route('finance.dashboard') }}">
-                <div class="parent-icon"><i class='bx bx-home-alt'></i></div>
+            <a href="{{ route('admin.dashboard') }}">
+                <div class="parent-icon"><i class='bx bx-home-circle'></i></div>
                 <div class="menu-title">Dashboard</div>
             </a>
         </li>
 
+        <li class="menu-label">Staff Management</li>
+        <li>
+            <a href="javascript:;" class="has-arrow">
+                <div class="parent-icon"><i class='bx bx-user-circle'></i></div>
+                <div class="menu-title">Managers</div>
+            </a>
+            <ul>
+                <li>
+                    <a href="{{ route('admin.managers.index') }}"><i class="bx bx-right-arrow-alt"></i>All Managers</a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.managers.create') }}"><i class="bx bx-right-arrow-alt"></i>Add Manager</a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="menu-label">Contract Management</li>
+        <li>
+            <a href="javascript:;" class="has-arrow">
+                <div class="parent-icon"><i class='bx bx-file'></i></div>
+                <div class="menu-title">Contracts</div>
+            </a>
+            <ul>
+                <li>
+                    <a href="{{ route('admin.contracts.index') }}">
+                        <i class="bx bx-right-arrow-alt"></i>All Contracts
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.contracts.reports') }}">
+                        <i class="bx bx-chart"></i>Contract Reports
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="menu-label">Support Management</li>
+        <li>
+            <a href="javascript:;" class="has-arrow">
+                <div class="parent-icon"><i class='bx bx-support'></i></div>
+                <div class="menu-title">Tickets</div>
+            </a>
+            <ul>
+                <li>
+                    <a href="{{ route('admin.tickets.index') }}"><i class="bx bx-right-arrow-alt"></i>All Tickets</a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.tickets.reports') }}"><i class="bx bx-chart"></i>Tickets Reports</a>
+                </li>
+            </ul>
+        </li>
+
         <li class="menu-label">Financial Management</li>
-        <li class="mm-active">
+        <li>
             <a href="javascript:;" class="has-arrow">
                 <div class="parent-icon"><i class='bx bx-money'></i></div>
                 <div class="menu-title">Payments</div>
             </a>
             <ul>
                 <li>
-                    <a href="{{ route('finance.payments') }}">
-                        <i class="bx bx-right-arrow-alt"></i>All Payments
-                    </a>
+                    <a href="{{ route('admin.payments.index') }}"><i class="bx bx-right-arrow-alt"></i>All Payments</a>
                 </li>
                 <li>
-                    <a href="{{ route('finance.payments.pending') }}">
-                        <i class="bx bx-right-arrow-alt"></i>Pending Payments
-                    </a>
+                    <a href="{{ route('admin.payments.reports') }}"><i class="bx bx-right-arrow-alt"></i>Payment Reports</a>
                 </li>
             </ul>
         </li>
 
-        <li>
-            <a href="{{ route('finance.reports.financial') }}">
-                <div class="parent-icon"><i class='bx bx-chart'></i></div>
-                <div class="menu-title">Financial Reports</div>
-            </a>
-        </li>
-
-        <li class="menu-label">Account Settings</li>
+        <li class="menu-label">My Account</li>
         <li>
             <a href="{{ route('change.user.profile') }}">
                 <div class="parent-icon"><i class='bx bx-user'></i></div>
@@ -60,7 +101,7 @@
             </a>
         </li>
 
-        <li class="mm-active">
+        <li>
             <a href="{{ route('alerts.index') }}">
                 <div class="parent-icon">
                     <i class='bx bx-bell'></i>
@@ -76,8 +117,7 @@
         </li>
 
         <li>
-            <a href="{{ route('logout') }}"
-                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <div class="parent-icon"><i class='bx bx-log-out'></i></div>
                 <div class="menu-title">Logout</div>
             </a>

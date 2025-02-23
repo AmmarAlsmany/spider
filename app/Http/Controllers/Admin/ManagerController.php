@@ -11,7 +11,7 @@ class ManagerController extends Controller
 {
     public function index()
     {
-        $managers = User::whereIn('role', ['technical', 'financial', 'sales_manager'])->get();
+        $managers = User::whereIn('role', ['technical', 'finance', 'sales_manager'])->get();
         return view('admin.managers.index', compact('managers'));
     }
 
@@ -26,7 +26,7 @@ class ManagerController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'required|in:technical,financial,sales_manager',
+            'role' => 'required|in:technical,finance,sales_manager',
             'phone' => 'required|string',
             'address' => 'required|string',
         ]);
@@ -50,7 +50,7 @@ class ManagerController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $manager->id,
-            'role' => 'required|in:technical_manager,financial_manager,procurement_manager',
+            'role' => 'required|in:technical,finance,sales_manager',
             'phone' => 'required|string',
             'address' => 'required|string',
             'status' => 'required|in:active,inactive',
@@ -64,5 +64,16 @@ class ManagerController extends Controller
 
         return redirect()->route('admin.managers.index')
             ->with('success', 'Manager updated successfully');
+    }
+
+    public function destroy(User $manager)
+    {
+        if ($manager->role === 'admin') {
+            return back()->with('error', 'Cannot delete admin users');
+        }
+
+        $manager->delete();
+        return redirect()->route('admin.managers.index')
+            ->with('success', 'Manager deleted successfully');
     }
 }

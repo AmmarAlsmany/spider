@@ -288,7 +288,7 @@
                         <button type="button" class="mb-2 btn btn-secondary w-100" data-bs-toggle="modal" data-bs-target="#historyModal{{ $contract->id }}">
                             <i class="bx bx-history me-1"></i> {{ __('contract_details.actions.view_history') }}
                         </button>
-                        <a href="{{ route('client.contract.download', $contract->id) }}" class="btn btn-dark w-100">
+                        <a href="{{ route('contract.pdf.generate', $contract->id) }}" class="btn btn-dark w-100">
                             <i class="bx bx-download me-1"></i> {{ __('contract_details.actions.download_contract') }}
                         </a>
                     </div>

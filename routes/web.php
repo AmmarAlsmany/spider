@@ -52,7 +52,6 @@ Route::middleware(['prevent-back-history', 'auth:web,client'])->group(function (
     // Payment Details Route
     Route::get('/Payment/view Payment Details/{id}', [PaymentsController::class, 'show'])->name('payment.show');
     Route::get('/payments/{id}/pdf', [PaymentsController::class, 'generatePDF'])->name('payments.pdf');
-    
     Route::get('/contract/{id}/pdf', [ContractsController::class, 'generatePDF'])->name('contract.pdf.generate');
 });
 

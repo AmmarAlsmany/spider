@@ -121,7 +121,7 @@
                                 </button>
                                 @endif
 
-                                <a href="{{ route('client.contract.download', $contract->id) }}" class="btn btn-dark btn-sm">
+                                <a href="{{ route('contract.pdf.generate', $contract->id) }}" class="btn btn-dark btn-sm">
                                     <i class="bx bx-download me-1"></i> {{ __('contracts.actions.download') }}
                                 </a>
                             </div>

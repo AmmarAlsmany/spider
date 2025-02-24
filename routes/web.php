@@ -54,6 +54,7 @@ Route::middleware(['prevent-back-history', 'auth:web,client'])->group(function (
 
     // Contract PDF Download Route
     Route::get('/contract/{id}/pdf', [ContractsController::class, 'downloadPDF'])->name('contract.pdf.download');
+    Route::get('/contract/{id}/pdf', [ContractsController::class, 'generatePDF'])->name('contract.pdf.generate');
 });
 
 // Admin Routes

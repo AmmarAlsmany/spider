@@ -21,6 +21,7 @@ use Carbon\Carbon;
 use App\Services\VisitScheduleService;
 use App\Traits\NotificationDispatcher;
 use Exception;
+use Spatie\Browsershot\Browsershot;
 
 class ContractsController extends Controller
 {
@@ -1295,5 +1296,22 @@ class ContractsController extends Controller
             Log::error('Error generating contract PDF: ' . $e->getMessage());
             return back()->with('error', 'Unable to generate PDF at this time.');
         }
+    }
+
+    public function generatePDF($id)
+    {
+        $contract = contracts::with('customer','branchs','visitSchedules','payments','type','history')->findOrFail($id);
+        $template = view('pdf_templates.contract_pdf', compact('contract'))->render();
+        $filename = 'contract_' . $contract->contract_number . '.pdf';
+
+        $pdf = Browsershot::html($template)
+            ->showBackground()
+            ->setPaper('a4', 'landscape')
+            ->margin(4)
+            ->base64pdf();
+
+        return response(base64_decode($pdf))
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
     }
 }

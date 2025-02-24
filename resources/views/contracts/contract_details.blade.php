@@ -52,10 +52,10 @@
                             {{ __('contract_details_new.button_stop_contract') }}
                         </button>
                         @endif
-                        <button class="btn btn-success w-100 w-md-auto" onclick="generatePDF()">
+                        <a href="{{ route('contract.pdf.generate', $contract->id) }}" class="btn btn-success w-100 w-md-auto">
                             <i class="bx bx-download me-1"></i>
                             {{ __('contract_details_new.button_download_pdf') }}
-                        </button>
+                        </a>
                         <a href="{{ route('contract.edit', $contract->id) }}" class="btn btn-warning w-100 w-md-auto">
                             <i class="bx bx-edit me-1"></i>
                             {{ __('contract_details_new.button_edit_contract') }}
@@ -541,7 +541,6 @@
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
@@ -556,19 +555,6 @@
     };
     function getCsrfToken() {
         return document.querySelector('meta[name="csrf-token"]').content;
-    }
-
-    function generatePDF() {
-        const element = document.querySelector('.page-content');
-        const opt = {
-            margin: 1,
-            filename: 'contract_details.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-
-        html2pdf().set(opt).from(element).save();
     }
 
     function stopContract(contractId) {

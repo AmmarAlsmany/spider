@@ -11,6 +11,7 @@ use App\Models\tikets;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Mpdf\Mpdf;
 
 class sales extends Controller
 {
@@ -291,13 +292,160 @@ class sales extends Controller
         return view('managers.sales.ToDoList', compact('payments', 'filter'));
     }
 
-        // chnage status of the cancled or not approved contracts
-        public function return_contract(Request $request)
-        {
-            $contract = contracts::findOrFail($request->id);
-            $contract->contract_status = $request->status;
-            $contract->rejection_reason = null;
-            $contract->save();
-            return redirect()->back()->with('success', 'Contract status changed successfully');
+    public function generatePDF(Request $request)
+    {
+        // Get the authenticated sales user
+        $salesId = Auth::user()->id;
+
+        // Get the report type and date range
+        $reportType = $request->input('report_type');
+        $startDate = null;
+        $endDate = null;
+
+        // Set date range based on report type
+        switch ($reportType) {
+            case 'daily':
+                $startDate = Carbon::today();
+                $endDate = Carbon::today()->endOfDay();
+                break;
+            case 'monthly':
+                $startDate = Carbon::now()->startOfMonth();
+                $endDate = Carbon::now()->endOfMonth();
+                break;
+            case 'quarterly':
+                $startDate = Carbon::now()->startOfQuarter();
+                $endDate = Carbon::now()->endOfQuarter();
+                break;
+            case 'annual':
+                $startDate = Carbon::now()->startOfYear();
+                $endDate = Carbon::now()->endOfYear();
+                break;
+            case 'custom':
+                $startDate = Carbon::parse($request->input('start_date'))->startOfDay();
+                $endDate = Carbon::parse($request->input('end_date'))->endOfDay();
+                break;
+            default:
+                // If no report type specified, show all time
+                $startDate = Carbon::minValue();
+                $endDate = Carbon::now();
         }
+
+        // Get all contracts for the sales person within the date range
+        $contracts = contracts::where('sales_id', $salesId)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->with(['customer', 'type', 'payments'])
+            ->get()
+            ->groupBy('contract_status');
+
+        // Get all payments grouped by status within the date range
+        $payments = payments::whereHas('contract', function ($query) use ($salesId) {
+            $query->where('sales_id', $salesId);
+        })
+            ->whereBetween('due_date', [$startDate, $endDate])
+            ->with('contract')
+            ->get()
+            ->groupBy('payment_status');
+
+        // Calculate financial summaries
+        $financialSummary = [
+            'total_contract_value' => $contracts->flatten()->sum('contract_price'),
+            'total_paid' => $payments->flatten()->where('payment_status', 'paid')->sum('payment_amount'),
+            'total_pending' => $payments->flatten()->where('payment_status', 'unpaid')->sum('payment_amount'),
+            'total_overdue' => $payments->flatten()->where('payment_status', 'overdue')->sum('payment_amount')
+        ];
+
+        // Contract statistics
+        $contractStats = [
+            'total_contracts' => $contracts->flatten()->count(),
+            'active_contracts' => $contracts->get('approved', collect())->count(),
+            'pending_contracts' => $contracts->get('pending', collect())->count(),
+            'completed_contracts' => $contracts->get('completed', collect())->count(),
+            'cancelled_contracts' => $contracts->get('cancelled', collect())->count()
+        ];
+
+        // Add period information
+        $periodInfo = [
+            'report_type' => $reportType,
+            'start_date' => $startDate->format('Y-m-d'),
+            'end_date' => $endDate->format('Y-m-d'),
+            'period_label' => $this->getPeriodLabel($reportType, $startDate, $endDate)
+        ];
+
+        // Initialize mPDF
+        $mpdf = new \Mpdf\Mpdf([
+            'orientation' => 'L',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 15,
+            'margin_bottom' => 15,
+        ]);
+
+        // Generate PDF content
+        $html = view('pdf_templates.sales_report_pdf', compact(
+            'contracts',
+            'payments',
+            'financialSummary',
+            'contractStats',
+            'periodInfo'
+        ))->render();
+
+        // Write PDF content
+        $mpdf->WriteHTML($html);
+
+        // Return the PDF as a download
+        return $mpdf->Output($periodInfo['period_label'] . '.pdf', 'D');
+    }
+
+    private function getContractsForPeriod($startDate, $endDate)
+    {
+        $salesId = Auth::user()->id;
+        return contracts::where('sales_id', $salesId)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->with(['customer', 'type', 'payments'])
+            ->get()
+            ->groupBy('contract_status');
+    }
+
+    private function getPaymentsForPeriod($startDate, $endDate)
+    {
+        $salesId = Auth::user()->id;
+        return payments::whereHas('contract', function ($query) use ($salesId) {
+            $query->where('sales_id', $salesId);
+        })
+            ->whereBetween('due_date', [$startDate, $endDate])
+            ->with('contract')
+            ->get()
+            ->groupBy('payment_status');
+    }
+
+    private function calculateFinancialSummary($contracts, $payments)
+    {
+        return [
+            'total_contract_value' => $contracts->flatten()->sum('contract_price'),
+            'total_paid' => $payments->flatten()->where('payment_status', 'paid')->sum('payment_amount'),
+            'total_pending' => $payments->flatten()->where('payment_status', 'unpaid')->sum('payment_amount'),
+            'total_overdue' => $payments->flatten()->where('payment_status', 'overdue')->sum('payment_amount')
+        ];
+    }
+
+    private function calculateContractStats($contracts)
+    {
+        return [
+            'total_contracts' => $contracts->flatten()->count(),
+            'active_contracts' => $contracts->get('approved', collect())->count(),
+            'pending_contracts' => $contracts->get('pending', collect())->count(),
+            'completed_contracts' => $contracts->get('completed', collect())->count(),
+            'cancelled_contracts' => $contracts->get('cancelled', collect())->count()
+        ];
+    }
+
+    // chnage status of the cancled or not approved contracts
+    public function return_contract(Request $request)
+    {
+        $contract = contracts::findOrFail($request->id);
+        $contract->contract_status = $request->status;
+        $contract->rejection_reason = null;
+        $contract->save();
+        return redirect()->back()->with('success', 'Contract status changed successfully');
+    }
 }

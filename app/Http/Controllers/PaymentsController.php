@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use App\Traits\NotificationDispatcher;
-
+use Mpdf\Mpdf;
 
 class PaymentsController extends Controller
 {
@@ -186,5 +186,119 @@ class PaymentsController extends Controller
                 'message' => 'Error fetching payment details'
             ], 500);
         }
+    }
+
+    /**
+     * Generate PDF for payment invoice
+     */
+    public function generatePDF($id)
+    {
+        $payment = payments::with('contract.customer')->findOrFail($id);
+
+        // Generate amount in words
+        $amount = $payment->payment_amount + ($payment->vat_amount ?? 0);
+        $words_english = $this->numberToWordsEnglish($amount);
+        $words_arabic = $this->numberToWordsArabic($amount);
+
+        // Initialize mPDF
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 15,
+            'margin_bottom' => 15,
+            'default_font' => 'cairo'
+        ]);
+
+        // Generate PDF content
+        $html = view('pdf_templates.payment_invoice_pdf', compact(
+            'payment',
+            'words_english',
+            'words_arabic'
+        ))->render();
+
+        // Write PDF content
+        $mpdf->WriteHTML($html);
+
+        // Return the PDF as a download
+        return $mpdf->Output('Invoice_' . $payment->payment_number . '.pdf', 'D');
+    }
+
+    private function numberToWordsEnglish($number)
+    {
+        $ones = array(
+            0 => "", 1 => "one", 2 => "two", 3 => "three", 4 => "four",
+            5 => "five", 6 => "six", 7 => "seven", 8 => "eight", 9 => "nine",
+            10 => "ten", 11 => "eleven", 12 => "twelve", 13 => "thirteen",
+            14 => "fourteen", 15 => "fifteen", 16 => "sixteen", 17 => "seventeen",
+            18 => "eighteen", 19 => "nineteen"
+        );
+        $tens = array(
+            2 => "twenty", 3 => "thirty", 4 => "forty", 5 => "fifty",
+            6 => "sixty", 7 => "seventy", 8 => "eighty", 9 => "ninety"
+        );
+        $hundreds = array(
+            "hundred", "thousand", "million", "billion", "trillion",
+            "quadrillion", "quintillion"
+        );
+
+        if ($number == 0) return "zero";
+
+        $number = number_format($number, 2, ".", ",");
+        $num_arr = explode(".", $number);
+        $wholenum = $num_arr[0];
+        $decnum = $num_arr[1];
+        $whole_arr = array_reverse(explode(",", $wholenum));
+        krsort($whole_arr);
+        $return = "";
+
+        foreach ($whole_arr as $key => $i) {
+            if ($i < 20) {
+                $return .= $ones[$i];
+            } elseif ($i < 100) {
+                $return .= $tens[substr($i, 0, 1)];
+                if (substr($i, 1, 1) != 0) {
+                    $return .= "-" . $ones[substr($i, 1, 1)];
+                }
+            } else {
+                $return .= $ones[substr($i, 0, 1)] . " " . $hundreds[0];
+                if (substr($i, 1, 1) != 0) {
+                    $return .= " and " . $tens[substr($i, 1, 1)];
+                }
+                if (substr($i, 2, 1) != 0) {
+                    $return .= "-" . $ones[substr($i, 2, 1)];
+                }
+            }
+            if ($key > 0) {
+                $return .= " " . $hundreds[$key] . " ";
+            }
+        }
+
+        if ($decnum > 0) {
+            $return .= " and ";
+            if ($decnum < 20) {
+                $return .= $ones[$decnum];
+            } elseif ($decnum < 100) {
+                $return .= $tens[substr($decnum, 0, 1)];
+                if (substr($decnum, 1, 1) != 0) {
+                    $return .= "-" . $ones[substr($decnum, 1, 1)];
+                }
+            }
+            $return .= " cents";
+        }
+
+        return ucfirst(trim($return)) . " Saudi Riyals";
+    }
+
+    private function numberToWordsArabic($number)
+    {
+        // This is a simplified version. You might want to implement a more complete Arabic conversion
+        $arabic_numbers = [
+            0 => 'صفر', 1 => 'واحد', 2 => 'اثنان', 3 => 'ثلاثة', 4 => 'أربعة', 5 => 'خمسة',
+            6 => 'ستة', 7 => 'سبعة', 8 => 'ثمانية', 9 => 'تسعة', 10 => 'عشرة'
+        ];
+
+        return $number . " ريال سعودي"; // Simplified return for now
     }
 }

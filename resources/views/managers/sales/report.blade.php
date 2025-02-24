@@ -235,7 +235,6 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
     function downloadPDF() {
         // Show loading indicator
@@ -244,33 +243,36 @@
         btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Generating PDF...';
         btn.disabled = true;
 
-        // Get the report content
-        const element = document.querySelector('.container-fluid');
+        // Get the current URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
         
-        // Configure PDF options
-        const opt = {
-            margin: [0.5, 0.5],
-            filename: '{{ $periodInfo['period_label'] }}.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { 
-                scale: 2,
-                useCORS: true,
-                logging: true
-            },
-            jsPDF: { 
-                unit: 'in', 
-                format: 'a4', 
-                orientation: 'portrait'
-            },
-            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        // Generate PDF
-        html2pdf().set(opt).from(element).save().then(() => {
+        // Make request to generate PDF
+        fetch(`/reports/sales/pdf?${urlParams.toString()}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.blob();
+        })
+        .then(blob => {
+            // Create download link
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = '{{ $periodInfo['period_label'] }}.pdf';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
             // Restore button state
             btn.innerHTML = originalText;
             btn.disabled = false;
-        }).catch(error => {
+        })
+        .catch(error => {
             console.error('PDF generation failed:', error);
             btn.innerHTML = originalText;
             btn.disabled = false;

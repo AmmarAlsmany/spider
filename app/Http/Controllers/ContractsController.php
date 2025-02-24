@@ -21,7 +21,7 @@ use Carbon\Carbon;
 use App\Services\VisitScheduleService;
 use App\Traits\NotificationDispatcher;
 use Exception;
-use Spatie\Browsershot\Browsershot;
+use Mpdf\Mpdf;
 
 class ContractsController extends Controller
 {
@@ -935,7 +935,7 @@ class ContractsController extends Controller
                     'branch_manager_phone' => $branchData['branch_manager_phone'],
                     'branch_address' => $branchData['branch_address'],
                     'branch_city' => $branchData['branch_city'],
-                    'contracts_id' => $contract_id,
+                    'contracts_id' => $contract->id,
                     'annex_id' => $annex->id // Link branch to annex
                 ]);
                 $branch->save();
@@ -1304,13 +1304,11 @@ class ContractsController extends Controller
         $template = view('pdf_templates.contract_pdf', compact('contract'))->render();
         $filename = 'contract_' . $contract->contract_number . '.pdf';
 
-        $pdf = Browsershot::html($template)
-            ->showBackground()
-            ->setPaper('a4', 'landscape')
-            ->margin(4)
-            ->base64pdf();
+        $mpdf = new Mpdf(['orientation' => 'L']);
+        $mpdf->WriteHTML($template);
+        $pdf = $mpdf->Output('', 'S');
 
-        return response(base64_decode($pdf))
+        return response($pdf)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
     }

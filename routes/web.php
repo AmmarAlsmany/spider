@@ -51,9 +51,8 @@ Route::middleware(['prevent-back-history', 'auth:web,client'])->group(function (
     Route::get('/payment/qr/{id}', [PaymentsController::class, 'qrView'])->name('payment.qr.view');
     // Payment Details Route
     Route::get('/Payment/view Payment Details/{id}', [PaymentsController::class, 'show'])->name('payment.show');
-
-    // Contract PDF Download Route
-    Route::get('/contract/{id}/pdf', [ContractsController::class, 'downloadPDF'])->name('contract.pdf.download');
+    Route::get('/payments/{id}/pdf', [PaymentsController::class, 'generatePDF'])->name('payments.pdf');
+    
     Route::get('/contract/{id}/pdf', [ContractsController::class, 'generatePDF'])->name('contract.pdf.generate');
 });
 
@@ -137,6 +136,8 @@ Route::middleware(['auth', 'role:sales', 'prevent-back-history'])->group(functio
     // Branch Management Routes
     Route::get('/api/branches/{id}', [BranchsController::class, 'index'])->name('branches.get');
     Route::put('/branches/{id}', [BranchsController::class, 'update'])->name('branches.update');
+
+    Route::get('/reports/sales/pdf', [sales::class, 'generatePDF'])->name('sales.report.pdf');
 });
 
 // Sales Manager Routes

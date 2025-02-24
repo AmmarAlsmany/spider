@@ -12,9 +12,12 @@
             </nav>
         </div>
         <div class="ms-auto">
-            <button class="btn btn-primary" onclick="window.print()">
-                <i class="bx bx-printer"></i> Print
-            </button>
+            <a href="{{ route('payments.pdf', $payment->id) }}" class="btn btn-primary">
+                <i class="bx bx-download"></i> Download PDF
+            </a>
+            <a href="{{ url()->previous() }}" class="btn btn-secondary">
+                <i class="bx bx-arrow-back"></i> Back
+            </a>
         </div>
     </div>
     <div class="container">

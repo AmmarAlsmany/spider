@@ -351,7 +351,7 @@ class ContractsController extends Controller
                 'equipment_description' => 'required|string',
                 'financial_amount' => 'required|numeric|min:0',
                 'vat_percentage' => 'required|numeric',
-                'payment_type' => 'required|in:cash,installment',
+                'payment_type' => 'required|in:postpaid,prepaid',
                 'contract_number' => 'required|string|unique:contracts,contract_number',
                 'warranty_type' => 'required|in:none,standard,extended',
             ];
@@ -360,10 +360,18 @@ class ContractsController extends Controller
                 $rules['warranty_period'] = 'required|integer|min:1|max:60';
             }
 
+            if ($request->payment_type === 'prepaid') {
+                $rules['number_of_installments'] = 'required|integer|min:1';
+            }
+
             if (!$request->has('client_id')) {
-                $rules['customer_name'] ='required|string';
+                $rules['customer_name'] = 'required|string';
                 $rules['customer_mobile'] = 'required|string';
-                $rules['customer_email'] = 'required|email|unique:client,email';
+                $rules['customer_email'] = 'required|email|unique:clients,email';
+                $rules['customer_address'] = 'required|string';
+                $rules['customer_city'] = 'required|string';
+                $rules['customer_zip_code'] = 'nullable|string';
+                $rules['customer_tax_number'] = 'required|string|min:10|max:15';
             } else {
                 $rules['client_id'] = 'required|exists:clients,id';
             }
@@ -402,7 +410,7 @@ class ContractsController extends Controller
             $contract->contract_number = $request->contract_number;
             $contract->contract_start_date = now();
             $contract->contract_end_date = now()->addYear(); // Default 1 year warranty
-            $contract->Property_type = 'Buy equipment';
+            $contract->Property_type = 'equipment';
             $contract->contract_type = contracts_types::where('name', 'Buy equipment')->first()->id;
             $contract->contract_price = $total_with_vat;
             $contract->payment_type = $request->payment_type; // Updated to match model
@@ -434,20 +442,20 @@ class ContractsController extends Controller
             $equipmentContract->save();
 
             // Create payment record(s)
-            if ($request->payment_type === 'cash') {
-                // Create single payment for cash
+            if ($request->payment_type === 'prepaid') {
+                // Create single payment for prepaid
                 $payment = new payments([
                     'customer_id' => $client->id,
                     'contract_id' => $contract->id,
                     'due_date' => now(),
                     'payment_amount' => $total_with_vat,
-                    'payment_method' => 'cash',
+                    'payment_method' => 'prepaid',
                     'payment_status' => 'pending',
                     'payment_description' => 'Full payment for equipment purchase',
                     'invoice_number' => $contract->contract_number . '-1'
                 ]);
                 $payment->save();
-            } else if ($request->payment_type === 'installment') {
+            } else if ($request->payment_type === 'postpaid') {
                 // Default to 3 installments if not specified
                 $number_of_installments = $request->number_of_installments ?? 3;
                 $installment_amount = ceil($total_with_vat / $number_of_installments);

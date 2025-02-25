@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('contract_number')->unique();
             $table->foreignId('customer_id')->constrained('clients')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('sales_id')->constrained("users")->onDelete('cascade')->onUpdate('cascade');
-            $table->enum('Property_type',["Residential","Commercial","Industrial","Government"])->nullable();
+            $table->enum('Property_type',["Residential","Commercial","Industrial","Government","equipment"])->nullable();
             $table->foreignId('contract_type')->constrained('contracts_types')->onDelete('cascade')->onUpdate('cascade');
             $table->string('contract_price');
             $table->enum('contract_status',["approved","pending","Not approved","completed","stopped","canceled"])->default("pending");

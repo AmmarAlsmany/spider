@@ -124,9 +124,21 @@
                                 </tr>
                                 <tr>
                                     <th class="bg-light">
-                                        {{ __('contract_details_new.contract_info_amount') }}
+                                        {{ __('contract_details_new.contract_info_amount_with_vat') }}
                                     </th>
                                     <td>{{ number_format($contract->contract_price, 2) }} SAR</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        {{ __('contract_details_new.contract_info_amount_without_vat') }}
+                                    </th>
+                                    <td>{{ number_format($contract->contract_price/1.15, 2) }} SAR</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        {{ __('contract_details_new.vat_amount') }}
+                                    </th>
+                                    <td>{{ number_format($contract->contract_price * 0.15 / 1.15, 2) }} SAR</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light">
@@ -179,6 +191,61 @@
                             </table>
                         </div>
                     </div>
+                    {{-- iff the contract type is Buy equipment we need to show the equipment info --}}
+                    @if ($contract->type->name == 'Buy equipment')
+                    <div class="col-md-6">
+                        <div class="equipment-info-card h-100">
+                            <h4 class="pb-2 mb-4 border-bottom text-primary">
+                                <i class="bx bx-info-circle me-2"></i>
+                                {{ __('contract_details_new.equipment_info_title') }}
+                            </h4>
+                            <table class="table table-bordered table-hover">
+                                <tr>
+                                    <th class="bg-light">
+                                        {{ __('contract_details_new.equipment_info_name') }}
+                                    </th>
+                                    <td>{{ $contract->equipment->equipmentType->name ?? 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        {{ __('contract_details_new.equipment_info_description') }}
+                                    </th>
+                                    <td>{{ $contract->equipment->equipment_model ?? 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        {{ __('contract_details_new.equipment_info_quantity') }}
+                                    </th>
+                                    <td>{{ $contract->equipment->equipment_quantity ?? 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        {{ __('contract_details_new.equipment_unit_price') }}
+                                    </th>
+                                    <td>{{ number_format($contract->equipment->unit_price, 2) ?? 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        {{ __('contract_details_new.equipment_info_total_price') }}
+                                    </th>
+                                    <td>{{ number_format($contract->equipment->total_price, 2) ?? 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        {{ __('contract_details_new.equipment_info_vat_amount') }}
+                                    </th>
+                                    <td>{{ number_format($contract->equipment->vat_amount, 2) ?? 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        {{ __('contract_details_new.equipment_info_total_amount') }}
+                                    </th>
+                                    <td>{{ number_format($contract->equipment->total_with_vat, 2) ?? 'N/A' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    @endif
                 </div>
 
                 <!-- Contract Description Section -->
@@ -366,7 +433,8 @@
                                         <td>{{ number_format($request->payment->payment_amount, 2) }} SAR</td>
                                         <td>{{ \Carbon\Carbon::parse($request->requested_date)->format('M d, Y') }}</td>
                                         <td>
-                                            <span class="badge bg-{{ 
+                                            <span
+                                                class="badge bg-{{ 
                                                     $request->status == 'approved' ? 'success' : 
                                                     ($request->status == 'pending' ? 'warning' : 'danger') 
                                                 }} px-3 py-2">

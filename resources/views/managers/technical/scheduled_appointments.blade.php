@@ -278,11 +278,11 @@
                                                                     </button>
                                                                 @endif
                                                                 @if($visit->status == 'completed')
-                                                                    <button type="button" 
+                                                                    <a type="button" 
                                                                             class="px-3 btn btn-soft-info btn-sm" 
-                                                                            onclick="window.location.href='/technical/visit/{{ $visit->id }}/report'">
+                                                                            href="{{ route('technical.visit.report.view', $visit->id) }}">
                                                                         <i class="bx bx-file me-1"></i> View Report
-                                                                    </button>
+                                                                    </a>
                                                                 @endif
                                                             </div>
                                                         </td>

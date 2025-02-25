@@ -12,6 +12,7 @@ use App\Models\payments;
 use App\Models\PostponementRequest;
 use App\Models\VisitSchedule;
 use App\Models\EquipmentContract; // Add the EquipmentContract model import
+use App\Models\EquipmentType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -335,7 +336,10 @@ class ContractsController extends Controller
         // Get contract number
         $contract_number = $this->generator_contract_number();
 
-        return view('managers.sales.create_equipment_contract', compact('clients', 'contract_number'));
+        // Get all active equipment types
+        $equipment_types = EquipmentType::where('is_active', true)->get();
+
+        return view('managers.sales.create_equipment_contract', compact('clients', 'contract_number', 'equipment_types'));
     }
 
     public function storeEquipmentContract(Request $request)
@@ -344,29 +348,23 @@ class ContractsController extends Controller
             DB::beginTransaction();
 
             // Validate the request
+            // dd($request->all());
             $rules = [
-                'equipment_type' => 'required|string',
+                'equipment_type_id' => 'required|exists:equipment_types,id',
                 'equipment_model' => 'required|string',
                 'equipment_quantity' => 'required|integer|min:1',
                 'equipment_description' => 'required|string',
-                'financial_amount' => 'required|numeric|min:0',
-                'vat_percentage' => 'required|numeric',
-                'payment_type' => 'required|in:postpaid,prepaid',
-                'contract_number' => 'required|string|unique:contracts,contract_number',
-                'warranty_type' => 'required|in:none,standard,extended',
+                'contractamount' => 'required|numeric|min:0',
+                'warranty' => 'required|numeric|min:0',
+                'payment_type'=> 'required|in:postpaid,prepaid',
+                'number_of_installments' => 'required_if:payment_type,postpaid|integer|min:1|max:12',
             ];
 
-            if ($request->warranty_type !== 'none') {
-                $rules['warranty_period'] = 'required|integer|min:1|max:60';
-            }
-
-            if ($request->payment_type === 'prepaid') {
-                $rules['number_of_installments'] = 'required|integer|min:1';
-            }
+            $request->validate($rules);
 
             if (!$request->has('client_id')) {
                 $rules['customer_name'] = 'required|string';
-                $rules['customer_mobile'] = 'required|string';
+                $rules['customer_mobile'] = ['required', 'string', 'regex:/^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$/'];
                 $rules['customer_email'] = 'required|email|unique:clients,email';
                 $rules['customer_address'] = 'required|string';
                 $rules['customer_city'] = 'required|string';
@@ -376,17 +374,15 @@ class ContractsController extends Controller
                 $rules['client_id'] = 'required|exists:clients,id';
             }
 
-            $request->validate($rules);
-
             // Handle client creation/selection
             if ($request->has('client_id')) {
-                $client = client::find($request->client_id);
+                $client = client::findOrFail($request->client_id);
             } else {
                 // Create new client
                 $client = new client();
                 $client->name = $request->customer_name;
                 $client->email = $request->customer_email;
-                $client->phone = $request->customer_mobile; // Use mobile number as phone
+                $client->phone = $request->customer_mobile;
                 $client->mobile = $request->customer_mobile;
                 $client->address = $request->customer_address;
                 $client->city = $request->customer_city;
@@ -397,47 +393,45 @@ class ContractsController extends Controller
                 $client->save();
             }
 
-            // Calculate amounts
-            $unit_price = floatval($request->financial_amount);
-            $total_price = $unit_price * $request->equipment_quantity;
-            $vat_amount = $total_price * ($request->vat_percentage / 100);
-            $total_with_vat = $total_price + $vat_amount;
+            $amount = floatval($request->contractamount);
+            $vat = $amount * 0.15;
+            $total_amount = $amount + $vat;
 
-            // Create base contract
+            $unit_price = $request->contractamount / $request->equipment_quantity;
+            $vat_amount = $unit_price * 0.15;
+            $total_price = $unit_price + $vat_amount;
+            $total_with_vat = $total_price * $request->equipment_quantity;
+
+            // Calculate contract end date based on warranty period
+            $contract_end_date = now()->addMonths(intval($request->warranty));
+
             $contract = new contracts();
             $contract->customer_id = $client->id;
             $contract->sales_id = Auth::user()->id;
             $contract->contract_number = $request->contract_number;
             $contract->contract_start_date = now();
-            $contract->contract_end_date = now()->addYear(); // Default 1 year warranty
+            $contract->contract_end_date = $contract_end_date;
             $contract->Property_type = 'equipment';
-            $contract->contract_type = contracts_types::where('name', 'Buy equipment')->first()->id;
-            $contract->contract_price = $total_with_vat;
-            $contract->payment_type = $request->payment_type; // Updated to match model
-            $contract->contract_status = 'pending'; // Add default status
-            $contract->is_multi_branch = 'no'; // Equipment contracts don't have multiple branches
-            $contract->contract_description = $request->equipment_description; // Use equipment description
-
-            // Add warranty information
-            if ($request->warranty_type !== 'none') {
-                $contract->warranty = $request->warranty_period;
-            } else {
-                $contract->warranty = null;
-            }
-
+            $contract->contract_type = contracts_types::where('name', 'Buy equipment')->firstOrFail()->id;
+            $contract->contract_price = $total_amount;
+            $contract->payment_type = $request->payment_type;
+            $contract->contract_status = 'pending';
+            $contract->is_multi_branch = 'no';
+            $contract->contract_description = $request->equipment_description;
+            $contract->warranty = $request->warranty;
             $contract->save();
 
             // Create equipment contract details
             $equipmentContract = new EquipmentContract([
                 'contract_id' => $contract->id,
-                'equipment_type' => $request->equipment_type,
+                'equipment_type' => $request->equipment_type_id,
                 'equipment_model' => $request->equipment_model,
                 'equipment_quantity' => $request->equipment_quantity,
                 'equipment_description' => $request->equipment_description,
                 'unit_price' => $unit_price,
                 'total_price' => $total_price,
                 'vat_amount' => $vat_amount,
-                'total_with_vat' => $total_with_vat
+                'total_with_vat' => $total_with_vat,
             ]);
             $equipmentContract->save();
 
@@ -448,60 +442,45 @@ class ContractsController extends Controller
                     'customer_id' => $client->id,
                     'contract_id' => $contract->id,
                     'due_date' => now(),
-                    'payment_amount' => $total_with_vat,
-                    'payment_method' => 'prepaid',
-                    'payment_status' => 'pending',
+                    'payment_amount' => $total_amount,
                     'payment_description' => 'Full payment for equipment purchase',
-                    'invoice_number' => $contract->contract_number . '-1'
+                    'invoice_number' => $this->generateInvoiceNumber()
                 ]);
                 $payment->save();
-            } else if ($request->payment_type === 'postpaid') {
-                // Default to 3 installments if not specified
-                $number_of_installments = $request->number_of_installments ?? 3;
-                $installment_amount = ceil($total_with_vat / $number_of_installments);
-                
-                for ($i = 0; $i < $number_of_installments; $i++) {
-                    $payment = new payments([
-                        'customer_id' => $client->id,
-                        'contract_id' => $contract->id,
-                        'due_date' => now()->addMonths($i),
-                        'payment_amount' => $installment_amount,
-                        'payment_method' => 'installment',
-                        'payment_status' => 'pending',
-                        'payment_description' => 'Installment ' . ($i + 1) . ' of ' . $number_of_installments,
-                        'invoice_number' => $contract->contract_number . '-' . ($i + 1)
-                    ]);
-                    $payment->save();
+            } else {
+                $payment_amount = $total_amount / intval($request->number_of_payments);
+    
+                // Create first payment using first_payment_date
+                try {
+                    $this->create_payment($contract->id, $client->id, $payment_amount, $request->first_payment_date);
+                } catch (\Exception $e) {
+                    Log::error('Error creating first payment: ' . $e->getMessage());
+                    return back()->with('error', 'Error creating first payment: ' . $e->getMessage());
+                }
+    
+                if ($request->payment_schedule === 'monthly') {
+                    // Create remaining monthly payments
+                    $payment_date = Carbon::parse($request->first_payment_date);
+                    for ($i = 2; $i <= $request->number_of_payments; $i++) {
+                        $payment_date->addMonth();
+                        $this->create_payment($contract->id, $client->id, $payment_amount, $payment_date->copy());
+                    }
+                } else {
+                    // Create remaining payments with custom dates
+                    for ($i = 2; $i <= $request->number_of_payments; $i++) {
+                        $this->create_payment($contract->id, $client->id, $payment_amount, $request->input("payment_date_$i"));
+                    }
                 }
             }
 
             DB::commit();
-
-            // Send notification
-            $notificationData = [
-                'title' => 'New Equipment Contract Created',
-                'message' => 'Equipment Purchase Contract ' . $contract->contract_number . ' has been created.',
-                'type' => 'info',
-                'url' => "#",
-                'priority' => 'normal'
-            ];
-
-            $this->notifyRoles(['technical', 'sales_manager'], $notificationData, $contract->customer_id, $contract->sales_id);
-
-            return redirect()->route('sales.dashboard')
-                ->with('success', 'Equipment Purchase Contract Created Successfully');
+            return redirect()->route('contract.show.details', $contract->id)->with('success', 'Equipment contract created successfully.');
 
         } catch (\Exception $e) {
-            DB::rollback();
-            Log::error('Equipment contract creation error: ' . $e->getMessage(), [
-                'user_id' => Auth::id(),
-                'request' => $request->except(['password']),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
-            ]);
-
+            DB::rollBack();
+            Log::error('Error creating equipment contract: ' . $e->getMessage());
             return back()
-                ->with('error', 'Error creating contract: ' . $e->getMessage())
+                ->withErrors(['error' => 'Error creating equipment contract. Please try again.'])
                 ->withInput();
         }
     }
@@ -749,7 +728,7 @@ class ContractsController extends Controller
             'message' => 'Payment of ' . $payment->payment_amount . ' SAR has been postponed to ' . Carbon::parse($postponement->requested_date)->format('M d, Y'),
             'type' => 'info',
             'url' => "#",
-            'priority' => 'normal',
+            'priority' => 'normal'
         ];
 
         $this->notifyRoles(['sales', 'financial', 'client'], $notificationData, $payment->customer_id, $payment->sales_id);

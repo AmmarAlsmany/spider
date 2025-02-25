@@ -48,6 +48,13 @@
             </a>
         </li>
         <li>
+            <a href="{{ route('equipment-types.index') }}">
+                <div class="parent-icon"><i class='bx bx-list-ul'></i>
+                </div>
+                <div class="menu-title">Equipment Types</div>
+            </a>
+        </li>
+        <li>
             <a href="{{ route('sales_manager.postponement_requests') }}">
                 <div class="parent-icon"><i class='bx bx-time'></i>
                 </div>

@@ -154,7 +154,7 @@
                                                         data-visit-time="{{ $visit->visit_time }}">
                                                         <i class="bx bx-edit-alt me-1"></i>{{ __('visits.actions.edit') }}
                                                     </button>
-                                                @elseif($visit->status == 'completed' && $visit->report)
+                                                @elseif($visit->status == 'completed')
                                                     <a href="{{ route('client.visit.details', $visit->id) }}" class="btn btn-sm btn-info">
                                                         <i class="bx bx-show me-1"></i>View
                                                     </a>

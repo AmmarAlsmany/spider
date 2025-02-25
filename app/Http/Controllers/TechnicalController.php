@@ -483,7 +483,8 @@ class TechnicalController extends Controller
 
     public function viewCompletedVisits(Request $request)
     {
-        $query = VisitSchedule::with(['contract', 'contract.customer', 'team']);
+        $query = VisitSchedule::with(['contract', 'contract.customer', 'team'])
+            ->where('status', 'completed');
 
         // Filter by date range if provided
         if ($request->filled('start_date')) {
@@ -518,7 +519,8 @@ class TechnicalController extends Controller
 
     public function viewCancelledVisits(Request $request)
     {
-        $query = VisitSchedule::with(['contract', 'contract.customer', 'team']);
+        $query = VisitSchedule::with(['contract', 'contract.customer', 'team'])
+            ->where('status', 'cancelled');
 
         // Filter by date range if provided
         if ($request->filled('start_date')) {
@@ -860,20 +862,6 @@ class TechnicalController extends Controller
             ->with(['contract.customer', 'contract.branchs'])
             ->latest()
             ->paginate(10);
-
-        // Get the requested changes from notifications
-        foreach ($pendingVisits as $visit) {
-            $notification = Auth::user()->notifications()
-                ->where('type', 'App\Notifications\VisitChangeRequestNotification')
-                ->where('data->visit_id', $visit->id)
-                ->first();
-
-            if ($notification) {
-                $visit->requested_date = $notification->data['requested_date'];
-                $visit->requested_time = $notification->data['requested_time'];
-            }
-        }
-
         return view('managers.technical.visit_change_requests', compact('pendingVisits'));
     }
 

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\VisitSchedule;
+use App\Models\User;
 
 class VisitReport extends Model
 {
@@ -16,6 +18,8 @@ class VisitReport extends Model
         'visit_type',
         'target_insects',
         'pesticides_used',
+        'elimination_steps',
+        'pesticide_quantities',
         'recommendations',
         'customer_notes',
         'customer_signature',

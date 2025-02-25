@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\EquipmentType;
 
 class EquipmentContract extends Model
 {
@@ -15,11 +16,16 @@ class EquipmentContract extends Model
         'unit_price',
         'total_price',
         'vat_amount',
-        'total_with_vat'
+        'total_with_vat',
     ];
 
     public function contract()
     {
         return $this->belongsTo(contracts::class, 'contract_id');
+    }
+
+    public function equipmentType()
+    {
+        return $this->belongsTo(EquipmentType::class, 'equipment_type');
     }
 }

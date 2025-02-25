@@ -8,6 +8,7 @@ use App\Http\Controllers\BranchsController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContractsController;
 use App\Http\Controllers\ContractRequestController;
+use App\Http\Controllers\EquipmentTypeController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\NotificationController;
@@ -193,6 +194,10 @@ Route::middleware(['auth', 'role:sales_manager', 'prevent-back-history'])->group
     Route::post('/contracts/annex/{annex}/reject', [ContractsController::class, 'rejectAnnex'])->name('contracts.annex.reject');
     Route::get('/sales-manager/pending-annexes', [SalesManagerController::class, 'pendingAnnexes'])
         ->name('sales_manager.pending_annexes');
+
+    // Equipment Types Management
+    Route::resource('equipment-types', EquipmentTypeController::class);
+    Route::post('equipment-types/{id}/restore', [EquipmentTypeController::class, 'restore'])->name('equipment-types.restore');
 });
 
 // Finance Routes

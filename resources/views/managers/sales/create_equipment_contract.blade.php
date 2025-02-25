@@ -117,8 +117,8 @@ sort($saudiCities);
                         <div class="step-trigger" role="tab" id="stepper1trigger1" aria-controls="test-l-1">
                             <div class="bs-stepper-circle">1</div>
                             <div class="">
-                                <h5 class="mb-0 steper-title">Equipment Information</h5>
-                                <p class="mb-0 steper-sub-title">Enter equipment details</p>
+                                <h5 class="mb-0 steper-title">Customer Information</h5>
+                                <p class="mb-0 steper-sub-title">Enter customer details</p>
                             </div>
                         </div>
                     </div>
@@ -127,8 +127,8 @@ sort($saudiCities);
                         <div class="step-trigger" role="tab" id="stepper1trigger2" aria-controls="test-l-2">
                             <div class="bs-stepper-circle">2</div>
                             <div class="">
-                                <h5 class="mb-0 steper-title">Customer Details</h5>
-                                <p class="mb-0 steper-sub-title">Enter customer information</p>
+                                <h5 class="mb-0 steper-title">Equipment Details</h5>
+                                <p class="mb-0 steper-sub-title">Enter equipment and warranty details</p>
                             </div>
                         </div>
                     </div>
@@ -137,8 +137,18 @@ sort($saudiCities);
                         <div class="step-trigger" role="tab" id="stepper1trigger3" aria-controls="test-l-3">
                             <div class="bs-stepper-circle">3</div>
                             <div class="">
-                                <h5 class="mb-0 steper-title">Financial Information</h5>
-                                <p class="mb-0 steper-sub-title">Enter financial details</p>
+                                <h5 class="mb-0 steper-title">Payment Information</h5>
+                                <p class="mb-0 steper-sub-title">Enter payment details and schedule</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bs-stepper-line"></div>
+                    <div class="step" data-target="#test-l-4">
+                        <div class="step-trigger" role="tab" id="stepper1trigger4" aria-controls="test-l-4">
+                            <div class="bs-stepper-circle">4</div>
+                            <div class="">
+                                <h5 class="mb-0 steper-title">Summary</h5>
+                                <p class="mb-0 steper-sub-title">Review and submit</p>
                             </div>
                         </div>
                     </div>
@@ -150,37 +160,7 @@ sort($saudiCities);
                         @csrf
                         <input type="hidden" name="contract_number" value="{{ $contract_number }}">
                         <div id="test-l-1" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger1">
-                            <h5 class="mb-1">Equipment Information</h5>
-                            <p class="mb-4">Enter the equipment details</p>
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label for="equipment_type" class="form-label">Equipment Type <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="equipment_type" name="equipment_type" required>
-                                    <div class="invalid-feedback">Please enter the equipment type</div>
-                                </div>
-                                <div class="col-12">
-                                    <label for="equipment_model" class="form-label">Equipment Model <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="equipment_model" name="equipment_model" required>
-                                    <div class="invalid-feedback">Please enter the equipment model</div>
-                                </div>
-                                <div class="col-12">
-                                    <label for="equipment_quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" id="equipment_quantity" name="equipment_quantity" required min="1">
-                                    <div class="invalid-feedback">Please enter a valid quantity (minimum 1)</div>
-                                </div>
-                                <div class="col-12">
-                                    <label for="equipment_description" class="form-label">Description <span class="text-danger">*</span></label>
-                                    <textarea class="form-control" id="equipment_description" name="equipment_description" rows="3" required></textarea>
-                                    <div class="invalid-feedback">Please enter the equipment description</div>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <button type="button" class="btn btn-primary" onclick="handleNextStep()">Next</button>
-                            </div>
-                        </div>
-
-                        <div id="test-l-2" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger2">
-                            <h5 class="mb-1">Customer Details</h5>
+                            <h5 class="mb-1">Customer Information</h5>
                             <p class="mb-4">Enter the customer details</p>
                             <div class="row g-3">
                                 @if(request()->has('existing'))
@@ -201,8 +181,8 @@ sort($saudiCities);
                                 </div>
                                 <div class="col-12">
                                     <label for="customer_mobile" class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="customer_mobile" name="customer_mobile" required>
-                                    <div class="invalid-feedback">Please enter a valid Saudi mobile number</div>
+                                    <input type="text" class="form-control" id="customer_mobile" name="customer_mobile" pattern="^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$" required>
+                                    <div class="invalid-feedback">Please enter a valid Saudi mobile number (05xxxxxxxx)</div>
                                 </div>
                                 <div class="col-12">
                                     <label for="customer_email" class="form-label">Email Address <span class="text-danger">*</span></label>
@@ -237,65 +217,203 @@ sort($saudiCities);
                                 @endif
                             </div>
                             <div class="mt-3">
-                                <button type="button" class="btn btn-primary" onclick="handlePreviousStep()"><i class='bx bx-left-arrow-alt me-2'></i>Previous</button>
                                 <button type="button" class="btn btn-primary" onclick="handleNextStep()">Next</button>
                             </div>
                         </div>
 
-                        <div id="test-l-3" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger3">
-                            <h5 class="mb-1">Financial Information</h5>
-                            <p class="mb-4">Enter the financial details</p>
+                        <div id="test-l-2" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger2">
+                            <div class="step-indicator">
+                                <div class="step-number">2</div>
+                                <h5 class="mb-1">Equipment Details</h5>
+                            </div>
+                            <p class="mb-4">Enter equipment and warranty details</p>
                             <div class="row g-3">
-                                <div class="col-12">
-                                    <label for="financial_amount" class="form-label">Unit Price (SAR) <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" id="financial_amount" name="financial_amount" required min="0" step="0.01">
-                                    <div class="invalid-feedback">Please enter a valid amount</div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="equipment_type_id" name="equipment_type_id" required>
+                                            <option value="">Select Equipment Type</option>
+                                            @foreach($equipment_types as $type)
+                                                <option value="{{ $type->id }}" data-price="{{ $type->default_price }}">{{ $type->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label for="equipment_type_id">Equipment Type <i class="bx bx-info-circle tooltip-icon" data-bs-toggle="tooltip" title="Select the type of equipment you wish to purchase"></i></label>
+                                        <div class="invalid-feedback">Please select an equipment type</div>
+                                    </div>
                                 </div>
-                                <div class="col-12">
-                                    <label for="vat_percentage" class="form-label">VAT Percentage <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" id="vat_percentage" name="vat_percentage" required min="0" max="100" step="0.01" value="15">
-                                    <div class="invalid-feedback">Please enter a valid VAT percentage (0-100)</div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="equipment_model" name="equipment_model" placeholder="Enter model" required>
+                                        <label for="equipment_model">Equipment Model <i class="bx bx-info-circle tooltip-icon" data-bs-toggle="tooltip" title="Enter the specific model of the equipment"></i></label>
+                                        <div class="invalid-feedback">Please enter the equipment model</div>
+                                    </div>
                                 </div>
-                                <div class="col-12">
-                                    <div class="alert alert-info">
-                                        <p class="mb-1">Subtotal: <strong><span id="subtotal">0.00</span> SAR</strong></p>
-                                        <p class="mb-1">VAT Amount: <strong><span id="vat_amount">0.00</span> SAR</strong></p>
-                                        <p class="mb-0">Total Amount: <strong><span id="total_amount">0.00</span> SAR</strong></p>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="equipment_quantity" name="equipment_quantity" placeholder="Enter quantity" required min="1">
+                                        <label for="equipment_quantity">Quantity <i class="bx bx-info-circle tooltip-icon" data-bs-toggle="tooltip" title="Enter the number of units you wish to purchase"></i></label>
+                                        <div class="invalid-feedback">Please enter a valid quantity (minimum 1)</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="warranty" name="warranty" placeholder="Enter warranty period" required min="0" value="0">
+                                        <label for="warranty">Warranty Period (Months) <i class="bx bx-info-circle tooltip-icon" data-bs-toggle="tooltip" title="Enter the warranty period in months"></i></label>
+                                        <div class="invalid-feedback">Please enter a valid warranty period</div>
                                     </div>
                                 </div>
                                 <div class="col-12">
-                                    <label for="warranty_type" class="form-label">Warranty Type <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="warranty_type" name="warranty_type" required onchange="toggleWarrantyPeriod(this.value)">
-                                        <option value="none">No Warranty</option>
-                                        <option value="standard">Standard Warranty</option>
-                                        <option value="extended">Extended Warranty</option>
-                                    </select>
-                                    <div class="invalid-feedback">Please select the warranty type</div>
-                                </div>
-
-                                <div class="col-12" id="warranty_period_div" style="display: none;">
-                                    <label for="warranty_period" class="form-label">Warranty Period (Months) <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" id="warranty_period" name="warranty_period" min="1" max="60" value="12">
-                                    <div class="invalid-feedback">Please enter a valid warranty period (1-60 months)</div>
-                                </div>
-
-                                <div class="col-12">
-                                    <label for="payment_type" class="form-label">Payment Type <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="payment_type" name="payment_type" required onchange="toggleInstallments(this.value)">
-                                        <option value="postpaid">Postpaid</option>
-                                        <option value="prepaid">Prepaid</option>
-                                    </select>
-                                    <div class="invalid-feedback">Please select the payment type</div>
-                                </div>
-                                <div class="col-12" id="installments_div" style="display: none;">
-                                    <label for="number_of_installments" class="form-label">Number of Installments <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" id="number_of_installments" name="number_of_installments" value="3" min="2" max="12">
-                                    <div class="invalid-feedback">Please enter a valid number of installments (minimum 2)</div>
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="equipment_description" name="equipment_description" placeholder="Enter description" style="height: 100px" required></textarea>
+                                        <label for="equipment_description">Description <i class="bx bx-info-circle tooltip-icon" data-bs-toggle="tooltip" title="Provide a detailed description of the equipment"></i></label>
+                                        <div class="invalid-feedback">Please enter the equipment description</div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="mt-3">
                                 <button type="button" class="btn btn-primary" onclick="handlePreviousStep()"><i class='bx bx-left-arrow-alt me-2'></i>Previous</button>
-                                <button type="submit" class="btn btn-primary">Create Contract</button>
+                                <button type="button" class="btn btn-primary" onclick="handleNextStep()">Next<i class='bx bx-right-arrow-alt ms-2'></i></button>
+                            </div>
+                        </div>
+
+                        <div id="test-l-3" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger3">
+                            <h5 class="mb-1">Payment Information</h5>
+                            <p class="mb-4">Enter payment information and the number of payments</p>
+
+                            <div class="row g-3" x-data="{
+                                contractAmount: 0,
+                                payment_type: 'prepaid',
+                                payment_schedule: 'monthly',
+                                numberOfPayments: 1,
+                                first_payment_date: '',
+                                initPaymentDates() {
+                                    if (this.payment_schedule === 'monthly') {
+                                        // Clear custom payment date fields when switching to monthly
+                                        const container = document.getElementById('custom-payment-dates');
+                                        if (container) {
+                                            container.innerHTML = '';
+                                        }
+                                    } else if (this.payment_schedule === 'custom') {
+                                        generateCustomPaymentDateFields(this.numberOfPayments);
+                                    }
+                                }
+                            }" x-init="$watch('numberOfPayments', value => initPaymentDates()); $watch('payment_schedule', value => initPaymentDates())">
+                                <div class="col-12 col-lg-6">
+                                    <label for="Contractamount" class="form-label">Contract Amount (without VAT) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="contractamount" id="Contractamount"
+                                        x-model="contractAmount" required min="1" step="0.01">
+                                    <div class="invalid-feedback">Please enter a valid contract amount</div>
+                                </div>
+
+                                <div class="col-12 col-lg-6">
+                                    <label for="payment_type" class="form-label">Payment Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="payment_type" id="payment_type" x-model="payment_type" required>
+                                        <option value="prepaid">Prepaid (Full Amount)</option>
+                                        <option value="postpaid">Postpaid (Installments)</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a payment type</div>
+                                </div>
+
+                                <template x-if="payment_type === 'postpaid'">
+                                    <div class="col-12 col-lg-6">
+                                        <label for="number_of_payments" class="form-label">Number of Payments <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" name="number_of_payments" id="number_of_payments"
+                                            x-model="numberOfPayments" required min="1" max="24">
+                                        <div class="invalid-feedback">Please enter a valid number of payments (1-24)</div>
+                                    </div>
+                                </template>
+
+                                <template x-if="payment_type === 'postpaid'">
+                                    <div class="col-12 col-lg-6">
+                                        <label for="payment_schedule" class="form-label">Payment Schedule <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="payment_schedule" id="payment_schedule" x-model="payment_schedule" required>
+                                            <option value="monthly">Monthly</option>
+                                            <option value="custom">Custom Dates</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select a payment schedule</div>
+                                    </div>
+                                </template>
+
+                                <div class="col-12 col-lg-6">
+                                    <label for="first_payment_date" class="form-label">First Payment Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" name="first_payment_date" id="first_payment_date"
+                                        x-model="first_payment_date" required min="{{ date('Y-m-d') }}">
+                                    <div class="invalid-feedback">Please select a valid payment date</div>
+                                </div>
+
+                                <template x-if="payment_type === 'postpaid' && payment_schedule === 'custom'">
+                                    <div class="col-12">
+                                        <div class="p-3 rounded border">
+                                            <h6 class="mb-3">Custom Payment Dates</h6>
+                                            <div id="custom-payment-dates">
+                                                <!-- Custom payment date fields will be generated here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        <div class="row">
+                                            <div class="col-6">Contract Amount:</div>
+                                            <div class="col-6 text-end" x-text="'SAR ' + Number(contractAmount).toFixed(2)"></div>
+                                            <div class="col-6">VAT (15%):</div>
+                                            <div class="col-6 text-end" x-text="'SAR ' + (Number(contractAmount) * 0.15).toFixed(2)"></div>
+                                            <div class="col-6"><strong>Total Amount:</strong></div>
+                                            <div class="col-6 text-end"><strong x-text="'SAR ' + (Number(contractAmount) * 1.15).toFixed(2)"></strong></div>
+                                            <template x-if="payment_type === 'postpaid'">
+                                                <div class="col-12 mt-2">
+                                                    <div class="row">
+                                                        <div class="col-6">Payment per Installment:</div>
+                                                        <div class="col-6 text-end" x-text="'SAR ' + (Number(contractAmount) * 1.15 / numberOfPayments).toFixed(2)"></div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-primary" onclick="handlePreviousStep()"><i class='bx bx-left-arrow-alt me-2'></i>Previous</button>
+                                <button type="button" class="btn btn-primary" onclick="handleNextStep()">Next<i class='bx bx-right-arrow-alt ms-2'></i></button>
+                            </div>
+                        </div>
+
+                        <div id="test-l-4" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger4">
+                            <div class="step-indicator">
+                                <div class="step-number">4</div>
+                                <h5 class="mb-1">Summary</h5>
+                            </div>
+                            <p class="mb-4">Review your contract details</p>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title mb-4">Contract Summary</h5>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h6 class="mb-3">Equipment Information</h6>
+                                                    <table class="table table-borderless">
+                                                        <tbody id="equipment-summary">
+                                                            <!-- Will be populated by JavaScript -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h6 class="mb-3">Payment Information</h6>
+                                                    <table class="table table-borderless">
+                                                        <tbody id="payment-summary">
+                                                            <!-- Will be populated by JavaScript -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-primary" onclick="handlePreviousStep()"><i class='bx bx-left-arrow-alt me-2'></i>Previous</button>
+                                <button type="submit" class="btn btn-success"><i class='bx bx-check me-2'></i>Submit Contract</button>
                             </div>
                         </div>
                     </form>
@@ -307,181 +425,103 @@ sort($saudiCities);
 
 <script src="https://cdn.jsdelivr.net/npm/bs-stepper/dist/js/bs-stepper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
 <script>
-    var stepper;
-    var currentStep = 0;
+    let stepper;
+    let currentStep = 0;
 
-    document.addEventListener('DOMContentLoaded', function () {
-        stepper = new Stepper(document.querySelector('#stepper1'), {
-            linear: true,
-            animation: true
-        });
-    });
-
-    async function validateEquipmentInfo() {
-        const form = document.getElementById('contractForm');
-        const requiredFields = [
-            { name: 'equipment_type', message: 'Please enter equipment type' },
-            { name: 'equipment_model', message: 'Please enter equipment model' },
-            { name: 'equipment_quantity', pattern: /^[1-9]\d*$/, message: 'Please enter a valid quantity (minimum 1)' },
-            { name: 'equipment_description', message: 'Please enter equipment description' }
-        ];
-
-        let isValid = true;
-        let errorMessage = '';
-
-        for (const field of requiredFields) {
-            const input = form.querySelector(`[name="${field.name}"]`);
-            if (!input.value) {
-                isValid = false;
-                errorMessage = field.message;
-                input.classList.add('is-invalid');
-                break;
-            }
-            if (field.pattern && !field.pattern.test(input.value)) {
-                isValid = false;
-                errorMessage = field.message;
-                input.classList.add('is-invalid');
-                break;
-            }
-            input.classList.remove('is-invalid');
-        }
-
-        if (!isValid) {
-            await Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: errorMessage
-            });
-        }
-
-        return isValid;
-    }
-
-    async function validateCustomerInfo() {
+    // Validation functions
+    function validateStep1() {
         const form = document.getElementById('contractForm');
         if (form.querySelector('[name="client_id"]')) {
-            return true; // Skip validation for existing client
-        }
+            // For existing client
+            const clientId = form.querySelector('[name="client_id"]').value;
+            return clientId ? true : false;
+        } else {
+            // For new client
+            const fields = [
+                { id: 'customer_name', regex: new RegExp('.+') },
+                { id: 'customer_mobile', regex: new RegExp('^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$') },
+                { id: 'customer_email', regex: new RegExp('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$') },
+                { id: 'customer_address', regex: new RegExp('.+') },
+                { id: 'customer_city', regex: new RegExp('.+') },
+                { id: 'customer_tax_number', regex: new RegExp('^[0-9]{10,15}$') }
+            ];
 
-        const requiredFields = [
-            { name: 'customer_name', message: 'Please enter customer name' },
-            { name: 'customer_mobile', pattern: /^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$/, message: 'Please enter a valid Saudi mobile number' },
-            { name: 'customer_email', pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Please enter a valid email address' },
-            { name: 'customer_address', message: 'Please enter customer address' },
-            { name: 'customer_city', message: 'Please select customer city' }
-        ];
-
-        let isValid = true;
-        let errorMessage = '';
-
-        for (const field of requiredFields) {
-            const input = form.querySelector(`[name="${field.name}"]`);
-            if (!input.value) {
-                isValid = false;
-                errorMessage = field.message;
-                input.classList.add('is-invalid');
-                break;
-            }
-            if (field.pattern && !field.pattern.test(input.value)) {
-                isValid = false;
-                errorMessage = field.message;
-                input.classList.add('is-invalid');
-                break;
-            }
-            input.classList.remove('is-invalid');
-        }
-
-        if (!isValid) {
-            await Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: errorMessage
+            return fields.every(field => {
+                const element = document.getElementById(field.id);
+                if (!element) return true;
+                const isValid = field.regex.test(element.value);
+                element.classList.toggle('is-invalid', !isValid);
+                return isValid;
             });
         }
-
-        return isValid;
     }
 
-    async function validateFinancialInfo() {
-        const form = document.getElementById('contractForm');
-        const requiredFields = [
-            { name: 'financial_amount', pattern: /^[0-9]+(\.[0-9]{1,2})?$/, message: 'Please enter a valid amount' },
-            { name: 'vat_percentage', pattern: /^[0-9]+(\.[0-9]{1,2})?$/, message: 'Please enter a valid VAT percentage' },
-            { name: 'warranty_type', message: 'Please select warranty type' }
+    function validateStep2() {
+        const fields = [
+            { id: 'equipment_type_id', regex: new RegExp('.+') },
+            { id: 'equipment_model', regex: new RegExp('.+') },
+            { id: 'equipment_quantity', regex: new RegExp('^[1-9]\\d*$') },
+            { id: 'equipment_description', regex: new RegExp('.+') },
+            { id: 'warranty', regex: new RegExp('^[0-9]+$') }
         ];
 
-        let isValid = true;
-        let errorMessage = '';
-
-        for (const field of requiredFields) {
-            const input = form.querySelector(`[name="${field.name}"]`);
-            if (!input.value) {
-                isValid = false;
-                errorMessage = field.message;
-                input.classList.add('is-invalid');
-                break;
-            }
-            if (field.pattern && !field.pattern.test(input.value)) {
-                isValid = false;
-                errorMessage = field.message;
-                input.classList.add('is-invalid');
-                break;
-            }
-            input.classList.remove('is-invalid');
-        }
-
-        // Additional validation for warranty period if warranty type is not 'none'
-        const warrantyType = form.querySelector('[name="warranty_type"]').value;
-        if (warrantyType !== 'none') {
-            const warrantyPeriod = form.querySelector('[name="warranty_period"]');
-            if (!warrantyPeriod.value || parseInt(warrantyPeriod.value) < 1 || parseInt(warrantyPeriod.value) > 60) {
-                isValid = false;
-                errorMessage = 'Please enter a valid warranty period (1-60 months)';
-                warrantyPeriod.classList.add('is-invalid');
-            }
-        }
-
-        // Additional validation for installments if payment type is prepaid
-        const paymentType = form.querySelector('[name="payment_type"]').value;
-        if (paymentType === 'prepaid') {
-            const installments = form.querySelector('[name="number_of_installments"]');
-            if (!installments.value || parseInt(installments.value) < 1) {
-                isValid = false;
-                errorMessage = 'Please enter a valid number of installments (minimum 1)';
-                installments.classList.add('is-invalid');
-            }
-        }
-
-        if (!isValid) {
-            await Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: errorMessage
-            });
-        }
-
-        return isValid;
+        return fields.every(field => {
+            const element = document.getElementById(field.id);
+            if (!element) return true;
+            const isValid = field.regex.test(element.value);
+            element.classList.toggle('is-invalid', !isValid);
+            return isValid;
+        });
     }
 
-    async function handleNextStep() {
-        let isValid = true;
+    function validateStep3() {
+        const fields = [
+            { id: 'Contractamount', regex: new RegExp('^[0-9]+(\\.[0-9]{1,2})?$') },
+            { id: 'payment_type', regex: new RegExp('.+') }
+        ];
 
+        const paymentType = document.getElementById('payment_type').value;
+        if (paymentType === 'postpaid') {
+            fields.push({ id: 'number_of_payments', regex: new RegExp('^([1-9]|1[0-2])$') });
+        }
+
+        return fields.every(field => {
+            const element = document.getElementById(field.id);
+            if (!element) return true;
+            const isValid = field.regex.test(element.value);
+            element.classList.toggle('is-invalid', !isValid);
+            return isValid;
+        });
+    }
+
+    function validateCurrentStep() {
         switch(currentStep) {
             case 0:
-                isValid = await validateEquipmentInfo();
-                break;
+                return validateStep1();
             case 1:
-                isValid = await validateCustomerInfo();
-                break;
+                return validateStep2();
             case 2:
-                isValid = await validateFinancialInfo();
-                break;
+                return validateStep3();
+            case 3:
+                return true; // Summary step, no validation needed
+            default:
+                return false;
         }
+    }
 
-        if (isValid) {
+    function handleNextStep() {
+        if (validateCurrentStep()) {
             currentStep++;
             stepper.next();
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please fill in all required fields correctly.'
+            });
         }
     }
 
@@ -490,35 +530,35 @@ sort($saudiCities);
         stepper.previous();
     }
 
-    function toggleWarrantyPeriod(value) {
-        const warrantyPeriodDiv = document.getElementById('warranty_period_div');
-        if (value === 'none') {
-            warrantyPeriodDiv.style.display = 'none';
-        } else {
-            warrantyPeriodDiv.style.display = 'block';
+    function submitForm() {
+        if (validateCurrentStep()) {
+            document.getElementById('contractForm').submit();
         }
     }
 
-    function calculateTotal() {
-        const amount = parseFloat(document.getElementById('financial_amount').value) || 0;
-        const quantity = parseInt(document.getElementById('equipment_quantity').value) || 0;
-        const vatPercentage = parseFloat(document.getElementById('vat_percentage').value) || 0;
-        
-        const subtotal = amount * quantity;
-        const vatAmount = subtotal * (vatPercentage / 100);
-        const total = subtotal + vatAmount;
-        
-        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
-        document.getElementById('vat_amount').textContent = vatAmount.toFixed(2);
-        document.getElementById('total_amount').textContent = total.toFixed(2);
-    }
-
-    // Add event listeners for amount calculations
-    document.addEventListener('DOMContentLoaded', function() {
-        const calcInputs = ['financial_amount', 'equipment_quantity', 'vat_percentage'];
-        calcInputs.forEach(id => {
-            document.getElementById(id)?.addEventListener('input', calculateTotal);
+    // Initialize stepper when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function () {
+        stepper = new Stepper(document.querySelector('#stepper1'), {
+            linear: true,
+            animation: true
         });
+
+        // Initialize AlpineJS data
+        window.initPaymentDates = function() {
+            const numberOfPayments = this.numberOfPayments;
+            const schedule = this.payment_schedule;
+            
+            if (numberOfPayments > 0) {
+                this.paymentDates = [];
+                for (let i = 0; i < numberOfPayments; i++) {
+                    if (schedule === 'monthly') {
+                        this.paymentDates.push(new Date(Date.now() + (i * 30 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0]);
+                    } else if (schedule === 'quarterly') {
+                        this.paymentDates.push(new Date(Date.now() + (i * 90 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0]);
+                    }
+                }
+            }
+        };
     });
 </script>
 @endsection

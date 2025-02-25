@@ -82,4 +82,9 @@ class contracts extends Model
     {
         return $this->hasMany(ContractAnnex::class, 'contract_id');
     }
+
+    public function equipment()
+    {
+        return $this->hasOne(EquipmentContract::class, 'contract_id');
+    }
 }

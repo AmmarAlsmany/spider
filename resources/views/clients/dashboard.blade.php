@@ -286,8 +286,20 @@
                                                             </p>
                                                             <div class="mt-3">
                                                                 <h6>Team Notes:</h6>
-                                                                <p class="text-muted">{{ $visit->report && $visit->report->recommendations ? $visit->report->recommendations : 'No notes available.' }}</p>
+                                                                <p class="text-muted">{{ $visit->report?->recommendations ?? 'No notes available.' }}</p>
                                                             </div>
+                                                            {{-- view the report if it exists --}}
+                                                            @if($visit->status == 'completed')
+                                                            <div class="mt-3">
+                                                                <h6>Visit Report:</h6>
+                                                                <p class="text-muted">
+                                                                    @if($visit->report?->customer_notes)
+                                                                    <strong>Customer Notes:</strong> {{ $visit->report->customer_notes }}<br>
+                                                                    @endif
+                                                                </p>
+                                                                <a href="{{ route('client.visit.details', $visit->id) }}" class="btn btn-primary">View Report</a>
+                                                            </div>
+                                                            @endif
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

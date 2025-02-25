@@ -146,6 +146,7 @@
                                             <th>Location</th>
                                             <th>Type</th>
                                             <th>Status</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -171,11 +172,17 @@
                                                     <span class="badge bg-warning">Pending</span>
                                                 @endif
                                             </td>
+                                            <td>
+                                                @if($visit->status == 'completed')
+                                                    <a href="{{ route('technical.visit.report.view', $visit->id) }}" class="btn btn-sm btn-primary"><i class="bx bx-file me-1"></i> View Report</a>
+                                                @endif
+                                            </td>
                                         </tr>
                                         @endforeach
                                     </tbody>
+                                    </tbody>
                                 </table>
-                                <div class="d-flex justify-content-end mt-3">
+                                <div class="mt-3 d-flex justify-content-end">
                                     {{ $visitSchedules->links('pagination::bootstrap-4') }}
                                 </div>
                             </div>

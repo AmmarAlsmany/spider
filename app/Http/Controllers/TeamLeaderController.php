@@ -57,7 +57,7 @@ class TeamLeaderController extends Controller
     {
         // Get the authenticated team leader's team
         $team = Team::where('team_leader_id', Auth::id())->first();
-        
+
         if (!$team) {
             return redirect()->back()->with('error', 'No team assigned.');
         }
@@ -67,7 +67,7 @@ class TeamLeaderController extends Controller
 
         // Filter by contract number
         if ($request->filled('contract_number')) {
-            $query->whereHas('contract', function($q) use ($request) {
+            $query->whereHas('contract', function ($q) use ($request) {
                 $q->where('contract_number', 'like', '%' . $request->contract_number . '%');
             });
         }
@@ -173,42 +173,73 @@ class TeamLeaderController extends Controller
 
     public function storeReport(Request $request, $visitId)
     {
-        $visit = VisitSchedule::findOrFail($visitId);
+        try {
+            $visit = VisitSchedule::findOrFail($visitId);
 
-        // Check if visit is completed
-        if ($visit->status !== 'completed') {
-            return redirect()->back()->with('error', 'Visit must be marked as completed before creating a report.');
+            // Check if visit is completed
+            if ($visit->status !== 'completed') {
+                return redirect()->back()->with('error', 'Visit must be marked as completed before creating a report.');
+            }
+
+            // dd($request->all());
+
+            // First validate the basic required fields
+            $request->validate([
+                'time_in' => 'required|date_format:H:i',
+                'time_out' => 'required|date_format:H:i|after:time_in',
+                'visit_type' => 'required|in:regular,complementary,emergency,free,other',
+                'target_insects' => 'required|array',
+                'target_insects.*' => 'required|string',
+                'pesticides_used' => 'required|array',
+                'pesticides_used.*' => 'required|string',
+                'elimination_steps' => 'required|string|min:10',
+                'recommendations' => 'required|string',
+                'customer_notes' => 'nullable|string',
+                'customer_signature' => 'required|string',
+                'phone_signature' => 'required|string'
+            ]);
+            // Process and validate pesticide quantities
+            $pesticide_quantities = [];
+            foreach ($request->pesticides_used as $pesticide) {
+                // Validate quantity and unit for each selected pesticide
+                $request->validate([
+                    "pesticide_quantity.$pesticide" => 'required|numeric|min:0',
+                    "pesticide_unit.$pesticide" => 'required|in:g,ml'
+                ], [
+                    "pesticide_quantity.$pesticide.required" => "Please enter quantity for $pesticide",
+                    "pesticide_quantity.$pesticide.numeric" => "Quantity for $pesticide must be a number",
+                    "pesticide_quantity.$pesticide.min" => "Quantity for $pesticide cannot be negative",
+                    "pesticide_unit.$pesticide.required" => "Please select unit for $pesticide",
+                    "pesticide_unit.$pesticide.in" => "Unit for $pesticide must be either grams (g) or milliliters (ml)"
+                ]);
+
+                $pesticide_quantities[$pesticide] = [
+                    'quantity' => $request->input("pesticide_quantity.$pesticide"),
+                    'unit' => $request->input("pesticide_unit.$pesticide")
+                ];
+            }
+
+            // Create visit report
+            $report = new VisitReport([
+                'visit_id' => $visitId,
+                'time_in' => $request->time_in,
+                'time_out' => $request->time_out,
+                'visit_type' => $request->visit_type,
+                'target_insects' => json_encode($request->target_insects),
+                'pesticides_used' => json_encode($request->pesticides_used),
+                'pesticide_quantities' => json_encode($pesticide_quantities),
+                'elimination_steps' => $request->elimination_steps,
+                'recommendations' => $request->recommendations,
+                'customer_notes' => $request->customer_notes,
+                'customer_signature' => $request->customer_signature,
+                'phone_signature' => $request->phone_signature,
+                'created_by' => Auth::id()
+            ]);
+
+            $report->save();
+        } catch (\Exception  $e) {
+            return redirect()->back()->with('error', 'Failed to create visit report: ' . $e->getMessage());
         }
-
-        // Validate request
-        $request->validate([
-            'time_in' => 'required',
-            'time_out' => 'required',
-            'visit_type' => 'required|in:regular,complementary,emergency,free,other',
-            'target_insects' => 'required|array',
-            'pesticides_used' => 'required|array',
-            'recommendations' => 'required|string',
-            'customer_notes' => 'nullable|string',
-            'customer_signature' => 'required|string', // This will be a base64 image string
-            'phone_signature' => 'required|string'
-        ]);
-
-        // Create visit report
-        $report = new VisitReport([
-            'visit_id' => $visitId,
-            'time_in' => $request->time_in,
-            'time_out' => $request->time_out,
-            'visit_type' => $request->visit_type,
-            'target_insects' => json_encode($request->target_insects),
-            'pesticides_used' => json_encode($request->pesticides_used),
-            'recommendations' => $request->recommendations,
-            'customer_notes' => $request->customer_notes,
-            'customer_signature' => $request->customer_signature,
-            'phone_signature' => $request->phone_signature,
-            'created_by' => Auth::id()
-        ]);
-
-        $report->save();
 
         return redirect()->route('team-leader.visit.show', $visit->id)
             ->with('success', 'Visit report has been created successfully.');
@@ -216,7 +247,7 @@ class TeamLeaderController extends Controller
 
     public function showContract($contractId)
     {
-        $contract = contracts::with(['customer', 'branchs', 'visitSchedules' => function($query) {
+        $contract = contracts::with(['customer', 'branchs', 'visitSchedules' => function ($query) {
             $query->orderBy('visit_date', 'desc');
         }])->findOrFail($contractId);
 

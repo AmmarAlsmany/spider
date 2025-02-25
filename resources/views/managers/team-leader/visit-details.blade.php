@@ -31,13 +31,10 @@
                             <a href="{{ route('team-leader.visits') }}" class="btn btn-secondary btn-sm">
                                 <i class="bx bx-arrow-back me-1"></i>Back to Visits
                             </a>
-                            @if($visit->status != 'completed' && (date('Y-m-d') == $visit->visit_date || date('Y-m-d') >
-                            $visit->visit_date))
-                            <form action="{{ route('team-leader.visit.complete', $visit->id) }}" method="POST"
-                                class="d-inline">
+                            @if($visit->status != 'completed' && (date('Y-m-d') == $visit->visit_date || date('Y-m-d') > $visit->visit_date))
+                            <form action="{{ route('team-leader.visit.complete', $visit->id) }}" method="POST" class="d-inline">
                                 @csrf
-                                <button type="submit" class="btn btn-success btn-sm"
-                                    onclick="return confirm('Are you sure you want to mark this visit as completed?')">
+                                <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to mark this visit as completed?')">
                                     <i class="bx bx-check-circle me-1"></i>Mark as Completed
                                 </button>
                             </form>
@@ -149,21 +146,44 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <h6>Target Insects</h6>
+                                            @php
+                                                $insects = is_array($visit->report->target_insects) 
+                                                    ? $visit->report->target_insects 
+                                                    : json_decode($visit->report->target_insects, true);
+                                            @endphp
                                             <ul class="list-unstyled">
-                                                @foreach(json_decode($visit->report->target_insects) as $insect)
-                                                <li><i class="bx bx-check text-success me-2"></i>{{
-                                                    ucfirst(str_replace('_', ' ', $insect)) }}</li>
+                                                @foreach($insects as $insect)
+                                                <li><i class="bx bx-check text-success me-2"></i>{{ ucfirst(str_replace('_', ' ', $insect)) }}</li>
                                                 @endforeach
                                             </ul>
                                         </div>
                                         <div class="col-md-6">
-                                            <h6>Pesticides Used</h6>
+                                            <h6>Pesticides Used with Quantities</h6>
+                                            @php
+                                                $pesticides = is_array($visit->report->pesticides_used) 
+                                                    ? $visit->report->pesticides_used 
+                                                    : json_decode($visit->report->pesticides_used, true);
+                                                $quantities = is_array($visit->report->pesticide_quantities) 
+                                                    ? $visit->report->pesticide_quantities 
+                                                    : json_decode($visit->report->pesticide_quantities, true);
+                                            @endphp
                                             <ul class="list-unstyled">
-                                                @foreach(json_decode($visit->report->pesticides_used) as $pesticide)
-                                                <li><i class="bx bx-check text-success me-2"></i>{{
-                                                    ucfirst(str_replace('_', ' ', $pesticide)) }}</li>
+                                                @foreach($pesticides as $pesticide)
+                                                <li>
+                                                    <i class="bx bx-check text-success me-2"></i>
+                                                    {{ ucfirst(str_replace('_', ' ', $pesticide)) }}
+                                                    @if(isset($quantities[$pesticide]))
+                                                        - {{ $quantities[$pesticide]['quantity'] }} {{ $quantities[$pesticide]['unit'] }}
+                                                    @endif
+                                                </li>
                                                 @endforeach
                                             </ul>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 row">
+                                        <div class="col-12">
+                                            <h6>Elimination Steps</h6>
+                                            <p class="mb-0">{{ $visit->report->elimination_steps }}</p>
                                         </div>
                                     </div>
                                     <div class="mt-4 row">

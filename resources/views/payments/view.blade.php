@@ -211,9 +211,13 @@
                     
                     <div class="p-2">
                         <p class="mb-2 text-lg"><strong>معلومات العقد / Contract Information</strong></p>
-                        <p class="text-md">رقم العقد / Contract Number: {{ $payment->contract_number }}</p>
+                        <p class="text-md">رقم العقد / Contract Number : {{ $payment->contract_number }}</p>
                         {{-- contract amount --}}
-                        <p class="text-md">قيمة العقد / Contract Amount: {{ number_format($payment->contract->contract_price, 2) }} SAR</p>
+                        <p class="text-md">قيمة العقد بدون الضريبة / Contract Amount Without Vat: {{ number_format($payment->contract->contract_price /1.15, 2) }} SAR</p>
+                        
+                        <p class="text-md">قيمة العقد مع الضريبة / Contract Amount With Vat: {{ number_format($payment->contract->contract_price, 2) }} SAR</p>
+                        
+                        <p class="text-md">قيمة الضريبة / Vat Amount: {{ number_format($payment->contract->contract_price * 0.15 / 1.15, 2) }} SAR</p>
                         {{-- payment amount --}}
                         <p class="text-md">قيمة الدفعة / Payment Amount: {{ number_format($payment->payment_amount, 2) }} SAR</p>
                         {{-- total payments --}}

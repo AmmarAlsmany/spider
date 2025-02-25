@@ -124,9 +124,21 @@
                                 </tr>
                                 <tr>
                                     <th class="bg-light">
-                                        {{ __('contract_details_new.contract_info_amount') }}
+                                        {{ __('contract_details_new.contract_info_amount_with_vat') }}
                                     </th>
                                     <td>{{ number_format($contract->contract_price, 2) }} SAR</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        {{ __('contract_details_new.contract_info_amount_without_vat') }}
+                                    </th>
+                                    <td>{{ number_format($contract->contract_price/1.15, 2) }} SAR</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        {{ __('contract_details_new.vat_amount') }}
+                                    </th>
+                                    <td>{{ number_format($contract->contract_price * 0.15 / 1.15, 2) }} SAR</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light">

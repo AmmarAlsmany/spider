@@ -152,29 +152,37 @@
                                                 <div class="mb-3">
                                                     <label class="form-label">Team Leader</label>
                                                     <select class="form-select select2-single" name="team_leader_id" 
-                                                            required data-placeholder="Select Team Leader">
-                                                        <option value=""></option>
+                                                            required data-placeholder="Select Team Leader"
+                                                            {{ $team->visitSchedules()->where('status', 'scheduled')->exists() ? 'disabled' : '' }}>
+                                                        <option value="{{ $team->team_leader_id }}" selected>{{ $team->leader->name }}</option>
                                                         @php
+                                                        // Get available leaders (not assigned to any team except current)
                                                         $leaders = \App\Models\User::where('role', 'team_leader')
                                                             ->where('status', 'active')
-                                                            ->whereNotExists(function($query) {
+                                                            ->where('id', '!=', $team->team_leader_id)  // Exclude current leader since already added
+                                                            ->whereNotExists(function($query) use ($team) {
                                                                 $query->from('teams')
+                                                                    ->where('teams.id', '!=', $team->id)  // Exclude current team
                                                                     ->whereColumn('teams.team_leader_id', 'users.id');
                                                             })
+                                                            ->whereNotExists(function($query) use ($team) {
+                                                                $query->from('team_members')
+                                                                    ->where('team_members.team_id', '!=', $team->id)  // Exclude current team
+                                                                    ->whereColumn('team_members.user_id', 'users.id');
+                                                            })
+                                                            ->orderBy('name')
                                                             ->get();
                                                         @endphp
                                                         @foreach($leaders as $leader)
-                                                            <option value="{{ $leader->id }}" 
-                                                                {{ $leader->id == $team->team_leader_id ? 'selected' : '' }}>
-                                                                {{ $leader->name }}
-                                                            </option>
+                                                            <option value="{{ $leader->id }}">{{ $leader->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label class="form-label">Team Members</label>
                                                     <select class="form-select select2-multiple" name="members[]" 
-                                                            multiple data-placeholder="Select Members">
+                                                            multiple data-placeholder="Select Members"
+                                                            {{ $team->visitSchedules()->where('status', 'scheduled')->exists() ? 'disabled' : '' }}>
                                                         @php
                                                         // For edit modal - show current members plus available workers
                                                         $workers = \App\Models\User::where('role', 'worker')
@@ -279,14 +287,20 @@
                         <label class="form-label">Team Leader</label>
                         <select class="form-select select2-single" name="team_leader_id" required
                             data-placeholder="Select Team Leader">
-                            <option value=""></option>
                             @php
                             $leaders = \App\Models\User::where('role', 'team_leader')
                                 ->where('status', 'active')
+                                // Not assigned as leader to any team
                                 ->whereNotExists(function($query) {
                                     $query->from('teams')
                                         ->whereColumn('teams.team_leader_id', 'users.id');
                                 })
+                                // Not a member of any team (exclusive relationships)
+                                ->whereNotExists(function($query) {
+                                    $query->from('team_members')
+                                        ->whereColumn('team_members.user_id', 'users.id');
+                                })
+                                ->orderBy('name')
                                 ->get();
                             @endphp
                             @foreach($leaders as $leader)

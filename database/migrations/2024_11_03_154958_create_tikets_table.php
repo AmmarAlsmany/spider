@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('tiket_description');
             $table->enum('status', ['open', 'closed'])->default('open');
             $table->string('ticket_priority')->nullable();
-            $table->foreignId('who_solved_it')->nullable()->constrained('users')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('customer_id')->constrained('clients')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('who_solved_it')->nullable()->constrained('users')->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('customer_id')->constrained('clients')->onDelete('restrict')->onUpdate('cascade');
             $table->timestamps();
         });
     }

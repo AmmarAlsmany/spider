@@ -93,39 +93,77 @@ class TechnicalController extends Controller
     {
         try {
             DB::beginTransaction();
+            
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'team_leader_id' => 'required|exists:users,id',
                 'description' => 'nullable|string',
-                'members' => 'array',
+                'members' => 'nullable|array',
                 'members.*' => 'exists:users,id'
             ]);
 
+            // Initialize members array if not set
+            $members = isset($validated['members']) ? $validated['members'] : [];
+
+            // Remove team leader from members if present
+            $members = array_diff($members, [$validated['team_leader_id']]);
+
             // Check if the team leader is already assigned to another team
-            if (Team::where('team_leader_id', $validated['team_leader_id'])->exists()) {
-                return redirect()->back()->with('error', 'This user is already a team leader in another team');
+            $existingLeaderTeam = Team::where('team_leader_id', $validated['team_leader_id'])->first();
+            if ($existingLeaderTeam) {
+                return redirect()->back()->with('error', 'This user is already a team leader in team: ' . $existingLeaderTeam->name);
+            }
+
+            // Check if the team leader is a member in another team
+            $leaderMemberTeam = DB::table('team_members')
+                ->join('teams', 'team_members.team_id', '=', 'teams.id')
+                ->where('team_members.user_id', $validated['team_leader_id'])
+                ->first();
+
+            if ($leaderMemberTeam) {
+                return redirect()->back()->with('error', 'The selected team leader is already a member in team: ' . $leaderMemberTeam->name);
+            }
+
+            // Check if any of the members are already in other teams or are team leaders
+            if (!empty($members)) {
+                // Check members who are already in other teams
+                $existingMembers = DB::table('team_members')
+                    ->join('teams', 'team_members.team_id', '=', 'teams.id')
+                    ->join('users', 'team_members.user_id', '=', 'users.id')
+                    ->whereIn('team_members.user_id', $members)
+                    ->first();
+                
+                if ($existingMembers) {
+                    return redirect()->back()->with('error', "User {$existingMembers->name} is already a member in team: {$existingMembers->name}");
+                }
+
+                // Check if any member is a team leader
+                $memberLeaderTeam = Team::whereIn('team_leader_id', $members)->first();
+                if ($memberLeaderTeam) {
+                    $leader = User::find($memberLeaderTeam->team_leader_id);
+                    return redirect()->back()->with('error', "User {$leader->name} is already a team leader in team: {$memberLeaderTeam->name}");
+                }
             }
 
             // Create the team
-            $team = new Team();
-            $team->name = $validated['name'];
-            $team->team_leader_id = $validated['team_leader_id'];
-
-            $team->description = $validated['description'];
-            $team->save();
+            $team = Team::create([
+                'name' => $validated['name'],
+                'team_leader_id' => $validated['team_leader_id'],
+                'description' => $validated['description'] ?? null
+            ]);
 
             // Attach members if any
-            if (!empty($validated['members'])) {
-                $team->members()->attach($validated['members']);
+            if (!empty($members)) {
+                $team->members()->attach($members);
             }
 
             DB::commit();
+            return redirect()->back()->with('success', 'Team created successfully');
+            
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Error creating team: ' . $e->getMessage());
         }
-
-        return redirect()->back()->with('success', 'Team created successfully');
     }
 
     public function modify(Request $request, $id)
@@ -139,36 +177,101 @@ class TechnicalController extends Controller
                 'name' => 'sometimes|string|max:255',
                 'team_leader_id' => 'sometimes|exists:users,id',
                 'description' => 'nullable|string',
-                'members' => 'sometimes|array',
+                'members' => 'nullable|array',
                 'members.*' => 'exists:users,id'
             ]);
 
-            // If changing team leader, check if new leader is not already leading another team
+            // Initialize members array if not set
+            $members = isset($validated['members']) ? $validated['members'] : [];
+            
+            // Remove team leader from members if present
+            if (isset($validated['team_leader_id'])) {
+                $members = array_diff($members, [$validated['team_leader_id']]);
+            }
+
+            // If changing team leader
             if (isset($validated['team_leader_id']) && $validated['team_leader_id'] !== $team->team_leader_id) {
-                if (Team::where('team_leader_id', $validated['team_leader_id'])->exists()) {
-                    return redirect()->back()->with('error', 'This user is already a team leader in another team');
+                // Check if current team has active schedules
+                if ($team->visitSchedules()->exists()) {
+                    return redirect()->back()->with('error', 'Cannot change team leader: This team has active visit schedules. Please complete or reassign the schedules first.');
+                }
+
+                // Check if new leader is already a leader elsewhere
+                $existingLeaderTeam = Team::where('team_leader_id', $validated['team_leader_id'])
+                    ->where('id', '!=', $team->id)
+                    ->first();
+                if ($existingLeaderTeam) {
+                    return redirect()->back()->with('error', "This user is already a team leader in team: {$existingLeaderTeam->name}");
+                }
+
+                // Check if new leader is a member in another team
+                $leaderMemberTeam = DB::table('team_members')
+                    ->join('teams', 'team_members.team_id', '=', 'teams.id')
+                    ->where('team_members.user_id', $validated['team_leader_id'])
+                    ->where('teams.id', '!=', $team->id)
+                    ->first();
+                
+                if ($leaderMemberTeam) {
+                    return redirect()->back()->with('error', "The selected team leader is already a member in team: {$leaderMemberTeam->name}");
                 }
             }
 
-            $team->update($validated);
-
-            // Update members if provided
+            // Handle member changes
             if (isset($validated['members'])) {
-                $team->members()->sync($validated['members']);
+                $currentMembers = $team->members->pluck('id')->toArray();
+                $removedMembers = array_diff($currentMembers, $members);
+                $newMembers = array_diff($members, $currentMembers);
+
+                // Check if we're removing members and have active schedules
+                if (!empty($removedMembers) && $team->visitSchedules()->exists()) {
+                    return redirect()->back()->with('error', 'Cannot remove team members: This team has active visit schedules. Please complete or reassign the schedules first.');
+                }
+
+                // Check if new members are already in other teams or are team leaders
+                if (!empty($newMembers)) {
+                    // Check if any new member is already in another team
+                    $existingMembers = DB::table('team_members')
+                        ->join('teams', 'team_members.team_id', '=', 'teams.id')
+                        ->join('users', 'team_members.user_id', '=', 'users.id')
+                        ->whereIn('team_members.user_id', $newMembers)
+                        ->where('teams.id', '!=', $team->id)
+                        ->first();
+                    
+                    if ($existingMembers) {
+                        return redirect()->back()->with('error', "User {$existingMembers->name} is already a member in team: {$existingMembers->name}");
+                    }
+
+                    // Check if any new member is a team leader
+                    $memberLeaderTeam = Team::whereIn('team_leader_id', $newMembers)->first();
+                    if ($memberLeaderTeam) {
+                        $leader = User::find($memberLeaderTeam->team_leader_id);
+                        return redirect()->back()->with('error', "User {$leader->name} is already a team leader in team: {$memberLeaderTeam->name}");
+                    }
+                }
+
+                // All checks passed, sync the members
+                $team->members()->sync($members);
             }
 
+            $team->update($validated);
+            
             DB::commit();
+            return redirect()->back()->with('success', 'Team updated successfully');
+            
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Error updating team: ' . $e->getMessage());
         }
-
-        return redirect()->back()->with('success', 'Team updated successfully');
     }
 
     public function delete($id)
     {
         $team = Team::findOrFail($id);
+
+        // Check if team has any linked visit schedules
+        if ($team->visitSchedules()->exists()) {
+            return redirect()->back()->with('error', 'Cannot delete team: This team is linked to visit schedules. Please reassign or delete the schedules first.');
+        }
 
         try {
             DB::beginTransaction();
@@ -226,7 +329,6 @@ class TechnicalController extends Controller
 
         try {
             DB::beginTransaction();
-
 
             $validated = $request->validate([
                 'name' => 'required|string|max:255',

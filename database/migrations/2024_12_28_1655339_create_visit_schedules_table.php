@@ -10,9 +10,9 @@ return new class extends Migration
     {
         Schema::create('visit_schedules', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('contract_id')->constrained('contracts')->onDelete('cascade');
-            $table->foreignId('branch_id')->nullable()->constrained('branchs')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
+            $table->foreignId('contract_id')->constrained('contracts')->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('branch_id')->nullable()->constrained('branchs')->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('team_id')->constrained('teams')->onDelete('restrict')->onUpdate('cascade');
             $table->string('visit_date');
             $table->string('visit_time');
             $table->enum('visit_type', ['regular', 'complementary', 'emergency', 'free', 'other']);

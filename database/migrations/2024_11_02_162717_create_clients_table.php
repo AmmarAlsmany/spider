@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('zip_code')->nullable();
             $table->string('city')->nullable();
             $table->string('address');
-            $table->foreignId('sales_id')->constrained('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('sales_id')->constrained('users')->onDelete('restrict')->onUpdate('cascade');
             $table->string('password');
             $table->string('role')->default('client');
             $table->string('status')->default('active');

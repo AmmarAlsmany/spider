@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('priority', ['low', 'medium', 'high'])->default('low');
             
             // Add created_by field
-            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
+            $table->foreignId('created_by')->constrained('users')->onDelete('restrict')->onUpdate('cascade');
             
             // Rename who_solved_it to solver_id for consistency
             $table->renameColumn('who_solved_it', 'solver_id');

@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('customer_id')->constrained('clients')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('contract_id')->constrained('contracts')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('annex_id')->nullable()->constrained('contract_annexes')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('customer_id')->constrained('clients')->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('contract_id')->constrained('contracts')->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('annex_id')->nullable()->constrained('contract_annexes')->onDelete('restrict')->onUpdate('cascade');
             $table->string('invoice_number')->unique();
             $table->enum('payment_method',["cash","bank transfer"])->nullable();
             $table->enum('payment_status',["unpaid","paid","overdue","pending"])->default("unpaid");

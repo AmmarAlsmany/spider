@@ -4,6 +4,7 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
     rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" integrity="sha512-vKMx8Mt9yKMkOnHeDpPvPvJR1j+MPY+2h24HFbaQrNfBIhssLPD3LC3B9FuQzjS9gQ2tRul6OzKneid7/7InUg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
     .select2-container--bootstrap-5 .select2-selection {
         min-height: 38px;
@@ -42,23 +43,30 @@
     .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
         height: 36px;
     }
+
+    /* Make alerts more visible */
+    .alert {
+        position: relative;
+        z-index: 1000;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
 </style>
 @endpush
 
 @section('content')
-<div class="page-content">
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bx bx-check-circle me-1"></i>
-        {{ session('success') }}
+<div class="page-content">    
+    @if(session('error'))
+    <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bx bx-error-circle me-1"></i>
+        {{ session('error') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
 
-    @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bx bx-error-circle me-1"></i>
-        {{ session('error') }}
+    @if(session('success'))
+    <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bx bx-check-circle me-1"></i>
+        {{ session('success') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
@@ -147,7 +155,13 @@
                                                             required data-placeholder="Select Team Leader">
                                                         <option value=""></option>
                                                         @php
-                                                        $leaders = \App\Models\User::where('role', 'team_leader')->get();
+                                                        $leaders = \App\Models\User::where('role', 'team_leader')
+                                                            ->where('status', 'active')
+                                                            ->whereNotExists(function($query) {
+                                                                $query->from('teams')
+                                                                    ->whereColumn('teams.team_leader_id', 'users.id');
+                                                            })
+                                                            ->get();
                                                         @endphp
                                                         @foreach($leaders as $leader)
                                                             <option value="{{ $leader->id }}" 
@@ -162,7 +176,28 @@
                                                     <select class="form-select select2-multiple" name="members[]" 
                                                             multiple data-placeholder="Select Members">
                                                         @php
-                                                        $workers = \App\Models\User::where('role', 'worker')->get();
+                                                        // For edit modal - show current members plus available workers
+                                                        $workers = \App\Models\User::where('role', 'worker')
+                                                            ->where('status', 'active')
+                                                            ->where(function($query) use ($team) {
+                                                                // Always include current team members
+                                                                $query->whereIn('id', $team->members->pluck('id'))
+                                                                    // Or include available workers who are not in any team and not leaders
+                                                                    ->orWhere(function($q) {
+                                                                        // Not a member of any other team
+                                                                        $q->whereNotExists(function($sub) {
+                                                                            $sub->from('team_members')
+                                                                                ->whereColumn('team_members.user_id', 'users.id');
+                                                                        })
+                                                                        // Not a leader of any team
+                                                                        ->whereNotExists(function($sub) {
+                                                                            $sub->from('teams')
+                                                                                ->whereColumn('teams.team_leader_id', 'users.id');
+                                                                        });
+                                                                    });
+                                                            })
+                                                            ->orderBy('name')
+                                                            ->get();
                                                         @endphp
                                                         @foreach($workers as $worker)
                                                             <option value="{{ $worker->id }}" 
@@ -246,7 +281,13 @@
                             data-placeholder="Select Team Leader">
                             <option value=""></option>
                             @php
-                            $leaders = \App\Models\User::where('role', 'team_leader')->get();
+                            $leaders = \App\Models\User::where('role', 'team_leader')
+                                ->where('status', 'active')
+                                ->whereNotExists(function($query) {
+                                    $query->from('teams')
+                                        ->whereColumn('teams.team_leader_id', 'users.id');
+                                })
+                                ->get();
                             @endphp
                             @foreach($leaders as $leader)
                             <option value="{{ $leader->id }}">{{ $leader->name }}</option>
@@ -258,7 +299,21 @@
                         <select class="form-select select2-multiple" name="members[]" multiple
                             data-placeholder="Select Members">
                             @php
-                            $workers = \App\Models\User::where('role', 'worker')->get();
+                            // For create modal - show only available workers (not in any team and not team leaders)
+                            $workers = \App\Models\User::where('role', 'worker')
+                                ->where('status', 'active')
+                                // Not a member of any team
+                                ->whereNotExists(function($query) {
+                                    $query->from('team_members')
+                                        ->whereColumn('team_members.user_id', 'users.id');
+                                })
+                                // Not a leader of any team
+                                ->whereNotExists(function($query) {
+                                    $query->from('teams')
+                                        ->whereColumn('teams.team_leader_id', 'users.id');
+                                })
+                                ->orderBy('name')
+                                ->get();
                             @endphp
                             @foreach($workers as $worker)
                                 <option value="{{ $worker->id }}">{{ $worker->name }}</option>
@@ -281,6 +336,7 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-vKMx8Mt9yKMkOnHeDpPvPvJR1j+MPY+2h24HFbaQrNfBIhssLPD3LC3B9FuQzjS9gQ2tRul6OzKneid7/7InUg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     $(document).ready(function() {
         $('.select2-multiple').select2({
@@ -304,6 +360,15 @@
             });
         }, 5000);
     });
+</script>
+<script type="text/javascript">
+    @if(session('error'))
+        toastr.error("{{ session('error') }}")
+    @endif
+    
+    @if(session('success'))
+        toastr.success("{{ session('success') }}")
+    @endif
 </script>
 @endpush
 @endsection

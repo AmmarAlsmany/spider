@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('visit_reports', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('visit_id')->constrained('visit_schedules')->onDelete('cascade');
+            $table->foreignId('visit_id')->constrained('visit_schedules')->onDelete('restrict')->onUpdate('cascade');
             $table->time('time_in');
             $table->time('time_out');
             $table->enum('visit_type', ['regular', 'complementary', 'emergency', 'free', 'other']);

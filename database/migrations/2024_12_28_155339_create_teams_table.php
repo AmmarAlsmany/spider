@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->timestamps();
             $table->foreign('team_leader_id')->references('id')->on('users')
-                  ->onDelete('cascade')->onUpdate('cascade');
+                  ->onDelete('restrict')->onUpdate('cascade');
         });
 
         // Create team_members pivot table

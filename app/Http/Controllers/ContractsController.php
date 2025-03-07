@@ -238,39 +238,38 @@ class ContractsController extends Controller
         $contract->save();
 
         // Handle branch information
-        if ($request->is_multi_branch == "yes") {
-            $branch_names = [];
-            for ($i = 0; $i < $request->branchs_number; $i++) {
-                $branch_name = $request->input("branchName{$i}");
+        $branch_names = [];
+        for ($i = 0; $i < $request->branchs_number; $i++) {
+            $branch_name = $request->input("branchName{$i}");
 
-                // Check for duplicate branch names
-                if (in_array($branch_name, $branch_names)) {
-                    throw new \Exception("Duplicate branch name: {$branch_name}");
-                }
-                $branch_names[] = $branch_name;
-
-                // Validate phone number format
-                $phone = $request->input("branchphone{$i}");
-                if (!preg_match('/^[0-9]{10}$/', $phone)) {
-                    throw new \Exception("Invalid phone number format for branch: {$branch_name}");
-                }
-
-                // Validate city
-                $city = $request->input("branchcity{$i}");
-                if (!in_array($city, $this->getSaudiCities())) {
-                    throw new \Exception("Invalid city selected for branch: {$branch_name}");
-                }
-
-                $branch = new branchs();
-                $branch->branch_name = $branch_name;
-                $branch->branch_manager_name = $request->input("branchmanager{$i}");
-                $branch->branch_manager_phone = $phone;
-                $branch->branch_address = $request->input("branchAddress{$i}");
-                $branch->branch_city = $city;
-                $branch->contracts_id = $contract->id;
-                $branch->save();
+            // Check for duplicate branch names
+            if (in_array($branch_name, $branch_names)) {
+                throw new \Exception("Duplicate branch name: {$branch_name}");
             }
+            $branch_names[] = $branch_name;
+
+            // Validate phone number format
+            $phone = $request->input("branchphone{$i}");
+            if (!preg_match('/^[0-9]{10}$/', $phone)) {
+                throw new \Exception("Invalid phone number format for branch: {$branch_name}");
+            }
+
+            // Validate city
+            $city = $request->input("branchcity{$i}");
+            if (!in_array($city, $this->getSaudiCities())) {
+                throw new \Exception("Invalid city selected for branch: {$branch_name}");
+            }
+
+            $branch = new branchs();
+            $branch->branch_name = $branch_name;
+            $branch->branch_manager_name = $request->input("branchmanager{$i}");
+            $branch->branch_manager_phone = $phone;
+            $branch->branch_address = $request->input("branchAddress{$i}");
+            $branch->branch_city = $city;
+            $branch->contracts_id = $contract->id;
+            $branch->save();
         }
+
 
         // Calculate payment amounts
         $amount = floatval($request->contractamount);
@@ -356,7 +355,7 @@ class ContractsController extends Controller
                 'equipment_description' => 'required|string',
                 'contractamount' => 'required|numeric|min:0',
                 'warranty' => 'required|numeric|min:0',
-                'payment_type'=> 'required|in:postpaid,prepaid',
+                'payment_type' => 'required|in:postpaid,prepaid',
                 'number_of_installments' => 'required_if:payment_type,postpaid|integer|min:1|max:12',
             ];
 
@@ -449,7 +448,7 @@ class ContractsController extends Controller
                 $payment->save();
             } else {
                 $payment_amount = $total_amount / intval($request->number_of_payments);
-    
+
                 // Create first payment using first_payment_date
                 try {
                     $this->create_payment($contract->id, $client->id, $payment_amount, $request->first_payment_date);
@@ -457,7 +456,7 @@ class ContractsController extends Controller
                     Log::error('Error creating first payment: ' . $e->getMessage());
                     return back()->with('error', 'Error creating first payment: ' . $e->getMessage());
                 }
-    
+
                 if ($request->payment_schedule === 'monthly') {
                     // Create remaining monthly payments
                     $payment_date = Carbon::parse($request->first_payment_date);
@@ -475,7 +474,6 @@ class ContractsController extends Controller
 
             DB::commit();
             return redirect()->route('contract.show.details', $contract->id)->with('success', 'Equipment contract created successfully.');
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error creating equipment contract: ' . $e->getMessage());
@@ -609,17 +607,17 @@ class ContractsController extends Controller
                     if (isset($branchIds[$index])) {
                         $branch = branchs::find($branchIds[$index]);
                         if ($branch) {
-                            try{
+                            try {
                                 $branch->update($branchData);
-                            }catch(Exception $e){
+                            } catch (Exception $e) {
                                 Log::error($e->getMessage());
                             }
                         }
                     } else {
                         // Create new branch
-                        try{
+                        try {
                             branchs::create($branchData);
-                        }catch(Exception $e){
+                        } catch (Exception $e) {
                             Log::error($e->getMessage());
                         }
                     }
@@ -1265,16 +1263,16 @@ class ContractsController extends Controller
     {
         try {
             $contract = contracts::with('client')->findOrFail($id);
-            
+
             // Generate PDF using Laravel's built-in View to String conversion
             $pdf_content = view('contracts.contract_pdf', compact('contract'))->render();
-            
+
             // Set response headers for PDF download
             $headers = [
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => 'attachment; filename="contract_' . $contract->contract_number . '.pdf"',
             ];
-            
+
             // For now, we'll return the HTML view until we implement the PDF package
             return response($pdf_content, 200, [
                 'Content-Type' => 'text/html',
@@ -1287,7 +1285,7 @@ class ContractsController extends Controller
 
     public function generatePDF($id)
     {
-        $contract = contracts::with('customer','branchs','visitSchedules','payments','type','history')->findOrFail($id);
+        $contract = contracts::with('customer', 'branchs', 'visitSchedules', 'payments', 'type', 'history')->findOrFail($id);
         $template = view('pdf_templates.contract_pdf', compact('contract'))->render();
         $filename = 'contract_' . $contract->contract_number . '.pdf';
 

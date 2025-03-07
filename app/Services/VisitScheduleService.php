@@ -17,53 +17,210 @@ class VisitScheduleService
         10, // 10:00 AM - 12:00 PM
         12, // 12:00 PM - 2:00 PM
         14,  // 2:00 PM - 4:00 PM
-        16, // 4:00 PM - 6:00 PM
     ];
+
+    /**
+     * Calculate visit frequency based on the total number of visits
+     * 
+     * @param int $numberOfVisits Total number of visits in the contract
+     * @return array Returns [monthInterval, visitsPerInterval]
+     */
+    private function calculateVisitFrequency(int $numberOfVisits): array
+    {
+        // Default: 1 visit per month
+        $monthInterval = 1;
+        $visitsPerInterval = 1;
+
+        // Determine frequency based on number of visits
+        switch (true) {
+            case $numberOfVisits == 24: // 2 visits per month
+                $monthInterval = 1;
+                $visitsPerInterval = 2;
+                break;
+            case $numberOfVisits == 12: // 1 visit per month
+                $monthInterval = 1;
+                $visitsPerInterval = 1;
+                break;
+            case $numberOfVisits == 6: // 1 visit every 2 months
+                $monthInterval = 2;
+                $visitsPerInterval = 1;
+                break;
+            case $numberOfVisits == 4: // 1 visit every 3 months
+                $monthInterval = 3;
+                $visitsPerInterval = 1;
+                break;
+            default:
+                // For other numbers, calculate the best distribution
+                // Contract duration is typically 1 year (12 months)
+                if ($numberOfVisits > 12) {
+                    // More than monthly visits needed
+                    $monthInterval = 1;
+                    $visitsPerInterval = ceil($numberOfVisits / 12);
+                } else {
+                    // Less than monthly visits needed
+                    $monthInterval = floor(12 / $numberOfVisits);
+                    $visitsPerInterval = 1;
+                }
+        }
+
+        return [$monthInterval, $visitsPerInterval];
+    }
 
     private function generateVisitDates(Carbon $startDate, int $numberOfVisits, array $existingBranchDates = []): array
     {
         $visitDates = [];
         $currentDate = $startDate->copy();
-        $usedDates = []; // Track used dates to ensure one visit per day
+        
+        // Calculate visit frequency
+        [$monthInterval, $visitsPerInterval] = $this->calculateVisitFrequency($numberOfVisits);
+        
+        // Calculate how many intervals we need
+        $totalIntervals = ceil($numberOfVisits / $visitsPerInterval);
+        
+        for ($interval = 0; $interval < $totalIntervals; $interval++) {
+            // Set the month for this interval
+            $intervalDate = $currentDate->copy()->addMonths($interval * $monthInterval);
+            
+            // Schedule the visits for this interval
+            $visitsThisInterval = min($visitsPerInterval, $numberOfVisits - count($visitDates));
+            $usedDatesThisMonth = [];
+            
+            // Try to distribute visits evenly within the month
+            $weekSpacing = floor(4 / $visitsThisInterval);
+            
+            for ($visitNum = 0; $visitNum < $visitsThisInterval; $visitNum++) {
+                $weekOffset = $visitNum * max(1, $weekSpacing);
+                $visitAttemptDate = $intervalDate->copy()->addWeeks($weekOffset);
+                
+                // Find a suitable day for this visit
+                $visitDate = $this->findSuitableDayForVisit(
+                    $visitAttemptDate, 
+                    $usedDatesThisMonth, 
+                    $existingBranchDates
+                );
+                
+                if ($visitDate) {
+                    $visitDates[] = $visitDate;
+                    $usedDatesThisMonth[] = $visitDate->format('Y-m-d');
+                }
+            }
+            
+            // Safety check to prevent infinite loop
+            if (count($visitDates) >= $numberOfVisits) {
+                break;
+            }
+        }
+        
+        // If we couldn't schedule all visits, try to fill in the gaps
+        if (count($visitDates) < $numberOfVisits) {
+            $remainingVisits = $numberOfVisits - count($visitDates);
+            $fillerDates = $this->fillRemainingVisits(
+                $startDate, 
+                $remainingVisits, 
+                $visitDates, 
+                $existingBranchDates
+            );
+            
+            $visitDates = array_merge($visitDates, $fillerDates);
+        }
 
-        while (count($visitDates) < $numberOfVisits) {
+        // Sort visits by date
+        usort($visitDates, function ($a, $b) {
+            return $a->timestamp - $b->timestamp;
+        });
+
+        return $visitDates;
+    }
+    
+    /**
+     * Find a suitable day for a visit, avoiding Fridays and already used dates
+     */
+    private function findSuitableDayForVisit(Carbon $attemptDate, array $usedDates, array $existingBranchDates): ?Carbon
+    {
+        $maxAttempts = 10; // Prevent infinite loops
+        $attempts = 0;
+        
+        while ($attempts < $maxAttempts) {
+            // Skip Fridays
+            if ($attemptDate->isFriday()) {
+                $attemptDate->addDay();
+                $attempts++;
+                continue;
+            }
+            
+            $dateString = $attemptDate->format('Y-m-d');
+            
+            // Skip if we already scheduled a visit for this day
+            if (in_array($dateString, $usedDates)) {
+                $attemptDate->addDay();
+                $attempts++;
+                continue;
+            }
+            
+            // Try to find an available time slot for this day
+            foreach (self::$timeSlots as $timeSlot) {
+                $visitTime = $attemptDate->copy()->setHour($timeSlot)->setMinute(0)->setSecond(0);
+                
+                if (!$visitTime->isPast()) {
+                    $fullDateTime = $visitTime->format('Y-m-d H:i:s');
+                    if (!in_array($fullDateTime, $existingBranchDates)) {
+                        return $visitTime;
+                    }
+                }
+            }
+            
+            // No available slots on this day, try the next day
+            $attemptDate->addDay();
+            $attempts++;
+        }
+        
+        return null; // Could not find a suitable day
+    }
+    
+    /**
+     * Fill in any remaining visits that couldn't be scheduled with the main algorithm
+     */
+    private function fillRemainingVisits(Carbon $startDate, int $remainingVisits, array $scheduledVisits, array $existingBranchDates): array
+    {
+        $additionalDates = [];
+        $usedDates = array_map(function ($date) {
+            return $date->format('Y-m-d');
+        }, $scheduledVisits);
+        
+        $currentDate = $startDate->copy();
+        $endDate = $startDate->copy()->addYear();
+        
+        while (count($additionalDates) < $remainingVisits && $currentDate->lt($endDate)) {
+            // Skip if this date is already used
+            if (in_array($currentDate->format('Y-m-d'), $usedDates)) {
+                $currentDate->addDay();
+                continue;
+            }
+            
             // Skip Fridays
             if ($currentDate->isFriday()) {
                 $currentDate->addDay();
                 continue;
             }
-
-            $dateString = $currentDate->format('Y-m-d');
             
-            // Skip if we already scheduled a visit for this day
-            if (in_array($dateString, $usedDates)) {
-                $currentDate->addDay();
-                continue;
-            }
-            
-            // Try to find an available time slot for this day
+            // Try to find an available time slot
             foreach (self::$timeSlots as $timeSlot) {
                 $visitTime = $currentDate->copy()->setHour($timeSlot)->setMinute(0)->setSecond(0);
                 
                 if (!$visitTime->isPast()) {
                     $fullDateTime = $visitTime->format('Y-m-d H:i:s');
                     if (!in_array($fullDateTime, $existingBranchDates)) {
-                        $visitDates[] = $visitTime;
-                        $usedDates[] = $dateString;
+                        $additionalDates[] = $visitTime;
+                        $usedDates[] = $currentDate->format('Y-m-d');
                         break; // Only one visit per day
                     }
                 }
             }
-
-            $currentDate->addDay();
             
-            // Add safety check to prevent infinite loop
-            if ($currentDate->diffInDays($startDate) > 365) {
-                throw new \Exception('Unable to schedule all visits within one year');
-            }
+            $currentDate->addDay();
         }
-
-        return $visitDates;
+        
+        return $additionalDates;
     }
 
     private function findAvailableTeamAndSlot($visitDate, array $usedTeamSlots)

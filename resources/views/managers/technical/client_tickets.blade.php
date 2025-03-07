@@ -2,6 +2,21 @@
 @section('title', 'Client Tickets')
 @section('content')
 <div class="page-content">
+    @if(session('error'))
+    <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bx bx-error-circle me-1"></i>
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
+    @if(session('success'))
+    <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bx bx-check-circle me-1"></i>
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
     <div class="mb-3 page-breadcrumb d-none d-sm-flex align-items-center">
         <div class="breadcrumb-title pe-3">Technical Manager</div>
         <div class="ps-3">

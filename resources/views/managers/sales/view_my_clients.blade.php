@@ -1,6 +1,21 @@
 @extends('shared.dashboard')
 @section('content')
     <div class="page-content">
+        @if(session('error'))
+        <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bx bx-error-circle me-1"></i>
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        @endif
+    
+        @if(session('success'))
+        <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bx bx-check-circle me-1"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        @endif
         <div class="mb-4 page-breadcrumb d-flex align-items-center">
             <div class="pe-3 breadcrumb-title d-flex align-items-center">
                 <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
@@ -18,7 +33,7 @@
             </div>
         </div>
 
-        <div class="card shadow-sm">
+        <div class="shadow-sm card">
             <div class="card-body">
                 <div class="table-responsive">
                     <table id="clientsTable" class="table table-hover">
@@ -43,7 +58,7 @@
                                             </div>
                                             <div class="ms-2">
                                                 <a href="{{ route('view.my.clients.details', ['id' => $item->id]) }}" 
-                                                   class="text-primary mb-0 fw-semibold text-decoration-none">
+                                                   class="mb-0 text-primary fw-semibold text-decoration-none">
                                                     {{ $item->name }}
                                                 </a>
                                             </div>

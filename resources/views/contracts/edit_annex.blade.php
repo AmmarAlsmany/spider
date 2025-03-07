@@ -2,6 +2,21 @@
 @section('content')
 <div class="container">
     <div class="page-content">
+        @if(session('error'))
+        <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bx bx-error-circle me-1"></i>
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        @endif
+    
+        @if(session('success'))
+        <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bx bx-check-circle me-1"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        @endif
         <div class="mb-4 page-breadcrumb d-sm-flex align-items-center">
             <div class="breadcrumb-title pe-3 fw-bold text-primary">Contract Management</div>
             <div class="ps-3">
@@ -44,8 +59,8 @@
                                     @foreach($branches->where('contracts_id', $contract->id) as $index => $branch)
                                     <div class="mb-4 branch-section" data-branch-index="{{ $index }}">
                                         <div class="col-md-12">
-                                            <div class="card h-100 border-0 shadow-sm">
-                                                <div class="card-header bg-primary bg-gradient text-white d-flex justify-content-between align-items-center">
+                                            <div class="border-0 shadow-sm card h-100">
+                                                <div class="text-white card-header bg-primary bg-gradient d-flex justify-content-between align-items-center">
                                                     <h6 class="mb-0"><i class="bx bx-building me-2"></i>Branch Information</h6>
                                                     @if($index > 0)
                                                     <button type="button" class="btn btn-outline-light btn-sm remove-branch">
@@ -57,7 +72,7 @@
                                                     <div class="row">
                                                         <input type="hidden" name="branches[{{ $index }}][id]" value="{{ $branch->id }}">
                                                         
-                                                        <div class="col-md-6 mb-3">
+                                                        <div class="mb-3 col-md-6">
                                                             <label class="form-label">Branch Name <span class="text-danger">*</span></label>
                                                             <input type="text" class="form-control @error('branches.'.$index.'.branch_name') is-invalid @enderror"
                                                                 name="branches[{{ $index }}][branch_name]" placeholder="Enter Branch Name" required
@@ -67,7 +82,7 @@
                                                             @enderror
                                                         </div>
 
-                                                        <div class="col-md-6 mb-3">
+                                                        <div class="mb-3 col-md-6">
                                                             <label class="form-label">Branch City <span class="text-danger">*</span></label>
                                                             <select class="form-select @error('branches.'.$index.'.branch_city') is-invalid @enderror"
                                                                 name="branches[{{ $index }}][branch_city]" required>
@@ -83,7 +98,7 @@
                                                             @enderror
                                                         </div>
 
-                                                        <div class="col-md-6 mb-3">
+                                                        <div class="mb-3 col-md-6">
                                                             <label class="form-label">Branch Manager Name <span class="text-danger">*</span></label>
                                                             <input type="text" class="form-control @error('branches.'.$index.'.branch_manager_name') is-invalid @enderror"
                                                                 name="branches[{{ $index }}][branch_manager_name]" placeholder="Enter Branch Manager Name" required
@@ -93,7 +108,7 @@
                                                             @enderror
                                                         </div>
 
-                                                        <div class="col-md-6 mb-3">
+                                                        <div class="mb-3 col-md-6">
                                                             <label class="form-label">Branch Manager Phone <span class="text-danger">*</span></label>
                                                             <div class="input-group">
                                                                 <span class="input-group-text bg-light">+966</span>
@@ -107,7 +122,7 @@
                                                             <small class="text-muted">Enter 9 digits without the country code</small>
                                                         </div>
 
-                                                        <div class="col-12 mb-3">
+                                                        <div class="mb-3 col-12">
                                                             <label class="form-label">Branch Address <span class="text-danger">*</span></label>
                                                             <textarea class="form-control @error('branches.'.$index.'.branch_address') is-invalid @enderror"
                                                                 name="branches[{{ $index }}][branch_address]" placeholder="Enter complete branch address" required
@@ -125,21 +140,21 @@
                                 </div>
 
                                 <!-- Add Branch Button -->
-                                <div class="mb-4 col-12 text-center">
-                                    <button type="button" class="btn btn-success btn-lg px-4" id="addBranch">
+                                <div class="mb-4 text-center col-12">
+                                    <button type="button" class="px-4 btn btn-success btn-lg" id="addBranch">
                                         <i class="bx bx-plus-circle me-2"></i>Add Another Branch
                                     </button>
                                 </div>
 
                                 <!-- Payment Information -->
                                 <div class="col-12">
-                                    <div class="card border-0 shadow-sm">
-                                        <div class="card-header bg-primary bg-gradient text-white">
+                                    <div class="border-0 shadow-sm card">
+                                        <div class="text-white card-header bg-primary bg-gradient">
                                             <h6 class="mb-0"><i class="bx bx-money me-2"></i>Payment Information</h6>
                                         </div>
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-md-6 mb-3">
+                                                <div class="mb-3 col-md-6">
                                                     <label class="form-label">Additional Amount <span class="text-danger">*</span></label>
                                                     <div class="input-group">
                                                         <span class="input-group-text">SAR</span>
@@ -152,7 +167,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-6 mb-3">
+                                                <div class="mb-3 col-md-6">
                                                     <label class="form-label">Due Date <span class="text-danger">*</span></label>
                                                     <input type="date" class="form-control @error('due_date') is-invalid @enderror"
                                                         name="due_date" required min="{{ date('Y-m-d') }}"

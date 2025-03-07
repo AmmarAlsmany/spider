@@ -1,6 +1,21 @@
 @extends('shared.dashboard')
 @section('content')
 <div class="container">
+    @if(session('error'))
+    <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bx bx-error-circle me-1"></i>
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
+    @if(session('success'))
+    <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bx bx-check-circle me-1"></i>
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
     <div class="page-content">
         <!-- Breadcrumb -->
         <div class="mb-4 page-breadcrumb d-sm-flex align-items-center">

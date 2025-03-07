@@ -1,6 +1,21 @@
 @extends('shared.dashboard')
 @section('content')
     <div class="page-content">
+        @if(session('error'))
+        <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bx bx-error-circle me-1"></i>
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        @endif
+    
+        @if(session('success'))
+        <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bx bx-check-circle me-1"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        @endif
         <div class="mb-4 page-breadcrumb d-flex align-items-center">
             <div class="pe-3 breadcrumb-title d-flex align-items-center">
                 <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
@@ -18,7 +33,7 @@
             </div>
         </div>
 
-        <div class="card shadow-sm">
+        <div class="shadow-sm card">
             <div class="card-body">
                 @include('shared.contract_search')
                 <div class="table-responsive">
@@ -85,7 +100,7 @@
                                     <td>
                                         @if ($contract->contract_status == 'approved')
                                             <a href="{{ route('sales_person.view.contract', ['id' => $contract->id]) }}"
-                                               class="btn btn-primary btn-sm shadow-sm">
+                                               class="shadow-sm btn btn-primary btn-sm">
                                                 <i class="bi bi-eye me-1"></i>View Visit Details
                                             </a>
                                         @else

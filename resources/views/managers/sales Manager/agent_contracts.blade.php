@@ -1,6 +1,21 @@
 @extends('shared.dashboard')
 @section('content')
 <div class="page-content">
+    @if(session('error'))
+    <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bx bx-error-circle me-1"></i>
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
+    @if(session('success'))
+    <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bx bx-check-circle me-1"></i>
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
     <div class="card radius-10">
         <div class="card-header">
             <div class="d-flex align-items-center">
@@ -15,12 +30,7 @@
             </div>
         </div>
         <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
-            <div class="row mb-3">
+            <div class="mb-3 row">
                 <div class="col-md-6">
                     <form action="{{ route('sales_manager.agent.contracts', $agent->id) }}" method="GET" class="d-flex">
                         <input type="text" name="search" class="form-control me-2" 

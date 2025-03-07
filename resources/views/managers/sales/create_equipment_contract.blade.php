@@ -91,6 +91,21 @@ sort($saudiCities);
 </style>
 
 <div class="page-content">
+    @if(session('error'))
+    <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bx bx-error-circle me-1"></i>
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
+    @if(session('success'))
+    <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bx bx-check-circle me-1"></i>
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
     <!--breadcrumb-->
     <div class="mb-4 page-breadcrumb d-flex align-items-center">
         <div class="pe-3 breadcrumb-title d-flex align-items-center">
@@ -361,7 +376,7 @@ sort($saudiCities);
                                             <div class="col-6"><strong>Total Amount:</strong></div>
                                             <div class="col-6 text-end"><strong x-text="'SAR ' + (Number(contractAmount) * 1.15).toFixed(2)"></strong></div>
                                             <template x-if="payment_type === 'postpaid'">
-                                                <div class="col-12 mt-2">
+                                                <div class="mt-2 col-12">
                                                     <div class="row">
                                                         <div class="col-6">Payment per Installment:</div>
                                                         <div class="col-6 text-end" x-text="'SAR ' + (Number(contractAmount) * 1.15 / numberOfPayments).toFixed(2)"></div>
@@ -388,7 +403,7 @@ sort($saudiCities);
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-body">
-                                            <h5 class="card-title mb-4">Contract Summary</h5>
+                                            <h5 class="mb-4 card-title">Contract Summary</h5>
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <h6 class="mb-3">Equipment Information</h6>

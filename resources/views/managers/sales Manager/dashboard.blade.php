@@ -1,6 +1,21 @@
 @extends('shared.dashboard')
 @section('content')
 <div class="page-content">
+    @if(session('error'))
+    <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bx bx-error-circle me-1"></i>
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
+    @if(session('success'))
+    <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bx bx-check-circle me-1"></i>
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
     <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
         <div class="col">
             <div class="border-0 border-4 card radius-10 border-start border-info">
@@ -99,7 +114,7 @@
                                     <td>{{ $contract->customer->name }}</td>
                                     <td>{{ $contract->salesRepresentative->name }}</td>
                                     <td>
-                                        <span class="badge bg-gradient-quepal text-white shadow-sm w-100">
+                                        <span class="text-white shadow-sm badge bg-gradient-quepal w-100">
                                             {{ ucfirst($contract->contract_status) }}
                                         </span>
                                     </td>

@@ -1,6 +1,7 @@
 @extends('shared.dashboard')
 @section('content')
 <div class="page-content">
+    @include('managers.sales Manager.partials.performance_filters')
     @if(session('error'))
     <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
         <i class="bx bx-error-circle me-1"></i>

@@ -13,6 +13,8 @@ use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentsController;
+use App\Http\Controllers\PesticideAnalyticsController;
+use App\Http\Controllers\PesticideController;
 use App\Http\Controllers\sales;
 use App\Http\Controllers\SalesManagerController;
 use App\Http\Controllers\shared;
@@ -213,13 +215,29 @@ Route::middleware(['auth', 'role:finance', 'prevent-back-history'])->group(funct
 });
 
 // Technical Routes
-Route::middleware(['auth', 'role:technical', 'prevent-back-history'])->group(function () {
+Route::middleware(['auth', 'role:technical'])->group(function () {
     Route::get('/technical/dashboard', [TechnicalController::class, 'dashboard'])->name('technical.dashboard');
     // Team management Routes
     Route::get('/teams', [TechnicalController::class, 'index'])->name('teams.index');
     Route::post('/teams', [TechnicalController::class, 'create'])->name('teams.create');
     Route::put('/teams/{id}', [TechnicalController::class, 'modify'])->name('teams.modify');
     Route::delete('/teams/{id}', [TechnicalController::class, 'delete'])->name('teams.delete');
+    
+    // Pesticide Management Routes
+    Route::prefix('technical/pesticides')->name('technical.pesticides.')->group(function () {
+        Route::get('/', [PesticideController::class, 'index'])->name('index');
+        Route::get('/create', [PesticideController::class, 'create'])->name('create');
+        Route::post('/store', [PesticideController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [PesticideController::class, 'edit'])->name('edit');
+        Route::post('/update/{id}', [PesticideController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [PesticideController::class, 'destroy'])->name('destroy');
+    });
+
+    // Pesticide Analytics Routes
+    Route::get('technical/pesticides/analytics', [PesticideAnalyticsController::class, 'index'])->name('technical.pesticides.analytics');
+    Route::get('technical/pesticides/analytics/team/{teamId}', [PesticideAnalyticsController::class, 'teamReport'])->name('technical.pesticides.analytics.teamReport');
+    Route::get('technical/pesticides/analytics/pesticide/{pesticideSlug}', [PesticideAnalyticsController::class, 'pesticideReport'])->name('technical.pesticides.analytics.pesticideReport');
+    
     // Workers and Team Leaders management
     Route::get('/workers', [TechnicalController::class, 'workersIndex'])->name('workers.index');
     Route::post('/workers', [TechnicalController::class, 'createWorker'])->name('workers.create');

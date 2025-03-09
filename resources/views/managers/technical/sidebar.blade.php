@@ -48,6 +48,32 @@
             </a>
         </li>
 
+        <li class="menu-label">{{ __('messages.inventory') }}</li>
+        <li>
+            <a href="javascript:;" class="has-arrow">
+                <div class="parent-icon"><i class='bx bx-vial'></i>
+                </div>
+                <div class="menu-title">{{ __('messages.pesticide_management') }}</div>
+            </a>
+            <ul>
+                <li>
+                    <a href="{{ route('technical.pesticides.index') }}">
+                        <i class="bx bx-list-ul"></i>{{ __('messages.pesticides') }}
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('technical.pesticides.create') }}">
+                        <i class="bx bx-plus"></i>{{ __('messages.add_new') }}
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('technical.pesticides.analytics') }}">
+                        <i class="bx bx-bar-chart-alt-2"></i>{{ __('messages.pesticide_consumption_analytics') }}
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         <li class="menu-label">{{ __('messages.tickets') }}</li>
         <li>
             <a href="{{ route('technical.client_tickets') }}">

@@ -232,152 +232,42 @@
                             </div>
                             <div class="card-body">
                                 <div class="row">
+                                    @php
+                                        $pesticides = \App\Models\Pesticide::where('active', true)->orderBy('name')->get();
+                                        $halfCount = ceil($pesticides->count() / 2);
+                                        $firstHalf = $pesticides->take($halfCount);
+                                        $secondHalf = $pesticides->slice($halfCount);
+                                    @endphp
+                                    
                                     <div class="col-md-6">
+                                        @foreach($firstHalf as $pesticide)
                                         <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="agenda" id="agenda">
-                                            <label class="form-check-label" for="agenda">Agenda</label>
+                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="{{ $pesticide->slug }}" id="{{ $pesticide->slug }}">
+                                            <label class="form-check-label" for="{{ $pesticide->slug }}">{{ $pesticide->name }}</label>
                                             <div class="mt-1 input-group quantity-input d-none">
-                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[agenda]" placeholder="Quantity">
-                                                <select class="form-select form-select-sm" name="pesticide_unit[agenda]">
+                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[{{ $pesticide->slug }}]" placeholder="Quantity">
+                                                <select class="form-select form-select-sm" name="pesticide_unit[{{ $pesticide->slug }}]">
                                                     <option value="g">Grams</option>
                                                     <option value="ml">Milliliters</option>
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="gel" id="gel">
-                                            <label class="form-check-label" for="gel">Gel</label>
-                                            <div class="mt-1 input-group quantity-input d-none">
-                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[gel]" placeholder="Quantity">
-                                                <select class="form-select form-select-sm" name="pesticide_unit[gel]">
-                                                    <option value="g">Grams</option>
-                                                    <option value="ml">Milliliters</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="snake_away" id="snake_away">
-                                            <label class="form-check-label" for="snake_away">Snake Away</label>
-                                            <div class="mt-1 input-group quantity-input d-none">
-                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[snake_away]" placeholder="Quantity">
-                                                <select class="form-select form-select-sm" name="pesticide_unit[snake_away]">
-                                                    <option value="g">Grams</option>
-                                                    <option value="ml">Milliliters</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="glue_board" id="glue_board">
-                                            <label class="form-check-label" for="glue_board">Glue Board</label>
-                                            <div class="mt-1 input-group quantity-input d-none">
-                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[glue_board]" placeholder="Quantity">
-                                                <select class="form-select form-select-sm" name="pesticide_unit[glue_board]">
-                                                    <option value="g">Grams</option>
-                                                    <option value="ml">Milliliters</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="fly_ribbon" id="fly_ribbon">
-                                            <label class="form-check-label" for="fly_ribbon">Fly Ribbon</label>
-                                            <div class="mt-1 input-group quantity-input d-none">
-                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[fly_ribbon]" placeholder="Quantity">
-                                                <select class="form-select form-select-sm" name="pesticide_unit[fly_ribbon]">
-                                                    <option value="g">Grams</option>
-                                                    <option value="ml">Milliliters</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="roban_pasta" id="roban_pasta">
-                                            <label class="form-check-label" for="roban_pasta">Roban Pasta</label>
-                                            <div class="mt-1 input-group quantity-input d-none">
-                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[roban_pasta]" placeholder="Quantity">
-                                                <select class="form-select form-select-sm" name="pesticide_unit[roban_pasta]">
-                                                    <option value="g">Grams</option>
-                                                    <option value="ml">Milliliters</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="powder" id="powder">
-                                            <label class="form-check-label" for="powder">Powder</label>
-                                            <div class="mt-1 input-group quantity-input d-none">
-                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[powder]" placeholder="Quantity">
-                                                <select class="form-select form-select-sm" name="pesticide_unit[powder]">
-                                                    <option value="g">Grams</option>
-                                                    <option value="ml">Milliliters</option>
-                                                </select>
-                                            </div>
-                                        </div>
+                                        @endforeach
                                     </div>
                                     <div class="col-md-6">
+                                        @foreach($secondHalf as $pesticide)
                                         <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="free_kill" id="free_kill">
-                                            <label class="form-check-label" for="free_kill">Free Kill</label>
+                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="{{ $pesticide->slug }}" id="{{ $pesticide->slug }}">
+                                            <label class="form-check-label" for="{{ $pesticide->slug }}">{{ $pesticide->name }}</label>
                                             <div class="mt-1 input-group quantity-input d-none">
-                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[free_kill]" placeholder="Quantity">
-                                                <select class="form-select form-select-sm" name="pesticide_unit[free_kill]">
+                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[{{ $pesticide->slug }}]" placeholder="Quantity">
+                                                <select class="form-select form-select-sm" name="pesticide_unit[{{ $pesticide->slug }}]">
                                                     <option value="g">Grams</option>
                                                     <option value="ml">Milliliters</option>
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="boomer" id="boomer">
-                                            <label class="form-check-label" for="boomer">Boomer</label>
-                                            <div class="mt-1 input-group quantity-input d-none">
-                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[boomer]" placeholder="Quantity">
-                                                <select class="form-select form-select-sm" name="pesticide_unit[boomer]">
-                                                    <option value="g">Grams</option>
-                                                    <option value="ml">Milliliters</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="glue_tandem" id="glue_tandem">
-                                            <label class="form-check-label" for="glue_tandem">Glue Tandem</label>
-                                            <div class="mt-1 input-group quantity-input d-none">
-                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[glue_tandem]" placeholder="Quantity">
-                                                <select class="form-select form-select-sm" name="pesticide_unit[glue_tandem]">
-                                                    <option value="g">Grams</option>
-                                                    <option value="ml">Milliliters</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="ageta" id="ageta">
-                                            <label class="form-check-label" for="ageta">Ageta</label>
-                                            <div class="mt-1 input-group quantity-input d-none">
-                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[ageta]" placeholder="Quantity">
-                                                <select class="form-select form-select-sm" name="pesticide_unit[ageta]">
-                                                    <option value="g">Grams</option>
-                                                    <option value="ml">Milliliters</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="wax" id="wax">
-                                            <label class="form-check-label" for="wax">Wax</label>
-                                            <div class="mt-1 input-group quantity-input d-none">
-                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[wax]" placeholder="Quantity">
-                                                <select class="form-select form-select-sm" name="pesticide_unit[wax]">
-                                                    <option value="g">Grams</option>
-                                                    <option value="ml">Milliliters</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="pesticides_used[]" value="hotac" id="hotac">
-                                            <label class="form-check-label" for="hotac">Hotac</label>
-                                            <div class="mt-1 input-group quantity-input d-none">
-                                                <input type="number" min="0" step="0.01" class="form-control form-control-sm" name="pesticide_quantity[hotac]" placeholder="Quantity">
-                                                <select class="form-select form-select-sm" name="pesticide_unit[hotac]">
-                                                    <option value="g">Grams</option>
-                                                    <option value="ml">Milliliters</option>
-                                                </select>
-                                            </div>
-                                        </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>

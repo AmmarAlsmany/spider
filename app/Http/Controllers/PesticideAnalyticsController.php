@@ -288,13 +288,13 @@ class PesticideAnalyticsController extends Controller
         // Get all visit reports that used this pesticide
         $reports = VisitReport::with(['visit.team', 'createdBy'])
             ->whereHas('visit', function ($q) use ($startDate, $endDate) {
-                $q->whereDate('visit_date', '>=', $startDate)
-                  ->whereDate('visit_date', '<=', $endDate);
+                $q->whereDate('created_at', '>=', $startDate)
+                  ->whereDate('created_at', '<=', $endDate);
             })
             ->whereRaw("JSON_CONTAINS(pesticides_used, '\"$pesticideSlug\"')")
             ->orderBy('created_at', 'desc')
             ->get();
-        
+            // dd($reports);
         return view('managers.technical.pesticides.pesticide-report', compact(
             'pesticide',
             'startDate',

@@ -1,5 +1,4 @@
 @extends('shared.dashboard')
-
 @section('content')
 <div class="container-fluid">
     <div class="row justify-content-center">
@@ -8,7 +7,8 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <span>{{ __('messages.pesticide_usage_report') }}: {{ $pesticide->name }}</span>
-                        <a href="{{ route('technical.pesticides.analytics', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-sm btn-secondary">
+                        <a href="{{ route('technical.pesticides.analytics', ['start_date' => $startDate, 'end_date' => $endDate]) }}"
+                            class="btn btn-sm btn-secondary">
                             <i class="fas fa-arrow-left"></i> {{ __('messages.back_to_analytics') }}
                         </a>
                     </div>
@@ -16,30 +16,34 @@
 
                 <div class="card-body">
                     @if (session('success'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('success') }}
-                        </div>
+                    <div class="alert alert-success" role="alert">
+                        {{ session('success') }}
+                    </div>
                     @endif
 
                     @if (session('error'))
-                        <div class="alert alert-danger" role="alert">
-                            {{ session('error') }}
-                        </div>
+                    <div class="alert alert-danger" role="alert">
+                        {{ session('error') }}
+                    </div>
                     @endif
 
                     <!-- Date Range Filter -->
-                    <form method="GET" action="{{ route('technical.pesticides.analytics.pesticideReport', $pesticide->slug) }}" class="mb-4">
+                    <form method="GET"
+                        action="{{ route('technical.pesticides.analytics.pesticideReport', $pesticide->slug) }}"
+                        class="mb-4">
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="start_date">{{ __('messages.start_date') }}</label>
-                                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ $startDate }}">
+                                    <input type="date" class="form-control" id="start_date" name="start_date"
+                                        value="{{ $startDate }}">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="end_date">{{ __('messages.end_date') }}</label>
-                                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ $endDate }}">
+                                    <input type="date" class="form-control" id="end_date" name="end_date"
+                                        value="{{ $endDate }}">
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -63,21 +67,23 @@
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="alert alert-primary">
-                                                <strong>{{ __('messages.total_usage') }}:</strong> {{ $totalUsage }} {{ __('messages.units') }}
+                                                <strong>{{ __('messages.total_usage') }}:</strong> {{ $totalUsage }} {{
+                                                __('messages.units') }}
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="alert alert-info">
-                                                <strong>{{ __('messages.teams_using') }}:</strong> {{ count($teamUsage) }}
+                                                <strong>{{ __('messages.teams_using') }}:</strong> {{ count($teamUsage)
+                                                }}
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="alert alert-success">
-                                                <strong>{{ __('messages.status') }}:</strong> 
+                                                <strong>{{ __('messages.status') }}:</strong>
                                                 @if($pesticide->active)
-                                                    <span class="badge badge-success">{{ __('messages.active') }}</span>
+                                                <span class="badge badge-success">{{ __('messages.active') }}</span>
                                                 @else
-                                                    <span class="badge badge-danger">{{ __('messages.inactive') }}</span>
+                                                <span class="badge badge-danger">{{ __('messages.inactive') }}</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -103,25 +109,26 @@
                             </thead>
                             <tbody>
                                 @forelse($teamUsage as $teamId => $data)
-                                    <tr>
-                                        <td>{{ $data['team_name'] }}</td>
-                                        <td>{{ $data['total_quantity'] }}</td>
-                                        <td>{{ $data['unit_counts']['g'] }}</td>
-                                        <td>{{ $data['unit_counts']['ml'] }}</td>
-                                        <td>
-                                            {{ $totalUsage > 0 ? number_format(($data['total_quantity'] / $totalUsage) * 100, 1) : 0 }}%
-                                        </td>
-                                        <td>
-                                            <a href="{{ route('technical.pesticides.analytics.teamReport', ['teamId' => $teamId, 'start_date' => $startDate, 'end_date' => $endDate]) }}" 
-                                               class="btn btn-sm btn-info">
-                                                <i class="fas fa-users"></i> {{ __('messages.view_team_report') }}
-                                            </a>
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td>{{ $data['team_name'] }}</td>
+                                    <td>{{ $data['total_quantity'] }}</td>
+                                    <td>{{ $data['unit_counts']['g'] }}</td>
+                                    <td>{{ $data['unit_counts']['ml'] }}</td>
+                                    <td>
+                                        {{ $totalUsage > 0 ? number_format(($data['total_quantity'] / $totalUsage) *
+                                        100, 1) : 0 }}%
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('technical.pesticides.analytics.teamReport', ['teamId' => $teamId, 'start_date' => $startDate, 'end_date' => $endDate]) }}"
+                                            class="btn btn-sm btn-info">
+                                            <i class="fas fa-users"></i> {{ __('messages.view_team_report') }}
+                                        </a>
+                                    </td>
+                                </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center">{{ __('messages.no_team_usage_data') }}</td>
-                                    </tr>
+                                <tr>
+                                    <td colspan="6" class="text-center">{{ __('messages.no_team_usage_data') }}</td>
+                                </tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -149,33 +156,34 @@
                             </thead>
                             <tbody>
                                 @forelse($reports as $report)
-                                    @php
-                                        $pesticidesUsed = json_decode($report->pesticides_used, true) ?? [];
-                                        $pesticideQuantities = json_decode($report->pesticide_quantities, true) ?? [];
-                                        
-                                        if (!in_array($pesticide->slug, $pesticidesUsed)) {
-                                            continue;
-                                        }
-                                        
-                                        $quantity = $pesticideQuantities[$pesticide->slug]['quantity'] ?? 0;
-                                        $unit = $pesticideQuantities[$pesticide->slug]['unit'] ?? 'g';
-                                    @endphp
-                                    <tr>
-                                        <td>{{ \Carbon\Carbon::parse($report->visit->visit_date)->format('Y-m-d') }}</td>
-                                        <td>{{ $report->visit->team->name ?? 'N/A' }}</td>
-                                        <td>{{ ucfirst($report->visit_type) }}</td>
-                                        <td>{{ $report->createdBy->name ?? 'N/A' }}</td>
-                                        <td>{{ $quantity }}{{ $unit }}</td>
-                                        <td>
-                                            <a href="{{ route('visit.report.view', $report->visit_id) }}" class="btn btn-sm btn-info">
-                                                <i class="fas fa-eye"></i> {{ __('messages.view_report') }}
-                                            </a>
-                                        </td>
-                                    </tr>
+                                @php
+                                $pesticidesUsed = json_decode($report->pesticides_used, true) ?? [];
+                                $pesticideQuantities = json_decode($report->pesticide_quantities, true) ?? [];
+
+                                if (!in_array($pesticide->slug, $pesticidesUsed)) {
+                                    continue;
+                                }
+
+                                $quantity = $pesticideQuantities[$pesticide->slug]['quantity'] ?? 0;
+                                $unit = $pesticideQuantities[$pesticide->slug]['unit'] ?? 'g';
+                                @endphp
+                                <tr>
+                                    <td>{{ \Carbon\Carbon::parse($report->visit->visit_date)->format('Y-m-d') }}</td>
+                                    <td>{{ $report->visit->team->name ?? 'N/A' }}</td>
+                                    <td>{{ ucfirst($report->visit_type) }}</td>
+                                    <td>{{ $report->createdBy->name ?? 'N/A' }}</td>
+                                    <td>{{ $quantity }}{{ $unit }}</td>
+                                    <td>
+                                        <a href="{{ route('visit.report.view', $report->visit_id) }}"
+                                            class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i> {{ __('messages.view_report') }}
+                                        </a>
+                                    </td>
+                                </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center">{{ __('messages.no_reports_found') }}</td>
-                                    </tr>
+                                <tr>
+                                    <td colspan="6" class="text-center">{{ __('messages.no_reports_found') }}</td>
+                                </tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -192,20 +200,23 @@
 <script>
     $(document).ready(function() {
         // Prepare data for chart
-        const timelineData = @json(collect($teamUsage)->flatMap(function($team) {
+        @php
+        $chartData = collect($teamUsage)->flatMap(function($team) {
             return collect($team['dates'] ?? [])->map(function($quantity, $date) use ($team) {
                 return [
                     'date' => $date,
                     'team' => $team['team_name'],
-                    'quantity' => $quantity
+                    'quantity' => (float) $quantity
                 ];
             });
         })->groupBy('date')->map(function($group) {
             return [
                 'date' => $group->first()['date'],
-                'total' => $group->sum('quantity')
+                'total' => (float) $group->sum('quantity')
             ];
-        })->sortBy('date')->values()->toArray());
+        })->sortBy('date')->values();
+        @endphp
+        const timelineData = @json($chartData);
 
         // Create chart
         if (timelineData.length > 0) {

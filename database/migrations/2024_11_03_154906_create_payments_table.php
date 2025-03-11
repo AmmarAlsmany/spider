@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('invoice_number')->unique();
             $table->enum('payment_method',["cash","bank transfer"])->nullable();
             $table->enum('payment_status',["unpaid","paid","overdue","pending"])->default("unpaid");
+            $table->boolean('reconciled')->default(false);
             $table->float('payment_amount')->default(0.0);
             $table->date('due_date');
             $table->date('paid_at')->nullable();

@@ -54,13 +54,18 @@
                         </p>
                     </div>
                     <div class="gap-2 d-flex flex-column flex-md-row">
-                        @if($contract->status !== 'stopped')
-                        <button class="btn btn-danger w-100 w-md-auto" onclick="stopContract({{ $contract->id }})">
-                            <i class="bx bx-stop-circle me-1"></i>
-                            {{ __('contract_details_new.button_stop_contract') }}
-                        </button>
+                        @if($contract->contract_status !== 'stopped')
+                        <form action="{{ route('contract.stop', $contract->id) }}" method="POST" style="display: inline-block; margin: 0; padding: 0;">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-danger w-100 w-md-auto">
+                                <i class="bx bx-stop-circle me-1"></i>
+                                {{ __('contract_details_new.button_stop_contract') }}
+                            </button>
+                        </form>
                         @endif
-                        <a href="{{ route('contract.pdf.generate', $contract->id) }}" class="btn btn-success w-100 w-md-auto">
+                        <a href="{{ route('contract.pdf.generate', $contract->id) }}"
+                            class="btn btn-success w-100 w-md-auto">
                             <i class="bx bx-download me-1"></i>
                             {{ __('contract_details_new.button_download_pdf') }}
                         </a>
@@ -69,13 +74,15 @@
                             {{ __('contract_details_new.button_edit_contract') }}
                         </a>
                         {{-- create annex --}}
-                        <a href="{{ route('contracts.annex.create', $contract->id) }}" class="btn btn-primary w-100 w-md-auto">
+                        <a href="{{ route('contracts.annex.create', $contract->id) }}"
+                            class="btn btn-primary w-100 w-md-auto">
                             <i class="bx bx-plus me-1"></i>
                             {{ __('contract_details_new.button_add_annex') }}
                         </a>
                         {{-- end create annex --}}
                         {{-- view the visit schedule --}}
-                        <a href="{{ route('view.contract.visit', $contract->id) }}" class="btn btn-info w-100 w-md-auto">
+                        <a href="{{ route('view.contract.visit', $contract->id) }}"
+                            class="btn btn-info w-100 w-md-auto">
                             <i class="bx bx-show me-1"></i>
                             {{ __('contract_details_new.button_view_visit') }}
                         </a>
@@ -631,30 +638,6 @@
     };
     function getCsrfToken() {
         return document.querySelector('meta[name="csrf-token"]').content;
-    }
-
-    function stopContract(contractId) {
-        if (confirm('{{ __("contract_details_new.confirm_stop_contract") }}')) {
-            fetch(`/sales/stop-Contract/${contractId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': getCsrfToken()
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('{{ __("contract_details_new.error_occurred") }}');
-            });
-        }
     }
 
     function editBranch(branchId) {

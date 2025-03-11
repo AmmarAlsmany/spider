@@ -12,7 +12,7 @@
     <!--navigation-->
     <ul class="metismenu" id="menu">
         <li>
-            <a href="{{ route('finance.dashboard') }}">
+            <a href="{{ route('finance.dashboard') }}" class="nav-link {{ request()->routeIs('finance.dashboard') ? 'active' : '' }}">
                 <div class="parent-icon"><i class='bx bx-home-alt'></i></div>
                 <div class="menu-title">{{ __('messages.dashboard') }}</div>
             </a>
@@ -20,29 +20,73 @@
 
         <li class="menu-label">{{ __('messages.financial_management') }}</li>
         <li class="mm-active">
-            <a href="javascript:;" class="has-arrow">
+            <a href="{{ route('finance.invoices') }}" class="nav-link {{ request()->routeIs('finance.invoices*') ? 'active' : '' }}">
+                <div class="parent-icon"><i class='bx bx-file'></i></div>
+                <div class="menu-title">{{ __('messages.invoices') }}</div>
+            </a>
+        </li>
+        <li class="mm-active">
+            <a href="{{ route('finance.payments') }}" class="nav-link {{ request()->routeIs('finance.payments') ? 'active' : '' }}">
                 <div class="parent-icon"><i class='bx bx-money'></i></div>
-                <div class="menu-title">{{ __('messages.payments') }}</div>
+                <div class="menu-title">{{ __('messages.all_payments') }}</div>
+            </a>
+        </li>
+        <li class="mm-active">
+            <a href="{{ route('finance.payments.pending') }}" class="nav-link {{ request()->routeIs('finance.payments.pending') ? 'active' : '' }}">
+                <div class="parent-icon"><i class='bx bx-clock'></i></div>
+                <div class="menu-title">{{ __('messages.pending_payments') }}</div>
+            </a>
+        </li>
+        <li class="mm-active">
+            <a href="{{ route('finance.reconciliation.index') }}" class="nav-link {{ request()->routeIs('finance.reconciliation*') ? 'active' : '' }}">
+                <div class="parent-icon"><i class='bx bx-balance-scale'></i></div>
+                <div class="menu-title">{{ __('messages.payment_reconciliation') }}</div>
+            </a>
+        </li>
+        <li class="mm-active has-treeview {{ request()->routeIs('finance.reports*') ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->routeIs('finance.reports*') ? 'active' : '' }}">
+                <div class="parent-icon"><i class='bx bx-chart'></i></div>
+                <div class="menu-title">
+                    {{ __('messages.reports') }}
+                    <i class="right bx bx-angle-left"></i>
+                </div>
             </a>
             <ul>
                 <li>
-                    <a href="{{ route('finance.payments') }}">
-                        <i class="bx bx-right-arrow-alt"></i>{{ __('messages.all_payments') }}
+                    <a href="{{ route('finance.reports.financial') }}" class="nav-link {{ request()->routeIs('finance.reports.financial') ? 'active' : '' }}">
+                        <i class="bx bx-right-arrow-alt"></i>{{ __('messages.financial_reports') }}
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('finance.payments.pending') }}">
-                        <i class="bx bx-right-arrow-alt"></i>{{ __('messages.pending_payments') }}
+                    <a href="{{ route('finance.reports.analytics') }}" class="nav-link {{ request()->routeIs('finance.reports.analytics') ? 'active' : '' }}">
+                        <i class="bx bx-right-arrow-alt"></i>{{ __('messages.advanced_analytics') }}
                     </a>
                 </li>
             </ul>
         </li>
-
-        <li>
-            <a href="{{ route('finance.reports.financial') }}">
-                <div class="parent-icon"><i class='bx bx-chart'></i></div>
-                <div class="menu-title">{{ __('messages.financial_reports') }}</div>
+        <li class="mm-active has-treeview {{ request()->routeIs('finance.exports*') || request()->routeIs('finance.notifications*') ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->routeIs('finance.exports*') || request()->routeIs('finance.notifications*') ? 'active' : '' }}">
+                <div class="parent-icon"><i class='bx bx-tools'></i></div>
+                <div class="menu-title">
+                    {{ __('messages.tools') }}
+                    <i class="right bx bx-angle-left"></i>
+                </div>
             </a>
+            <ul>
+                <li>
+                    <a href="{{ route('finance.exports.payments') }}" class="nav-link {{ request()->routeIs('finance.exports.payments') ? 'active' : '' }}">
+                        <i class="bx bx-right-arrow-alt"></i>{{ __('messages.export_payments') }}
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" onclick="event.preventDefault(); document.getElementById('send-reminders-form').submit();">
+                        <i class="bx bx-right-arrow-alt"></i>{{ __('messages.send_payment_reminders') }}
+                    </a>
+                    <form id="send-reminders-form" action="{{ route('finance.notifications.send-reminders') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
+                </li>
+            </ul>
         </li>
 
         <li class="menu-label">{{ __('messages.account_settings') }}</li>

@@ -356,7 +356,7 @@ class ContractsController extends Controller
                 'contractamount' => 'required|numeric|min:0',
                 'warranty' => 'required|numeric|min:0',
                 'payment_type' => 'required|in:postpaid,prepaid',
-                'number_of_installments' => 'required_if:payment_type,postpaid|integer|min:1|max:12',
+                'number_of_payments' => 'required_if:payment_type,postpaid|integer|min:1|max:12',
             ];
 
             $request->validate($rules);
@@ -1202,6 +1202,36 @@ class ContractsController extends Controller
             Log::error('Annex update error: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Error updating contract annex: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    // stop the contract
+    public function stop_contract($id)
+    {
+        try {
+            DB::beginTransaction();
+            $contract = contracts::findOrFail($id);
+            $contract->update([
+                'contract_status' => 'stopped'
+            ]);
+            DB::commit();
+
+            // Notify the team leader,client,sales manager,technical
+            $notificationData = [
+                'title' => 'Contract Stopped',
+                'message' => "Contract {$contract->contract_number} has been stopped",
+                'type' => 'info',
+                'url' => "#",
+                'priority' => 'high',
+            ];
+            $this->notifyRoles(['team_leader', 'client', 'sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id);
+            return redirect()->route('contract.show')->with('success', 'Contract stopped successfully');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Contract stop error: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Error stopping contract: ' . $e->getMessage())
                 ->withInput();
         }
     }

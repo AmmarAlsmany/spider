@@ -111,7 +111,7 @@ Route::middleware(['auth', 'role:sales', 'prevent-back-history'])->group(functio
     Route::post('/contract-requests/{id}/{action}', [ContractRequestController::class, 'handleRequest'])->where('action', 'approve|reject');
     Route::get('/sales/edit-Contract/{id}', [ContractsController::class, 'edit'])->name('contract.edit');
     Route::patch('/sales/update-Contract/{id}', [ContractsController::class, 'update'])->name('contract.update');
-    Route::patch('/sales/stop-Contract/{id}', [ContractsController::class, 'stop_contract'])->name('contract.stop');
+    Route::patch('/sales/stop-contract/{id}', [ContractsController::class, 'stop_contract'])->name('contract.stop');
     Route::delete('/sales/delete-contract/{id}', [ContractsController::class, 'destroy'])->name('contract.delete');
     Route::get('/sales/Show All Completed Contract', [ContractsController::class, 'view_completed_contracts'])->name('completed.show.all');
     Route::get('/sales/Show All Stopped Contract', [ContractsController::class, 'view_stopped_contract'])->name('stopped.show.all');
@@ -212,6 +212,16 @@ Route::middleware(['auth', 'role:finance', 'prevent-back-history'])->group(funct
     Route::get('/finance/invoices/{id}', [FinanceController::class, 'showInvoice'])->name('finance.invoices.show');
     Route::get('/finance/reports/financial', [FinanceController::class, 'generateFinancialReport'])->name('finance.reports.financial');
     Route::patch('/finance/payments/{id}/status', [FinanceController::class, 'updatePaymentStatus'])->name('finance.payments.update-status');
+    
+    // New routes for enhanced functionality
+    Route::get('/finance/payments/{id}/record', [FinanceController::class, 'paymentForm'])->name('finance.payments.form');
+    Route::post('/finance/payments/{id}/record', [FinanceController::class, 'recordPayment'])->name('finance.payments.record');
+    Route::get('/finance/reports/analytics', [FinanceController::class, 'advancedAnalytics'])->name('finance.reports.analytics');
+    Route::get('/finance/exports/payments/form', [FinanceController::class, 'exportPaymentsForm'])->name('finance.exports.payments');
+    Route::get('/finance/exports/payments/download', [FinanceController::class, 'exportPayments'])->name('finance.exports.payments.download');
+    Route::post('/finance/notifications/send-reminders', [FinanceController::class, 'sendPaymentReminders'])->name('finance.notifications.send-reminders');
+    Route::get('/finance/reconciliation', [FinanceController::class, 'reconciliationIndex'])->name('finance.reconciliation.index');
+    Route::post('/finance/reconciliation/mark', [FinanceController::class, 'reconcilePayments'])->name('finance.reconciliation.mark');
 });
 
 // Technical Routes

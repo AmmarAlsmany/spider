@@ -69,6 +69,16 @@ class PaymentsController extends Controller
             'invoice_number' => $invoiceNumber,
         ]);
 
+        // Notify client, sales, and finance about the new payment
+        $notificationData = [
+            'title' => 'New Payment Created',
+            'message' => 'A new payment of ' . $payment->payment_amount . ' SAR has been created with due date ' . $payment->due_date,
+            'type' => 'info',
+            'url' => "#",
+            'priority' => 'normal',
+        ];
+        $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $payment->customer_id);
+
         return redirect()->route('payments.show', $payment->id)
             ->with('success', 'تم إنشاء الدفعة والفاتورة بنجاح');
     }

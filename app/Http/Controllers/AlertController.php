@@ -5,13 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Alert;
 use App\Models\contracts;
 use App\Models\payments;
+use App\Models\User;
+use App\Models\client;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Model;
 
 class AlertController extends Controller
 {
     public function index()
     {
+        // Get system alerts
         $alerts = Alert::with(['contract', 'readByUsers'])
             ->orderBy('created_at', 'desc')
             ->paginate(10)
@@ -20,7 +24,56 @@ class AlertController extends Controller
                 return $alert;
             });
 
-        return view('alerts.index', compact('alerts'));
+        // Get user notifications
+        $notifications = $this->getUserNotifications();
+        
+        return view('alerts.index', compact('alerts', 'notifications'));
+    }
+
+    /**
+     * Get user notifications formatted for the alerts view
+     */
+    protected function getUserNotifications()
+    {
+        $user = $this->getAuthenticatedUser();
+        
+        if (!$user) {
+            return collect();
+        }
+        
+        // Both User and Client models use the Notifiable trait
+        return $user->notifications()
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($notification) {
+                return [
+                    'id' => $notification->id,
+                    'type' => $notification->data['type'] ?? 'info',
+                    'title' => $notification->data['title'] ?? '',
+                    'message' => $notification->data['message'] ?? '',
+                    'priority' => $notification->data['priority'] ?? 'normal',
+                    'url' => $notification->data['url'] ?? '#',
+                    'is_read' => !is_null($notification->read_at),
+                    'created_at' => $notification->created_at,
+                    'is_notification' => true
+                ];
+            });
+    }
+    
+    /**
+     * Get the authenticated user from either guard
+     */
+    protected function getAuthenticatedUser(): ?Model
+    {
+        if (Auth::guard('client')->check()) {
+            return Auth::guard('client')->user();
+        }
+        
+        if (Auth::check()) {
+            return Auth::user();
+        }
+        
+        return null;
     }
 
     public function checkExpiredContracts()
@@ -119,16 +172,54 @@ class AlertController extends Controller
 
     public function markAsRead($id)
     {
-        $alert = Alert::findOrFail($id);
-        $alert->readByUsers()->syncWithoutDetaching([Auth::id()]);
+        // Check if this is a notification (UUID format) or an alert (numeric ID)
+        if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $id)) {
+            // This is a notification
+            $user = $this->getAuthenticatedUser();
+            if ($user) {
+                $notification = $user->notifications()->where('id', $id)->first();
+                if ($notification) {
+                    $notification->markAsRead();
+                }
+            }
+        } else {
+            // This is an alert
+            $alert = Alert::findOrFail($id);
+            $alert->readByUsers()->syncWithoutDetaching([Auth::id()]);
+        }
+        
         return redirect()->back();
+    }
+
+    public function markAllAsRead()
+    {
+        // Mark all alerts as read
+        $alerts = Alert::all();
+        foreach ($alerts as $alert) {
+            $alert->readByUsers()->syncWithoutDetaching([Auth::id()]);
+        }
+        
+        // Mark all notifications as read
+        $user = $this->getAuthenticatedUser();
+        if ($user) {
+            $user->unreadNotifications->markAsRead();
+        }
+        
+        return redirect()->back()->with('success', 'All alerts and notifications marked as read');
     }
 
     public function getUnreadCount()
     {
-        return Alert::whereDoesntHave('readByUsers', function ($query) {
+        // Count unread alerts
+        $alertCount = Alert::whereDoesntHave('readByUsers', function ($query) {
             $query->where('user_id', Auth::id());
         })->count();
+        
+        // Count unread notifications
+        $user = $this->getAuthenticatedUser();
+        $notificationCount = $user ? $user->unreadNotifications->count() : 0;
+        
+        return $alertCount + $notificationCount;
     }
 
     public function destroy($id)

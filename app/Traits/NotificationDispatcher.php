@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\User;
+use App\Models\client;
 use App\Notifications\AdminNotification;
 use App\Notifications\ClientNotification;
 use App\Notifications\FinancialNotification;
@@ -47,17 +48,30 @@ trait NotificationDispatcher
             return;
         }
 
-        $query = User::where('role', $role);
-        if ($specificUserId) {
-            if ($role === 'client') {
+        // Handle client notifications differently since they're in a separate table
+        if ($role === 'client') {
+            $query = client::query();
+            if ($specificUserId) {
                 $query->where('id', $specificUserId);
-            } elseif ($role === 'sales') {
+            }
+        } else {
+            // For other roles, use the User model
+            $query = User::where('role', $role);
+            if ($specificUserId && $role === 'sales') {
                 $query->where('id', $specificUserId);
             }
         }
 
         $query->each(function ($user) use ($data, $notificationClass) {
-            $user->notify(new $notificationClass($data));
+            try {
+                $user->notify(new $notificationClass($data));
+            } catch (\Exception $e) {
+                Log::error('Error sending notification: ' . $e->getMessage(), [
+                    'user_id' => $user->id,
+                    'role' => $user instanceof client ? 'client' : $user->role,
+                    'notification_class' => $notificationClass
+                ]);
+            }
         });
     }
 

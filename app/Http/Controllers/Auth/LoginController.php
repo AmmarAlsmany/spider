@@ -83,6 +83,9 @@ class LoginController extends Controller
         $user->last_login_ip = $request->ip();
         $user->save();
 
+        // Set a session flag to indicate a new login for notification popup
+        $request->session()->put('new_login', true);
+
         // Get the appropriate dashboard URL based on user type
         $dashboardUrl = $this->getDashboardUrl($user, $guard);
 

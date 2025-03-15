@@ -7,11 +7,15 @@ use App\Models\client;
 use App\Models\contracts;
 use App\Models\payments;
 use App\Models\Tiket;
+use App\Services\NotificationService;
+use App\Traits\NotificationDispatcher;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
+    use NotificationDispatcher;
+
     public function index()
     {
         // Tickets Statistics
@@ -265,11 +269,28 @@ class DashboardController extends Controller
             'payment_method' => 'required_if:status,paid|string'
         ]);
 
+        $oldStatus = $payment->payment_status;
+        
         $payment->update([
             'payment_status' => $request->status,
             'paid_at' => $request->status === 'paid' ? $request->paid_at : null,
             'payment_method' => $request->payment_method
         ]);
+
+        // Notify client, sales, and finance about the payment status update
+        if ($oldStatus !== $request->status) {
+            $notificationData = [
+                'title' => 'Payment Status Updated',
+                'message' => 'Payment #' . $payment->invoice_number . ' status has been updated to ' . ucfirst($request->status),
+                'type' => $request->status === 'paid' ? 'success' : ($request->status === 'overdue' ? 'warning' : 'info'),
+                'url' => "#",
+                'priority' => $request->status === 'overdue' ? 'high' : 'normal',
+            ];
+            
+            // Create a new instance of NotificationService
+            $notificationService = new NotificationService();
+            $notificationService->notifyRoles(['client', 'sales', 'finance'], $notificationData);
+        }
 
         return redirect()->back()->with('success', 'Payment status updated successfully');
     }

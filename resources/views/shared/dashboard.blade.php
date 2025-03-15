@@ -34,6 +34,8 @@
     <link rel="stylesheet" href="{{ asset('backend/assets/css/dark-theme.css') }}" />
     <link rel="stylesheet" href="{{ asset('backend/assets/css/semi-dark.css') }}" />
     <link rel="stylesheet" href="{{ asset('backend/assets/css/header-colors.css') }}" />
+    <!-- Notification Popup CSS -->
+    <link rel="stylesheet" href="{{ asset('css/notification-popup.css') }}" />
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="{{ asset('backend/assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -49,28 +51,32 @@
     <title>Spider-Web</title>
 </head>
 
-<body>
+<body data-new-login="{{ Session::has('new_login') ? 'true' : 'false' }}">
+    @php
+        // Clear the new login flag after it's been used
+Session::forget('new_login');
+    @endphp
     <!--wrapper-->
     <div class="wrapper">
         <!--sidebar wrapper -->
         @if (Auth::check())
-        @if (Auth::user()->role == 'admin')
-        @include('admin.sidebar')
-        @elseif (Auth::user()->role == 'sales')
-        @include('managers.sales.sidebar')
-        @elseif (Auth::user()->role == 'technical')
-        @include('managers.technical.sidebar')
-        @elseif (Auth::user()->role == 'team_leader')
-        @include('managers.team-leader.sidebar')
-        @elseif (Auth::user()->role == 'sales_manager')
-        @include('managers.sales Manager.sidebar')
-        @elseif (Auth::user()->role == 'finance')
-        @include('managers.finance.sidebar')
+            @if (Auth::user()->role == 'admin')
+                @include('admin.sidebar')
+            @elseif (Auth::user()->role == 'sales')
+                @include('managers.sales.sidebar')
+            @elseif (Auth::user()->role == 'technical')
+                @include('managers.technical.sidebar')
+            @elseif (Auth::user()->role == 'team_leader')
+                @include('managers.team-leader.sidebar')
+            @elseif (Auth::user()->role == 'sales_manager')
+                @include('managers.sales Manager.sidebar')
+            @elseif (Auth::user()->role == 'finance')
+                @include('managers.finance.sidebar')
+            @else
+                @include('clients.sidebar')
+            @endif
         @else
-        @include('clients.sidebar')
-        @endif
-        @else
-        @include('clients.sidebar')
+            @include('clients.sidebar')
         @endif
         <!--end sidebar wrapper -->
         <!--start header -->
@@ -111,7 +117,10 @@
 
     <!-- App JS -->
     <script src="{{ asset('backend/assets/js/app.js') }}"></script>
-    
+
+    <!-- Notification Popup JS -->
+    <script src="{{ asset('js/notification-popup.js') }}"></script>
+
     <script>
         $(document).ready(function() {
             // Initialize flatpickr
@@ -121,9 +130,9 @@
             @if (Session::has('message'))
                 var type = "{{ Session::get('alert-type', 'info') }}";
                 var message = "{{ Session::get('message') }}";
-                
-                if(typeof toastr !== 'undefined') {
-                    switch(type) {
+
+                if (typeof toastr !== 'undefined') {
+                    switch (type) {
                         case 'info':
                             toastr.info(message);
                             break;

@@ -360,11 +360,16 @@ Route::middleware(['role:client', 'prevent-back-history'])->group(function () {
     Route::post('/client/tikets/{id}/reply', [TiketsController::class, 'reply'])->name('client.ticket.reply');
     Route::post('/client/tikets/{id}/update-status', [TiketsController::class, 'updateStatus'])->name('client.tikets.update-status');
     Route::post('/client/visit.update', [ClientController::class, 'send_updateVisit'])->name('client.visit.update');
+    Route::get('/client/contract/{id}/request-update', [ClientController::class, 'requestContractUpdate'])->name('client.contract.request-update');
+    Route::post('/client/contract/{id}/submit-update-request', [ClientController::class, 'submitContractUpdateRequest'])->name('client.contract.submit-update');
+    Route::get('/client/contract/{id}/visits', [ClientController::class, 'contractVisits'])->name('client.contract.visits');
+    Route::get('/client/test-notification', [ClientController::class, 'testNotification'])->name('client.test-notification');
 });
 
 // Alert Routes
 Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');
+    Route::get('/alerts/mark-all-as-read', [AlertController::class, 'markAllAsRead'])->name('alerts.mark-all-as-read');
     Route::get('/alerts/{id}/mark-as-read', [AlertController::class, 'markAsRead'])->name('alerts.mark-as-read');
     Route::delete('/alerts/{alert}', [AlertController::class, 'destroy'])->name('alerts.destroy');
 });

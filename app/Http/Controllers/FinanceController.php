@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\contracts;
 use App\Models\payments;
 use App\Models\tikets;
+use App\Traits\NotificationDispatcher;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PaymentReminder;
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Auth;
 
 class FinanceController extends Controller
 {
+    use NotificationDispatcher;
+
     public function dashboard()
     {
         $data = [
@@ -207,6 +210,16 @@ class FinanceController extends Controller
         
         // Log the payment activity
         Log::info('Payment recorded', ['payment_id' => $payment->id, 'amount' => $payment->payment_amount, 'method' => $request->payment_method]);
+        
+        // Notify client, sales, and finance about the payment being recorded
+        $notificationData = [
+            'title' => 'Payment Recorded',
+            'message' => 'Payment of ' . $payment->payment_amount . ' SAR has been recorded as paid',
+            'type' => 'success',
+            'url' => "#",
+            'priority' => 'normal',
+        ];
+        $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $payment->customer_id);
             
         return redirect()->route('finance.payments')->with('success', 'Payment recorded successfully.');
     }

@@ -540,4 +540,30 @@ class ClientController extends Controller
 
         return view('clients.contract_visits', compact('contract'));
     }
+
+    /**
+     * Send a test notification to the authenticated client
+     */
+    public function testNotification()
+    {
+        $client = Auth::guard('client')->user();
+        
+        if (!$client) {
+            return redirect()->back()->with('error', 'You must be logged in as a client to receive notifications.');
+        }
+        
+        // Create notification data
+        $data = [
+            'title' => 'Test Notification',
+            'message' => 'This is a test notification to verify that client notifications are working correctly.',
+            'type' => 'info',
+            'url' => '#',
+            'priority' => 'normal',
+        ];
+        
+        // Send notification directly to this client
+        $this->notifyRoles(['client'], $data, $client->id);
+        
+        return redirect()->back()->with('success', 'Test notification sent successfully. Please check your notifications.');
+    }
 }

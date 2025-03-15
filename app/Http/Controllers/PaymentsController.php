@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use App\Traits\NotificationDispatcher;
 use Mpdf\Mpdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PaymentsController extends Controller
 {
@@ -200,6 +201,22 @@ class PaymentsController extends Controller
         $words_english = $this->numberToWordsEnglish($amount);
         $words_arabic = $this->numberToWordsArabic($amount);
 
+        // Generate QR code content - exactly matching the web view
+        $qrCodeContent = implode("\n", [
+            $payment->company->name ?? 'Spider Web Co.',
+            'TAX: ' . ($payment->company->tax_number ?? '310152424500003'),
+            'Invoice: ' . str_pad($payment->invoice_number ?? $payment->id, 5, '0', STR_PAD_LEFT),
+            'Date: ' . \Carbon\Carbon::parse($payment->invoice_date ?? $payment->created_at)->format('Y-m-d'),
+            'Total: ' . number_format($payment->payment_amount + ($payment->payment_amount * 0.15), 2) . ' SAR'
+        ]);
+
+        // Generate QR code as SVG (doesn't require Imagick)
+        $qrCode = \SimpleSoftwareIO\QrCode\Facades\QrCode::size(150)
+            ->errorCorrection('H')
+            ->margin(1)
+            ->format('svg')
+            ->generate($qrCodeContent);
+
         // Initialize mPDF
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
@@ -215,7 +232,8 @@ class PaymentsController extends Controller
         $html = view('pdf_templates.payment_invoice_pdf', compact(
             'payment',
             'words_english',
-            'words_arabic'
+            'words_arabic',
+            'qrCode'
         ))->render();
 
         // Write PDF content

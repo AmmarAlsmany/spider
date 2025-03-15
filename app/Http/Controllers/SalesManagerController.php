@@ -231,10 +231,15 @@ class SalesManagerController extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
-        $contracts = contracts::when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-            return $query->whereBetween('created_at', [$startDate, $endDate]);
-        })
-            ->with(['customer', 'salesRepresentative', 'type'])
+        $query = contracts::query();
+        
+        if ($startDate && $endDate) {
+            // Add one day to end date to include the full day
+            $endDateAdjusted = date('Y-m-d', strtotime($endDate . ' +1 day'));
+            $query->whereBetween('created_at', [$startDate, $endDateAdjusted]);
+        }
+        
+        $contracts = $query->with(['customer', 'salesRepresentative', 'type'])
             ->get();
 
         $total = $contracts->count();
@@ -243,7 +248,7 @@ class SalesManagerController extends Controller
         $rejected = $contracts->where('contract_status', 'rejected')->count();
 
         return view(
-            'managers.sales manager.reports.contracts',
+            'managers.sales Manager.reports.contracts',
             compact('contracts', 'total', 'approved', 'pending', 'rejected')
         );
     }
@@ -252,10 +257,15 @@ class SalesManagerController extends Controller
     {
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
-        $collections = payments::when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-            return $query->whereBetween('paid_at', [$startDate, $endDate]);
-        })
-            ->whereNotNull('paid_at')
+        $query = payments::query();
+        
+        if ($startDate && $endDate) {
+            // Add one day to end date to include the full day
+            $endDateAdjusted = date('Y-m-d', strtotime($endDate . ' +1 day'));
+            $query->whereBetween('paid_at', [$startDate, $endDateAdjusted]);
+        }
+        
+        $collections = $query->whereNotNull('paid_at')
             ->with(['contract.customer', 'contract.salesRepresentative'])
             ->get();
 
@@ -272,17 +282,21 @@ class SalesManagerController extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
-        $remainingPayments = payments::when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-            return $query->whereBetween('due_date', [$startDate, $endDate]);
-        })
-            ->whereNull('paid_at')
-            ->with(['contract.customer', 'contract.salesRepresentative'])
+        $query = payments::query()->whereNull('paid_at');
+        
+        if ($startDate && $endDate) {
+            // Add one day to end date to include the full day
+            $endDateAdjusted = date('Y-m-d', strtotime($endDate . ' +1 day'));
+            $query->whereBetween('due_date', [$startDate, $endDateAdjusted]);
+        }
+        
+        $remainingPayments = $query->with(['contract.customer', 'contract.salesRepresentative'])
             ->get();
 
         $total = $remainingPayments->sum('payment_amount');
 
         return view(
-            'managers.sales manager.reports.payments',
+            'managers.sales Manager.reports.payments',
             compact('remainingPayments', 'total')
         );
     }
@@ -292,10 +306,15 @@ class SalesManagerController extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
-        $invoices = payments::when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-            return $query->whereBetween('due_date', [$startDate, $endDate]);
-        })
-            ->with(['contract.customer', 'contract.salesRepresentative'])
+        $query = \App\Models\payments::query();
+        
+        if ($startDate && $endDate) {
+            // Add one day to end date to include the full day
+            $endDateAdjusted = date('Y-m-d', strtotime($endDate . ' +1 day'));
+            $query->whereBetween('due_date', [$startDate, $endDateAdjusted]);
+        }
+        
+        $invoices = $query->with(['contract.customer', 'contract.salesRepresentative'])
             ->get();
 
         $total = $invoices->sum('payment_amount');
@@ -303,7 +322,7 @@ class SalesManagerController extends Controller
         $remaining = $total - $collected;
 
         return view(
-            'managers.sales manager.reports.invoices',
+            'managers.sales Manager.reports.invoices',
             compact('invoices', 'total', 'collected', 'remaining')
         );
     }
@@ -764,10 +783,16 @@ class SalesManagerController extends Controller
      */
     public function contactsReport(Request $request)
     {
-        $query = client::with('sales')
-            ->when($request->get('start_date') && $request->get('end_date'), function ($query) use ($request) {
-                return $query->whereBetween('created_at', [$request->get('start_date'), $request->get('end_date')]);
-            });
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+        
+        $query = \App\Models\client::with('sales');
+        
+        if ($startDate && $endDate) {
+            // Add one day to end date to include the full day
+            $endDateAdjusted = date('Y-m-d', strtotime($endDate . ' +1 day'));
+            $query->whereBetween('created_at', [$startDate, $endDateAdjusted]);
+        }
 
         // Filter by status if provided
         if ($request->has('status')) {

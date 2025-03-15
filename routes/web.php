@@ -15,6 +15,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\PesticideAnalyticsController;
 use App\Http\Controllers\PesticideController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\sales;
 use App\Http\Controllers\SalesManagerController;
 use App\Http\Controllers\shared;
@@ -56,6 +57,8 @@ Route::middleware(['prevent-back-history', 'auth:web,client'])->group(function (
     Route::get('/Payment/view Payment Details/{id}', [PaymentsController::class, 'show'])->name('payment.show');
     Route::get('/payments/{id}/pdf', [PaymentsController::class, 'generatePDF'])->name('payments.pdf');
     Route::get('/contract/{id}/pdf', [ContractsController::class, 'generatePDF'])->name('contract.pdf.generate');
+    // Report PDF Generation Route
+    Route::post('/reports/pdf', [ReportsController::class, 'generatePDF'])->name('reports.pdf');
 });
 
 // Admin Routes

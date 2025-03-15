@@ -1319,7 +1319,7 @@ class ContractsController extends Controller
         $template = view('pdf_templates.contract_pdf', compact('contract'))->render();
         $filename = 'contract_' . $contract->contract_number . '.pdf';
 
-        $mpdf = new Mpdf(['orientation' => 'L']);
+        $mpdf = new Mpdf(['orientation' => 'L', 'margin' => [10, 10, 10, 10]]);
         $mpdf->WriteHTML($template);
         $pdf = $mpdf->Output('', 'S');
 

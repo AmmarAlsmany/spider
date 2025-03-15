@@ -1,0 +1,112 @@
+/* PDF Styles */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+
+body {
+    font-family: 'Cairo', sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.content-container {
+    margin-top: 20px;
+    padding: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-align: center;
+    padding: 8px;
+}
+
+td {
+    padding: 8px;
+    text-align: left;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+h4 {
+    font-size: 16px;
+}
+
+p {
+    margin: 0 0 10px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right, .text-end {
+    text-align: right;
+}
+
+.fw-bold {
+    font-weight: bold;
+}
+
+.mb-4 {
+    margin-bottom: 15px;
+}
+
+/* Remove any Bootstrap-specific styling that might cause issues */
+.card, .card-body, .container, .row, .col {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Fix for badges */
+.badge {
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.bg-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.bg-warning {
+    background-color: #ffc107;
+    color: black;
+}
+
+.bg-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Print header styling */
+.print-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Table responsive fix */
+.table-responsive {
+    overflow: visible !important;
+}

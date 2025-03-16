@@ -96,7 +96,7 @@
                         </button>
                     </div>
                     <div>
-                        {{ $unreconciled->links() }}
+                        {{ $unreconciled->links('vendor.pagination.bootstrap-5') }}
                     </div>
                 </div>
                 @endif

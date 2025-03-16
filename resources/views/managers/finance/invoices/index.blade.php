@@ -62,7 +62,7 @@
                 </table>
             </div>
             <div class="mt-3">
-                {{ $invoices->links() }}
+                {{ $invoices->links('pagination.custom') }}
             </div>
         </div>
     </div>

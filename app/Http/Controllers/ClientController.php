@@ -227,7 +227,7 @@ class ClientController extends Controller
 
             return redirect()->back()->with('success', 'Contract has been approved successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to approve contract.');
+            return redirect()->back()->with('error', 'Failed to approve contract. ' . $e->getMessage());
         }
     }
 

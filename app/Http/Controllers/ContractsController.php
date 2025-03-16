@@ -40,38 +40,68 @@ class ContractsController extends Controller
      */
     public function index(Request $request)
     {
-        $contract_types = contracts_types::all();
+        // Cache contract types to avoid repeated database queries
+        $contract_types = cache()->remember('contract_types', 60*60, function() {
+            return contracts_types::all();
+        });
+        
         $property_types = ['Residential', 'Commercial', 'Industrial', 'Government'];
-        isset($request->client_id) ? $client_info = client::find($request->client_id) : $client_info = null;
-        $branches = $request->branches;
-        $contract_type_id = contracts_types::find($request->contract_type_id);
-        $contract_number = $this->generator_contract_number();
+        
+        // Only query client info if client_id is provided
+        $client_info = null;
+        if (isset($request->client_id)) {
+            $client_info = client::find($request->client_id);
+        }
+        
+        $branches = $request->branches ?? 0;
+        
+        // Only query contract type if contract_type_id is provided
+        $contract_type_id = null;
+        if (isset($request->contract_type_id)) {
+            // Now we can use eager loading since the relationship is defined
+            $contract_type_id = contracts_types::with('contracts')->find($request->contract_type_id);
+        }
+        
+        // Generate contract number - use caching to avoid repeated queries
+        $contract_number = cache()->remember('latest_contract_number_' . date('Y-m-d'), 60, function() {
+            return $this->generator_contract_number();
+        });
+        
         return view('contracts.index', compact('client_info', 'branches', 'contract_type_id', 'contract_number', 'contract_types', 'property_types'));
     }
 
     public function generator_contract_number()
     {
-        $latest_contract = contracts::orderBy('id', 'desc')->withTrashed()->first();
         $current_year = date('Y');
+        $prefix = "SP" . $current_year;
+
+        // Use a more efficient query with a specific filter for current year's prefix
+        $latest_contract = contracts::select('contract_number')
+            ->where('contract_number', 'like', $prefix . '%')
+            ->orderBy('id', 'desc')
+            ->limit(1)
+            ->withTrashed()
+            ->first();
 
         if ($latest_contract) {
+            // Extract the numeric part and increment
             $last_number = intval(substr($latest_contract->contract_number, 6));
-            $last_year = substr($latest_contract->contract_number, 2, 4);
-
-            if ($last_year == $current_year) {
-                $new_number = $last_number + 1;
-            } else {
-                $new_number = 1;
-            }
+            $new_number = $last_number + 1;
         } else {
             $new_number = 1;
         }
 
-        $contract_number = "SP" . $current_year . str_pad($new_number, 4, '0', STR_PAD_LEFT);
+        $contract_number = $prefix . str_pad($new_number, 4, '0', STR_PAD_LEFT);
 
-        while (contracts::where('contract_number', $contract_number)->exists()) {
-            $new_number++;
-            $contract_number = "SP" . $current_year . str_pad($new_number, 4, '0', STR_PAD_LEFT);
+        // Check if the generated number already exists (use a direct query)
+        $exists = contracts::where('contract_number', $contract_number)->exists();
+        
+        if ($exists) {
+            // If it exists, find the max number and increment by 1 (more efficient query)
+            $max_number = contracts::where('contract_number', 'like', $prefix . '%')
+                ->max(DB::raw('CAST(SUBSTRING(contract_number, 7) AS UNSIGNED)'));
+            $new_number = $max_number + 1;
+            $contract_number = $prefix . str_pad($new_number, 4, '0', STR_PAD_LEFT);
         }
 
         return $contract_number;
@@ -600,7 +630,7 @@ class ContractsController extends Controller
                         'branch_manager_phone' => $branchManagerPhones[$index],
                         'branch_address' => $branchAddresses[$index],
                         'branch_city' => $branchCities[$index],
-                        'contract_id' => $contract->id
+                        'contracts_id' => $contract->id
                     ];
 
                     // If branch_id exists, update existing branch

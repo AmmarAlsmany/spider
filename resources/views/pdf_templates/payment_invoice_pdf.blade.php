@@ -2,133 +2,186 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Tax Invoice</title>
     <style>
-        /* Reset all margins and paddings */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        @page {
+            margin: 1cm;
+        }
+
+        @font-face {
+            font-family: 'Cairo';
+            src: url({{ storage_path('fonts/Cairo-Regular.ttf') }}) format("truetype");
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Cairo';
+            src: url({{ storage_path('fonts/Cairo-Medium.ttf') }}) format("truetype");
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Cairo';
+            src: url({{ storage_path('fonts/Cairo-SemiBold.ttf') }}) format("truetype");
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Cairo';
+            src: url({{ storage_path('fonts/Cairo-Bold.ttf') }}) format("truetype");
+            font-weight: 700;
+            font-style: normal;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            /* Use a standard font instead of importing */
-            font-size: 8pt;
-            /* Use points for more precise control */
-            line-height: 1.1;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
         }
 
-        /* Fixed height container */
         .invoice-container {
+            background: white;
+            padding: 1rem;
             width: 100%;
             max-width: 800px;
-            max-height: 1050px;
-            /* Fixed height for A4 */
-            overflow: hidden;
-            /* Prevent overflow */
             margin: 0 auto;
-            padding: 10px;
-            position: relative;
         }
 
         .invoice-header {
             background: #ffff00;
             color: #000;
-            padding: 2pt;
-            margin-bottom: 3pt;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
             text-align: center;
-            font-weight: bold;
-            font-size: 10pt;
+            font-weight: 700;
+            font-size: 1.2rem;
         }
 
-        table {
+        .info-table {
             width: 100%;
+            margin-bottom: 1rem;
             border-collapse: collapse;
-            margin-bottom: 3pt;
         }
 
-        th,
-        td {
-            border: 0.5pt solid #000;
-            padding: 2pt;
-            font-size: 8pt;
+        .info-table th,
+        .info-table td {
+            padding: 0.5rem;
+            border: 1px solid #000;
             text-align: right;
         }
 
-        th {
+        .invoice-details-header {
+            background: #ffff00;
+            color: #000;
+            padding: 0.5rem;
+            margin: 1rem 0;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .details-table th,
+        .details-table td {
+            padding: 0.5rem;
+            border: 1px solid #000;
+            text-align: right;
+        }
+
+        .details-table th {
             background-color: #f0f0f0;
-            font-weight: bold;
+            font-weight: 600;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .summary-table td {
+            padding: 0.5rem;
+            border: 1px solid #000;
+            text-align: right;
         }
 
         .company-logo {
             text-align: center;
-            margin-bottom: 3pt;
+            margin-bottom: 1rem;
         }
 
         .company-logo img {
-            max-width: 40px;
+            max-width: 70px;
             height: auto;
         }
 
         .company-logo h3 {
-            margin: 1pt 0;
-            font-size: 9pt;
+            margin: 5px 0;
+            font-size: 16px;
+            font-weight: 600;
         }
 
         .qr-section {
             text-align: center;
-            margin-top: 3pt;
+            margin-top: 1rem;
         }
 
         .qr-section p {
-            margin: 1pt 0;
+            margin: 5px 0;
+            font-size: 14px;
         }
 
         .signature-section {
-            margin-top: 3pt;
+            margin-top: 1rem;
+            text-align: center;
         }
 
-        /* Strict page settings */
-        @page {
-            size: 21cm 29.7cm;
-            /* A4 size in cm */
-            margin: 0.5cm;
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-left {
+            text-align: left;
         }
     </style>
 </head>
 
 <body>
     <div class="invoice-container">
-        <!-- Company Logo and Name -->
         <div class="company-logo">
-            <img src="{{ public_path('backend/assets/images/logo-icon.png') }}" alt="Spider Web Logo">
+            <img src="{{ public_path('backend/assets/images/logo-icon.png') }}" alt="Spider Web Logo" style="max-width: 70px;">
             <h3>Spider Web For Pest Control</h3>
             <h3>خيوط العنكبوت لمكافحة الحشرات</h3>
         </div>
 
-        <!-- Invoice Header -->
-        <div class="invoice-header">فاتورة ضريبية</div>
+        <div class="invoice-header">
+            فاتورة ضريبية
+        </div>
 
-        <!-- Company Info -->
-        <table>
+        <table class="info-table">
             <tr>
                 <td>From/ Spider Web for Pest Control</td>
                 <td>من/ شركة خيوط العنكبوت لمكافحة الحشرات</td>
             </tr>
             <tr>
-                <td>العنوان /
-                    {{ $payment->company->address_ar ?? '6410 انس بن مالك - حي الياسمين - وحدة رقم 1 - الرياض 13325 - 3504' }}
-                </td>
-                <td>Address /
-                    {{ $payment->company->address ?? '6410 Anas bin Malik - Al-Yasmeen District - Unit No. 1 - Riyadh 13325 - 3504' }}
-                </td>
+                <td>العنوان / {{ $payment->company->address_ar ?? '6410 انس بن مالك - حي الياسمين - وحدة رقم 1 - الرياض 13325 - 3504' }}</td>
+                <td>Address / {{ $payment->company->address ?? '6410 Anas bin Malik - Al-Yasmeen District - Unit No. 1 - Riyadh 13325 - 3504' }}</td>
             </tr>
         </table>
 
-        <!-- Invoice Details -->
-        <table>
+        <table class="info-table">
             <tr>
                 <td>تاريخ اصدار الفاتورة</td>
                 <td>رقم الفاتورة</td>
@@ -138,18 +191,15 @@
             <tr>
                 <td>{{ \Carbon\Carbon::parse($payment->invoice_date ?? $payment->created_at)->format('d/m/Y') }}</td>
                 <td>{{ str_pad($payment->invoice_number ?? $payment->id, 5, '0', STR_PAD_LEFT) }}</td>
-                <td>{{ \Carbon\Carbon::parse($payment->due_date ?? $payment->created_at->addDays(30))->format('d/m/Y') }}
-                </td>
+                <td>{{ \Carbon\Carbon::parse($payment->due_date ?? $payment->created_at->addDays(30))->format('d/m/Y') }}</td>
                 <td>{{ $payment->company->tax_number ?? '310152424500003' }}</td>
             </tr>
         </table>
 
-        <!-- Customer Info -->
-        <table>
+        <table class="info-table">
             <tr>
                 <td>/To</td>
-                <td>الى/ شركة {{ $payment->customer->name_ar ?? ($payment->customer->name ?? 'الفرازدق التجارية') }}
-                </td>
+                <td>الى/ شركة {{ $payment->customer->name_ar ?? ($payment->customer->name ?? 'الفرازدق التجارية') }}</td>
             </tr>
             <tr>
                 <td>Address/</td>
@@ -161,11 +211,11 @@
             </tr>
         </table>
 
-        <!-- Invoice Statement Header -->
-        <div class="invoice-header">بيان الفاتورة</div>
+        <div class="invoice-details-header">
+            بيان الفاتورة
+        </div>
 
-        <!-- Invoice Line Items -->
-        <table>
+        <table class="details-table">
             <thead>
                 <tr>
                     <th>الإجمالي</th>
@@ -178,15 +228,13 @@
                 <tr>
                     <td>ريال سعودي {{ number_format($payment->payment_amount, 2) }}</td>
                     <td>ريال سعودي {{ number_format($payment->payment_amount, 2) }}</td>
-                    <td>الدفعة رقم {{ $payment->payment_number }} - من اصل {{ $payment->contract->number_Payments }}
-                    </td>
+                    <td>الدفعة رقم {{ $payment->payment_number }} - من اصل {{ $payment->contract->number_Payments }}</td>
                     <td>مكافحة حشرات - {{ $payment->contract->type->name }}</td>
                 </tr>
             </tbody>
         </table>
 
-        <!-- Summary Table -->
-        <table>
+        <table class="summary-table">
             <tr>
                 <td>Contract Number</td>
                 <td>{{ $payment->contract->contract_number }}</td>
@@ -204,7 +252,7 @@
             </tr>
             <tr>
                 <td>VAT 15%</td>
-                <td>ريال سعودي {{ number_format(($payment->payment_amount / 1.15) * 0.15, 2) }}</td>
+                <td>ريال سعودي {{ number_format($payment->payment_amount / 1.15 * 0.15, 2) }}</td>
                 <td>قيمة الضريبة</td>
             </tr>
             <tr>
@@ -214,35 +262,31 @@
             </tr>
         </table>
 
-        <!-- Payment Instructions and QR Code -->
         <div class="qr-section">
             <p>يمكنكم إصدار المبلغ المذكور أعلاه عن طريق:</p>
             <p>(1) شيك باسم شركة خيوط العنكبوت لمكافحة الحشرات</p>
             <p>(2) SPIDER WEB CO. SA6905000068201414261000 تحويل المبلغ على حساب (الانماء) رقم:</p>
-
-            <!-- QR Code -->
-            <div style="margin: 0 auto; width: 70px; height: 70px;">
+            <div style="margin: 0 auto; width: 150px; height: 150px;">
                 {!! str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $qrCode) !!}
             </div>
         </div>
 
-        <!-- Signature Section -->
         <div class="signature-section">
-            <table>
+            <table class="info-table">
                 <tr>
                     <td>توقيع استلام العميل:</td>
                 </tr>
                 <tr>
-                    <td style="height: 15px;"></td>
+                    <td style="height: 50px;"></td>
                 </tr>
             </table>
-
-            <table style="margin-top: 3pt;">
+            
+            <table class="info-table" style="margin-top: 10px;">
                 <tr>
                     <td>مسؤول المبيعات:</td>
                 </tr>
                 <tr>
-                    <td style="height: 15px;"></td>
+                    <td style="height: 50px;"></td>
                 </tr>
             </table>
         </div>

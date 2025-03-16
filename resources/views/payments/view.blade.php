@@ -15,6 +15,9 @@
             <a href="{{ route('payments.pdf', $payment->id) }}" class="btn btn-primary">
                 <i class="bx bx-download"></i> Download PDF
             </a>
+            <button onclick="window.print()" class="btn btn-info">
+                <i class="bx bx-printer"></i> Print Invoice
+            </button>
             <a href="{{ url()->previous() }}" class="btn btn-secondary">
                 <i class="bx bx-arrow-back"></i> Back
             </a>
@@ -124,6 +127,42 @@
 
                 .page-breadcrumb {
                     display: none !important;
+                }
+                
+                /* Hide dashboard elements */
+                .sidebar-wrapper, 
+                .topbar, 
+                .page-wrapper > .page-content > :not(.container),
+                .page-footer,
+                .back-to-top,
+                .switcher-wrapper,
+                .overlay {
+                    display: none !important;
+                }
+                
+                /* Reset page structure for printing */
+                .page-wrapper {
+                    margin-left: 0 !important;
+                    padding-top: 0 !important;
+                }
+                
+                .page-content {
+                    padding: 0 !important;
+                    margin: 0 !important;
+                }
+                
+                /* Ensure the invoice takes the full page */
+                .container {
+                    max-width: 100% !important;
+                    width: 100% !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                }
+                
+                /* Force background colors to print */
+                .invoice-header, .invoice-details-header {
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
                 }
             }
 

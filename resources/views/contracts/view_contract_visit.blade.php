@@ -54,56 +54,166 @@
                     <h5 class="mb-0"><i class="bx bx-calendar me-2"></i>Visit Schedule</h5>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table align-middle table-hover">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Visit Date</th>
-                                    <th>Visit Time</th>
-                                    <th>Team</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($visits as $visit)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($visit->visit_date)->format('d M, Y') }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($visit->visit_time)->format('h:i A') }}</td>
-                                    <td>{{ $visit->team->name ?? 'Not Assigned' }}</td>
-                                    <td>
-                                        @switch($visit->status)
-                                        @case('scheduled')
-                                        <span class="badge bg-info">Scheduled</span>
-                                        @break
-                                        @case('completed')
-                                        <span class="badge bg-success">Completed</span>
-                                        @break
-                                        @case('cancelled')
-                                        <span class="badge bg-danger">Cancelled</span>
-                                        @break
-                                        @default
-                                        <span class="badge bg-secondary">{{ $visit->status }}</span>
-                                        @endswitch
-                                    </td>
-                                    <td>
-                                        @if($visit->status === 'completed')
-                                            <a href="{{ route('contract.visit.report', $visit->id) }}" class="btn btn-sm btn-info">
-                                                <i class="bx bx-file"></i> View Report
-                                            </a>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="6" class="text-center">No visits scheduled</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+                    @php
+                        // Get all branches for this contract
+                        $contractBranches = App\Models\branchs::where('contracts_id', $contract->id)->get();
+                    @endphp
+                    
+                    @if($contractBranches->count() > 0)
+                        <!-- Branch tabs navigation -->
+                        <ul class="mb-3 nav nav-tabs" id="branchTabs" role="tablist">
+                            @foreach($contractBranches as $branch)
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link {{ $loop->first ? 'active' : '' }}" 
+                                            id="branch-{{ $branch->id }}-tab" 
+                                            data-bs-toggle="tab" 
+                                            data-bs-target="#branch-{{ $branch->id }}" 
+                                            type="button" 
+                                            role="tab" 
+                                            aria-controls="branch-{{ $branch->id }}" 
+                                            aria-selected="{{ $loop->first ? 'true' : 'false' }}">
+                                        <i class="bx bx-building-house me-1"></i>{{ $branch->branch_name }}
+                                    </button>
+                                </li>
+                            @endforeach
+                        </ul>
+                        
+                        <!-- Branch tabs content -->
+                        <div class="tab-content" id="branchTabsContent">
+                            @foreach($contractBranches as $branch)
+                                <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" 
+                                     id="branch-{{ $branch->id }}" 
+                                     role="tabpanel" 
+                                     aria-labelledby="branch-{{ $branch->id }}-tab">
+                                    
+                                    <div class="mb-3">
+                                        <h6 class="text-muted">
+                                            <i class="bx bx-map-pin me-1"></i>{{ $branch->branch_address }}
+                                        </h6>
+                                        <p class="mb-0">
+                                            <span class="text-muted">Manager:</span> {{ $branch->branch_manager_name }} 
+                                            <span class="ms-2 text-muted">Phone:</span> {{ $branch->branch_manager_phone }}
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="table-responsive">
+                                        <table class="table align-middle table-hover">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Visit Date</th>
+                                                    <th>Visit Time</th>
+                                                    <th>Team</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @php
+                                                    // Filter visits for this branch
+                                                    $branchVisits = $visits->filter(function($visit) use ($branch) {
+                                                        return $visit->branch_id == $branch->id;
+                                                    });
+                                                @endphp
+                                                
+                                                @forelse($branchVisits as $visit)
+                                                <tr>
+                                                    <td>{{ $visit->visit_number ?? $loop->iteration }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($visit->visit_date)->format('d M, Y') }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($visit->visit_time)->format('h:i A') }}</td>
+                                                    <td>{{ $visit->team->name ?? 'Not Assigned' }}</td>
+                                                    <td>
+                                                        @switch($visit->status)
+                                                        @case('scheduled')
+                                                        <span class="badge bg-info">Scheduled</span>
+                                                        @break
+                                                        @case('completed')
+                                                        <span class="badge bg-success">Completed</span>
+                                                        @break
+                                                        @case('cancelled')
+                                                        <span class="badge bg-danger">Cancelled</span>
+                                                        @break
+                                                        @default
+                                                        <span class="badge bg-secondary">{{ $visit->status }}</span>
+                                                        @endswitch
+                                                    </td>
+                                                    <td>
+                                                        @if($visit->status === 'completed')
+                                                            <a href="{{ route('contract.visit.report', $visit->id) }}" class="btn btn-sm btn-info">
+                                                                <i class="bx bx-file"></i> View Report
+                                                            </a>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                                @empty
+                                                <tr>
+                                                    <td colspan="6" class="text-center">No visits scheduled for this branch</td>
+                                                </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="alert alert-info">
+                            <i class="bx bx-info-circle me-1"></i> No branches found for this contract.
+                        </div>
+                        
+                        <!-- Show all visits if no branches are defined -->
+                        <div class="table-responsive mt-3">
+                            <table class="table align-middle table-hover">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Visit Date</th>
+                                        <th>Visit Time</th>
+                                        <th>Team</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($visits as $visit)
+                                    <tr>
+                                        <td>{{ $visit->visit_number ?? $loop->iteration }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($visit->visit_date)->format('d M, Y') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($visit->visit_time)->format('h:i A') }}</td>
+                                        <td>{{ $visit->team->name ?? 'Not Assigned' }}</td>
+                                        <td>
+                                            @switch($visit->status)
+                                            @case('scheduled')
+                                            <span class="badge bg-info">Scheduled</span>
+                                            @break
+                                            @case('completed')
+                                            <span class="badge bg-success">Completed</span>
+                                            @break
+                                            @case('cancelled')
+                                            <span class="badge bg-danger">Cancelled</span>
+                                            @break
+                                            @default
+                                            <span class="badge bg-secondary">{{ $visit->status }}</span>
+                                            @endswitch
+                                        </td>
+                                        <td>
+                                            @if($visit->status === 'completed')
+                                                <a href="{{ route('contract.visit.report', $visit->id) }}" class="btn btn-sm btn-info">
+                                                    <i class="bx bx-file"></i> View Report
+                                                </a>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center">No visits scheduled</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                    
                     @if($visits->hasPages())
                     <div class="mt-4 d-flex justify-content-end">
                         <nav>

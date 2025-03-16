@@ -148,7 +148,7 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="mb-3">
-                                                <label class="form-label">Additional Amount <span class="text-danger">*</span></label>
+                                                <label class="form-label">Additional Amount with out VAT <span class="text-danger">*</span></label>
                                                 <div class="input-group">
                                                     <input type="number" class="form-control @error('additional_amount') is-invalid @enderror"
                                                         name="additional_amount" placeholder="0.00" step="0.01" min="0" required

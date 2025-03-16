@@ -4,11 +4,11 @@
             {{-- Previous Page Link --}}
             @if ($paginator->onFirstPage())
                 <span class="btn btn-sm btn-outline-secondary disabled">
-                    <i class="bx bx-chevron-left me-1"></i> Previous
+                    Previous
                 </span>
             @else
                 <a href="{{ $paginator->previousPageUrl() }}" class="btn btn-sm btn-outline-secondary">
-                    <i class="bx bx-chevron-left me-1"></i> Previous
+                    Previous
                 </a>
             @endif
 
@@ -31,11 +31,11 @@
             {{-- Next Page Link --}}
             @if ($paginator->hasMorePages())
                 <a href="{{ $paginator->nextPageUrl() }}" class="btn btn-sm btn-outline-secondary">
-                    Next <i class="bx bx-chevron-right ms-1"></i>
+                    Next
                 </a>
             @else
                 <span class="btn btn-sm btn-outline-secondary disabled">
-                    Next <i class="bx bx-chevron-right ms-1"></i>
+                    Next
                 </span>
             @endif
         </div>

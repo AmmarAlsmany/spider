@@ -83,7 +83,7 @@
                 </table>
             </div>
             <div class="mt-3">
-                {{ $pendingPayments->links() }}
+                {{ $pendingPayments->links('vendor.pagination.custom') }}
             </div>
         </div>
     </div>

@@ -174,7 +174,7 @@
                         </table>
                     </div>
                     <div class="mt-3">
-                        {{ $report['payment_history']->links() }}
+                        {{ $report['payment_history']->links('vendor.pagination.custom') }}
                     </div>
                 </div>
             </div>

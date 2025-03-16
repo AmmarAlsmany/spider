@@ -65,7 +65,7 @@
                 </div>
 
                 <div class="mt-3">
-                    {{ $invoices->links('vendor.pagination.bootstrap-5') }}
+                    {{ $invoices->links('vendor.pagination.custom') }}
                 </div>
             </div>
         </div>

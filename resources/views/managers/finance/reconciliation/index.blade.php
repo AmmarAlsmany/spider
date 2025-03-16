@@ -96,7 +96,7 @@
                         </button>
                     </div>
                     <div>
-                        {{ $unreconciled->links('vendor.pagination.bootstrap-5') }}
+                        {{ $unreconciled->links('vendor.pagination.custom') }}
                     </div>
                 </div>
                 @endif
@@ -127,7 +127,7 @@
 @endsection
 
 @section('scripts')
-<script>
+<script>    
     document.addEventListener('DOMContentLoaded', function() {
         const selectAllCheckbox = document.getElementById('selectAll');
         const paymentCheckboxes = document.querySelectorAll('.payment-checkbox');

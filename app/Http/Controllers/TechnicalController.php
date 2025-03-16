@@ -779,20 +779,44 @@ class TechnicalController extends Controller
 
         // Transform the teams collection to include paginated visit schedules
         $teams = $teams->map(function ($team) use ($request) {
-            $query = VisitSchedule::where('team_id', $team->id)
+            // First create the base query
+            $baseQuery = VisitSchedule::where('team_id', $team->id)
                 ->with(['contract.customer'])
                 ->orderBy('visit_date', 'asc');
+            
+            // Apply date filters to a clone of the base query
+            $query = clone $baseQuery;
 
-            if ($request->has('month') && $request->has('year')) {
+            // Handle month/year filter
+            if ($request->filled('month') && $request->filled('year')) {
                 $query->whereMonth('visit_date', $request->month)
                       ->whereYear('visit_date', $request->year);
             }
-            if ($request->has('date')) {
+            // Handle single date filter
+            elseif ($request->filled('date')) {
                 $query->whereDate('visit_date', $request->date);
             }
+            // Handle custom date range filter
+            elseif ($request->filled('from_date') && $request->filled('to_date')) {
+                $query->whereDate('visit_date', '>=', $request->from_date)
+                      ->whereDate('visit_date', '<=', $request->to_date);
+            }
+            // Handle just from_date without to_date (filter from a date onwards)
+            elseif ($request->filled('from_date')) {
+                $query->whereDate('visit_date', '>=', $request->from_date);
+            }
+            // Handle just to_date without from_date (filter up to a date)
+            elseif ($request->filled('to_date')) {
+                $query->whereDate('visit_date', '<=', $request->to_date);
+            }
 
-            $team->paginatedSchedules = $query->paginate(10, ['*'], 'page_'.$team->id);
+            // Count total filtered records before pagination
             $team->totalSchedules = $query->count();
+            
+            // Apply pagination after count
+            $team->paginatedSchedules = $query->paginate(10, ['*'], 'page_'.$team->id)
+                ->appends($request->except('page_'.$team->id));
+                
             return $team;
         });
 

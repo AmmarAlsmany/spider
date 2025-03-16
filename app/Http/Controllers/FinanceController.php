@@ -439,7 +439,7 @@ class FinanceController extends Controller
             ->where('reconciled', false)
             ->with(['contract', 'customer'])
             ->orderBy('paid_at', 'desc')
-            ->get();
+            ->paginate(10);
             
         // Get recently reconciled payments
         $reconciled = payments::where('reconciled', true)

@@ -43,7 +43,7 @@ Customer Contacts Report {{ request('start_date') && request('end_date') ? '(' .
             </div>
 
             <div class="mt-3">
-                {{ $customers->links() }}
+                {{ $customers->links('vendor.pagination.custom') }}
             </div>
         </div>
     </div>

@@ -255,7 +255,7 @@
                             </table>
                         </div>
                         <div class="mt-3">
-                            {{ $alerts->links() }}
+                            {{ $alerts->links('vendor.pagination.custom') }}
                         </div>
                     </div>
 

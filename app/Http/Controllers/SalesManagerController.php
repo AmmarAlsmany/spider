@@ -248,7 +248,7 @@ class SalesManagerController extends Controller
         $rejected = $contracts->where('contract_status', 'rejected')->count();
 
         return view(
-            'managers.sales Manager.reports.contracts',
+            'managers.sales manager.reports.contracts',
             compact('contracts', 'total', 'approved', 'pending', 'rejected')
         );
     }
@@ -296,7 +296,7 @@ class SalesManagerController extends Controller
         $total = $remainingPayments->sum('payment_amount');
 
         return view(
-            'managers.sales Manager.reports.payments',
+            'managers.sales manager.reports.payments',
             compact('remainingPayments', 'total')
         );
     }
@@ -322,7 +322,7 @@ class SalesManagerController extends Controller
         $remaining = $total - $collected;
 
         return view(
-            'managers.sales Manager.reports.invoices',
+            'managers.sales manager.reports.invoices',
             compact('invoices', 'total', 'collected', 'remaining')
         );
     }

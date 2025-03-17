@@ -110,7 +110,7 @@
                                 </table>
 
                                 <div class="mt-4">
-                                    {{ $annexes->links() }}
+                                    {{ $annexes->links('vendor.pagination.custom') }}
                                 </div>
                             @else
                                 <div class="py-4 text-center">

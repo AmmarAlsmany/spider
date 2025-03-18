@@ -1617,7 +1617,8 @@
                 if (branchsNumber >= 1) {
                     const branchInfo = document.createElement('div');
                     branchInfo.className = 'col-md-12 mt-4';
-                    branchInfo.innerHTML = `
+
+                    let branchTableHtml = `
                     <h6 class="mb-3">Branch Information</h6>
                     <div class="table-responsive">
                         <table class="table table-bordered">
@@ -1630,32 +1631,33 @@
                                     <th>Address</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                ${Array.from({ length: branchsNumber }, (_, i) => ` <
-                        tr >
-                        <
-                        td > $ {
-                            getInputValue('branchName' + i)
-                        } < /td> <
-                    td > $ {
-                        getInputValue('branchmanager' + i)
-                    } < /td> <
-                    td > $ {
-                        getInputValue('branchphone' + i)
-                    } < /td> <
-                    td > $ {
-                        document.getElementById('branchcity' + i)?.options[document.getElementById('branchcity' + i)
-                            ?.selectedIndex]?.text || ''
-                    } < /td> <
-                    td > $ {
-                        getInputValue('branchAddress' + i)
-                    } < /td> < /
-                    tr >
-                        `).join('')}
+                            <tbody>`;
+
+                    // Generate table rows properly
+                    for (let i = 0; i < branchsNumber; i++) {
+                        const branchName = getInputValue('branchName' + i);
+                        const branchManager = getInputValue('branchmanager' + i);
+                        const branchPhone = getInputValue('branchphone' + i);
+                        const branchCity = document.getElementById('branchcity' + i)?.options[
+                            document.getElementById('branchcity' + i)?.selectedIndex]?.text || '';
+                        const branchAddress = getInputValue('branchAddress' + i);
+
+                        branchTableHtml += `
+                                <tr>
+                                    <td>${branchName}</td>
+                                    <td>${branchManager}</td>
+                                    <td>${branchPhone}</td>
+                                    <td>${branchCity}</td>
+                                    <td>${branchAddress}</td>
+                                </tr>`;
+                    }
+
+                    branchTableHtml += `
                             </tbody>
                         </table>
-                    </div>
-                `;
+                    </div>`;
+
+                    branchInfo.innerHTML = branchTableHtml;
 
                     // Add branch information to the summary
                     const summaryContainer = document.querySelector('.card-body');

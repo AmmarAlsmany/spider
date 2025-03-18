@@ -15,19 +15,19 @@ class client extends Authenticatable
 
     protected $table = 'clients';
     protected $fillable = [
-        'name', 
-        'email', 
-        'password', 
+        'name',
+        'email',
+        'password',
         'phone',
-        'mobile', 
+        'mobile',
         'zip_code',
         'tax_number',
-        'address', 
-        'city', 
-        'state', 
+        'address',
+        'city',
+        'state',
         'role',
         'sales_id',
-        'last_login_at', 
+        'last_login_at',
         'last_login_ip'
     ];
     protected $hidden = ['password'];
@@ -56,7 +56,7 @@ class client extends Authenticatable
     {
         return $this->hasMany(payments::class, 'customer_id');
     }
-    
+
     /**
      * Get the entity's notifications.
      *
@@ -65,5 +65,17 @@ class client extends Authenticatable
     public function notifications()
     {
         return $this->morphMany(DatabaseNotification::class, 'notifiable')->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Get the entity's unread notifications.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function unreadNotifications()
+    {
+        return $this->morphMany(DatabaseNotification::class, 'notifiable')
+            ->whereNull('read_at')
+            ->orderBy('created_at', 'desc');
     }
 }

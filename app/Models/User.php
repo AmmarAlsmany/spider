@@ -80,4 +80,11 @@ class User extends Authenticatable
     {
         return $this->morphMany(DatabaseNotification::class, 'notifiable')->orderBy('created_at', 'desc');
     }
+
+    public function unreadNotifications()
+    {
+        return $this->morphMany(DatabaseNotification::class, 'notifiable')
+            ->whereNull('read_at')
+            ->orderBy('created_at', 'desc');
+    }
 }

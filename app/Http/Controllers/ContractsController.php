@@ -193,7 +193,7 @@ class ContractsController extends Controller
                 $client->email = $request->clientEmail;
                 $client->phone = $request->clientPhone;
                 $client->mobile = $request->clientMobile;
-                $client->password = Hash::make($request->clientPhone);
+                $client->password = Hash::make($request->clientMobile);
                 $client->address = $request->clientAddress;
                 $client->city = $request->clientCity;
                 $client->zip_code = $request->client_zipcode;

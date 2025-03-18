@@ -136,8 +136,7 @@ function showNotificationPopup(notifications) {
             // Add click event to navigate to notification URL if available
             if (notification.url && notification.url !== '#') {
                 notificationItem.addEventListener('click', function () {
-                    markAsRead(notification.id);
-                    window.location.href = notification.url;
+                    handleNotificationNavigation(notification.id, notification.url);
                 });
                 notificationItem.style.cursor = 'pointer';
 
@@ -239,12 +238,246 @@ function showNotificationPopup(notifications) {
     document.addEventListener('keydown', escKeyHandler);
 }
 
+// Real-time notification system
+class NotificationSystem {
+    constructor(options = {}) {
+        this.options = {
+            toastContainer: 'toast-container',
+            autoHide: true,
+            delay: 5000,
+            position: 'bottom-right',
+            maxNotifications: 5,
+            sounds: {
+                info: null,
+                success: null,
+                warning: null,
+                error: null
+            },
+            ...options
+        };
+
+        this.notificationCount = 0;
+        this.soundsLoaded = false;
+
+        this.init();
+    }
+
+    init() {
+        // Create toast container if it doesn't exist
+        if (!document.getElementById(this.options.toastContainer)) {
+            const container = document.createElement('div');
+            container.id = this.options.toastContainer;
+            container.className = `position-fixed ${this.getPositionClasses()} p-3`;
+            container.style.zIndex = '1090';
+            document.body.appendChild(container);
+        }
+
+        // Load sound effects if provided
+        this.loadSounds();
+    }
+
+    getPositionClasses() {
+        switch (this.options.position) {
+            case 'top-right': return 'top-0 end-0';
+            case 'top-left': return 'top-0 start-0';
+            case 'bottom-left': return 'bottom-0 start-0';
+            case 'bottom-right': return 'bottom-0 end-0';
+            case 'top-center': return 'top-0 start-50 translate-middle-x';
+            case 'bottom-center': return 'bottom-0 start-50 translate-middle-x';
+            default: return 'bottom-0 end-0';
+        }
+    }
+
+    loadSounds() {
+        if (!this.soundsLoaded) {
+            for (const [type, path] of Object.entries(this.options.sounds)) {
+                if (path) {
+                    try {
+                        this.options.sounds[type] = new Audio(path);
+                    } catch (e) {
+                        console.error(`Failed to load sound for ${type} notifications`, e);
+                    }
+                }
+            }
+            this.soundsLoaded = true;
+        }
+    }
+
+    show(options) {
+        this.notificationCount++;
+
+        const {
+            type = 'info',
+            title = '',
+            message = '',
+            autohide = this.options.autoHide,
+            delay = this.options.delay,
+            playSound = true,
+            url = null
+        } = options;
+
+        // Create toast element
+        const toastId = `toast-${Date.now()}-${this.notificationCount}`;
+        const toast = document.createElement('div');
+        toast.id = toastId;
+        toast.className = `toast mb-2 notification-toast notification-${type}`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.setAttribute('data-bs-autohide', autohide.toString());
+        toast.setAttribute('data-bs-delay', delay.toString());
+
+        // Make it clickable if URL is provided
+        if (url && url !== '#') {
+            toast.style.cursor = 'pointer';
+            toast.setAttribute('title', 'Click to view details');
+            toast.setAttribute('data-url', url);
+            toast.addEventListener('click', function (e) {
+                // Don't navigate if close button was clicked
+                if (e.target.classList.contains('btn-close') ||
+                    e.target.closest('.btn-close')) {
+                    return;
+                }
+
+                // Use the common navigation handler (without marking as read for toasts)
+                handleNotificationNavigation(null, this.getAttribute('data-url'), false);
+            });
+        }
+
+        // Add toast content
+        const iconClass = this.getIconClass(type);
+        const bgClass = this.getBgClass(type);
+
+        toast.innerHTML = `
+            <div class="toast-header ${bgClass}">
+                <i class="${iconClass} me-2"></i>
+                <strong class="me-auto">${title}</strong>
+                <small>${this.getTimeText()}</small>
+                <button type="button" class="btn-close ${type === 'warning' ? '' : 'btn-close-white'}" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        `;
+
+        // Add to container
+        const container = document.getElementById(this.options.toastContainer);
+        container.appendChild(toast);
+
+        // Initialize toast
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+
+        // Play sound if enabled
+        if (playSound && this.options.sounds[type]) {
+            try {
+                this.options.sounds[type].play();
+            } catch (e) {
+                console.error('Failed to play notification sound', e);
+            }
+        }
+
+        // Remove oldest toast if we have too many
+        const toasts = container.querySelectorAll('.toast');
+        if (toasts.length > this.options.maxNotifications) {
+            container.removeChild(toasts[0]);
+        }
+
+        // Return toast for further manipulation
+        return { id: toastId, element: toast, bsToast };
+    }
+
+    getIconClass(type) {
+        switch (type) {
+            case 'success': return 'bx bx-check-circle';
+            case 'warning': return 'bx bx-error';
+            case 'error': return 'bx bx-x-circle';
+            case 'info': return 'bx bx-info-circle';
+            case 'payment': return 'bx bx-credit-card';
+            case 'message': return 'bx bx-message-detail';
+            case 'update': return 'bx bx-refresh';
+            default: return 'bx bx-bell';
+        }
+    }
+
+    getBgClass(type) {
+        switch (type) {
+            case 'success': return 'bg-success text-white';
+            case 'warning': return 'bg-warning text-dark';
+            case 'error': return 'bg-danger text-white';
+            case 'info': return 'bg-info text-white';
+            default: return 'bg-primary text-white';
+        }
+    }
+
+    getTimeText() {
+        return 'Just now';
+    }
+
+    success(title, message, options = {}) {
+        return this.show({ type: 'success', title, message, ...options });
+    }
+
+    info(title, message, options = {}) {
+        return this.show({ type: 'info', title, message, ...options });
+    }
+
+    warning(title, message, options = {}) {
+        return this.show({ type: 'warning', title, message, ...options });
+    }
+
+    error(title, message, options = {}) {
+        return this.show({ type: 'error', title, message, ...options });
+    }
+
+    message(title, message, options = {}) {
+        return this.show({ type: 'message', title, message, ...options });
+    }
+
+    payment(title, message, options = {}) {
+        return this.show({ type: 'payment', title, message, ...options });
+    }
+
+    update(title, message, options = {}) {
+        return this.show({ type: 'update', title, message, ...options });
+    }
+
+    closeAll() {
+        const container = document.getElementById(this.options.toastContainer);
+        const toasts = container.querySelectorAll('.toast');
+        toasts.forEach(toast => {
+            const bsToast = bootstrap.Toast.getInstance(toast);
+            if (bsToast) {
+                bsToast.hide();
+            }
+        });
+    }
+}
+
+// Initialize notification system
+let notifySystem;
+
+document.addEventListener('DOMContentLoaded', () => {
+    notifySystem = new NotificationSystem({
+        position: 'bottom-right',
+        delay: 5000,
+        maxNotifications: 5,
+        sounds: {
+            error: null,
+            success: null
+        }
+    });
+
+    // Expose globally if needed
+    window.notify = notifySystem;
+});
+
 // Helper functions (duplicated from notifications.js for independence)
 function getNotificationIcon(type) {
     switch (type) {
         case 'success': return 'bx bx-check-circle';
         case 'warning': return 'bx bx-error';
-        case 'danger': return 'bx bx-x-circle';
+        case 'error': return 'bx bx-x-circle';
         case 'info': return 'bx bx-info-circle';
         case 'payment': return 'bx bx-credit-card';
         case 'message': return 'bx bx-message-detail';
@@ -332,4 +565,48 @@ function updateNotificationCounter() {
         counter.textContent = '0';
         counter.style.display = 'none';
     }
-} 
+}
+
+/**
+ * Global utility function to handle notification clicks
+ * This ensures consistent behavior across all notification types
+ * 
+ * @param {string} id - The notification ID
+ * @param {string} url - The URL to navigate to
+ * @param {boolean} markRead - Whether to mark the notification as read (default: true)
+ */
+function handleNotificationNavigation(id, url, markRead = true) {
+    // If we should mark as read and ID is provided
+    if (markRead && id) {
+        // Mark the notification as read
+        markAsRead(id);
+    }
+
+    // Then navigate to the URL if it's provided and valid
+    if (url && url !== 'javascript:void(0)' && url !== '#') {
+        // Wait a tiny bit to allow the notification to be marked as read first
+        setTimeout(() => {
+            window.location.href = url;
+        }, 100);
+        return true;
+    }
+
+    return false;
+}
+
+// Update the showNotificationPopup function to use the new utility function
+document.addEventListener('DOMContentLoaded', function () {
+    // Find existing notifications and add click handlers
+    const existingNotifications = document.querySelectorAll('.notification-item');
+    existingNotifications.forEach(notification => {
+        const id = notification.getAttribute('data-id');
+        const url = notification.getAttribute('href');
+
+        if (id && url) {
+            notification.addEventListener('click', function (e) {
+                e.preventDefault();
+                handleNotificationNavigation(id, url);
+            });
+        }
+    });
+}); 

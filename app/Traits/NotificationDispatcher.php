@@ -13,10 +13,11 @@ use App\Notifications\TeamLeaderNotification;
 use App\Notifications\TechnicalNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Notifications\DatabaseNotification;
 
 trait NotificationDispatcher
 {
-    
+
     protected function getRole()
     {
         return Auth::user()->role;
@@ -33,7 +34,7 @@ trait NotificationDispatcher
             'priority' => 'normal'
         ], $data);
 
-        $notificationClass = match($role) {
+        $notificationClass = match ($role) {
             'client' => ClientNotification::class,
             'sales' => SalesNotification::class,
             'sales_manager' => SalesManagerNotification::class,
@@ -95,13 +96,17 @@ trait NotificationDispatcher
     protected function markNotificationAsRead($notificationId)
     {
         $user = Auth::guard('client')->check() ? Auth::guard('client')->user() : Auth::user();
-        
+
         if (!$user) {
             return false;
         }
 
         try {
-            $notification = $user->notifications()->where('id', $notificationId)->first();
+            $notification = DatabaseNotification::where('id', $notificationId)
+                ->where('notifiable_id', $user->id)
+                ->where('notifiable_type', get_class($user))
+                ->first();
+
             if ($notification) {
                 $notification->markAsRead();
                 return true;
@@ -109,7 +114,7 @@ trait NotificationDispatcher
         } catch (\Exception $e) {
             Log::error('Error marking notification as read: ' . $e->getMessage());
         }
-        
+
         return false;
     }
 
@@ -120,7 +125,10 @@ trait NotificationDispatcher
     {
         $user = Auth::guard('client')->check() ? Auth::guard('client')->user() : Auth::user();
         if ($user) {
-            $user->unreadNotifications->markAsRead();
+            DatabaseNotification::where('notifiable_id', $user->id)
+                ->where('notifiable_type', get_class($user))
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
             return true;
         }
         return false;
@@ -132,12 +140,12 @@ trait NotificationDispatcher
     protected function notifyWithPriority(string $role, array $data, string $priority = 'normal')
     {
         $data['priority'] = $priority;
-        $data['type'] = match($priority) {
+        $data['type'] = match ($priority) {
             'high' => 'error',
             'medium' => 'warning',
             default => 'info'
         };
-        
+
         $this->notifyByRole($role, $data);
     }
 }

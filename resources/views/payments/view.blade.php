@@ -368,11 +368,11 @@
                         <td>ريال سعودي {{ number_format($payment->payment_amount, 2) }}</td>
                         <td>إجمالي المبلغ شامل الضريبة</td>
                     </tr>
-                    {{-- <tr>
-                    <td>leverage the amount</td>
-                    <td>{{ convertNumberToArabicWords($payment->payment_amount) }}</td>
-                    <td>المبلغ بالحروف</td>
-                </tr> --}}
+                    <tr>
+                        <td>leverage the amount</td>
+                        <td>{{ $words['arabic'] }}</td>
+                        <td>المبلغ بالحروف</td>
+                    </tr>
                 </table>
 
                 <div class="row">

@@ -191,7 +191,7 @@
                 <div class="text-muted">
                     Showing {{ $contracts->firstItem() ?? 0 }} to {{ $contracts->lastItem() ?? 0 }} of {{ $contracts->total() ?? 0 }} contracts
                 </div>
-                {{ $contracts->links() }}
+                {{ $contracts->links("vendor.pagination.custom") }}
             </div>
         </div>
     </div>

@@ -157,7 +157,7 @@
             </div>
             <!-- Pagination -->
             <div class="mt-4 d-flex justify-content-end">
-                {{ $visits->links() }}
+                {{ $visits->links("vendor.pagination.custom") }}
             </div>
             @else
             <div class="py-4 text-center">

@@ -111,7 +111,7 @@
             </div>
 
             <div class="mt-3 d-flex justify-content-end">
-                {{ $payments->links() }}
+                {{ $payments->links("vendor.pagination.custom") }}
             </div>
         </div>
     </div>

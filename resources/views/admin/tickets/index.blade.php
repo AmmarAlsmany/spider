@@ -85,7 +85,7 @@
                 </table>
             </div>
             <div class="mt-3 d-flex justify-content-end">
-                {{ $tickets->links() }}
+                {{ $tickets->links("vendor.pagination.custom") }}
             </div>
         </div>
     </div>

@@ -116,7 +116,7 @@
 
                     <!-- Pagination -->
                     <div class="mt-4">
-                        {{ $visits->links() }}
+                        {{ $visits->links("vendor.pagination.custom") }}
                     </div>
                 </div>
             </div>

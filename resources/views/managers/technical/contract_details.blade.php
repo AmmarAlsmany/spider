@@ -198,7 +198,7 @@
                                     </tbody>
                                 </table>
                                 <div class="mt-3 d-flex justify-content-end">
-                                    {{ $visitSchedules->links('pagination::bootstrap-4') }}
+                                    {{ $visitSchedules->links('vendor.pagination.custom') }}
                                 </div>
                             </div>
                             @else

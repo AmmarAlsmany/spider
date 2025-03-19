@@ -63,6 +63,9 @@ class sales extends Controller
         })
             ->with(['client_info'])
             ->where('status', 'open')
+            ->orWhere('status', 'in_progress')
+            ->orWhere('status', 'resolved')
+            ->orWhere('status', 'closed')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();

@@ -46,6 +46,7 @@
                                         <th>Status</th>
                                         <th>Created</th>
                                         <th>Solved By</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -72,6 +73,14 @@
                                         </td>
                                         <td>{{ $ticket->created_at->format('Y-m-d H:i') }}</td>
                                         <td>{{ $ticket->solver ? $ticket->solver->name : 'Not solved yet' }}</td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <button type="button" class="btn btn-info btn-sm me-1" data-bs-toggle="modal"
+                                                data-bs-target="#viewReplies{{ $ticket->id }}">
+                                                <i class="bx bx-message-square-detail"></i> View Replies
+                                            </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                     @empty
                                     <tr>
@@ -81,6 +90,55 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="viewReplies{{ $ticket->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Ticket #{{ $ticket->tiket_number }} - Conversation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-4 ticket-details">
+                            <h6>Original Ticket</h6>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ $ticket->tiket_title }}</h6>
+                                    <p class="card-text">{{ $ticket->tiket_description }}</p>
+                                    <small class="text-muted">Created by {{ $ticket->customer->name }} -
+                                        {{ $ticket->created_at->format('Y-m-d H:i') }}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="replies-section">
+                            <h6>Replies</h6>
+                            @if($ticket->replies && $ticket->replies->count() > 0)
+                            @foreach($ticket->replies as $reply)
+                            <div
+                                class="card mb-2 {{ $reply->user_id == $ticket->customer_id ? 'bg-light' : 'bg-info-subtle' }}">
+                                <div class="card-body">
+                                    <p class="card-text">{{ $reply->reply }}</p>
+                                    <small class="text-muted">
+                                        By {{ $reply->user_id == $ticket->customer_id ?
+                                        $ticket->customer->name : 'Support Team' }}
+                                        - {{ $reply->created_at->format('Y-m-d H:i') }}
+                                    </small>
+                                </div>
+                            </div>
+                            @endforeach
+                            @else
+                            <p class="text-muted">No replies yet.</p>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>

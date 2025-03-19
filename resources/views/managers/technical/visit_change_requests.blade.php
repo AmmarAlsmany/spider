@@ -119,7 +119,7 @@
             </div>
             @if($pendingVisits->hasPages())
             <div class="mt-4">
-                {{ $pendingVisits->links() }}
+                {{ $pendingVisits->links('vendor.pagination.custom') }}
             </div>
             @endif
             @endif

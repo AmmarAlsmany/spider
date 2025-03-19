@@ -228,7 +228,7 @@
             </div>
             @if($tickets->hasPages())
             <div class="mt-4">
-                {{ $tickets->links() }}
+                {{ $tickets->links('vendor.pagination.custom') }}
             </div>
             @endif
         </div>

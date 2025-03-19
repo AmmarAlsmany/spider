@@ -146,3 +146,19 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize all modals with proper configuration
+        var modalElements = document.querySelectorAll('.modal');
+        modalElements.forEach(function(modalElement) {
+            new bootstrap.Modal(modalElement, {
+                backdrop: true,
+                keyboard: true,
+                focus: true
+            });
+        });
+    });
+</script>
+@endpush

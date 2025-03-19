@@ -263,19 +263,10 @@ function formatTimeAgo(date) {
 }
 
 function handleNotificationClick(event, id, url) {
-    // Prevent default behavior of the link
-    event.preventDefault();
-
-    // First mark the notification as read
-    markAsRead(id);
-
-    // Then navigate to the URL if it's provided and valid
-    if (url && url !== 'javascript:void(0)' && url !== '#') {
-        // Wait a tiny bit to allow the notification to be marked as read first
-        setTimeout(() => {
-            window.location.href = url;
-        }, 100);
+    if (!url || url === 'javascript:void(0)') {
+        event.preventDefault();
     }
+    markAsRead(id);
 }
 
 function markAsRead(id) {

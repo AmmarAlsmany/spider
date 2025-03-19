@@ -136,7 +136,8 @@ function showNotificationPopup(notifications) {
             // Add click event to navigate to notification URL if available
             if (notification.url && notification.url !== '#') {
                 notificationItem.addEventListener('click', function () {
-                    handleNotificationNavigation(notification.id, notification.url);
+                    markAsRead(notification.id);
+                    window.location.href = notification.url;
                 });
                 notificationItem.style.cursor = 'pointer';
 
@@ -312,8 +313,7 @@ class NotificationSystem {
             message = '',
             autohide = this.options.autoHide,
             delay = this.options.delay,
-            playSound = true,
-            url = null
+            playSound = true
         } = options;
 
         // Create toast element
@@ -326,23 +326,6 @@ class NotificationSystem {
         toast.setAttribute('aria-atomic', 'true');
         toast.setAttribute('data-bs-autohide', autohide.toString());
         toast.setAttribute('data-bs-delay', delay.toString());
-
-        // Make it clickable if URL is provided
-        if (url && url !== '#') {
-            toast.style.cursor = 'pointer';
-            toast.setAttribute('title', 'Click to view details');
-            toast.setAttribute('data-url', url);
-            toast.addEventListener('click', function (e) {
-                // Don't navigate if close button was clicked
-                if (e.target.classList.contains('btn-close') ||
-                    e.target.closest('.btn-close')) {
-                    return;
-                }
-
-                // Use the common navigation handler (without marking as read for toasts)
-                handleNotificationNavigation(null, this.getAttribute('data-url'), false);
-            });
-        }
 
         // Add toast content
         const iconClass = this.getIconClass(type);
@@ -463,8 +446,8 @@ document.addEventListener('DOMContentLoaded', () => {
         delay: 5000,
         maxNotifications: 5,
         sounds: {
-            error: null,
-            success: null
+            error: '/sounds/error.mp3',
+            success: '/sounds/success.mp3'
         }
     });
 
@@ -565,48 +548,4 @@ function updateNotificationCounter() {
         counter.textContent = '0';
         counter.style.display = 'none';
     }
-}
-
-/**
- * Global utility function to handle notification clicks
- * This ensures consistent behavior across all notification types
- * 
- * @param {string} id - The notification ID
- * @param {string} url - The URL to navigate to
- * @param {boolean} markRead - Whether to mark the notification as read (default: true)
- */
-function handleNotificationNavigation(id, url, markRead = true) {
-    // If we should mark as read and ID is provided
-    if (markRead && id) {
-        // Mark the notification as read
-        markAsRead(id);
-    }
-
-    // Then navigate to the URL if it's provided and valid
-    if (url && url !== 'javascript:void(0)' && url !== '#') {
-        // Wait a tiny bit to allow the notification to be marked as read first
-        setTimeout(() => {
-            window.location.href = url;
-        }, 100);
-        return true;
-    }
-
-    return false;
-}
-
-// Update the showNotificationPopup function to use the new utility function
-document.addEventListener('DOMContentLoaded', function () {
-    // Find existing notifications and add click handlers
-    const existingNotifications = document.querySelectorAll('.notification-item');
-    existingNotifications.forEach(notification => {
-        const id = notification.getAttribute('data-id');
-        const url = notification.getAttribute('href');
-
-        if (id && url) {
-            notification.addEventListener('click', function (e) {
-                e.preventDefault();
-                handleNotificationNavigation(id, url);
-            });
-        }
-    });
-}); 
+} 

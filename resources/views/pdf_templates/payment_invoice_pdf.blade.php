@@ -302,7 +302,7 @@
             </div>
             <div style="width: 30%; display: flex; justify-content: center; align-items: center;">
                 <div style="width: 100px; height: 100px;">
-                    {!! preg_replace('/<\?xml.*\?>/', '', $qrCode) !!}
+                    {!!  preg_replace('/<\?xml.*\?>/', '', $qrCode) !!}
                 </div>
             </div>
         </div>

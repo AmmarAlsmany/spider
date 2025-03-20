@@ -109,7 +109,7 @@
     </div>
     <div class="container mt-4">
         <h2>Edit Contract</h2>
-        <form action="{{ route('contract.update', $contract->id) }}" method="POST">
+        <form action="{{ route('contract.update', $contract->id) }}" method="POST" id="contract-form">
             @csrf
             @method('PATCH')
             <fieldset class="mb-4">
@@ -326,7 +326,6 @@
                     </div>
                 </div>
             </fieldset>
-            @if ($contract->is_multi_branch == 'yes')
             <fieldset class="mb-4">
                 <legend>Branch Information</legend>
                 @foreach ($contract->branchs as $index => $branch)
@@ -382,11 +381,28 @@
                 @endforeach
                 <button type="button" class="mt-2 btn btn-success" id="add-branch">Add New Branch</button>
             </fieldset>
-            @endif
             <fieldset class="mb-4">
                 <legend>Payment Information</legend>
                 <div class="card">
                     <div class="card-body" id="payments-container">
+                        <div class="mb-3 payment-summary">
+                            <div class="alert alert-info payment-summary-alert">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Total Payments:</strong> <span id="payment-count">{{ count($contract->payments) }}</span>
+                                    </div>
+                                    <div>
+                                        <strong>Total Amount:</strong> <span id="total-contract-amount">{{ number_format($contract->contract_price, 2) }}</span> SAR
+                                    </div>
+                                    <div>
+                                        <strong>Total Payment Amount:</strong> <span id="total-payment-amount">0.00</span> SAR
+                                    </div>
+                                    <div id="payment-validation-status">
+                                        <span class="badge bg-warning">Validating...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         @foreach ($contract->payments as $index => $payment)
                         <div class="mb-3 row payment-row" data-payment-id="{{ $index + 1 }}">
                             <input type="hidden" name="payment_id[]" value="{{ $payment->id }}">
@@ -433,6 +449,70 @@
             const paymentsContainer = document.getElementById('payments-container');
             const addPaymentBtn = document.getElementById('add-payment');
             const paymentTypeSelect = document.getElementById('payment_type');
+            const paymentCountElement = document.getElementById('payment-count');
+            const totalContractAmountElement = document.getElementById('total-contract-amount');
+            const totalPaymentAmountElement = document.getElementById('total-payment-amount');
+            const paymentValidationStatusElement = document.getElementById('payment-validation-status');
+            const contractPriceInput = document.getElementById('contract_price');
+            
+            // Function to update payment count
+            function updatePaymentCount() {
+                const paymentRows = document.querySelectorAll('.payment-row');
+                paymentCountElement.textContent = paymentRows.length;
+                validatePaymentAmounts();
+            }   
+            
+            // Function to update the contract amount display
+            function updateContractAmountDisplay() {
+                const contractPrice = parseFloat(contractPriceInput.value) || 0;
+                totalContractAmountElement.textContent = contractPrice.toFixed(2);
+                validatePaymentAmounts();
+            }
+            
+            // Function to calculate and validate total payment amounts
+            function validatePaymentAmounts() {
+                const paymentAmountInputs = document.querySelectorAll('input[name="payment_amount[]"]');
+                let totalPaymentAmount = 0;
+                
+                paymentAmountInputs.forEach(input => {
+                    const amount = parseFloat(input.value) || 0;
+                    totalPaymentAmount += amount;
+                });
+                
+                totalPaymentAmountElement.textContent = totalPaymentAmount.toFixed(2);
+                
+                // Get contract total amount
+                const contractTotalText = totalContractAmountElement.textContent.replace(/,/g, '');
+                const contractTotal = parseFloat(contractTotalText) || 0;
+                
+                // Compare and update validation status
+                if (Math.abs(totalPaymentAmount - contractTotal) < 0.01) {
+                    // Amounts match (allowing for small floating point differences)
+                    paymentValidationStatusElement.innerHTML = '<span class="badge bg-success">Amounts Match ✓</span>';
+                } else if (totalPaymentAmount > contractTotal) {
+                    // Payment total exceeds contract amount
+                    paymentValidationStatusElement.innerHTML = '<span class="badge bg-danger">Payment Total Exceeds Contract Amount!</span>';
+                } else {
+                    // Payment total is less than contract amount
+                    const difference = (contractTotal - totalPaymentAmount).toFixed(2);
+                    paymentValidationStatusElement.innerHTML = 
+                        `<span class="badge bg-warning">Payments Short by ${difference} SAR</span>`;
+                }
+            }
+            
+            // Initialize validation on page load
+            updatePaymentCount();
+            
+            // Calculate initial total payment amount
+            validatePaymentAmounts();
+            
+            // Add event listeners to all payment amount inputs
+            document.querySelectorAll('input[name="payment_amount[]"]').forEach(input => {
+                input.addEventListener('input', validatePaymentAmounts);
+            });
+            
+            // Add event listener to contract price input
+            contractPriceInput.addEventListener('input', updateContractAmountDisplay);
 
             // Function to update the visibility of the add payment button
             function updateAddPaymentButtonVisibility() {
@@ -480,6 +560,13 @@
             </div>
         `;
                 paymentsContainer.insertAdjacentHTML('beforeend', newPaymentRow);
+                
+                // Add event listener to the new payment amount input
+                const newPaymentAmountInput = document.getElementById(`payment_amount${newIndex}`);
+                newPaymentAmountInput.addEventListener('input', validatePaymentAmounts);
+                
+                // Update payment count and validation
+                updatePaymentCount();
             });
 
             // Remove payment row
@@ -488,6 +575,8 @@
                     const paymentRows = document.querySelectorAll('.payment-row');
                     if (paymentRows.length > 1) {
                         e.target.closest('.payment-row').remove();
+                        // Update payment count and validation after removal
+                        updatePaymentCount();
                     } else {
                         alert('At least one payment record must exist');
                     }
@@ -495,16 +584,17 @@
             });
         });
 </script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-            const addBranchBtn = document.getElementById('add-branch');
+        const addBranchBtn = document.getElementById('add-branch');
 
-            // Add new branch
-            addBranchBtn.addEventListener('click', function() {
-                const branchSections = document.querySelectorAll('.card h5').length;
-                const newIndex = branchSections;
+        // Add new branch
+        addBranchBtn.addEventListener('click', function() {
+            const branchSections = document.querySelectorAll('.card h5').length;
+            const newIndex = branchSections;
 
-                const newBranchHtml = `
+            const newBranchHtml = `
         <div class="mb-3 card">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -606,7 +696,9 @@
 
             // Calculate payment amount
             let finalAmount = parseFloat(finalAmountSpan.textContent);
-            paymentAmountSpan.textContent = paymentAmount.toFixed(2);
+            if (paymentAmountSpan) {
+                paymentAmountSpan.textContent = finalAmount.toFixed(2);
+            }
         }
 
         // Add event listeners
@@ -615,6 +707,66 @@
 
         // Initial calculation
         calculateAmounts();
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const contractForm = document.getElementById('contract-form');
+        const contractPriceInput = document.getElementById('contract_price');
+        
+        // Initialize validation on page load
+        validatePaymentTotals();
+        
+        // Add event listener to contract price input
+        contractPriceInput.addEventListener('input', validatePaymentTotals);
+        
+        // Add event listeners to all payment amount inputs
+        document.querySelectorAll('input[name="payment_amount[]"]').forEach(input => {
+            input.addEventListener('input', validatePaymentTotals);
+        });
+        
+        // Function to validate payment totals
+        function validatePaymentTotals() {
+            const paymentAmountInputs = document.querySelectorAll('input[name="payment_amount[]"]');
+            let totalPaymentAmount = 0;
+            
+            paymentAmountInputs.forEach(input => {
+                const amount = parseFloat(input.value) || 0;
+                totalPaymentAmount += amount;
+            });
+            
+            const contractTotal = parseFloat(contractPriceInput.value) || 0;
+            
+            // Store the validation result in a data attribute for use during form submission
+            contractForm.dataset.paymentsValid = (Math.abs(totalPaymentAmount - contractTotal) <= 0.01).toString();
+        }
+        
+        contractForm.addEventListener('submit', function(e) {
+            // Get payment amounts and contract total
+            const paymentAmountInputs = document.querySelectorAll('input[name="payment_amount[]"]');
+            let totalPaymentAmount = 0;
+            
+            paymentAmountInputs.forEach(input => {
+                const amount = parseFloat(input.value) || 0;
+                totalPaymentAmount += amount;
+            });
+            
+            // Get contract total amount
+            const contractTotal = parseFloat(contractPriceInput.value) || 0;
+            
+            // Check if amounts match
+            if (Math.abs(totalPaymentAmount - contractTotal) > 0.01) {
+                e.preventDefault(); // Prevent form submission
+                
+                // Show confirmation dialog
+                if (!confirm(`Warning: The total payment amount (${totalPaymentAmount.toFixed(2)} SAR) does not match the contract total (${contractTotal.toFixed(2)} SAR).\n\nDo you want to continue anyway?`)) {
+                    return false;
+                }
+            }
+            
+            return true;
+        });
     });
 </script>
 

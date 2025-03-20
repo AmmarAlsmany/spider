@@ -335,8 +335,8 @@
                         <tr>
                             <td>ريال سعودي {{ number_format($payment->payment_amount / 1.15, 2) }}</td>
                             <td>ريال سعودي {{ number_format($payment->payment_amount / 1.15, 2) }}</td>
-                            <td> الدفعة رقم {{ $payment->payment_number }} - من اصل
-                                {{ $payment->contract->number_Payments }} </td>
+                            <td>الدفعة رقم {{ $payment->payment_number }} - من اصل
+                                {{ $payment->total_payments }} </td>
                             <td>مكافحة حشرات - {{ $payment->contract->type->name }}</td>
                         </tr>
                     </tbody>

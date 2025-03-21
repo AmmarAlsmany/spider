@@ -109,13 +109,19 @@
                                     <th class="bg-light">
                                         {{ __('contract_details_new.contract_info_start_date') }}
                                     </th>
-                                    <td>{{ $contract->contract_start_date }}</td>
+                                    <td>{{ $contract->contract_start_date ? date('M d, Y', strtotime($contract->contract_start_date)) : 'Same as contract start date' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light">
                                         {{ __('contract_details_new.contract_info_end_date') }}
                                     </th>
-                                    <td>{{ $contract->contract_end_date}}</td>
+                                    <td>{{ $contract->contract_end_date ? date('M d, Y', strtotime($contract->contract_end_date)) : 'Same as contract start date' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        {{ __('contract_details_new.visit_start_date') }}
+                                    </th>
+                                    <td>{{ $contract->visit_start_date ? date('M d, Y', strtotime($contract->visit_start_date)) : 'Same as contract start date' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light">

@@ -193,6 +193,16 @@
                     @enderror
                 </div>
                 <div class="form-group">
+                    <label for="visit_start_date">Visit Start Date <span data-toggle="tooltip"
+                            title="Select the date when visits should start">(?)</span></label>
+                    <input type="date" class="form-control @error('visit_start_date') is-invalid @enderror" 
+                        id="visit_start_date" name="visit_start_date"
+                        value="{{ old('visit_start_date', $contract->visit_start_date) }}" required>
+                    @error('visit_start_date')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="form-group">
                     <label for="contract_end_date">End Date <span data-toggle="tooltip"
                             title="Select the end date of the contract">(?)</span></label>
                     <input type="date" class="form-control @error('contract_end_date') is-invalid @enderror" 
@@ -672,6 +682,9 @@
         const taxAmountSpan = document.getElementById('taxAmount');
         const finalAmountSpan = document.getElementById('finalAmount');
         const paymentAmountSpan = document.getElementById('paymentAmount');
+        const contractStartDateInput = document.getElementById('contract_start_date');
+        const visitStartDateInput = document.getElementById('visit_start_date');
+        const contractEndDateInput = document.getElementById('contract_end_date');
 
         function calculateAmounts() {
             let amount = parseFloat(totalAmountInput.value) || 0;
@@ -701,9 +714,39 @@
             }
         }
 
+        // Date validation
+        function validateDates() {
+            const startDate = new Date(contractStartDateInput.value);
+            const visitStartDate = new Date(visitStartDateInput.value);
+            const endDate = new Date(contractEndDateInput.value);
+            
+            // Validate visit start date
+            if (visitStartDate < startDate) {
+                visitStartDateInput.setCustomValidity('Visit start date must be on or after the contract start date');
+            } else if (visitStartDate > endDate) {
+                visitStartDateInput.setCustomValidity('Visit start date must be on or before the contract end date');
+            } else {
+                visitStartDateInput.setCustomValidity('');
+            }
+            
+            // Validate contract end date
+            if (endDate <= startDate) {
+                contractEndDateInput.setCustomValidity('End date must be after the start date');
+            } else {
+                contractEndDateInput.setCustomValidity('');
+            }
+        }
+
         // Add event listeners
         totalAmountInput.addEventListener('input', calculateAmounts);
         includeTaxCheckbox.addEventListener('change', calculateAmounts);
+        
+        // Add event listeners for date validation
+        if (contractStartDateInput && visitStartDateInput && contractEndDateInput) {
+            contractStartDateInput.addEventListener('change', validateDates);
+            visitStartDateInput.addEventListener('change', validateDates);
+            contractEndDateInput.addEventListener('change', validateDates);
+        }
 
         // Initial calculation
         calculateAmounts();

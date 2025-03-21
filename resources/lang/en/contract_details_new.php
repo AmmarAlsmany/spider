@@ -39,6 +39,7 @@ return [
     'contract_info_type' => 'Contract Type',
     'contract_info_warranty' => 'Warranty',
     'contract_info_visits' => 'Number of Visits',
+    'visit_start_date' => 'Visit Start Date',
     'contract_info_amount_with_vat' => 'Contract Amount (including VAT)',
     'contract_info_amount_without_vat' => 'Contract Amount (without VAT)',
     'vat_amount' => 'VAT Amount',

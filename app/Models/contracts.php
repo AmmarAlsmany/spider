@@ -17,6 +17,7 @@ class contracts extends Model
         'contract_number',
         'contract_start_date',
         'contract_end_date',
+        'visit_start_date',
         'is_finish',
         'contract_status',
         'contract_type',

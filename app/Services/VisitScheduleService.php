@@ -273,12 +273,16 @@ class VisitScheduleService
                 throw new \Exception('Contract must have at least one branch');
             }
 
+            // Use visit_start_date if available, otherwise fallback to contract_start_date
+            $startDate = $contract->visit_start_date 
+                ? Carbon::parse($contract->visit_start_date) 
+                : Carbon::parse($contract->contract_start_date);
+
             $branchVisitDates = [];
             $schedules = [];
 
             // First, generate all visit dates for each branch
             foreach ($branches as $branch) {
-                $startDate = Carbon::parse($contract->contract_start_date);
                 $existingVisits = VisitSchedule::where('branch_id', $branch->id)
                     ->where('status', '!=', 'cancelled')
                     ->get()
@@ -339,24 +343,27 @@ class VisitScheduleService
             }
 
             // } else {
-            //     $startDate = Carbon::parse($contract->contract_start_date);
+            //     // Use visit_start_date if available, otherwise fallback to contract_start_date
+            //     $startDate = $contract->visit_start_date 
+            //         ? Carbon::parse($contract->visit_start_date) 
+            //         : Carbon::parse($contract->contract_start_date);
             //     $visitDates = $this->generateVisitDates($startDate, $numberOfVisits, []);
             //     $usedTeamSlots = [];
             //     foreach ($visitDates as $index => $visitDateTime) {
             //         $dateString = $visitDateTime->format('Y-m-d');
-
+            //
             //         // Find available team and time slot
             //         $available = $this->findAvailableTeamAndSlot($dateString, $usedTeamSlots);
-
+            //
             //         if (!$available) {
             //             DB::rollBack();
             //             throw new \Exception('No available team/slot found for visit on ' . $dateString);
             //         }
-
+            //
             //         // Mark this team as used for this date
             //         $teamDateKey = $available['team']->id . '_' . $dateString;
             //         $usedTeamSlots[$teamDateKey] = true;
-
+            //
             //         // Create visit schedule
             //         $visitSchedule = new VisitSchedule();
             //         $visitSchedule->contract_id = $contract->id;

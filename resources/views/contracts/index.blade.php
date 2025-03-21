@@ -349,6 +349,14 @@
                                             </div>
 
                                             <div class="col-12 col-lg-6">
+                                                <label for="visit_start_date" class="form-label">Visit Start Date <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="date" class="form-control" name="visit_start_date"
+                                                    id="visit_start_date" required>
+                                                <div class="invalid-feedback">Please select a visit start date between contract start and end dates</div>
+                                            </div>
+
+                                            <div class="col-12 col-lg-6">
                                                 <label for="contract_type_id" class="form-label">Contract Type <span
                                                         class="text-danger">*</span></label>
                                                 <select class="form-select" name="contract_type_id" id="contract_type_id"
@@ -723,8 +731,16 @@
                                                                         <td id="summary-contract-number"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>Contract Date:</strong></td>
-                                                                        <td id="summary-contract-date"></td>
+                                                                        <td><strong>Start Date:</strong></td>
+                                                                        <td id="summary-contract-date-start"></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><strong>End Date:</strong></td>
+                                                                        <td id="summary-contract-date-end"></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><strong>Visit Start Date:</strong></td>
+                                                                        <td id="summary-contract-date-visit-start"></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <td><strong>Warranty Period:</strong></td>
@@ -1055,6 +1071,7 @@
             const contractNumber = form.querySelector('[name="contractnumber"]');
             const startDate = form.querySelector('[name="contractstartdate"]');
             const endDate = form.querySelector('[name="contractenddate"]');
+            const visitStartDate = form.querySelector('[name="visit_start_date"]');
             const warranty = form.querySelector('[name="warranty"]');
             const contractType = form.querySelector('[name="contract_type_id"]');
             const propertyType = form.querySelector('[name="Property_type"]');
@@ -1062,7 +1079,7 @@
             const visits = form.querySelector('[name="number_of_visits"]');
 
             // Reset validation states
-            [contractNumber, startDate, endDate, warranty, contractType, propertyType, description, visits].forEach(
+            [contractNumber, startDate, endDate, visitStartDate, warranty, contractType, propertyType, description, visits].forEach(
                 field => {
                     if (field) {
                         field.classList.remove('is-invalid', 'is-valid');
@@ -1141,6 +1158,18 @@
                 endDate.classList.add('is-valid');
             }
 
+            // Validate visit start date
+            if (!visitStartDate || !visitStartDate.value.trim()) {
+                if (visitStartDate) {
+                    visitStartDate.classList.add('is-invalid');
+                    const feedback = visitStartDate.nextElementSibling;
+                    if (feedback) feedback.textContent = 'Please select a visit start date between contract start and end dates';
+                }
+                isValid = false;
+            } else {
+                visitStartDate.classList.add('is-valid');
+            }
+
             // Validate warranty
             if (!warranty || !warranty.value.trim() || parseInt(warranty.value) < 0) {
                 if (warranty) {
@@ -1163,6 +1192,24 @@
                     const feedback = endDate.nextElementSibling;
                     if (feedback) feedback.textContent = 'End date must be after start date';
                     isValid = false;
+                }
+                
+                // Validate visit start date is between contract start and end dates
+                const visitStart = document.getElementById('visit_start_date');
+                if (visitStart && visitStart.value) {
+                    const visitStartValue = new Date(visitStart.value);
+                    
+                    if (visitStartValue < start) {
+                        visitStart.classList.add('is-invalid');
+                        const feedback = visitStart.nextElementSibling;
+                        if (feedback) feedback.textContent = 'Visit start date must be on or after contract start date';
+                        isValid = false;
+                    } else if (visitStartValue > end) {
+                        visitStart.classList.add('is-invalid');
+                        const feedback = visitStart.nextElementSibling;
+                        if (feedback) feedback.textContent = 'Visit start date must be on or before contract end date';
+                        isValid = false;
+                    }
                 }
             }
 
@@ -1560,8 +1607,9 @@
 
                 // Contract Details
                 document.getElementById('summary-contract-number').textContent = getInputValue('contractNumber');
-                document.getElementById('summary-contract-date').textContent =
-                    `${getInputValue('contractstartdate')} to ${getInputValue('contractenddate')}`;
+                document.getElementById('summary-contract-date-start').textContent = getInputValue('contractstartdate');
+                document.getElementById('summary-contract-date-end').textContent = getInputValue('contractenddate');
+                document.getElementById('summary-contract-date-visit-start').textContent = getInputValue('visit_start_date');
                 document.getElementById('summary-warranty').textContent = getInputValue('warranty') + ' months';
 
                 // Get contract type

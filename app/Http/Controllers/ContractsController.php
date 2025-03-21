@@ -128,6 +128,7 @@ class ContractsController extends Controller
                 'contractnumber' => 'required|string|unique:contracts,contract_number',
                 'contractstartdate' => 'required|date|after_or_equal:today',
                 'contractenddate' => 'required|date|after:contractstartdate',
+                'visit_start_date' => 'required|date|after_or_equal:contractstartdate|before_or_equal:contractenddate',
                 'Property_type' => 'required|in:Residential,Commercial,Industrial,Government',
                 'contract_type_id' => 'required|exists:contracts_types,id',
                 'contract_description' => 'required|string',
@@ -158,6 +159,10 @@ class ContractsController extends Controller
                 'contractstartdate.after_or_equal' => 'The start date must be today or a future date.',
                 'contractenddate.required' => 'The contract end date is required.',
                 'contractenddate.after' => 'The end date must be after the start date.',
+                'visit_start_date.required' => 'The visit start date is required.',
+                'visit_start_date.date' => 'The visit start date must be a valid date.',
+                'visit_start_date.after_or_equal' => 'The visit start date must be on or after the contract start date.',
+                'visit_start_date.before_or_equal' => 'The visit start date must be on or before the contract end date.',
                 'Property_type.required' => 'The property type field is required.',
                 'contract_description.required' => 'The contract description field is required.',
                 'number_of_visits.required' => 'The number of visits field is required.',
@@ -249,6 +254,7 @@ class ContractsController extends Controller
         $contract->contract_number = $request->contractnumber;
         $contract->contract_start_date = $request->contractstartdate;
         $contract->contract_end_date = $request->contractenddate;
+        $contract->visit_start_date = $request->visit_start_date;
         $contract->Property_type = $request->Property_type;
         $contract->contract_type = $request->contract_type_id; // Use contract_type_id instead of contracttype
         $contract->contract_description = $request->contract_description;
@@ -585,6 +591,7 @@ class ContractsController extends Controller
                 'warranty' => 'required|integer|min:0',
                 'contract_start_date' => 'required|date',
                 'contract_end_date' => 'required|date|after:contract_start_date',
+                'visit_start_date' => 'required|date|after_or_equal:contract_start_date|before_or_equal:contract_end_date',
                 'contract_price' => 'required|numeric|min:0',
                 'payment_type' => 'required|string',
                 'number_Payments' => 'nullable|integer|min:1',

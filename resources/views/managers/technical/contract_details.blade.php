@@ -49,6 +49,10 @@
                                     <td>{{ date('M d, Y', strtotime($contract->contract_start_date)) }}</td>
                                 </tr>
                                 <tr>
+                                    <th>Visit Start Date</th>
+                                    <td>{{ $contract->visit_start_date ? date('M d, Y', strtotime($contract->visit_start_date)) : 'Same as contract start date' }}</td>
+                                </tr>
+                                <tr>
                                     <th>End Date</th>
                                     <td>{{ date('M d, Y', strtotime($contract->contract_end_date)) }}</td>
                                 </tr>

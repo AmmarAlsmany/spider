@@ -39,6 +39,7 @@ return [
     'contract_info_type' => 'نوع العقد',
     'contract_info_warranty' => 'الضمان',
     'contract_info_visits' => 'عدد الزيارات',
+    'visit_start_date' => 'تاريخ بدء الزيارات',
     'contract_info_amount_with_vat' => 'قيمة العقد مع ضريبة القيمة المضافة',
     'contract_info_amount_without_vat' => 'قيمة العقد بدون ضريبة القيمة المضافة',
     'vat_amount' => 'قيمة الضريبة',

@@ -50,6 +50,10 @@
                         <p>{{ $contract->contract_start_date }}</p>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label fw-bold">Visit Start Date</label>
+                        <p>{{ $contract->visit_start_date ?? 'Same as contract start date' }}</p>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label fw-bold">End Date</label>
                         <p>{{ $contract->contract_end_date ?? 'N/A' }}</p>
                     </div>

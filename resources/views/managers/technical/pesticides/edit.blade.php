@@ -31,7 +31,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('technical.pesticides.update', $pesticide) }}" method="POST">
+                    <form action="{{ route('technical.pesticides.update', $pesticide->id) }}" method="POST">
                         @csrf
                         @method('PUT')
                         <div class="mb-3">
@@ -48,6 +48,44 @@
                             @error('description')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category</label>
+                            <select class="form-control @error('category') is-invalid @enderror" id="category" name="category">
+                                <option value="">-- Select Category --</option>
+                                <option value="insecticide" {{ old('category', $pesticide->category) == 'insecticide' ? 'selected' : '' }}>Insecticide</option>
+                                <option value="rodenticide" {{ old('category', $pesticide->category) == 'rodenticide' ? 'selected' : '' }}>Rodenticide</option>
+                                <option value="fungicide" {{ old('category', $pesticide->category) == 'fungicide' ? 'selected' : '' }}>Fungicide</option>
+                                <option value="herbicide" {{ old('category', $pesticide->category) == 'herbicide' ? 'selected' : '' }}>Herbicide</option>
+                                <option value="other" {{ old('category', $pesticide->category) == 'other' ? 'selected' : '' }}>Other</option>
+                            </select>
+                            @error('category')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="current_stock" class="form-label">Current Stock</label>
+                                    <input type="number" class="form-control @error('current_stock') is-invalid @enderror" 
+                                        id="current_stock" name="current_stock" value="{{ old('current_stock', $pesticide->current_stock) }}" min="0">
+                                    @error('current_stock')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="min_stock_threshold" class="form-label">Minimum Stock Threshold</label>
+                                    <input type="number" class="form-control @error('min_stock_threshold') is-invalid @enderror" 
+                                        id="min_stock_threshold" name="min_stock_threshold" value="{{ old('min_stock_threshold', $pesticide->min_stock_threshold) }}" min="0">
+                                    @error('min_stock_threshold')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mb-3 form-check">

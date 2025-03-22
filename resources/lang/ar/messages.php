@@ -197,4 +197,10 @@ return [
     'quantity' => 'الكمية',
     'usage' => 'الاستخدام',
     'no_timeline_data_available' => 'لا تتوفر بيانات الجدول الزمني',
+    'no_team_usage_data_available' => 'لا توجد بيانات استخدام للفريق',
+    'no_pesticide_usage_data_available' => 'لا توجد بيانات استخدام للمبيدات',
+    'pesticide_usage_distribution' => 'توزيع استخدام المبيدات',
+    'team_consumption_comparison' => 'مقارنة استهلاك الفريق',
+    'consumption_units' => 'وحدات الاستهلاك',
+    'team_usage' => 'استخدام الفريق',
 ];

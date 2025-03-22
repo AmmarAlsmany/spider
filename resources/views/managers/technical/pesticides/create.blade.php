@@ -50,6 +50,44 @@
                                 @enderror
                             </div>
 
+                            <div class="mb-3">
+                                <label for="category" class="form-label">Category</label>
+                                <select class="form-control @error('category') is-invalid @enderror" id="category" name="category">
+                                    <option value="">-- Select Category --</option>
+                                    <option value="insecticide" {{ old('category') == 'insecticide' ? 'selected' : '' }}>Insecticide</option>
+                                    <option value="rodenticide" {{ old('category') == 'rodenticide' ? 'selected' : '' }}>Rodenticide</option>
+                                    <option value="fungicide" {{ old('category') == 'fungicide' ? 'selected' : '' }}>Fungicide</option>
+                                    <option value="herbicide" {{ old('category') == 'herbicide' ? 'selected' : '' }}>Herbicide</option>
+                                    <option value="other" {{ old('category') == 'other' ? 'selected' : '' }}>Other</option>
+                                </select>
+                                @error('category')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="current_stock" class="form-label">Current Stock</label>
+                                        <input type="number" class="form-control @error('current_stock') is-invalid @enderror" 
+                                            id="current_stock" name="current_stock" value="{{ old('current_stock', 0) }}" min="0">
+                                        @error('current_stock')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="min_stock_threshold" class="form-label">Minimum Stock Threshold</label>
+                                        <input type="number" class="form-control @error('min_stock_threshold') is-invalid @enderror" 
+                                            id="min_stock_threshold" name="min_stock_threshold" value="{{ old('min_stock_threshold', 10) }}" min="0">
+                                        @error('min_stock_threshold')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="mb-3 form-check">
                                 <input type="checkbox" class="form-check-input" id="active" name="active" value="1" {{
                                     old('active') ? 'checked' : 'checked' }}>

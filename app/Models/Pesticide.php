@@ -14,6 +14,9 @@ class Pesticide extends Model
         'name',
         'slug',
         'description',
+        'category',
+        'current_stock',
+        'min_stock_threshold',
         'active'
     ];
 
@@ -25,17 +28,5 @@ class Pesticide extends Model
     public function getRouteKeyName()
     {
         return 'slug';
-    }
-
-    /**
-     * Set the slug attribute.
-     *
-     * @param  string  $value
-     * @return void
-     */
-    public function setNameAttribute($value)
-    {
-        $this->attributes['name'] = $value;
-        $this->attributes['slug'] = Str::slug($value);
     }
 }

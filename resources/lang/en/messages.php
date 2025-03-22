@@ -197,4 +197,10 @@ return [
     'quantity' => 'Quantity',
     'usage' => 'Usage',
     'no_timeline_data_available' => 'No timeline data available',
+    'no_team_usage_data_available' => 'No team usage data available',
+    'no_pesticide_usage_data_available' => 'No pesticide usage data available',
+    'team_consumption_comparison' => 'Team Consumption Comparison',
+    'pesticide_usage_distribution' => 'Pesticide Usage Distribution',
+    'consumption_units' => 'Consumption Units',
+    'team_usage' => 'Team Usage',
 ];

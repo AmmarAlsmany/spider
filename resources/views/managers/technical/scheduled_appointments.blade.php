@@ -484,7 +484,7 @@
                         <div class="mb-3 form-group">
                             <label for="edit_visit_date">Visit Date</label>
                             <input type="date" class="form-control" id="edit_visit_date" name="visit_date" required
-                                min="{{ date('Y-m-d', strtotime('+1 day')) }}">
+                                min="{{ date('Y-m-d', strtotime($visit->visit_date)) }}" >
                         </div>
                         <div class="mb-3 form-group">
                             <label for="edit_visit_time">Visit Time</label>

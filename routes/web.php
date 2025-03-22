@@ -242,8 +242,9 @@ Route::middleware(['auth', 'role:technical'])->group(function () {
         Route::get('/create', [PesticideController::class, 'create'])->name('create');
         Route::post('/store', [PesticideController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [PesticideController::class, 'edit'])->name('edit');
-        Route::post('/update/{id}', [PesticideController::class, 'update'])->name('update');
+        Route::put('/update/{id}', [PesticideController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [PesticideController::class, 'destroy'])->name('destroy');
+        Route::get('/export', [PesticideController::class, 'export'])->name('export');
     });
 
     // Pesticide Analytics Routes

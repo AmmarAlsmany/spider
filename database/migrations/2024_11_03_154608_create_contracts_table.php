@@ -28,7 +28,6 @@ return new class extends Migration
             $table->enum('is_finish',["1","0"])->default("0");
             $table->date('contract_start_date');
             $table->date('contract_end_date');
-            $table->date('visit_start_date');
             $table->integer('warranty')->nullable();
             $table->integer('number_of_visits')->default(1);
             $table->softDeletes();

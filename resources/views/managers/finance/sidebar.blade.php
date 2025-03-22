@@ -33,13 +33,13 @@
         </li>
         <li class="mm-active">
             <a href="{{ route('finance.payments.pending') }}" class="nav-link {{ request()->routeIs('finance.payments.pending') ? 'active' : '' }}">
-                <div class="parent-icon"><i class='bx bx-clock'></i></div>
+                <div class="parent-icon"><i class='bx bx-time'></i></div>
                 <div class="menu-title">{{ __('messages.pending_payments') }}</div>
             </a>
         </li>
         <li class="mm-active">
             <a href="{{ route('finance.reconciliation.index') }}" class="nav-link {{ request()->routeIs('finance.reconciliation*') ? 'active' : '' }}">
-                <div class="parent-icon"><i class='bx bx-balance-scale'></i></div>
+                <div class="parent-icon"><i class='bx bx-check-square'></i></div>
                 <div class="menu-title">{{ __('messages.payment_reconciliation') }}</div>
             </a>
         </li>

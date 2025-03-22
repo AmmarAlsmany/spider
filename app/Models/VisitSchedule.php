@@ -56,4 +56,9 @@ class VisitSchedule extends Model
     {
         return $this->hasOne(VisitChangeRequest::class, 'visit_id');
     }
+
+    public function getTotalVisitsAttribute()
+    {
+        return $this->visit_number;
+    }
 }

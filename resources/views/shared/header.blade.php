@@ -6,7 +6,7 @@
 
             <div class="top-menu ms-auto">
                 <ul class="gap-1 navbar-nav align-items-center">
-                    <li class="nav-item dropdown dropdown-laungauge d-none d-sm-flex">
+                    <li class="nav-item dropdown dropdown-laungauge">
                         <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="javascript:;"
                             data-bs-toggle="dropdown" title="{{ __('messages.language') }}">
                             <img src="{{ asset('backend/assets/images/county/' . (app()->getLocale() == 'ar' ? '02.png' : '01.png')) }}"
@@ -27,7 +27,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="nav-item dark-mode d-none d-sm-flex">
+                    <li class="nav-item dark-mode">
                         <a class="nav-link dark-mode-icon" href="javascript:;" id="darkModeToggle"><i class='bx bx-moon'></i>
                         </a>
                     </li>
@@ -146,40 +146,8 @@
 
 @push('scripts')
 <script>
-    // Dark mode functionality
-    document.addEventListener('DOMContentLoaded', () => {
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const html = document.documentElement;
-
-        function setDarkMode(enabled) {
-            if (enabled) {
-                html.classList.add('dark-theme');
-                darkModeToggle.querySelector('i').classList.remove('bx-moon');
-                darkModeToggle.querySelector('i').classList.add('bx-sun');
-            } else {
-                html.classList.remove('dark-theme');
-                darkModeToggle.querySelector('i').classList.remove('bx-sun');
-                darkModeToggle.querySelector('i').classList.add('bx-moon');
-            }
-            localStorage.setItem('darkMode', enabled ? 'enabled' : 'disabled');
-
-            // Dispatch a custom event for other components to react
-            const event = new CustomEvent('themeChanged', { detail: { darkMode: enabled } });
-            document.dispatchEvent(event);
-        }
-
-        // Check if dark mode was previously enabled
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            setDarkMode(true);
-        }
-
-        // Toggle dark mode
-        darkModeToggle.addEventListener('click', () => {
-            const isDarkMode = html.classList.contains('dark-theme');
-            setDarkMode(!isDarkMode);
-        });
-    });
-
+    // Dark mode functionality - REMOVED (now handled by dark-mode.js)
+    
     function markAsRead(notificationId) {
         fetch(`/notifications/${notificationId}/mark-as-read`, {
             method: 'POST',

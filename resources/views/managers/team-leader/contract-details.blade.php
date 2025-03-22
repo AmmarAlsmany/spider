@@ -45,8 +45,16 @@
                                     <td>{{ $contract->contract_number }}</td>
                                 </tr>
                                 <tr>
+                                    <th>Contract Type</th>
+                                    <td>{{ $contract->type->name }}</td>
+                                </tr>
+                                <tr>
                                     <th>Start Date</th>
                                     <td>{{ date('M d, Y', strtotime($contract->contract_start_date)) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>End Date</th>
+                                    <td>{{ date('M d, Y', strtotime($contract->contract_end_date)) }}</td>
                                 </tr>
                                 <tr>
                                     <th>Status</th>

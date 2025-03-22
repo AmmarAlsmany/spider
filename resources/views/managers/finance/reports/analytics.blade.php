@@ -113,6 +113,12 @@
                         <div class="card-body">
                             <h6 class="mb-3">Monthly Revenue Breakdown</h6>
                             <div id="monthlyRevenueChart" style="height: 300px;"></div>
+                            <div id="monthlyRevenueChartFallback" class="d-none">
+                                <div class="alert alert-warning">
+                                    <i class="bx bx-info-circle me-1"></i>
+                                    No data available for the selected period. Try adjusting your date range.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -121,6 +127,12 @@
                         <div class="card-body">
                             <h6 class="mb-3">Cash Flow Projection</h6>
                             <div id="cashFlowProjectionChart" style="height: 300px;"></div>
+                            <div id="cashFlowProjectionChartFallback" class="d-none">
+                                <div class="alert alert-warning">
+                                    <i class="bx bx-info-circle me-1"></i>
+                                    No cash flow projection data available. Try adjusting your date range.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -198,148 +210,182 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Monthly Revenue Breakdown Chart
-        var monthlyData = @json($analytics['monthly_breakdown']);
-        var months = monthlyData.map(item => item.month);
-        var revenue = monthlyData.map(item => item.revenue);
-        var pending = monthlyData.map(item => item.pending);
-        var overdue = monthlyData.map(item => item.overdue);
+        // Debug data to console
+        console.log('Monthly Data:', @json($analytics['monthly_breakdown']));
+        console.log('Cash Flow Data:', @json($analytics['cash_flow_projection']));
+        console.log('Aging Data:', @json($analytics['aging_analysis']));
         
-        var monthlyRevenueOptions = {
-            series: [{
-                name: 'Revenue',
-                data: revenue
-            }, {
-                name: 'Pending',
-                data: pending
-            }, {
-                name: 'Overdue',
-                data: overdue
-            }],
-            chart: {
-                type: 'bar',
-                height: 300,
-                stacked: true,
-                toolbar: {
-                    show: false
-                }
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    columnWidth: '55%',
-                    endingShape: 'rounded'
-                },
-            },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                show: true,
-                width: 2,
-                colors: ['transparent']
-            },
-            xaxis: {
-                categories: months,
-            },
-            yaxis: {
-                title: {
-                    text: 'Amount (SAR)'
-                }
-            },
-            fill: {
-                opacity: 1
-            },
-            tooltip: {
-                y: {
-                    formatter: function (val) {
-                        return val.toLocaleString() + " SAR"
-                    }
-                }
-            },
-            colors: ['#20c997', '#ffc107', '#dc3545']
-        };
-        
-        var monthlyRevenueChart = new ApexCharts(document.querySelector("#monthlyRevenueChart"), monthlyRevenueOptions);
-        monthlyRevenueChart.render();
-        
-        // Cash Flow Projection Chart
-        var cashFlowData = @json($analytics['cash_flow_projection']);
-        var cashFlowMonths = cashFlowData.map(item => item.month);
-        var expectedInflow = cashFlowData.map(item => item.expected_inflow);
-        
-        var cashFlowOptions = {
-            series: [{
-                name: 'Expected Inflow',
-                data: expectedInflow
-            }],
-            chart: {
-                type: 'area',
-                height: 300,
-                toolbar: {
-                    show: false
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                curve: 'smooth',
-                width: 2
-            },
-            xaxis: {
-                categories: cashFlowMonths
-            },
-            yaxis: {
-                title: {
-                    text: 'Amount (SAR)'
-                }
-            },
-            tooltip: {
-                y: {
-                    formatter: function (val) {
-                        return val.toLocaleString() + " SAR"
-                    }
-                }
-            },
-            colors: ['#0d6efd']
-        };
-        
-        var cashFlowChart = new ApexCharts(document.querySelector("#cashFlowProjectionChart"), cashFlowOptions);
-        cashFlowChart.render();
-        
-        // Aging Analysis Chart
-        var agingData = @json($analytics['aging_analysis']);
-        
-        var agingOptions = {
-            series: [
-                agingData.current,
-                agingData['1_30'],
-                agingData['31_60'],
-                agingData['61_90'],
-                agingData.over_90
-            ],
-            chart: {
-                type: 'donut',
-                height: 300
-            },
-            labels: ['Current', '1-30 Days', '31-60 Days', '61-90 Days', 'Over 90 Days'],
-            responsive: [{
-                breakpoint: 480,
-                options: {
+        try {
+            // Monthly Revenue Breakdown Chart
+            var monthlyData = @json($analytics['monthly_breakdown'] ?? []);
+            if (monthlyData && monthlyData.length > 0) {
+                var months = monthlyData.map(item => item.month);
+                var revenue = monthlyData.map(item => item.revenue);
+                var pending = monthlyData.map(item => item.pending);
+                var overdue = monthlyData.map(item => item.overdue);
+                
+                var monthlyRevenueOptions = {
+                    series: [{
+                        name: 'Revenue',
+                        data: revenue
+                    }, {
+                        name: 'Pending',
+                        data: pending
+                    }, {
+                        name: 'Overdue',
+                        data: overdue
+                    }],
                     chart: {
-                        width: 200
+                        type: 'bar',
+                        height: 300,
+                        stacked: true,
+                        toolbar: {
+                            show: false
+                        }
                     },
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }],
-            colors: ['#20c997', '#0dcaf0', '#ffc107', '#fd7e14', '#dc3545']
-        };
-        
-        var agingChart = new ApexCharts(document.querySelector("#agingAnalysisChart"), agingOptions);
-        agingChart.render();
+                    plotOptions: {
+                        bar: {
+                            horizontal: false,
+                            columnWidth: '55%',
+                            endingShape: 'rounded'
+                        },
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    stroke: {
+                        show: true,
+                        width: 2,
+                        colors: ['transparent']
+                    },
+                    xaxis: {
+                        categories: months,
+                    },
+                    yaxis: {
+                        title: {
+                            text: 'Amount (SAR)'
+                        }
+                    },
+                    fill: {
+                        opacity: 1
+                    },
+                    tooltip: {
+                        y: {
+                            formatter: function (val) {
+                                return val.toLocaleString() + " SAR"
+                            }
+                        }
+                    },
+                    colors: ['#20c997', '#ffc107', '#dc3545']
+                };
+                
+                var monthlyRevenueChart = new ApexCharts(document.querySelector("#monthlyRevenueChart"), monthlyRevenueOptions);
+                monthlyRevenueChart.render();
+                console.log('Monthly Revenue chart rendered');
+                document.querySelector("#monthlyRevenueChartFallback").classList.add('d-none');
+            } else {
+                document.querySelector("#monthlyRevenueChart").innerHTML = '';
+                document.querySelector("#monthlyRevenueChartFallback").classList.remove('d-none');
+            }
+            
+            // Cash Flow Projection Chart
+            var cashFlowData = @json($analytics['cash_flow_projection'] ?? []);
+            if (cashFlowData && cashFlowData.length > 0) {
+                var cashFlowMonths = cashFlowData.map(item => item.month);
+                var expectedInflow = cashFlowData.map(item => item.expected_inflow);
+                var actualInflow = cashFlowData.map(item => item.actual_inflow || 0);
+                
+                var cashFlowOptions = {
+                    series: [{
+                        name: 'Expected Inflow',
+                        data: expectedInflow
+                    }, {
+                        name: 'Actual Inflow',
+                        data: actualInflow
+                    }],
+                    chart: {
+                        type: 'area',
+                        height: 300,
+                        toolbar: {
+                            show: false
+                        }
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    stroke: {
+                        curve: 'smooth',
+                        width: 2
+                    },
+                    xaxis: {
+                        categories: cashFlowMonths
+                    },
+                    yaxis: {
+                        title: {
+                            text: 'Amount (SAR)'
+                        }
+                    },
+                    tooltip: {
+                        y: {
+                            formatter: function (val) {
+                                return val.toLocaleString() + " SAR"
+                            }
+                        }
+                    },
+                    colors: ['#0d6efd', '#20c997']
+                };
+                
+                var cashFlowChart = new ApexCharts(document.querySelector("#cashFlowProjectionChart"), cashFlowOptions);
+                cashFlowChart.render();
+                console.log('Cash Flow chart rendered');
+                document.querySelector("#cashFlowProjectionChartFallback").classList.add('d-none');
+            } else {
+                document.querySelector("#cashFlowProjectionChart").innerHTML = '';
+                document.querySelector("#cashFlowProjectionChartFallback").classList.remove('d-none');
+            }
+            
+            // Aging Analysis Chart
+            var agingData = @json($analytics['aging_analysis'] ?? []);
+            if (agingData && Object.keys(agingData).length > 0) {
+                var agingOptions = {
+                    series: [
+                        agingData.current || 0,
+                        agingData['1_30'] || 0,
+                        agingData['31_60'] || 0,
+                        agingData['61_90'] || 0,
+                        agingData.over_90 || 0
+                    ],
+                    chart: {
+                        type: 'donut',
+                        height: 300
+                    },
+                    labels: ['Current', '1-30 Days', '31-60 Days', '61-90 Days', 'Over 90 Days'],
+                    responsive: [{
+                        breakpoint: 480,
+                        options: {
+                            chart: {
+                                width: 200
+                            },
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }],
+                    colors: ['#20c997', '#0dcaf0', '#ffc107', '#fd7e14', '#dc3545']
+                };
+                
+                var agingChart = new ApexCharts(document.querySelector("#agingAnalysisChart"), agingOptions);
+                agingChart.render();
+                console.log('Aging Analysis chart rendered');
+            } else {
+                document.querySelector("#agingAnalysisChart").innerHTML = '<div class="alert alert-info">No aging analysis data available.</div>';
+            }
+        } catch (error) {
+            console.error('Error rendering charts:', error);
+            document.querySelector("#monthlyRevenueChart").innerHTML = '<div class="alert alert-danger">Error rendering chart: ' + error.message + '</div>';
+            document.querySelector("#cashFlowProjectionChart").innerHTML = '<div class="alert alert-danger">Error rendering chart: ' + error.message + '</div>';
+            document.querySelector("#agingAnalysisChart").innerHTML = '<div class="alert alert-danger">Error rendering chart: ' + error.message + '</div>';
+        }
     });
 </script>
 @endsection

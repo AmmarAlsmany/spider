@@ -117,6 +117,9 @@ Session::forget('new_login');
 
     <!-- App JS -->
     <script src="{{ asset('backend/assets/js/app.js') }}"></script>
+    
+    <!-- Dark Mode JS -->
+    <script src="{{ asset('backend/assets/js/dark-mode.js') }}"></script>
 
     <!-- Notification Popup JS -->
     <script src="{{ asset('js/notification-popup.js') }}"></script>

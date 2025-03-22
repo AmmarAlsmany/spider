@@ -156,7 +156,7 @@ class FinanceController extends Controller
                 ->where('payment_status', $status)
                 ->count();
         }
-        
+
         return $distribution;
     }
 
@@ -236,15 +236,27 @@ class FinanceController extends Controller
         $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : Carbon::now()->startOfMonth();
         $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date')) : Carbon::now();
         
-        $analytics = [
-            'collection_rate' => $this->calculateCollectionRate($startDate, $endDate),
-            'monthly_breakdown' => $this->getMonthlyBreakdown($startDate, $endDate),
-            'payment_status_distribution' => $this->getPaymentStatusDistribution($startDate, $endDate),
-            'aging_analysis' => $this->getAgingAnalysis(),
-            'cash_flow_projection' => $this->getCashFlowProjection(),
-        ];
-        
-        return view('managers.finance.reports.analytics', compact('analytics', 'startDate', 'endDate'));
+        try {
+            $analytics = [
+                'collection_rate' => $this->calculateCollectionRate($startDate, $endDate),
+                'monthly_breakdown' => $this->getMonthlyBreakdown($startDate, $endDate),
+                'payment_status_distribution' => $this->getPaymentStatusDistribution($startDate, $endDate),
+                'aging_analysis' => $this->getAgingAnalysis(),
+                'cash_flow_projection' => $this->getCashFlowProjection(),
+            ];
+            
+            // Debug data to log
+            Log::info('Finance Analytics Data', [
+                'collection_rate' => $analytics['collection_rate'],
+                'monthly_breakdown_count' => count($analytics['monthly_breakdown']),
+                'cash_flow_projection_count' => count($analytics['cash_flow_projection']),
+            ]);
+            
+            return view('managers.finance.reports.analytics', compact('analytics', 'startDate', 'endDate'));
+        } catch (\Exception $e) {
+            Log::error('Error generating finance analytics: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error generating analytics: ' . $e->getMessage());
+        }
     }
     
     private function getAgingAnalysis()
@@ -271,14 +283,14 @@ class FinanceController extends Controller
                 ->where('due_date', '<', $now->copy()->subDays(90))
                 ->sum('payment_amount'),
         ];
-        
+
         return $aging;
     }
     
     private function getCashFlowProjection()
     {
         $startDate = Carbon::now();
-        $endDate = Carbon::now()->addMonths(3);
+        $endDate = Carbon::now()->addMonths(6); // Extended to 6 months for better visualization
         
         $months = [];
         $currentDate = Carbon::parse($startDate);
@@ -287,11 +299,23 @@ class FinanceController extends Controller
             $monthStart = $currentDate->copy()->startOfMonth();
             $monthEnd = $currentDate->copy()->endOfMonth();
             
+            // Get expected inflows (pending payments)
+            $expectedInflow = payments::whereBetween('due_date', [$monthStart, $monthEnd])
+                ->whereIn('payment_status', ['pending', 'unpaid', 'overdue'])
+                ->sum('payment_amount');
+            
+            // Add actual paid amounts for past months
+            $actualInflow = 0;
+            if ($currentDate < Carbon::now()) {
+                $actualInflow = payments::whereBetween('due_date', [$monthStart, $monthEnd])
+                    ->where('payment_status', 'paid')
+                    ->sum('payment_amount');
+            }
+            
             $months[] = [
                 'month' => $currentDate->format('M Y'),
-                'expected_inflow' => payments::whereBetween('due_date', [$monthStart, $monthEnd])
-                    ->whereIn('payment_status', ['pending', 'unpaid', 'overdue'])
-                    ->sum('payment_amount'),
+                'expected_inflow' => $expectedInflow,
+                'actual_inflow' => $actualInflow
             ];
             
             $currentDate->addMonth();

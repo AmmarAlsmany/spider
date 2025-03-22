@@ -88,4 +88,9 @@ class contracts extends Model
     {
         return $this->hasOne(EquipmentContract::class, 'contract_id');
     }
+
+    public function getTotalVisitsAttribute()
+    {
+        return $this->number_of_visits;
+    }
 }

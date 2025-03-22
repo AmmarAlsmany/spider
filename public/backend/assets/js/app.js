@@ -71,20 +71,10 @@ $(function() {
 		$(".search-bar").removeClass("full-search-bar")
 	}),
 
-	$(".dark-mode").on("click", function() {
-
-		if($(".dark-mode-icon i").attr("class") == 'bx bx-sun') {
-			$(".dark-mode-icon i").attr("class", "bx bx-moon");
-			$("html").attr("class", "light-theme")
-		} else {
-			$(".dark-mode-icon i").attr("class", "bx bx-sun");
-			$("html").attr("class", "dark-theme")
-		}
-
-	}), 
-
+	// Dark mode toggle is now handled in dark-mode.js
 	
 	$(document).ready(function() {
+		// Back to top button
 		$(window).on("scroll", function() {
 			$(this).scrollTop() > 300 ? $(".back-to-top").fadeIn() : $(".back-to-top").fadeOut()
 		}), $(".back-to-top").on("click", function() {
@@ -129,8 +119,10 @@ $(function() {
 		$(".switcher-wrapper").removeClass("switcher-toggled")
 	}), $("#lightmode").on("click", function() {
 		$("html").attr("class", "light-theme")
+		localStorage.setItem("darkMode", "disabled");
 	}), $("#darkmode").on("click", function() {
 		$("html").attr("class", "dark-theme")
+		localStorage.setItem("darkMode", "enabled");
 	}), $("#semidark").on("click", function() {
 		$("html").attr("class", "semi-dark")
 	}), $("#minimaltheme").on("click", function() {

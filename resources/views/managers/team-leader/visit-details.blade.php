@@ -78,7 +78,7 @@
                                         </tr>
                                         <tr>
                                             <th>Visit Number</th>
-                                            <td>{{ $visit->visit_number }} of {{ $visit->total_visits }}</td>
+                                            <td>{{ $visit->visit_number }} of {{ $visit->contract->totalVisits }}</td>
                                         </tr>
                                     </table>
                                 </div>

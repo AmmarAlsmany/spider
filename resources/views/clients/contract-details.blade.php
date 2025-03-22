@@ -66,6 +66,14 @@
                     <h5 class="mb-0">{{ __('contract_details.contract_information') }}</h5>
                 </div>
                 <div class="card-body">
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ __('messages.contract_details') }}</h5>
+                        <div>
+                            <a href="{{ route('contract.insect-analytics', $contract->id) }}" class="btn btn-primary">
+                                <i class="bx bx-line-chart"></i> Insect Analytics
+                            </a>
+                        </div>
+                    </div>
                     <div class="mb-4 row">
                         <div class="col-md-6">
                             <h6 class="mb-3 text-secondary">{{ __('contract_details.basic_details.title') }}</h6>

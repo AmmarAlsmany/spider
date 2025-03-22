@@ -19,12 +19,12 @@
     @endif
     <div class="card">
         <div class="card-body">
-            <div class="mb-4 d-flex align-items-center">
+            <div class="mb-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Contract Details</h5>
                 <div>
-                    <h5 class="mb-0">Contract Details</h5>
-                    <p class="mb-0 text-muted">Contract #{{ $contract->contract_number }}</p>
-                </div>
-                <div class="ms-auto">
+                    <a href="{{ route('contract.insect-analytics', $contract->id) }}" class="btn btn-primary">
+                        <i class="bx bx-line-chart"></i> Insect Analytics
+                    </a>
                     <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
                         <i class="bx bx-arrow-back me-1"></i>Back
                     </a>
@@ -198,7 +198,6 @@
                                             </td>
                                         </tr>
                                         @endforeach
-                                    </tbody>
                                     </tbody>
                                 </table>
                                 <div class="mt-3 d-flex justify-content-end">

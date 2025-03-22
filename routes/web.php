@@ -20,6 +20,7 @@ use App\Http\Controllers\sales;
 use App\Http\Controllers\SalesManagerController;
 use App\Http\Controllers\shared;
 use App\Http\Controllers\TargetInsectController;
+use App\Http\Controllers\TargetInsectAnalyticsController;
 use App\Http\Controllers\TeamLeaderController;
 use App\Http\Controllers\TechnicalController;
 use App\Http\Controllers\TiketsController;
@@ -60,6 +61,11 @@ Route::middleware(['prevent-back-history', 'auth:web,client'])->group(function (
     Route::get('/contract/{id}/pdf', [ContractsController::class, 'generatePDF'])->name('contract.pdf.generate');
     // Report PDF Generation Route
     Route::post('/reports/pdf', [ReportsController::class, 'generatePDF'])->name('reports.pdf');
+
+    // Shared Contract Insect Analytics - accessible by technical, sales, and clients
+    Route::get('/contract/{contract}/insect-analytics', [TargetInsectAnalyticsController::class, 'contractAnalytics'])
+        ->middleware(['auth'])
+        ->name('contract.insect-analytics');
 });
 
 // Admin Routes
@@ -248,14 +254,17 @@ Route::middleware(['auth', 'role:technical'])->group(function () {
         Route::get('/export', [PesticideController::class, 'export'])->name('export');
     });
 
-    // Target Insects Management Routes
-    Route::prefix('technical/target-insects')->name('technical.target-insects.')->group(function () {
-        Route::get('/', [TargetInsectController::class, 'index'])->name('index');
-        Route::get('/create', [TargetInsectController::class, 'create'])->name('create');
-        Route::post('/store', [TargetInsectController::class, 'store'])->name('store');
-        Route::get('/edit/{id}', [TargetInsectController::class, 'edit'])->name('edit');
-        Route::put('/update/{id}', [TargetInsectController::class, 'update'])->name('update');
-        Route::delete('/delete/{id}', [TargetInsectController::class, 'destroy'])->name('destroy');
+    // Target Insects Management
+    Route::prefix('technical/target-insects')->middleware(['auth', 'role:technical'])->group(function () {
+        Route::get('/', [TargetInsectController::class, 'index'])->name('target-insects.index');
+        Route::get('/create', [TargetInsectController::class, 'create'])->name('target-insects.create');
+        Route::post('/', [TargetInsectController::class, 'store'])->name('target-insects.store');
+        Route::get('/{targetInsect}/edit', [TargetInsectController::class, 'edit'])->name('target-insects.edit');
+        Route::put('/{targetInsect}', [TargetInsectController::class, 'update'])->name('target-insects.update');
+        Route::delete('/{targetInsect}', [TargetInsectController::class, 'destroy'])->name('target-insects.destroy');
+        
+        // Target Insects Analytics
+        Route::get('/analytics', [TargetInsectAnalyticsController::class, 'index'])->name('target-insects.analytics');
     });
 
     // Pesticide Analytics Routes

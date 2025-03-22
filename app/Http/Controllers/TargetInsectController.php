@@ -49,7 +49,7 @@ class TargetInsectController extends Controller
         ]);
         $targetInsect->save();
 
-        return redirect()->route('technical.target-insects.index')->with('success', 'Target insect added successfully');
+        return redirect()->route('target-insects.index')->with('success', 'Target insect added successfully');
     }
 
     /**
@@ -67,14 +67,14 @@ class TargetInsectController extends Controller
     public function update(Request $request, $id)
     {
         $targetInsect = TargetInsect::findOrFail($id);
-
         $request->validate([
             'name' => 'required|string|max:255|unique:target_insects,name,' . $targetInsect->id,
             'value' => 'required|string|max:255|unique:target_insects,value,' . $targetInsect->id,
             'description' => 'nullable|string',
-            'active' => 'boolean'
+            'active' => 'string'
         ]);
 
+        
         $targetInsect->fill([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
@@ -84,7 +84,7 @@ class TargetInsectController extends Controller
         ]);
         $targetInsect->save();
 
-        return redirect()->route('technical.target-insects.index')->with('success', 'Target insect updated successfully');
+        return redirect()->route('target-insects.index')->with('success', 'Target insect updated successfully');
     }
 
     /**
@@ -96,9 +96,9 @@ class TargetInsectController extends Controller
         
         try {
             $targetInsect->delete();
-            return redirect()->route('technical.target-insects.index')->with('success', 'Target insect deleted successfully');
+            return redirect()->route('target-insects.index')->with('success', 'Target insect deleted successfully');
         } catch (\Exception $e) {
-            return redirect()->route('technical.target-insects.index')->with('error', 'Cannot delete this target insect as it is in use');
+            return redirect()->route('target-insects.index')->with('error', 'Cannot delete this target insect as it is in use');
         }
     }
 }

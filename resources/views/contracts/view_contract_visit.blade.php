@@ -52,6 +52,11 @@
             <div class="border-0 shadow-sm card">
                 <div class="bg-transparent card-header">
                     <h5 class="mb-0"><i class="bx bx-calendar me-2"></i>Visit Schedule</h5>
+                    <div>
+                        <a href="{{ route('contract.insect-analytics', $contract->id) }}" class="btn btn-primary">
+                            <i class="bx bx-line-chart"></i> Insect Analytics
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     @php
@@ -162,7 +167,7 @@
                         </div>
                         
                         <!-- Show all visits if no branches are defined -->
-                        <div class="table-responsive mt-3">
+                        <div class="mt-3 table-responsive">
                             <table class="table align-middle table-hover">
                                 <thead class="bg-light">
                                     <tr>

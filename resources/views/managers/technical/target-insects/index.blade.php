@@ -44,7 +44,7 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Target Insects Management</h5>
-            <a href="{{ route('technical.target-insects.create') }}" class="btn btn-primary">
+            <a href="{{ route('target-insects.create') }}" class="btn btn-primary">
                 <i class="bx bx-plus me-1"></i> Add New Target Insect
             </a>
         </div>
@@ -76,10 +76,10 @@
                                 @endif
                             </td>
                             <td class="action-buttons">
-                                <a href="{{ route('technical.target-insects.edit', $insect->id) }}" class="btn btn-sm btn-primary">
+                                <a href="{{ route('target-insects.edit', $insect->id) }}" class="btn btn-sm btn-primary">
                                     <i class="bx bx-edit"></i> Edit
                                 </a>
-                                <form action="{{ route('technical.target-insects.destroy', $insect->id) }}" method="POST" class="d-inline">
+                                <form action="{{ route('target-insects.destroy', $insect->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this target insect?')">

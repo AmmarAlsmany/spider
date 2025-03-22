@@ -82,13 +82,18 @@
             </a>
             <ul>
                 <li>
-                    <a href="{{ route('technical.target-insects.index') }}">
+                    <a href="{{ route('target-insects.index') }}">
                         <i class="bx bx-list-ul"></i>Manage Insects
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('technical.target-insects.create') }}">
+                    <a href="{{ route('target-insects.create') }}">
                         <i class="bx bx-plus"></i>Add New Insect
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('target-insects.analytics') }}">
+                        <i class="bx bx-line-chart"></i>Insect Analytics
                     </a>
                 </li>
             </ul>

@@ -7,12 +7,12 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Edit Target Insect</h5>
-            <a href="{{ route('technical.target-insects.index') }}" class="btn btn-secondary">
+            <a href="{{ route('target-insects.index') }}" class="btn btn-secondary">
                 <i class="bx bx-arrow-back me-1"></i> Back to List
             </a>
         </div>
         <div class="card-body">
-            <form action="{{ route('technical.target-insects.update', $targetInsect->id) }}" method="POST">
+            <form action="{{ route('target-insects.update', $targetInsect->id) }}" method="POST">
                 @csrf
                 @method('PUT')
                 

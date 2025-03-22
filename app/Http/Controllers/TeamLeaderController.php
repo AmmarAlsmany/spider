@@ -8,6 +8,8 @@ use App\Models\Team;
 use App\Models\VisitSchedule;
 use App\Models\VisitReport;
 use App\Models\contracts;
+use App\Models\TargetInsect;
+use App\Models\Pesticide;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\NotificationDispatcher;
@@ -168,7 +170,13 @@ class TeamLeaderController extends Controller
 
         $this->notifyRoles(['sales', 'sales_manager', 'technical'], $data, $visit->contract->customer_id, $visit->contract->sales_id);
 
-        return view('managers.team-leader.create-report', compact('visit'));
+        // Get active target insects for the form
+        $targetInsects = TargetInsect::where('active', true)->orderBy('name')->get();
+        
+        // Get active pesticides for the form
+        $pesticides = Pesticide::where('active', true)->orderBy('name')->get();
+
+        return view('managers.team-leader.create-report', compact('visit', 'targetInsects', 'pesticides'));
     }
 
     public function storeReport(Request $request, $visitId)

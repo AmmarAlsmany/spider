@@ -73,6 +73,26 @@
                 </li>
             </ul>
         </li>
+        
+        <li>
+            <a href="javascript:;" class="has-arrow">
+                <div class="parent-icon"><i class='bx bx-bug'></i>
+                </div>
+                <div class="menu-title">Target Insects</div>
+            </a>
+            <ul>
+                <li>
+                    <a href="{{ route('technical.target-insects.index') }}">
+                        <i class="bx bx-list-ul"></i>Manage Insects
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('technical.target-insects.create') }}">
+                        <i class="bx bx-plus"></i>Add New Insect
+                    </a>
+                </li>
+            </ul>
+        </li>
 
         <li class="menu-label">{{ __('messages.tickets') }}</li>
         <li>

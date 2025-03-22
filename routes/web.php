@@ -19,6 +19,7 @@ use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\sales;
 use App\Http\Controllers\SalesManagerController;
 use App\Http\Controllers\shared;
+use App\Http\Controllers\TargetInsectController;
 use App\Http\Controllers\TeamLeaderController;
 use App\Http\Controllers\TechnicalController;
 use App\Http\Controllers\TiketsController;
@@ -245,6 +246,16 @@ Route::middleware(['auth', 'role:technical'])->group(function () {
         Route::put('/update/{id}', [PesticideController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [PesticideController::class, 'destroy'])->name('destroy');
         Route::get('/export', [PesticideController::class, 'export'])->name('export');
+    });
+
+    // Target Insects Management Routes
+    Route::prefix('technical/target-insects')->name('technical.target-insects.')->group(function () {
+        Route::get('/', [TargetInsectController::class, 'index'])->name('index');
+        Route::get('/create', [TargetInsectController::class, 'create'])->name('create');
+        Route::post('/store', [TargetInsectController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [TargetInsectController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [TargetInsectController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [TargetInsectController::class, 'destroy'])->name('destroy');
     });
 
     // Pesticide Analytics Routes

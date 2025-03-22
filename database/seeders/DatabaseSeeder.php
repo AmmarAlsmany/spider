@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Alert;
 use App\Models\User;
 use App\Models\contracts_types;
 use App\Models\Team;
 use App\Models\tikets;
+use Database\Seeders\TargetInsectSeeder;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -17,6 +17,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Call the TargetInsectSeeder
+        $this->call([
+            TargetInsectSeeder::class,
+        ]);
+        
         User::create([
             'name' => 'sales man',
             'email' => 'sales@spider.com',

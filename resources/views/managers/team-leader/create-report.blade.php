@@ -176,48 +176,20 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
+                                        @foreach($targetInsects->take(ceil($targetInsects->count() / 2)) as $insect)
                                         <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="target_insects[]" value="cockroaches" id="cockroaches">
-                                            <label class="form-check-label" for="cockroaches">Cockroaches</label>
+                                            <input type="checkbox" class="form-check-input" name="target_insects[]" value="{{ $insect->value }}" id="{{ $insect->value }}">
+                                            <label class="form-check-label" for="{{ $insect->value }}">{{ $insect->name }}</label>
                                         </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="target_insects[]" value="rodents" id="rodents">
-                                            <label class="form-check-label" for="rodents">Rodents</label>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="target_insects[]" value="flying_insects" id="flying_insects">
-                                            <label class="form-check-label" for="flying_insects">Flying Insects</label>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="target_insects[]" value="ants" id="ants">
-                                            <label class="form-check-label" for="ants">Ants</label>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="target_insects[]" value="snakes" id="snakes">
-                                            <label class="form-check-label" for="snakes">Snakes</label>
-                                        </div>
+                                        @endforeach
                                     </div>
                                     <div class="col-md-6">
+                                        @foreach($targetInsects->skip(ceil($targetInsects->count() / 2)) as $insect)
                                         <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="target_insects[]" value="scorpions" id="scorpions">
-                                            <label class="form-check-label" for="scorpions">Scorpions</label>
+                                            <input type="checkbox" class="form-check-input" name="target_insects[]" value="{{ $insect->value }}" id="{{ $insect->value }}">
+                                            <label class="form-check-label" for="{{ $insect->value }}">{{ $insect->name }}</label>
                                         </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="target_insects[]" value="lizard" id="lizard">
-                                            <label class="form-check-label" for="lizard">Lizard</label>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="target_insects[]" value="bed_bug" id="bed_bug">
-                                            <label class="form-check-label" for="bed_bug">Bed Bug</label>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="target_insects[]" value="termites_before" id="termites_before">
-                                            <label class="form-check-label" for="termites_before">Termites Before Building</label>
-                                        </div>
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="target_insects[]" value="termites_after" id="termites_after">
-                                            <label class="form-check-label" for="termites_after">Termites After Building</label>
-                                        </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>

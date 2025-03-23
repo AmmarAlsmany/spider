@@ -226,17 +226,25 @@ class VisitScheduleService
     private function findAvailableTeamAndSlot($visitDate, array $usedTeamSlots)
     {
         $teams = Team::where('status', '=', 'active')->get();
+        
+        if ($teams->isEmpty()) {
+            Log::warning("No active teams found when scheduling visits for date: $visitDate");
+            return null;
+        }
 
         // Get all visits for this date to avoid scheduling at the same time
         $existingVisits = VisitSchedule::whereDate('visit_date', $visitDate)
             ->pluck('visit_time')
             ->toArray();
+        
+        Log::info("Scheduling for date: $visitDate. Existing visits: " . json_encode($existingVisits));
 
         foreach (self::$timeSlots as $timeSlot) {
             $timeString = sprintf('%02d:00:00', $timeSlot);
 
             // Skip if this time slot is already used on this date
             if (in_array($timeString, $existingVisits)) {
+                Log::info("Time slot $timeString is already used on $visitDate");
                 continue;
             }
 
@@ -247,10 +255,14 @@ class VisitScheduleService
                 // Skip if this team is already assigned for this date
                 $teamDateKey = $team->id . '_' . $visitDate;
                 if (isset($usedTeamSlots[$teamDateKey])) {
+                    Log::info("Team {$team->name} (ID: {$team->id}) is already assigned for date $visitDate");
                     continue;
                 }
 
-                if ($this->isTeamAvailable($team, $visitDate, $timeString)) {
+                $isAvailable = $this->isTeamAvailable($team, $visitDate, $timeString);
+                Log::info("Team {$team->name} (ID: {$team->id}) availability for $visitDate $timeString: " . ($isAvailable ? 'Available' : 'Not available'));
+                
+                if ($isAvailable) {
                     return [
                         'team' => $team,
                         'time' => $timeString,
@@ -260,7 +272,84 @@ class VisitScheduleService
             }
         }
 
+        // If we get here, no standard slot was available - try a fallback time slot
+        $fallbackSlots = [15, 16]; // 3:00 PM and 4:00 PM as fallback options
+        
+        foreach ($fallbackSlots as $fallbackSlot) {
+            $timeString = sprintf('%02d:00:00', $fallbackSlot);
+            
+            // Skip if this fallback slot is already used
+            if (in_array($timeString, $existingVisits)) {
+                continue;
+            }
+            
+            foreach ($teams as $team) {
+                $teamDateKey = $team->id . '_' . $visitDate;
+                if (isset($usedTeamSlots[$teamDateKey])) {
+                    continue;
+                }
+                
+                if ($this->isTeamAvailable($team, $visitDate, $timeString)) {
+                    Log::info("Using fallback slot $timeString for team {$team->name} on $visitDate");
+                    return [
+                        'team' => $team,
+                        'time' => $timeString,
+                        'slot' => $fallbackSlot
+                    ];
+                }
+            }
+        }
+
+        Log::warning("No available team/slot found for visit on $visitDate after trying all options");
         return null;
+    }
+
+    private function isTeamAvailable(Team $team, $visitDate, $visitTime)
+    {
+        $visitStart = Carbon::parse($visitDate . ' ' . $visitTime);
+        $visitEnd = $visitStart->copy()->addHours(self::VISIT_DURATION_HOURS);
+        
+        // First check if the team exists and is active
+        if (!$team || $team->status !== 'active') {
+            Log::info("Team {$team->name} is not active");
+            return false;
+        }
+        
+        // Convert to database-friendly format
+        $visitStartStr = $visitStart->format('Y-m-d H:i:s');
+        $visitEndStr = $visitEnd->format('Y-m-d H:i:s');
+
+        // Check for conflicts with existing schedules
+        $conflicts = VisitSchedule::where('team_id', $team->id)
+            ->where('status', '!=', 'cancelled')
+            ->where(function ($query) use ($visitStartStr, $visitEndStr) {
+                // Find any schedule that overlaps with our proposed time window
+                $query->where(function ($q) use ($visitStartStr, $visitEndStr) {
+                    // Schedule starts during our window
+                    $q->whereRaw("CONCAT(visit_date, ' ', visit_time) >= ?", [$visitStartStr])
+                      ->whereRaw("CONCAT(visit_date, ' ', visit_time) < ?", [$visitEndStr]);
+                })->orWhere(function ($q) use ($visitStartStr, $visitEndStr) {
+                    // Schedule ends during our window
+                    $q->whereRaw(
+                        "DATE_ADD(CONCAT(visit_date, ' ', visit_time), INTERVAL ? HOUR) > ?",
+                        [self::VISIT_DURATION_HOURS, $visitStartStr]
+                    )->whereRaw(
+                        "CONCAT(visit_date, ' ', visit_time) <= ?",
+                        [$visitStartStr]
+                    );
+                });
+            })
+            ->get();
+            
+        if ($conflicts->count() > 0) {
+            Log::info("Team {$team->name} has conflicts for $visitDate $visitTime: " . $conflicts->count() . " conflicting visits");
+            foreach ($conflicts as $conflict) {
+                Log::info("Conflict: Visit ID {$conflict->id} on {$conflict->visit_date} at {$conflict->visit_time}");
+            }
+            return false;
+        }
+
+        return true;
     }
 
     public function createVisitSchedule(contracts $contract)
@@ -342,70 +431,11 @@ class VisitScheduleService
                 }
             }
 
-            // } else {
-            //     // Use visit_start_date if available, otherwise fallback to contract_start_date
-            //     $startDate = $contract->visit_start_date 
-            //         ? Carbon::parse($contract->visit_start_date) 
-            //         : Carbon::parse($contract->contract_start_date);
-            //     $visitDates = $this->generateVisitDates($startDate, $numberOfVisits, []);
-            //     $usedTeamSlots = [];
-            //     foreach ($visitDates as $index => $visitDateTime) {
-            //         $dateString = $visitDateTime->format('Y-m-d');
-            //
-            //         // Find available team and time slot
-            //         $available = $this->findAvailableTeamAndSlot($dateString, $usedTeamSlots);
-            //
-            //         if (!$available) {
-            //             DB::rollBack();
-            //             throw new \Exception('No available team/slot found for visit on ' . $dateString);
-            //         }
-            //
-            //         // Mark this team as used for this date
-            //         $teamDateKey = $available['team']->id . '_' . $dateString;
-            //         $usedTeamSlots[$teamDateKey] = true;
-            //
-            //         // Create visit schedule
-            //         $visitSchedule = new VisitSchedule();
-            //         $visitSchedule->contract_id = $contract->id;
-            //         $visitSchedule->team_id = $available['team']->id;
-            //         $visitSchedule->visit_date = $dateString;
-            //         $visitSchedule->visit_time = $available['time'];
-            //         $visitSchedule->status = 'scheduled';
-            //         $visitSchedule->visit_number = $index + 1;
-            //         $visitSchedule->visit_type = 'regular';
-            //         $visitSchedule->save();
-            //         $schedules[] = $visitSchedule;
-            //     }
-            // }
-
             DB::commit();
             return $schedules;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
         }
-    }
-
-    private function isTeamAvailable(Team $team, $visitDate, $visitTime)
-    {
-        $visitStart = Carbon::parse($visitDate . ' ' . $visitTime);
-        $visitEnd = $visitStart->copy()->addHours(self::VISIT_DURATION_HOURS);
-
-        return !VisitSchedule::where('team_id', $team->id)
-            ->where('status', '!=', 'cancelled')
-            ->where(function ($query) use ($visitStart, $visitEnd) {
-                $query->where(function ($q) use ($visitStart, $visitEnd) {
-                    $q->whereRaw(
-                        "CONCAT(visit_date, ' ', visit_time) <= ?",
-                        [$visitEnd->format('Y-m-d H:i:s')]
-                    )
-                        ->whereRaw(
-                            "DATE_ADD(CONCAT(visit_date, ' ', visit_time), 
-                          INTERVAL ? HOUR) >= ?",
-                            [self::VISIT_DURATION_HOURS, $visitStart->format('Y-m-d H:i:s')]
-                        );
-                });
-            })
-            ->exists();
     }
 }

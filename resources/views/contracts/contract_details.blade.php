@@ -55,7 +55,8 @@
                     </div>
                     <div class="gap-2 d-flex flex-column flex-md-row">
                         @if($contract->contract_status !== 'stopped')
-                        <form action="{{ route('contract.stop', $contract->id) }}" method="POST" style="display: inline-block; margin: 0; padding: 0;">
+                        <form action="{{ route('contract.stop', $contract->id) }}" method="POST"
+                            style="display: inline-block; margin: 0; padding: 0;">
                             @csrf
                             @method('PATCH')
                             <button type="submit" class="btn btn-danger w-100 w-md-auto">
@@ -109,19 +110,23 @@
                                     <th class="bg-light">
                                         {{ __('contract_details_new.contract_info_start_date') }}
                                     </th>
-                                    <td>{{ $contract->contract_start_date ? date('M d, Y', strtotime($contract->contract_start_date)) : 'Same as contract start date' }}</td>
+                                    <td>{{ $contract->contract_start_date ? date('M d, Y',
+                                        strtotime($contract->contract_start_date)) : 'Same as contract start date' }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light">
                                         {{ __('contract_details_new.contract_info_end_date') }}
                                     </th>
-                                    <td>{{ $contract->contract_end_date ? date('M d, Y', strtotime($contract->contract_end_date)) : 'Same as contract start date' }}</td>
+                                    <td>{{ $contract->contract_end_date ? date('M d, Y',
+                                        strtotime($contract->contract_end_date)) : 'Same as contract start date' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light">
                                         {{ __('contract_details_new.visit_start_date') }}
                                     </th>
-                                    <td>{{ $contract->visit_start_date ? date('M d, Y', strtotime($contract->visit_start_date)) : 'Same as contract start date' }}</td>
+                                    <td>{{ $contract->visit_start_date ? date('M d, Y',
+                                        strtotime($contract->visit_start_date)) : 'Same as contract start date' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light">
@@ -454,8 +459,7 @@
                                         <td>{{ number_format($request->payment->payment_amount, 2) }} SAR</td>
                                         <td>{{ \Carbon\Carbon::parse($request->requested_date)->format('M d, Y') }}</td>
                                         <td>
-                                            <span
-                                                class="badge bg-{{ 
+                                            <span class="badge bg-{{ 
                                                     $request->status == 'approved' ? 'success' : 
                                                     ($request->status == 'pending' ? 'warning' : 'danger') 
                                                 }} px-3 py-2">
@@ -591,6 +595,7 @@
                                                 {{ __('contract_details_new.status_' . $annex->status) }}
                                             </span>
                                         </td>
+                                        @if($annex->status === 'pending')
                                         <td>
                                             <form
                                                 action="{{ route('contracts.annex.destroy', ['contract' => $contract->id, 'annex' => $annex->id]) }}"
@@ -604,6 +609,7 @@
                                                 </button>
                                             </form>
                                         </td>
+                                        @endif
                                     </tr>
                                     @endforeach
                                 </tbody>

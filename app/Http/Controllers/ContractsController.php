@@ -13,6 +13,7 @@ use App\Models\PostponementRequest;
 use App\Models\VisitSchedule;
 use App\Models\EquipmentContract; // Add the EquipmentContract model import
 use App\Models\EquipmentType;
+use App\Models\Team;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -1063,14 +1064,30 @@ class ContractsController extends Controller
             // Create a temporary contract object for scheduling only the new branches
             $tempContract = clone $contract;
             $tempContract->setRelation('branchs', $newBranches);
+            
+            // Ensure the temporary contract has all required properties
+            if (!isset($tempContract->number_of_visits) || empty($tempContract->number_of_visits)) {
+                $tempContract->number_of_visits = $contract->number_of_visits;
+            }
+            
+            if (!isset($tempContract->visit_start_date) || empty($tempContract->visit_start_date)) {
+                // Use current date as the visit start date for annex branches
+                $tempContract->visit_start_date = now()->format('Y-m-d');
+            }
 
             // Schedule visits for the new branches only
             try {
+                // Check if there are active teams available
+                $activeTeams = Team::where('status', 'active')->count();
+                if ($activeTeams == 0) {
+                    throw new \Exception('No active teams available for scheduling visits');
+                }
+                
                 $this->visitScheduleService->createVisitSchedule($tempContract);
             } catch (\Exception $e) {
                 DB::rollback();
                 Log::error('Failed to schedule visits for annex branches: ' . $e->getMessage());
-                return back()->with('error', 'Failed to schedule visits for the new branches');
+                return back()->with('error', 'Failed to schedule visits for the new branches: ' . $e->getMessage());
             }
 
             // Notify relevant parties
@@ -1090,7 +1107,7 @@ class ContractsController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Annex approval error: ' . $e->getMessage());
-            return back()->with('error', 'Error approving annex');
+            return back()->with('error', 'Error approving annex: ' . $e->getMessage());
         }
     }
 
@@ -1111,6 +1128,12 @@ class ContractsController extends Controller
 
             DB::beginTransaction();
 
+            // Delete branches associated with this annex
+            branchs::where('annex_id', $annex->id)->delete();
+            
+            // Delete payment associated with this annex
+            payments::where('annex_id', $annex->id)->delete();
+
             $annex->update([
                 'status' => 'rejected',
                 'approved_by' => Auth::id(),
@@ -1130,7 +1153,7 @@ class ContractsController extends Controller
 
             DB::commit();
 
-            return back()->with('success', 'Annex rejected successfully');
+            return back()->with('success', 'Annex rejected successfully and related branches and payments removed');
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Annex rejection error: ' . $e->getMessage());

@@ -99,6 +99,27 @@
             margin-top: 50px;
             margin-bottom: 10px;
         }
+        .branch-visits {
+            margin-bottom: 20px;
+        }
+        .branch-name {
+            color: #0056b3;
+            margin-bottom: 5px;
+            font-size: 14px;
+            border-bottom: 1px solid #0056b3;
+            padding-bottom: 3px;
+        }
+        .branch-address {
+            color: #555;
+            font-style: italic;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        .branch-separator {
+            height: 1px;
+            background-color: #ddd;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -176,7 +197,7 @@
                 @foreach($contract->branchs as $branch)
                 <tr>
                     <td>{{ $branch->branch_name }}</td>
-                    <td>{{ $branch->branch_manager }}</td>
+                    <td>{{ $branch->branch_manager_name }}</td>
                     <td>{{ $branch->branch_manager_phone }}</td>
                     <td>{{ $branch->branch_address }}, {{ $branch->branch_city }}</td>
                 </tr>
@@ -194,14 +215,18 @@
                 <thead>
                     <tr>
                         <th>Payment Date</th>
-                        <th>Amount</th>
+                        <th>Amount without VAT</th>
+                        <th>VAT</th>
+                        <th>Amount with VAT</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($contract->payments as $payment)
                     <tr>
-                        <td>{{ date('F d, Y', strtotime($payment->payment_date)) }}</td>
+                        <td>{{ date('F d, Y', strtotime($payment->due_date)) }}</td>
+                        <td>{{ number_format($payment->payment_amount / 1.15, 2) }}</td>
+                        <td>{{ number_format($payment->payment_amount - ($payment->payment_amount / 1.15), 2) }}</td>
                         <td>{{ number_format($payment->payment_amount, 2) }}</td>
                         <td>{{ ucfirst($payment->payment_status) }}</td>
                     </tr>
@@ -215,28 +240,49 @@
     @if($contract->visitSchedules && count($contract->visitSchedules) > 0)
     <div class="section">
         <h3 class="section-title">Visit Schedule</h3>
-        <table class="visit-schedule">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Team</th>
-                    <th>Notes</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($contract->visitSchedules as $visit)
-                <tr>
-                    <td>{{ date('F d, Y', strtotime($visit->visit_date)) }}</td>
-                    <td>{{ $visit->visit_type }}</td>
-                    <td>{{ ucfirst($visit->status) }}</td>
-                    <td>{{ $visit->team->name }}</td>
-                    <td>{{ $visit->notes ?? 'N/A' }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+        
+        @php
+            // Group visits by branch
+            $visitsByBranch = $contract->visitSchedules->groupBy('branch_id');
+        @endphp
+        
+        @foreach($visitsByBranch as $branchId => $branchVisits)
+            @php
+                $branch = App\Models\branchs::find($branchId);
+            @endphp
+            
+            <div class="branch-visits">
+                <h4 class="branch-name">Branch: {{ $branch->branch_name }}</h4>
+                <p class="branch-address">{{ $branch->branch_address }}, {{ $branch->branch_city }}</p>
+                
+                <table class="visit-schedule">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Team</th>
+                            <th>Team Recommendations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($branchVisits as $visit)
+                        <tr>
+                            <td>{{ date('F d, Y', strtotime($visit->visit_date)) }}</td>
+                            <td>{{ $visit->visit_type }}</td>
+                            <td>{{ ucfirst($visit->status) }}</td>
+                            <td>{{ $visit->team->name }}</td>
+                            <td>{{ $visit->report->recommendations ?? 'N/A' }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            
+            @if(!$loop->last)
+                <div class="branch-separator"></div>
+            @endif
+        @endforeach
     </div>
     @endif
 

@@ -177,6 +177,12 @@
                                                                 onclick="rescheduleVisit({{ $schedule->id }})">
                                                                 <i class="bx bx-calendar-edit"></i> Reschedule
                                                             </button>
+                                                        @elseif($schedule->status == 'completed')
+                                                            <button type="button" class="btn btn-sm btn-outline-success">
+                                                                <a href="{{ route('technical.visit.report.view', $schedule->id) }}">
+                                                                    <i class="bx bx-calendar-check"></i> View Report
+                                                                </a>
+                                                            </button>
                                                         @endif
                                                     </td>
                                                 </tr>

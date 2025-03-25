@@ -207,156 +207,184 @@
                                 <div id="contract-{{ $contract->id }}" class="accordion-collapse collapse"
                                     aria-labelledby="heading{{ $contract->id }}" data-bs-parent="#contractAccordion">
                                     <div class="accordion-body">
-                                        <div class="table-responsive visits-table">
-                                            <table class="table mb-0 align-middle table-borderless">
-                                                <thead>
-                                                    <tr class="table-light">
-                                                        <th class="px-3 py-3 fw-semibold">Visit Details</th>
-                                                        <th class="px-3 py-3 fw-semibold">Branch</th>
-                                                        <th class="px-3 py-3 fw-semibold">Team</th>
-                                                        <th class="px-3 py-3 fw-semibold">Status</th>
-                                                        <th class="px-3 py-3 fw-semibold text-end">Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($contractVisits[$contract->id] as $visit)
-                                                    <tr class="border-bottom">
-                                                        <td class="px-3 py-3">
-                                                            <div class="d-flex flex-column">
-                                                                <span class="mb-1 text-dark fw-medium">
-                                                                    {{ \Carbon\Carbon::parse($visit->visit_date)->format('M d, Y') }}
-                                                                </span>
-                                                                <span class="text-muted font-size-13">
-                                                                    {{ \Carbon\Carbon::parse($visit->visit_time)->format('h:i A') }}
-                                                                </span>
+                                        <!-- Branch Tabs -->
+                                        <ul class="mb-3 nav nav-tabs" id="branchTabs-{{ $contract->id }}" role="tablist">
+                                            @php
+                                                // Group visits by branch
+                                                $branchVisits = [];
+                                                foreach($contractVisits[$contract->id] as $visit) {
+                                                    $branchId = $visit->branch_id ?? 'main';
+                                                    $branchName = $visit->branch ? $visit->branch->branch_name : 'Main Location';
+                                                    
+                                                    if(!isset($branchVisits[$branchId])) {
+                                                        $branchVisits[$branchId] = [
+                                                            'name' => $branchName,
+                                                            'visits' => []
+                                                        ];
+                                                    }
+                                                    
+                                                    $branchVisits[$branchId]['visits'][] = $visit;
+                                                }
+                                                $firstBranch = true;
+                                            @endphp
+                                            
+                                            @foreach($branchVisits as $branchId => $branch)
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link {{ $firstBranch ? 'active' : '' }}" 
+                                                            id="branch-{{ $contract->id }}-{{ $branchId }}-tab" 
+                                                            data-bs-toggle="tab" 
+                                                            data-bs-target="#branch-{{ $contract->id }}-{{ $branchId }}-content" 
+                                                            type="button" 
+                                                            role="tab" 
+                                                            aria-controls="branch-{{ $contract->id }}-{{ $branchId }}-content" 
+                                                            aria-selected="{{ $firstBranch ? 'true' : 'false' }}">
+                                                        <i class="bx bx-building me-1"></i> {{ $branch['name'] }}
+                                                        <span class="badge rounded-pill bg-primary ms-1">{{ count($branch['visits']) }}</span>
+                                                    </button>
+                                                </li>
+                                                @php $firstBranch = false; @endphp
+                                            @endforeach
+                                        </ul>
+                                        
+                                        <!-- Branch Tab Content -->
+                                        <div class="tab-content" id="branchTabsContent-{{ $contract->id }}">
+                                            @php $firstBranch = true; @endphp
+                                            @foreach($branchVisits as $branchId => $branch)
+                                                <div class="tab-pane fade {{ $firstBranch ? 'show active' : '' }}" 
+                                                     id="branch-{{ $contract->id }}-{{ $branchId }}-content" 
+                                                     role="tabpanel" 
+                                                     aria-labelledby="branch-{{ $contract->id }}-{{ $branchId }}-tab">
+                                                    
+                                                    <div class="mb-3 branch-header">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <h6 class="mb-0">
+                                                                <i class="bx bx-map-pin text-primary me-1"></i>
+                                                                {{ $branch['name'] }} Visits
+                                                            </h6>
+                                                            <div>
+                                                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                                        data-bs-toggle="modal" 
+                                                                        data-bs-target="#createVisitModal" 
+                                                                        data-contract-id="{{ $contract->id }}" 
+                                                                        data-branch-id="{{ $branchId == 'main' ? '' : $branchId }}">
+                                                                    <i class="bx bx-plus me-1"></i>Add Visit
+                                                                </button>
                                                             </div>
-                                                        </td>
-                                                        <td class="px-3 py-3">
-                                                            <div class="d-flex align-items-center">
-                                                                <i class="bx bx-map-pin me-2 text-muted"></i>
-                                                                <span>{{ $visit->branch->branch_name ?? $visit->contract->customer->city }} 
-                                                                    <small class="text-muted">{{ $visit->branch->branch_address ?? $visit->contract->customer->address }}</small>
-                                                                </span>
-                                                            </div>
-                                                        </td>
-                                                        <td class="px-3 py-3">
-                                                            <div class="d-flex align-items-center">
-                                                                <i class="bx bx-group me-2 text-muted"></i>
-                                                                <span>{{ $visit->team ? $visit->team->name : 'Not Assigned' }}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td class="px-3 py-3">
-                                                            @if($visit->status == 'scheduled')
-                                                                <div class="px-2 py-1 d-inline-flex rounded-pill bg-soft-warning">
-                                                                    <i class="bx bx-time-five text-warning me-1"></i>
-                                                                    <span class="stat-label">Scheduled</span>
-                                                                </div>
-                                                            @elseif($visit->status == 'completed')
-                                                                <div class="px-2 py-1 d-inline-flex rounded-pill bg-soft-success">
-                                                                    <i class="bx bx-check-circle text-success me-1"></i>
-                                                                    <span class="stat-label">Completed</span>
-                                                                </div>
-                                                            @elseif($visit->status == 'cancelled')
-                                                                <div class="px-2 py-1 d-inline-flex rounded-pill bg-soft-danger">
-                                                                    <i class="bx bx-x-circle text-danger me-1"></i>
-                                                                    <span class="stat-label">Cancelled</span>
-                                                                </div>
-                                                            @endif
-                                                        </td>
-                                                        <td class="px-3 py-3 text-end">
-                                                            <div class="btn-group">
-                                                                @if($visit->status == 'scheduled')
-                                                                    <button type="button" 
-                                                                            class="px-3 btn btn-soft-primary btn-sm" 
-                                                                            onclick="openEditModal({{ $visit->id }}, '{{ $visit->visit_date }}', '{{ $visit->visit_time }}', {{ $visit->team_id }})">
-                                                                        <i class="bx bx-edit-alt me-1"></i> Edit
-                                                                    </button>
-                                                                    <button type="button" 
-                                                                            class="px-3 btn btn-soft-danger btn-sm" 
-                                                                            onclick="cancelAppointment({{ $visit->id }})">
-                                                                        <i class="bx bx-x me-1"></i> Cancel
-                                                                    </button>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="table-responsive visits-table">
+                                                        <table class="table mb-0 align-middle table-borderless">
+                                                            <thead>
+                                                                <tr class="table-light">
+                                                                    <th class="px-3 py-3 fw-semibold">Visit Details</th>
+                                                                    <th class="px-3 py-3 fw-semibold">Team</th>
+                                                                    <th class="px-3 py-3 fw-semibold">Status</th>
+                                                                    <th class="px-3 py-3 fw-semibold text-end">Actions</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($branch['visits'] as $visit)
+                                                                <tr class="border-bottom">
+                                                                    <td class="px-3 py-3">
+                                                                        <div class="d-flex flex-column">
+                                                                            <span class="mb-1 text-dark fw-medium">
+                                                                                Visit #{{ $visit->visit_number ?? 'N/A' }}
+                                                                            </span>
+                                                                            <span class="mb-1 text-dark">
+                                                                                {{ \Carbon\Carbon::parse($visit->visit_date)->format('M d, Y') }}
+                                                                            </span>
+                                                                            <span class="text-muted font-size-13">
+                                                                                {{ \Carbon\Carbon::parse($visit->visit_time)->format('h:i A') }}
+                                                                            </span>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="px-3 py-3">
+                                                                        <div class="d-flex align-items-center">
+                                                                            <i class="bx bx-group me-2 text-muted"></i>
+                                                                            <span>{{ $visit->team ? $visit->team->name : 'Not Assigned' }}</span>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="px-3 py-3">
+                                                                        @if($visit->status == 'scheduled')
+                                                                            <div class="px-2 py-1 d-inline-flex rounded-pill bg-soft-warning">
+                                                                                <i class="bx bx-time-five text-warning me-1"></i>
+                                                                                <span class="stat-label">Scheduled</span>
+                                                                            </div>
+                                                                        @elseif($visit->status == 'completed')
+                                                                            <div class="px-2 py-1 d-inline-flex rounded-pill bg-soft-success">
+                                                                                <i class="bx bx-check-circle text-success me-1"></i>
+                                                                                <span class="stat-label">Completed</span>
+                                                                            </div>
+                                                                        @elseif($visit->status == 'cancelled')
+                                                                            <div class="px-2 py-1 d-inline-flex rounded-pill bg-soft-danger">
+                                                                                <i class="bx bx-x-circle text-danger me-1"></i>
+                                                                                <span class="stat-label">Cancelled</span>
+                                                                            </div>
+                                                                        @elseif($visit->status == 'in_progress')
+                                                                            <div class="px-2 py-1 d-inline-flex rounded-pill bg-soft-primary">
+                                                                                <i class="bx bx-loader-alt text-primary me-1"></i>
+                                                                                <span class="stat-label">In Progress</span>
+                                                                            </div>
+                                                                        @endif
+                                                                    </td>
+                                                                    <td class="px-3 py-3 text-end">
+                                                                        <div class="btn-group">
+                                                                            @if($visit->status == 'scheduled')
+                                                                                <button type="button" 
+                                                                                        class="px-3 btn btn-soft-primary btn-sm" 
+                                                                                        data-bs-toggle="modal" 
+                                                                                        data-bs-target="#editModal" 
+                                                                                        data-visit-id="{{ $visit->id }}" 
+                                                                                        data-visit-date="{{ $visit->visit_date }}" 
+                                                                                        data-visit-time="{{ $visit->visit_time }}" 
+                                                                                        data-team-id="{{ $visit->team_id }}" 
+                                                                                        data-contract-id="{{ $visit->contract_id }}"
+                                                                                        data-branch-id="{{ $visit->branch_id }}">
+                                                                                    <i class="bx bx-edit-alt me-1"></i> Edit
+                                                                                </button>
+                                                                                <button type="button" 
+                                                                                        class="px-3 btn btn-soft-danger btn-sm cancelVisit" 
+                                                                                        data-visit-id="{{ $visit->id }}">
+                                                                                    <i class="bx bx-x-circle me-1"></i> Cancel
+                                                                                </button>
+                                                                            @elseif($visit->status == 'in_progress')
+                                                                                <a href="{{ route('technical.visit.report.view', $visit->id) }}" 
+                                                                                   class="px-3 btn btn-soft-primary btn-sm">
+                                                                                    <i class="bx bx-file me-1"></i> Report
+                                                                                </a>
+                                                                            @elseif($visit->status == 'completed')
+                                                                                <a href="{{ route('technical.visit.report.view', $visit->id) }}" 
+                                                                                   class="px-3 btn btn-soft-success btn-sm">
+                                                                                    <i class="bx bx-file me-1"></i> View Report
+                                                                                </a>
+                                                                            @endif
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                @endforeach
+                                                                
+                                                                @if(count($branch['visits']) == 0)
+                                                                <tr>
+                                                                    <td colspan="4" class="py-4 text-center">
+                                                                        <div class="empty-state">
+                                                                            <i class="mb-2 bx bx-calendar-x text-muted" style="font-size: 2rem;"></i>
+                                                                            <p class="mb-0">No visits scheduled for this branch</p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
                                                                 @endif
-                                                                @if($visit->status == 'completed')
-                                                                    <a type="button" 
-                                                                            class="px-3 btn btn-soft-info btn-sm" 
-                                                                            href="{{ route('technical.visit.report.view', $visit->id) }}">
-                                                                        <i class="bx bx-file me-1"></i> View Report
-                                                                    </a>
-                                                                @endif
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                @php $firstBranch = false; @endphp
+                                            @endforeach
                                         </div>
+                                        
                                         @if($contractVisits[$contract->id]->hasPages())
                                             <div class="px-3 mt-3 d-flex justify-content-end">
-                                                <nav>
-                                                    <ul class="pagination">
-                                                        {{-- Previous Page Link --}}
-                                                        @if ($contractVisits[$contract->id]->onFirstPage())
-                                                            <li class="page-item disabled">
-                                                                <span class="page-link">Prev</span>
-                                                            </li>
-                                                        @else
-                                                            <li class="page-item">
-                                                                <a class="page-link" href="{{ $contractVisits[$contract->id]->previousPageUrl() }}" rel="prev">Prev</a>
-                                                            </li>
-                                                        @endif
-
-                                                        @php
-                                                            $currentPage = $contractVisits[$contract->id]->currentPage();
-                                                            $lastPage = $contractVisits[$contract->id]->lastPage();
-                                                            $delta = 1; // Number of pages to show before and after current page
-                                                        @endphp
-
-                                                        {{-- First Page --}}
-                                                        @if($currentPage > ($delta + 2))
-                                                            <li class="page-item">
-                                                                <a class="page-link" href="{{ $contractVisits[$contract->id]->url(1) }}">1</a>
-                                                            </li>
-                                                            <li class="page-item disabled">
-                                                                <span class="page-link dots">...</span>
-                                                            </li>
-                                                        @endif
-
-                                                        {{-- Page Numbers --}}
-                                                        @foreach (range(max(1, $currentPage - $delta), min($lastPage, $currentPage + $delta)) as $page)
-                                                            @if ($page == $currentPage)
-                                                                <li class="page-item active">
-                                                                    <span class="page-link">{{ $page }}</span>
-                                                                </li>
-                                                            @else
-                                                                <li class="page-item">
-                                                                    <a class="page-link" href="{{ $contractVisits[$contract->id]->url($page) }}">{{ $page }}</a>
-                                                                </li>
-                                                            @endif
-                                                        @endforeach
-
-                                                        {{-- Last Page --}}
-                                                        @if($currentPage < ($lastPage - $delta - 1))
-                                                            <li class="page-item disabled">
-                                                                <span class="page-link dots">...</span>
-                                                            </li>
-                                                            <li class="page-item">
-                                                                <a class="page-link" href="{{ $contractVisits[$contract->id]->url($lastPage) }}">{{ $lastPage }}</a>
-                                                            </li>
-                                                        @endif
-
-                                                        {{-- Next Page Link --}}
-                                                        @if ($contractVisits[$contract->id]->hasMorePages())
-                                                            <li class="page-item">
-                                                                <a class="page-link" href="{{ $contractVisits[$contract->id]->nextPageUrl() }}" rel="next">Next</a>
-                                                            </li>
-                                                        @else
-                                                            <li class="page-item disabled">
-                                                                <span class="page-link">Next</span>
-                                                            </li>
-                                                        @endif
-                                                    </ul>
-                                                </nav>
+                                                {{ $contractVisits[$contract->id]->links('vendor.pagination.custom') }}
                                             </div>
                                         @endif
                                     </div>
@@ -480,11 +508,12 @@
                 </div>
                 <form id="editForm" method="POST">
                     @csrf
+                    @method('PUT')
                     <div class="modal-body">
                         <div class="mb-3 form-group">
                             <label for="edit_visit_date">Visit Date</label>
                             <input type="date" class="form-control" id="edit_visit_date" name="visit_date" required
-                                min="{{ date('Y-m-d', strtotime($visit->visit_date)) }}" >
+                                min="{{ date('Y-m-d',strtotime('today')) }}" >
                         </div>
                         <div class="mb-3 form-group">
                             <label for="edit_visit_time">Visit Time</label>
@@ -902,14 +931,99 @@
             // Initialize tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
+                return new bootstrap.Tooltip(tooltipTriggerEl)
             });
 
-            // Prevent contract details button from triggering accordion
-            document.querySelectorAll('.view-contract-btn').forEach(function(btn) {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
+            // Branch tab activation on page load
+            $('.nav-tabs').each(function() {
+                // Check if there's an active tab already
+                if ($(this).find('.active').length === 0) {
+                    // Activate the first tab
+                    $(this).find('button:first').tab('show');
+                }
+            });
+
+            // Edit modal data loading
+            $('#editModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var visitId = button.data('visit-id');
+                var visitDate = button.data('visit-date');
+                var visitTime = button.data('visit-time');
+                var teamId = button.data('team-id');
+                var contractId = button.data('contract-id');
+                var branchId = button.data('branch-id');
+                
+                var modal = $(this);
+                
+                // Set data in the modal
+                modal.find('#edit_visit_date').val(visitDate);
+                modal.find('#edit_visit_time').val(visitTime);
+                modal.find('#edit_team_id').val(teamId);
+                
+                // Update the form action
+                var formAction = "{{ route('technical.appointment.edit', ':id') }}";
+                formAction = formAction.replace(':id', visitId);
+                
+                modal.find('#editForm').attr('action', formAction);
+                
+                // Store additional data for reference if needed
+                modal.find('#editForm').data('contract-id', contractId);
+                modal.find('#editForm').data('branch-id', branchId);
+            });
+            
+            // Cancel Visit confirmation
+            $('.cancelVisit').on('click', function() {
+                var visitId = $(this).data('visit-id');
+                
+                if (confirm('Are you sure you want to cancel this visit?')) {
+                    var cancelUrl = "{{ route('technical.appointment.cancel', ':id') }}";
+                    cancelUrl = cancelUrl.replace(':id', visitId);
+                    
+                    // Create a form and submit it
+                    var form = $('<form>', {
+                        'method': 'POST',
+                        'action': cancelUrl
+                    });
+                    
+                    form.append($('<input>', {
+                        'type': 'hidden',
+                        'name': '_token',
+                        'value': '{{ csrf_token() }}'
+                    }));
+                    
+                    form.append($('<input>', {
+                        'type': 'hidden',
+                        'name': '_method',
+                        'value': 'PUT'
+                    }));
+                    
+                    form.append($('<input>', {
+                        'type': 'hidden',
+                        'name': 'status',
+                        'value': 'cancelled'
+                    }));
+                    
+                    $('body').append(form);
+                    form.submit();
+                }
+            });
+            
+            // Add branch_id to the create visit form when opened from a branch tab
+            $('#createVisitModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var contractId = button.data('contract-id');
+                var branchId = button.data('branch-id');
+                
+                if (contractId) {
+                    $(this).find('select[name="contract_id"]').val(contractId).trigger('change');
+                }
+                
+                if (branchId) {
+                    // Set timeout to allow contract_id change to process first
+                    setTimeout(function() {
+                        $(this).find('select[name="branch_id"]').val(branchId);
+                    }, 300);
+                }
             });
 
             // Client selection change handler
@@ -1037,7 +1151,35 @@
             }
         }
         
-        // Schedule warnings check
+        // Contract change handler in create modal
+        $('select[name="contract_id"]').change(function() {
+            var contractId = $(this).val();
+            if (contractId) {
+                fetchBranches(contractId);
+            } else {
+                $('select[name="branch_id"]').html('<option value="">Select Branch</option>');
+            }
+        });
+
+        // Function to fetch branches
+        function fetchBranches(contractId) {
+            $.ajax({
+                url: "/api/contracts/" + contractId + "/branches",
+                type: "GET",
+                success: function(response) {
+                    if (response.success) {
+                        var options = '<option value="">Select Branch</option>';
+                        $.each(response.branches, function(index, branch) {
+                            options += '<option value="' + branch.id + '">' + branch.name + '</option>';
+                        });
+                        $('select[name="branch_id"]').html(options);
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error fetching branches:', xhr);
+                }
+            });
+        }
     </script>
     @endpush
     @endsection

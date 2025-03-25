@@ -425,7 +425,7 @@ class ClientController extends Controller
         $request->validate([
             'visit_id' => 'required|exists:visit_schedules,id',
             'visit_date' => 'required|date',
-            'visit_time' => 'required|date_format:H:i',
+            'visit_time' => 'required',
         ]);
 
         $visit = VisitSchedule::find($request->visit_id);
@@ -464,7 +464,7 @@ class ClientController extends Controller
         $request->validate([
             'visit_id' => 'required|exists:visit_schedules,id',
             'visit_date' => 'required|date',
-            'visit_time' => 'required|date_format:H:i:s',
+            'visit_time' => 'required',
             'status' => 'required|in:scheduled,completed,cancelled,pending,approved,rejected',
         ]);
 

@@ -661,23 +661,11 @@ class TechnicalController extends Controller
             $request->validate([
                 'visit_date' => 'required',
                 'visit_time' => 'required',
+                'team_id' => 'required',
             ]);
 
             $visit = VisitSchedule::findOrFail($id);
             $visitDateTime = Carbon::parse($request->visit_date . ' ' . $request->visit_time);
-
-            // Get the hour and day for warning purposes
-            $hour = $visitDateTime->hour;
-            $dayOfWeek = $visitDateTime->dayOfWeek;
-
-            // Prepare warning messages if needed
-            $warnings = [];
-            if ($hour < 8 || $hour >= 14) {
-                $warnings[] = 'This appointment is scheduled outside regular working hours (8 AM to 2 PM).';
-            }
-            if ($dayOfWeek === Carbon::FRIDAY) {
-                $warnings[] = 'This appointment is scheduled on a Friday.';
-            }
 
             // Check if the team is already assigned to another visit at the same time
             $existingVisit = VisitSchedule::where('team_id', $visit->team_id)
@@ -699,16 +687,11 @@ class TechnicalController extends Controller
             // Update the visit schedule
             $visit->update([
                 'visit_date' => $visitDateTime->format('Y-m-d'),
-                'visit_time' => $visitDateTime->format('H:i:s')
+                'visit_time' => $visitDateTime->format('H:i:s'),
+                'status' => 'scheduled'
             ]);
 
-            // If there are warnings, include them in the success message
-            $message = 'Visit rescheduled successfully.';
-            if (!empty($warnings)) {
-                $message .= ' Note: ' . implode(' ', $warnings);
-            }
-
-            return redirect()->back()->with('success', $message);
+            return redirect()->back()->with('success', 'Visit rescheduled successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to reschedule visit: ' . $e->getMessage());
         }
@@ -721,24 +704,6 @@ class TechnicalController extends Controller
 
             // Parse the date and time
             $visitDateTime = Carbon::parse($request->visit_date . ' ' . $request->visit_time);
-
-            // Get the hour for informational purposes
-            $hour = $visitDateTime->hour;
-            $dayOfWeek = $visitDateTime->dayOfWeek;
-
-            // Prepare warning messages if needed
-            $warnings = [];
-            if ($hour < 8 || $hour >= 14) {
-                $warnings[] = 'Note: This appointment is scheduled outside regular working hours (8 AM to 2 PM).';
-            }
-            if ($dayOfWeek === Carbon::FRIDAY) {
-                $warnings[] = 'Note: This appointment is scheduled on a Friday.';
-            }
-
-            // If there are warnings, add them as a flash message but continue with the scheduling
-            if (!empty($warnings)) {
-                session()->flash('warning', implode(' ', $warnings));
-            }
 
             // Check if the team is already assigned to another visit at the same time
             $existingVisit = VisitSchedule::where('team_id', $request->team_id)

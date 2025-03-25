@@ -132,11 +132,12 @@
             </div>
             <form id="rescheduleForm" method="POST">
                 @csrf
+                @method('PUT')
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="new_visit_date">New Visit Date</label>
                         <input type="date" class="form-control" id="new_visit_date" name="visit_date" required
-                               min="{{ date('Y-m-d', strtotime('+1 day')) }}">
+                               min="{{ date('Y-m-d', strtotime('today')) }}">
                     </div>
 
                     <div class="form-group">

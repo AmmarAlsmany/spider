@@ -287,9 +287,9 @@ Route::middleware(['auth', 'role:technical'])->group(function () {
         ->name('technical.scheduled-appointments');
     Route::get('/technical/appointments/{appointment}/complete', [TechnicalController::class, 'markAppointmentComplete'])
         ->name('technical.appointment.complete');
-    Route::get('/technical/appointments/{appointment}/cancel', [TechnicalController::class, 'cancelAppointment'])
+    Route::put('/technical/appointments/{appointment}/cancel', [TechnicalController::class, 'cancelAppointment'])
         ->name('technical.appointment.cancel');
-    Route::post('/technical/appointments/{appointment}/edit', [TechnicalController::class, 'editAppointment'])
+    Route::put('/technical/appointments/{appointment}/edit', [TechnicalController::class, 'editAppointment'])
         ->name('technical.appointment.edit');
 
     // Technical Manager Visit Routes
@@ -297,7 +297,7 @@ Route::middleware(['auth', 'role:technical'])->group(function () {
         ->name('technical.completed-visits');
     Route::get('/technical/visits/cancelled', [TechnicalController::class, 'viewCancelledVisits'])
         ->name('technical.cancelled-visits');
-    Route::post('/technical/visits/{visit}/reschedule', [TechnicalController::class, 'rescheduleVisit'])
+    Route::put('/technical/visits/{visit}/reschedule', [TechnicalController::class, 'rescheduleVisit'])
         ->name('technical.reschedule-visit');
 
     // Visit Reports

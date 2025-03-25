@@ -51,10 +51,10 @@ return [
     'equipment_info_name' => 'اسم العنصر',
     'equipment_info_description' => 'وصف العنصر',
     'equipment_info_quantity' => 'الكمية',
-    'equipment_unit_price' => 'سعر العنصر',
-    'equipment_info_total_price' => 'المجموع الكلي',
-    'equipment_info_vat_amount' => 'قيمة الضريبة',
-    'equipment_info_total_amount' => 'المجموع الكلي بضريبة',
+    'equipment_unit_price' => 'سعر العنصر بدون الضريبة',
+    'equipment_info_total_price' => 'سعر العنصر مع الضريبة',
+    'equipment_info_vat_amount' => 'قيمة الضريبة للعنصر',
+    'equipment_info_total_amount' => 'المجموع الكلي مع الضريبة',
 
     // Client Information
     'client_info_title' => 'معلومات العميل',

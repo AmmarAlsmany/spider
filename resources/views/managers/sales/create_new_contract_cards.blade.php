@@ -56,13 +56,15 @@
                 </div>
                 <div class="card-body">
                     <h5 class="mb-3 card-title fw-bold">{{ $type->name }}</h5>
-                    <p class="mb-4 text-muted">{{ $type->description ?? 'Create a new contract with ' . $type->name }}</p>
+                    <p class="mb-4 text-muted">{{ $type->description ?? 'Create a new contract with ' . $type->name }}
+                    </p>
                     <div class="gap-2 d-flex justify-content-center">
                         @if($type->name == 'Buy equipment')
                         <a href="{{ route('equipment.contract.create') }}" class="btn btn-primary flex-grow-1">
                             <i class="bi bi-person-plus me-2"></i>New Client
                         </a>
-                        <a href="{{ route('equipment.contract.create') }}?existing=true" class="btn btn-outline-primary flex-grow-1">
+                        <a href="{{ route('equipment.contract.create') }}?existing=true"
+                            class="btn btn-outline-primary flex-grow-1">
                             <i class="bi bi-person-check me-2"></i>Existing Client
                         </a>
                         @else
@@ -138,10 +140,12 @@
                                 <label for="client" class="form-label">
                                     <i class="bi bi-search me-2"></i>Select Client
                                 </label>
-                                <select class="form-select form-select-lg" name="client_id" required>
+                                <select class="form-select form-select-lg" id="client" name="client_id" required>
                                     <option value="">Choose a client...</option>
                                     @foreach($clients as $client)
-                                    <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                    <option value="{{ $client->id }}">{{ $client->name }}
+                                        <small class="text-muted">({{ $client->email }})</small>
+                                    </option>
                                     @endforeach
                                 </select>
                             </div>

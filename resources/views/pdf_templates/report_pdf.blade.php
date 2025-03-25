@@ -85,7 +85,7 @@
 <body>
     <div class="report-container">
         <div class="company-logo">
-            <img src="{{ public_path('backend/assets/images/logo-icon.png') }}" alt="Spider Web Logo">
+            <img src="{{ public_path('backend/assets/images/logo-icon.png') }}" alt="Spider Web Logo" width="100px" height="100px">
             <h3>خيوط العنكبوت لمكافحة الحشرات</h3>
             <h3>Spider Web For Pest Control</h3>
         </div>

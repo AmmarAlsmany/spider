@@ -51,10 +51,10 @@ return [
     'equipment_info_name' => 'Equipment Name',
     'equipment_info_description' => 'Equipment Description',
     'equipment_info_quantity' => 'Quantity',
-    'equipment_unit_price' => 'Unit Price',
-    'equipment_info_total_price' => 'Total Price',
-    'equipment_info_vat_amount' => 'VAT Amount',
-    'equipment_info_total_amount' => 'Total Amount',
+    'equipment_unit_price' => 'Unit Price without VAT',
+    'equipment_info_total_price' => 'Unit price with VAT',
+    'equipment_info_vat_amount' => 'VAT Amount for Item',
+    'equipment_info_total_amount' => 'Total Amount with VAT',
 
     // Client Information
     'client_info_title' => 'Client Information',

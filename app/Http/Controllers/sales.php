@@ -421,27 +421,6 @@ class sales extends Controller
             ->groupBy('payment_status');
     }
 
-    private function calculateFinancialSummary($contracts, $payments)
-    {
-        return [
-            'total_contract_value' => $contracts->flatten()->sum('contract_price'),
-            'total_paid' => $payments->flatten()->where('payment_status', 'paid')->sum('payment_amount'),
-            'total_pending' => $payments->flatten()->where('payment_status', 'unpaid')->sum('payment_amount'),
-            'total_overdue' => $payments->flatten()->where('payment_status', 'overdue')->sum('payment_amount')
-        ];
-    }
-
-    private function calculateContractStats($contracts)
-    {
-        return [
-            'total_contracts' => $contracts->flatten()->count(),
-            'active_contracts' => $contracts->get('approved', collect())->count(),
-            'pending_contracts' => $contracts->get('pending', collect())->count(),
-            'completed_contracts' => $contracts->get('completed', collect())->count(),
-            'cancelled_contracts' => $contracts->get('cancelled', collect())->count()
-        ];
-    }
-
     // chnage status of the cancled or not approved contracts
     public function return_contract(Request $request)
     {

@@ -184,7 +184,9 @@ sort($saudiCities);
                                     <select class="form-select" name="client_id" id="client_id" required>
                                         <option value="">Choose a client...</option>
                                         @foreach($clients as $client)
-                                        <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                        <option value="{{ $client->id }}">{{ $client->name }}
+                                            <small class="text-muted">({{ $client->email }})</small>
+                                        </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -300,6 +302,17 @@ sort($saudiCities);
                                 payment_schedule: 'monthly',
                                 numberOfPayments: 1,
                                 first_payment_date: '',
+                                vatAmount: 0,
+                                totalAmount: 0,
+                                installmentAmount: 0,
+                                // Calculate amounts
+                                calculateAmounts() {
+                                    this.vatAmount = parseFloat((this.contractAmount * 0.15).toFixed(2));
+                                    this.totalAmount = parseFloat((this.contractAmount * 1.15).toFixed(2));
+                                    if (this.payment_type === 'postpaid' && this.numberOfPayments > 0) {
+                                        this.installmentAmount = parseFloat((this.totalAmount / this.numberOfPayments).toFixed(2));
+                                    }
+                                },
                                 initPaymentDates() {
                                     if (this.payment_schedule === 'monthly') {
                                         // Clear custom payment date fields when switching to monthly
@@ -308,15 +321,38 @@ sort($saudiCities);
                                             container.innerHTML = '';
                                         }
                                     } else if (this.payment_schedule === 'custom') {
-                                        generateCustomPaymentDateFields(this.numberOfPayments);
+                                        // Generate custom payment date fields
+                                        setTimeout(() => {
+                                            generateCustomPaymentDateFields(this.numberOfPayments);
+                                        }, 50);
                                     }
+                                },
+                                // Initialize with a small delay to avoid blocking rendering
+                                init() {
+                                    setTimeout(() => {
+                                        this.calculateAmounts();
+                                    }, 100);
                                 }
-                            }" x-init="$watch('numberOfPayments', value => initPaymentDates()); $watch('payment_schedule', value => initPaymentDates())">
+                            }" x-init="init();
+                            $watch('contractAmount', value => calculateAmounts());
+                            $watch('numberOfPayments', value => {
+                                calculateAmounts();
+                                initPaymentDates();
+                            });
+                            $watch('payment_schedule', value => initPaymentDates());
+                            $watch('payment_type', value => calculateAmounts())">
                                 <div class="col-12 col-lg-6">
                                     <label for="Contractamount" class="form-label">Contract Amount (without VAT) <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control" name="contractamount" id="Contractamount"
                                         x-model="contractAmount" required min="1" step="0.01">
                                     <div class="invalid-feedback">Please enter a valid contract amount</div>
+                                </div>
+
+                                <div class="col-12 col-lg-6">
+                                    <label for="first_payment_date" class="form-label">First Payment Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" name="first_payment_date" id="first_payment_date"
+                                        x-model="first_payment_date" required min="{{ date('Y-m-d') }}">
+                                    <div class="invalid-feedback">Please select a valid payment date</div>
                                 </div>
 
                                 <div class="col-12 col-lg-6">
@@ -329,7 +365,7 @@ sort($saudiCities);
                                 </div>
 
                                 <template x-if="payment_type === 'postpaid'">
-                                    <div class="col-12 col-lg-6">
+                                    <div class="col-12 col-lg-6 postpaid-field">
                                         <label for="number_of_payments" class="form-label">Number of Payments <span class="text-danger">*</span></label>
                                         <input type="number" class="form-control" name="number_of_payments" id="number_of_payments"
                                             x-model="numberOfPayments" required min="1" max="24">
@@ -338,7 +374,7 @@ sort($saudiCities);
                                 </template>
 
                                 <template x-if="payment_type === 'postpaid'">
-                                    <div class="col-12 col-lg-6">
+                                    <div class="col-12 col-lg-6 postpaid-field">
                                         <label for="payment_schedule" class="form-label">Payment Schedule <span class="text-danger">*</span></label>
                                         <select class="form-select" name="payment_schedule" id="payment_schedule" x-model="payment_schedule" required>
                                             <option value="monthly">Monthly</option>
@@ -348,15 +384,8 @@ sort($saudiCities);
                                     </div>
                                 </template>
 
-                                <div class="col-12 col-lg-6">
-                                    <label for="first_payment_date" class="form-label">First Payment Date <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control" name="first_payment_date" id="first_payment_date"
-                                        x-model="first_payment_date" required min="{{ date('Y-m-d') }}">
-                                    <div class="invalid-feedback">Please select a valid payment date</div>
-                                </div>
-
                                 <template x-if="payment_type === 'postpaid' && payment_schedule === 'custom'">
-                                    <div class="col-12">
+                                    <div class="col-12 postpaid-field custom-schedule-field">
                                         <div class="p-3 rounded border">
                                             <h6 class="mb-3">Custom Payment Dates</h6>
                                             <div id="custom-payment-dates">
@@ -372,14 +401,14 @@ sort($saudiCities);
                                             <div class="col-6">Contract Amount:</div>
                                             <div class="col-6 text-end" x-text="'SAR ' + Number(contractAmount).toFixed(2)"></div>
                                             <div class="col-6">VAT (15%):</div>
-                                            <div class="col-6 text-end" x-text="'SAR ' + (Number(contractAmount) * 0.15).toFixed(2)"></div>
+                                            <div class="col-6 text-end" x-text="'SAR ' + vatAmount.toFixed(2)"></div>
                                             <div class="col-6"><strong>Total Amount:</strong></div>
-                                            <div class="col-6 text-end"><strong x-text="'SAR ' + (Number(contractAmount) * 1.15).toFixed(2)"></strong></div>
+                                            <div class="col-6 text-end"><strong x-text="'SAR ' + totalAmount.toFixed(2)"></strong></div>
                                             <template x-if="payment_type === 'postpaid'">
                                                 <div class="mt-2 col-12">
                                                     <div class="row">
                                                         <div class="col-6">Payment per Installment:</div>
-                                                        <div class="col-6 text-end" x-text="'SAR ' + (Number(contractAmount) * 1.15 / numberOfPayments).toFixed(2)"></div>
+                                                        <div class="col-6 text-end" x-text="'SAR ' + installmentAmount.toFixed(2)"></div>
                                                     </div>
                                                 </div>
                                             </template>
@@ -493,23 +522,146 @@ sort($saudiCities);
     }
 
     function validateStep3() {
-        const fields = [
-            { id: 'Contractamount', regex: new RegExp('^[0-9]+(\\.[0-9]{1,2})?$') },
-            { id: 'payment_type', regex: new RegExp('.+') }
-        ];
+        const form = document.getElementById('contractForm');
+        let isValid = true;
+        let errorMessage = '';
 
-        const paymentType = document.getElementById('payment_type').value;
-        if (paymentType === 'postpaid') {
-            fields.push({ id: 'number_of_payments', regex: new RegExp('^([1-9]|1[0-2])$') });
+        // Validate contract amount
+        const contractAmount = form.querySelector('#Contractamount');
+        if (!contractAmount || !contractAmount.value || parseFloat(contractAmount.value) <= 0) {
+            if (contractAmount) contractAmount.classList.add('is-invalid');
+            isValid = false;
+            errorMessage = 'Please enter a valid contract amount greater than 0';
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: errorMessage
+            });
+            return false;
+        }
+        if (contractAmount) contractAmount.classList.remove('is-invalid');
+
+        // Get payment type
+        const paymentType = form.querySelector('#payment_type');
+        if (!paymentType || !paymentType.value || !['prepaid', 'postpaid'].includes(paymentType.value)) {
+            if (paymentType) paymentType.classList.add('is-invalid');
+            isValid = false;
+            errorMessage = 'Please select a valid payment type';
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: errorMessage
+            });
+            return false;
+        }
+        if (paymentType) paymentType.classList.remove('is-invalid');
+
+        // Validate first payment date (required for both prepaid and postpaid)
+        const firstPaymentDate = form.querySelector('#first_payment_date');
+        if (!firstPaymentDate || !firstPaymentDate.value) {
+            if (firstPaymentDate) firstPaymentDate.classList.add('is-invalid');
+            isValid = false;
+            errorMessage = 'Please select the payment date';
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: errorMessage
+            });
+            return false;
+        }
+        
+        // Validate first payment date is not in the past
+        if (firstPaymentDate && firstPaymentDate.value) {
+            const selectedDate = new Date(firstPaymentDate.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (selectedDate < today) {
+                firstPaymentDate.classList.add('is-invalid');
+                errorMessage = 'First payment date cannot be in the past';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: errorMessage
+                });
+                return false;
+            }
+        }
+        if (firstPaymentDate) firstPaymentDate.classList.remove('is-invalid');
+
+        if (paymentType.value === 'postpaid') {
+            // Validate number of payments
+            const numberOfPayments = form.querySelector('#number_of_payments');
+            if (!numberOfPayments || !numberOfPayments.value ||
+                parseInt(numberOfPayments.value) < 1 || parseInt(numberOfPayments.value) > 24) {
+                if (numberOfPayments) numberOfPayments.classList.add('is-invalid');
+                isValid = false;
+                errorMessage = 'Please enter a valid number of payments (1-24)';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: errorMessage
+                });
+                return false;
+            }
+            if (numberOfPayments) numberOfPayments.classList.remove('is-invalid');
+
+            // Validate payment schedule
+            const paymentSchedule = form.querySelector('#payment_schedule');
+            if (!paymentSchedule || !paymentSchedule.value) {
+                if (paymentSchedule) paymentSchedule.classList.add('is-invalid');
+                isValid = false;
+                errorMessage = 'Please select a payment schedule';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: errorMessage
+                });
+                return false;
+            }
+            if (paymentSchedule) paymentSchedule.classList.remove('is-invalid');
+
+            // Validate custom payment dates if custom schedule is selected
+            if (paymentSchedule.value === 'custom') {
+                const customDateInputs = form.querySelectorAll('[id^="payment_date_"]:not([id="payment_date_1"])');
+                if (customDateInputs && customDateInputs.length > 0) {
+                    let previousDate = new Date(firstPaymentDate.value);
+
+                    for (let i = 0; i < customDateInputs.length; i++) {
+                        const input = customDateInputs[i];
+                        if (!input.value) {
+                            input.classList.add('is-invalid');
+                            isValid = false;
+                            errorMessage = `Please select payment date ${i + 2}`;
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                text: errorMessage
+                            });
+                            return false;
+                        }
+
+                        const currentDate = new Date(input.value);
+                        if (currentDate <= previousDate) {
+                            input.classList.add('is-invalid');
+                            isValid = false;
+                            errorMessage = `Payment date ${i + 2} must be after the previous payment date`;
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                text: errorMessage
+                            });
+                            return false;
+                        }
+
+                        input.classList.remove('is-invalid');
+                        previousDate = currentDate;
+                    }
+                }
+            }
         }
 
-        return fields.every(field => {
-            const element = document.getElementById(field.id);
-            if (!element) return true;
-            const isValid = field.regex.test(element.value);
-            element.classList.toggle('is-invalid', !isValid);
-            return isValid;
-        });
+        return isValid;
     }
 
     function validateCurrentStep() {
@@ -527,16 +679,129 @@ sort($saudiCities);
         }
     }
 
+    function updateSummary() {
+        // Update equipment summary
+        const equipmentSummary = document.getElementById('equipment-summary');
+        if (equipmentSummary) {
+            const equipmentType = document.getElementById('equipment_type_id');
+            const equipmentTypeText = equipmentType ? equipmentType.options[equipmentType.selectedIndex]?.text : 'N/A';
+            const model = document.getElementById('equipment_model').value;
+            const description = document.getElementById('equipment_description').value;
+            
+            equipmentSummary.innerHTML = `
+                <tr>
+                    <td><strong>Equipment Type:</strong></td>
+                    <td>${equipmentTypeText || 'N/A'}</td>
+                </tr>
+                <tr>
+                    <td><strong>Model:</strong></td>
+                    <td>${model || 'N/A'}</td>
+                </tr>
+                <tr>
+                    <td><strong>Description:</strong></td>
+                    <td>${description || 'N/A'}</td>
+                </tr>
+            `;
+        }
+        
+        // Update payment summary
+        const paymentSummary = document.getElementById('payment-summary');
+        if (paymentSummary) {
+            const contractAmount = document.getElementById('Contractamount').value;
+            const paymentType = document.getElementById('payment_type').value;
+            const firstPaymentDate = document.getElementById('first_payment_date').value;
+            
+            // Calculate VAT and total amount
+            const vatAmount = parseFloat(contractAmount) * 0.15;
+            const totalAmount = parseFloat(contractAmount) * 1.15;
+            
+            let paymentDetails = `
+                <tr>
+                    <td><strong>Contract Amount:</strong></td>
+                    <td>SAR ${parseFloat(contractAmount).toFixed(2)}</td>
+                </tr>
+                <tr>
+                    <td><strong>VAT Amount (15%):</strong></td>
+                    <td>SAR ${vatAmount.toFixed(2)}</td>
+                </tr>
+                <tr>
+                    <td><strong>Total Amount:</strong></td>
+                    <td>SAR ${totalAmount.toFixed(2)}</td>
+                </tr>
+                <tr>
+                    <td><strong>Payment Type:</strong></td>
+                    <td>${paymentType === 'prepaid' ? 'Prepaid (Full Amount)' : 'Postpaid (Installments)'}</td>
+                </tr>
+            `;
+            
+            // Add installment details if postpaid
+            if (paymentType === 'postpaid') {
+                const numberOfPayments = document.getElementById('number_of_payments').value;
+                const paymentSchedule = document.getElementById('payment_schedule').value;
+                const installmentAmount = totalAmount / parseInt(numberOfPayments);
+                
+                paymentDetails += `
+                    <tr>
+                        <td><strong>Number of Payments:</strong></td>
+                        <td>${numberOfPayments}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Payment Schedule:</strong></td>
+                        <td>${paymentSchedule === 'monthly' ? 'Monthly' : 'Custom'}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Amount per Installment:</strong></td>
+                        <td>SAR ${installmentAmount.toFixed(2)}</td>
+                    </tr>
+                `;
+                
+                // Add payment dates section
+                paymentDetails += `<tr><td colspan="2"><strong>Payment Dates:</strong></td></tr>`;
+                
+                // Always include the first payment date as payment 1
+                paymentDetails += `
+                    <tr>
+                        <td>Payment 1:</td>
+                        <td>${firstPaymentDate}</td>
+                    </tr>
+                `;
+                
+                // Add custom payment dates if applicable
+                if (paymentSchedule === 'custom') {
+                    for (let i = 2; i <= parseInt(numberOfPayments); i++) {
+                        const dateInput = document.getElementById(`payment_date_${i}`);
+                        if (dateInput && dateInput.value) {
+                            paymentDetails += `
+                                <tr>
+                                    <td>Payment ${i}:</td>
+                                    <td>${dateInput.value}</td>
+                                </tr>
+                            `;
+                        }
+                    }
+                }
+            } else {
+                // For prepaid, just show the payment date
+                paymentDetails += `
+                    <tr>
+                        <td><strong>Payment Date:</strong></td>
+                        <td>${firstPaymentDate}</td>
+                    </tr>
+                `;
+            }
+            
+            paymentSummary.innerHTML = paymentDetails;
+        }
+    }
+    
     function handleNextStep() {
         if (validateCurrentStep()) {
-            currentStep++;
+            if (currentStep === 2) {
+                // Update summary before showing the summary step
+                updateSummary();
+            }
             stepper.next();
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: 'Please fill in all required fields correctly.'
-            });
+            currentStep++;
         }
     }
 
@@ -558,22 +823,139 @@ sort($saudiCities);
             animation: true
         });
 
-        // Initialize AlpineJS data
-        window.initPaymentDates = function() {
-            const numberOfPayments = this.numberOfPayments;
-            const schedule = this.payment_schedule;
+        // Function to generate custom payment date fields
+        window.generateCustomPaymentDateFields = function(numberOfPayments) {
+            const container = document.getElementById('custom-payment-dates');
+            if (!container) return;
             
-            if (numberOfPayments > 0) {
-                this.paymentDates = [];
-                for (let i = 0; i < numberOfPayments; i++) {
-                    if (schedule === 'monthly') {
-                        this.paymentDates.push(new Date(Date.now() + (i * 30 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0]);
-                    } else if (schedule === 'quarterly') {
-                        this.paymentDates.push(new Date(Date.now() + (i * 90 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0]);
-                    }
+            container.innerHTML = '';
+            
+            const today = new Date();
+            const minDate = today.toISOString().split('T')[0];
+            
+            // Get the first payment date value
+            const firstPaymentDate = document.getElementById('first_payment_date');
+            let firstDate = '';
+            if (firstPaymentDate && firstPaymentDate.value) {
+                firstDate = firstPaymentDate.value;
+                
+                // Add the first payment date as payment number 1
+                const row = document.createElement('div');
+                row.className = 'mb-3';
+                
+                const label = document.createElement('label');
+                label.className = 'form-label';
+                label.innerHTML = `Payment 1 Date <span class="text-danger">*</span>`;
+                
+                const input = document.createElement('input');
+                input.type = 'date';
+                input.className = 'form-control';
+                input.name = 'payment_date_1';
+                input.id = 'payment_date_1';
+                input.value = firstDate;
+                input.disabled = true;
+                
+                const helpText = document.createElement('div');
+                helpText.className = 'form-text';
+                helpText.textContent = 'This is your first payment date';
+                
+                row.appendChild(label);
+                row.appendChild(input);
+                row.appendChild(helpText);
+                container.appendChild(row);
+            }
+            
+            // Generate the rest of the payment date fields starting from payment 2
+            for (let i = 2; i <= numberOfPayments; i++) {
+                const row = document.createElement('div');
+                row.className = 'mb-3';
+                
+                const label = document.createElement('label');
+                label.className = 'form-label';
+                label.htmlFor = `payment_date_${i}`;
+                label.innerHTML = `Payment ${i} Date <span class="text-danger">*</span>`;
+                
+                const input = document.createElement('input');
+                input.type = 'date';
+                input.className = 'form-control';
+                input.name = `payment_date_${i}`;
+                input.id = `payment_date_${i}`;
+                input.required = true;
+                input.min = minDate;
+                
+                const feedback = document.createElement('div');
+                feedback.className = 'invalid-feedback';
+                feedback.textContent = 'Please select a valid payment date';
+                
+                row.appendChild(label);
+                row.appendChild(input);
+                row.appendChild(feedback);
+                container.appendChild(row);
+            }
+        }
+        
+        // Added JavaScript functions to handle payment type and schedule changes
+        function handlePaymentTypeChange() {
+            const paymentType = document.getElementById('payment_type').value;
+            const postpaidFields = document.querySelectorAll('.postpaid-field');
+            
+            if (paymentType === 'postpaid') {
+                postpaidFields.forEach(field => {
+                    field.style.display = 'block';
+                });
+            } else {
+                postpaidFields.forEach(field => {
+                    field.style.display = 'none';
+                });
+                
+                // Clear custom payment dates container when switching to prepaid
+                const container = document.getElementById('custom-payment-dates');
+                if (container) {
+                    container.innerHTML = '';
                 }
             }
-        };
+        }
+        
+        function handlePaymentScheduleChange() {
+            const paymentSchedule = document.getElementById('payment_schedule').value;
+            const numberOfPayments = parseInt(document.getElementById('number_of_payments').value);
+            
+            if (paymentSchedule === 'custom' && numberOfPayments > 0) {
+                generateCustomPaymentDateFields(numberOfPayments);
+            } else {
+                // Clear custom payment dates container when switching to monthly
+                const container = document.getElementById('custom-payment-dates');
+                if (container) {
+                    container.innerHTML = '';
+                }
+            }
+        }
+
+        // Add event listeners when the document is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initial setup
+            handlePaymentTypeChange();
+            
+            // Add event listeners for payment type and schedule changes
+            const paymentTypeSelect = document.getElementById('payment_type');
+            if (paymentTypeSelect) {
+                paymentTypeSelect.addEventListener('change', handlePaymentTypeChange);
+            }
+            
+            const paymentScheduleSelect = document.getElementById('payment_schedule');
+            if (paymentScheduleSelect) {
+                paymentScheduleSelect.addEventListener('change', handlePaymentScheduleChange);
+            }
+            
+            const numberOfPaymentsInput = document.getElementById('number_of_payments');
+            if (numberOfPaymentsInput) {
+                numberOfPaymentsInput.addEventListener('change', function() {
+                    if (document.getElementById('payment_schedule').value === 'custom') {
+                        generateCustomPaymentDateFields(parseInt(this.value));
+                    }
+                });
+            }
+        });
     });
 </script>
 @endsection

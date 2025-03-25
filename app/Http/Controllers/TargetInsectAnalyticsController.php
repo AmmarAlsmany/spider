@@ -102,6 +102,7 @@ class TargetInsectAnalyticsController extends Controller
     {
         $reports = VisitReport::all();
         $insectCounts = [];
+        $insectQuantities = [];
         
         foreach ($reports as $report) {
             // Ensure we have a string before json_decode
@@ -111,12 +112,24 @@ class TargetInsectAnalyticsController extends Controller
             }
             $targetInsects = json_decode($targetInsectsJson, true) ?: [];
             
+            // Get insect quantities if available
+            $quantities = is_array($report->insect_quantities) ? $report->insect_quantities : [];
+            
             if (is_array($targetInsects)) {
                 foreach ($targetInsects as $insect) {
                     if (!isset($insectCounts[$insect])) {
                         $insectCounts[$insect] = 0;
+                        $insectQuantities[$insect] = 0;
                     }
                     $insectCounts[$insect]++;
+                    
+                    // Add quantities if available
+                    if (is_array($quantities) && isset($quantities[$insect])) {
+                        $insectQuantities[$insect] += (int)$quantities[$insect];
+                    } else {
+                        // If no quantity data, use a default of 1 per report
+                        $insectQuantities[$insect] += 1;
+                    }
                 }
             }
         }
@@ -133,6 +146,8 @@ class TargetInsectAnalyticsController extends Controller
                 'name' => $name,
                 'value' => $value,
                 'count' => $count,
+                'quantity' => $insectQuantities[$value] ?? $count, // Fallback to count if no quantity
+                'avg_per_report' => $count > 0 ? round(($insectQuantities[$value] ?? $count) / $count, 1) : 0,
                 'percentage' => $reports->count() > 0 ? round(($count / $reports->count()) * 100, 1) : 0
             ];
         }
@@ -153,6 +168,7 @@ class TargetInsectAnalyticsController extends Controller
         }
         
         $insectCounts = [];
+        $insectQuantities = [];
         
         foreach ($reports as $report) {
             // Ensure we have a string before json_decode
@@ -162,12 +178,24 @@ class TargetInsectAnalyticsController extends Controller
             }
             $targetInsects = json_decode($targetInsectsJson, true) ?: [];
             
+            // Get insect quantities if available
+            $quantities = is_array($report->insect_quantities) ? $report->insect_quantities : [];
+            
             if (is_array($targetInsects)) {
                 foreach ($targetInsects as $insect) {
                     if (!isset($insectCounts[$insect])) {
                         $insectCounts[$insect] = 0;
+                        $insectQuantities[$insect] = 0;
                     }
                     $insectCounts[$insect]++;
+                    
+                    // Add quantities if available
+                    if (is_array($quantities) && isset($quantities[$insect])) {
+                        $insectQuantities[$insect] += (int)$quantities[$insect];
+                    } else {
+                        // If no quantity data, use a default of 1 per report
+                        $insectQuantities[$insect] += 1;
+                    }
                 }
             }
         }
@@ -184,6 +212,8 @@ class TargetInsectAnalyticsController extends Controller
                 'name' => $name,
                 'value' => $value,
                 'count' => $count,
+                'quantity' => $insectQuantities[$value] ?? $count, // Fallback to count if no quantity
+                'avg_per_report' => $count > 0 ? round(($insectQuantities[$value] ?? $count) / $count, 1) : 0,
                 'percentage' => $reports->count() > 0 ? round(($count / $reports->count()) * 100, 1) : 0
             ];
         }
@@ -207,10 +237,15 @@ class TargetInsectAnalyticsController extends Controller
                 }
                 $insects = json_decode($insectsJson, true) ?: [];
                 
+                // Get insect quantities if available
+                $insectQuantities = is_array($visit->report->insect_quantities) ? 
+                    $visit->report->insect_quantities : [];
+                
                 $visitData[] = [
                     'visit_id' => $visit->id,
                     'visit_date' => $visit->visit_date,
                     'target_insects' => is_array($insects) ? $insects : [],
+                    'insect_quantities' => $insectQuantities,
                     'recommendations' => $visit->report->recommendations
                 ];
             }
@@ -231,6 +266,7 @@ class TargetInsectAnalyticsController extends Controller
     {
         $trends = [];
         $months = [];
+        $quantities = [];
         
         // Generate the last 12 months
         for ($i = 11; $i >= 0; $i--) {
@@ -239,12 +275,17 @@ class TargetInsectAnalyticsController extends Controller
                 'label' => date('M Y', strtotime("-$i months")),
                 'insects' => []
             ];
+            $quantities[$month] = [
+                'label' => date('M Y', strtotime("-$i months")),
+                'insects' => []
+            ];
         }
         
         // Get all reports grouped by month
         $reports = VisitReport::select(
             DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
-            'target_insects'
+            'target_insects',
+            'insect_quantities'
         )->get();
         
         // Count insects by month
@@ -261,12 +302,24 @@ class TargetInsectAnalyticsController extends Controller
             }
             $insects = json_decode($insectsJson, true) ?: [];
             
+            // Get insect quantities
+            $insectQuantities = is_array($report->insect_quantities) ? $report->insect_quantities : [];
+            
             if (is_array($insects)) {
                 foreach ($insects as $insect) {
                     if (!isset($months[$month]['insects'][$insect])) {
                         $months[$month]['insects'][$insect] = 0;
+                        $quantities[$month]['insects'][$insect] = 0;
                     }
                     $months[$month]['insects'][$insect]++;
+                    
+                    // Add quantities if available
+                    if (is_array($insectQuantities) && isset($insectQuantities[$insect])) {
+                        $quantities[$month]['insects'][$insect] += (int)$insectQuantities[$insect];
+                    } else {
+                        // If no quantity data, use a default of 1 per report
+                        $quantities[$month]['insects'][$insect] += 1;
+                    }
                 }
             }
         }
@@ -275,17 +328,25 @@ class TargetInsectAnalyticsController extends Controller
         $insectTypes = TargetInsect::where('active', true)->pluck('name', 'value')->toArray();
         
         foreach ($insectTypes as $value => $name) {
-            $data = [];
+            $occurrenceData = [];
+            $quantityData = [];
+            
             foreach ($months as $month => $info) {
-                $data[] = [
+                $occurrenceData[] = [
                     'month' => $info['label'],
                     'count' => $info['insects'][$value] ?? 0
+                ];
+                
+                $quantityData[] = [
+                    'month' => $info['label'],
+                    'count' => $quantities[$month]['insects'][$value] ?? 0
                 ];
             }
             
             $trends[$value] = [
                 'name' => $name,
-                'data' => $data
+                'data' => $occurrenceData,
+                'quantity_data' => $quantityData
             ];
         }
         

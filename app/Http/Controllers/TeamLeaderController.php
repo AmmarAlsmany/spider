@@ -74,12 +74,18 @@ class TeamLeaderController extends Controller
             });
         }
 
+        // Filter by single date (for Today quick filter)
+        if ($request->filled('date')) {
+            $query->whereDate('visit_date', $request->date);
+        } 
         // Filter by date range
-        if ($request->filled('start_date')) {
-            $query->whereDate('visit_date', '>=', $request->start_date);
-        }
-        if ($request->filled('end_date')) {
-            $query->whereDate('visit_date', '<=', $request->end_date);
+        else {
+            if ($request->filled('start_date')) {
+                $query->whereDate('visit_date', '>=', $request->start_date);
+            }
+            if ($request->filled('end_date')) {
+                $query->whereDate('visit_date', '<=', $request->end_date);
+            }
         }
 
         // Filter by status
@@ -226,6 +232,21 @@ class TeamLeaderController extends Controller
                     'unit' => $request->input("pesticide_unit.$pesticide")
                 ];
             }
+            
+            // Process insect quantities
+            $insect_quantities = [];
+            foreach ($request->target_insects as $insect) {
+                // Validate quantity for each selected insect
+                $request->validate([
+                    "insect_quantity.$insect" => 'required|numeric|min:1'
+                ], [
+                    "insect_quantity.$insect.required" => "Please enter quantity for $insect",
+                    "insect_quantity.$insect.numeric" => "Quantity for $insect must be a number",
+                    "insect_quantity.$insect.min" => "Quantity for $insect must be at least 1"
+                ]);
+
+                $insect_quantities[$insect] = $request->input("insect_quantity.$insect");
+            }
 
             // Create visit report
             $report = new VisitReport([
@@ -236,6 +257,7 @@ class TeamLeaderController extends Controller
                 'target_insects' => json_encode($request->target_insects),
                 'pesticides_used' => json_encode($request->pesticides_used),
                 'pesticide_quantities' => json_encode($pesticide_quantities),
+                'insect_quantities' => json_encode($insect_quantities),
                 'elimination_steps' => $request->elimination_steps,
                 'recommendations' => $request->recommendations,
                 'customer_notes' => $request->customer_notes,

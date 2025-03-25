@@ -28,9 +28,12 @@
                         <h5 class="card-title">Visit Report Details</h5>
                         <div class="row">
                             <div class="col-md-6">
-                                <p class="card-text">Visit Date: {{ \Carbon\Carbon::parse($visit->visit_date)->format('d M, Y') }}</p>
-                                <p class="card-text">Visit Time In: {{ \Carbon\Carbon::parse($visit->report->time_in)->format('h:i A') }}</p>
-                                <p class="card-text">Visit Time Out: {{ \Carbon\Carbon::parse($visit->report->time_out)->format('h:i A') }}</p>
+                                <p class="card-text">Visit Date: {{ \Carbon\Carbon::parse($visit->visit_date)->format('d
+                                    M, Y') }}</p>
+                                <p class="card-text">Visit Time In: {{
+                                    \Carbon\Carbon::parse($visit->report->time_in)->format('h:i A') }}</p>
+                                <p class="card-text">Visit Time Out: {{
+                                    \Carbon\Carbon::parse($visit->report->time_out)->format('h:i A') }}</p>
                             </div>
                             <div class="col-md-6">
                                 <p class="card-text">Contract Number: {{ $visit->contract->contract_number }}</p>
@@ -57,17 +60,47 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <h6>Target Insects</h6>
+                                @php
+                                $insects = is_array($visit->report->target_insects)
+                                ? $visit->report->target_insects
+                                : json_decode($visit->report->target_insects, true);
+                                $insectQuantities = is_array($visit->report->insect_quantities)
+                                ? $visit->report->insect_quantities
+                                : json_decode($visit->report->insect_quantities, true);
+                                @endphp
                                 <ul class="list-unstyled">
-                                    @foreach(json_decode($visit->report->target_insects) as $insect)
-                                    <li><i class="bx bx-check text-success me-2"></i>{{ ucfirst(str_replace('_', ' ', $insect)) }}</li>
+                                    @foreach($insects as $insect)
+                                    <li>
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        {{ ucfirst(str_replace('_', ' ', $insect)) }}
+                                        @if(isset($insectQuantities[$insect]))
+                                        - <span class="badge bg-info">{{ $insectQuantities[$insect] }} {{
+                                            $insectQuantities[$insect] == 1 ? 'piece' : 'pieces' }}</span>
+                                        @endif
+                                    </li>
                                     @endforeach
                                 </ul>
                             </div>
                             <div class="col-md-6">
                                 <h6>Pesticides Used</h6>
+                                @php
+                                $pesticides = is_array($visit->report->pesticides_used)
+                                ? $visit->report->pesticides_used
+                                : json_decode($visit->report->pesticides_used, true);
+                                $quantities = is_array($visit->report->pesticide_quantities)
+                                ? $visit->report->pesticide_quantities
+                                : json_decode($visit->report->pesticide_quantities, true);
+                                @endphp
                                 <ul class="list-unstyled">
-                                    @foreach(json_decode($visit->report->pesticides_used) as $pesticide)
-                                    <li><i class="bx bx-check text-success me-2"></i>{{ ucfirst(str_replace('_', ' ', $pesticide)) }}</li>
+                                    @foreach($pesticides as $pesticide)
+                                    <li>
+                                        <i class="bx bx-check text-success me-2"></i>
+                                        {{ ucfirst(str_replace('_', ' ', $pesticide)) }}
+                                        @if(isset($quantities[$pesticide]))
+                                        - <span class="badge bg-info">{{ $quantities[$pesticide]['quantity']
+                                            }} {{ $quantities[$pesticide]['unit'] }}</span>
+                                        @endif
+                                    </li>
                                     @endforeach
                                 </ul>
                             </div>
@@ -89,7 +122,8 @@
                                 <div class="mt-4 row">
                                     <div class="col-md-6">
                                         <h6>Customer Signature</h6>
-                                        <img src="{{ $visit->report->customer_signature }}" alt="Customer Signature" class="img-fluid" style="max-height: 100px;">
+                                        <img src="{{ $visit->report->customer_signature }}" alt="Customer Signature"
+                                            class="img-fluid" style="max-height: 100px;">
                                     </div>
                                 </div>
                                 {{-- signature client phone --}}

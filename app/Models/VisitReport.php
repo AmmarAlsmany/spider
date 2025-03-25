@@ -20,6 +20,7 @@ class VisitReport extends Model
         'pesticides_used',
         'elimination_steps',
         'pesticide_quantities',
+        'insect_quantities',
         'recommendations',
         'customer_notes',
         'customer_signature',
@@ -30,6 +31,8 @@ class VisitReport extends Model
     protected $casts = [
         'target_insects' => 'array',
         'pesticides_used' => 'array',
+        'pesticide_quantities' => 'array',
+        'insect_quantities' => 'array',
     ];
 
     public function visit()

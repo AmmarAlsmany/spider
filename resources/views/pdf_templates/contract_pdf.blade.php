@@ -124,7 +124,7 @@
 </head>
 <body>
     <div class="header-logo">
-        <img src="{{ public_path('backend/assets/images/logo-img.png') }}" alt="Spider Web Services Logo">
+        <img src="{{ public_path('backend/assets/images/logo-img.png') }}" alt="Spider Web Services Logo" width="100" height="100">
         <h2>Spider Web Services</h2>
     </div>
 
@@ -177,6 +177,10 @@
             <tr>
                 <th>Status</th>
                 <td><strong>{{ ucfirst($contract->contract_status) }}</strong></td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ $contract->contract_description }}</td>
             </tr>
         </table>
     </div>

@@ -61,6 +61,26 @@
         margin-right: 5px;
         margin-bottom: 5px;
     }
+    .stats-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        transition: all 0.3s;
+    }
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .stats-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    .tab-pane {
+        padding-top: 1rem;
+    }
 </style>
 @endpush
 
@@ -93,15 +113,97 @@
         </div>
     </div>
 
+    <!-- Summary Stats Cards -->
+    <div class="row mt-4">
+        @php
+            $totalVisits = count($visitData);
+            $totalInsects = count($insectStats);
+            $totalQuantity = 0;
+            $totalReports = 0;
+            
+            foreach ($insectStats as $stat) {
+                $totalReports += $stat['count'];
+                $totalQuantity += $stat['quantity'] ?? $stat['count'];
+            }
+            
+            $avgPerReport = $totalReports > 0 ? round($totalQuantity / $totalReports, 1) : 0;
+        @endphp
+        
+        <div class="col-12 col-md-4">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="bx bx-bug fs-5"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0">Insect Types Found</h6>
+                            <h3 class="mb-0">{{ $totalInsects }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-12 col-md-4">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-success bg-opacity-10 text-success">
+                            <i class="bx bx-calendar-check fs-5"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0">Total Visits</h6>
+                            <h3 class="mb-0">{{ $totalVisits }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-12 col-md-4">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-danger bg-opacity-10 text-danger">
+                            <i class="bx bx-bug-alt fs-5"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0">Total Insects Found</h6>
+                            <h3 class="mb-0">{{ $totalQuantity }}</h3>
+                            <small class="text-muted">{{ $avgPerReport }} avg. per report</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="mt-4 row">
         <div class="col-12 col-lg-8">
             <div class="card">
                 <div class="card-header">
-                    <h6 class="mb-0">Insect Prevalence Over Time</h6>
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="occurrences-tab" data-bs-toggle="tab" data-bs-target="#occurrences" type="button" role="tab" aria-controls="occurrences" aria-selected="true">Insect Occurrences</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="quantities-tab" data-bs-toggle="tab" data-bs-target="#quantities" type="button" role="tab" aria-controls="quantities" aria-selected="false">Insect Quantities</button>
+                        </li>
+                    </ul>
                 </div>
                 <div class="card-body">
-                    <div class="chart-container">
-                        <div id="insectTrendsChart"></div>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="occurrences" role="tabpanel" aria-labelledby="occurrences-tab">
+                            <div class="chart-container">
+                                <div id="insectTrendsChart"></div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="quantities" role="tabpanel" aria-labelledby="quantities-tab">
+                            <div class="chart-container">
+                                <div id="insectQuantitiesChart"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -120,10 +222,11 @@
                                         <i class="bx bx-bug me-1"></i>
                                         {{ $stat['name'] }}
                                     </span>
-                                    <span>
-                                        <span class="badge bg-primary insect-badge">{{ $stat['count'] }} visits</span>
+                                    <div class="d-flex flex-column align-items-end">
+                                        <span class="badge bg-primary insect-badge mb-1">{{ $stat['count'] }} visits</span>
+                                        <span class="badge bg-success insect-badge mb-1">{{ $stat['quantity'] ?? $stat['count'] }} insects found</span>
                                         <span class="badge bg-info insect-badge">{{ $stat['percentage'] }}%</span>
-                                    </span>
+                                    </div>
                                 </li>
                             @empty
                                 <li class="text-center list-group-item">No data available</li>
@@ -136,14 +239,62 @@
     </div>
 
     <div class="mt-4 row">
-        <div class="col-12">
+        <div class="col-12 col-lg-6">
             <div class="card">
                 <div class="card-header">
-                    <h6 class="mb-0">Insect Distribution</h6>
+                    <h6 class="mb-0">Insect Occurrence Distribution</h6>
                 </div>
                 <div class="card-body">
                     <div class="chart-container">
                         <div id="insectDistributionChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Insect Quantity Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <div id="insectQuantityChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4 row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Insect Density Analysis</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Insect Type</th>
+                                    <th>Reports</th>
+                                    <th>Total Found</th>
+                                    <th>Avg. per Report</th>
+                                    <th>% of Visits</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($insectStats as $stat)
+                                <tr>
+                                    <td><i class="bx bx-bug me-1"></i> {{ $stat['name'] }}</td>
+                                    <td>{{ $stat['count'] }}</td>
+                                    <td>{{ $stat['quantity'] ?? $stat['count'] }}</td>
+                                    <td>{{ $stat['avg_per_report'] ?? 1 }}</td>
+                                    <td>{{ $stat['percentage'] }}%</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -172,8 +323,14 @@
                                                     @php
                                                         $insect = $targetInsects->where('value', $insectValue)->first();
                                                         $insectName = $insect ? $insect->name : $insectValue;
+                                                        $quantity = isset($visit['insect_quantities'][$insectValue]) ? $visit['insect_quantities'][$insectValue] : 1;
                                                     @endphp
-                                                    <span class="badge bg-primary insect-tag">{{ $insectName }}</span>
+                                                    <span class="badge bg-primary insect-tag">
+                                                        {{ $insectName }} 
+                                                        @if(isset($visit['insect_quantities'][$insectValue]))
+                                                            <span class="badge bg-light text-dark">{{ $quantity }}</span>
+                                                        @endif
+                                                    </span>
                                                 @endforeach
                                             @else
                                                 <span class="text-muted">No insects reported</span>
@@ -221,8 +378,13 @@
         
         // Prepare series data for each insect
         const seriesData = {};
+        const quantityData = {};
         uniqueInsects.forEach(insect => {
             seriesData[insect] = {
+                name: insectNames[insect] || insect,
+                data: []
+            };
+            quantityData[insect] = {
                 name: insectNames[insect] || insect,
                 data: []
             };
@@ -247,14 +409,25 @@
             uniqueInsects.forEach(insect => {
                 const found = visit.target_insects.includes(insect) ? 1 : 0;
                 seriesData[insect].data.push(found);
+                
+                // Get quantity if available, otherwise use 1 if found
+                let quantity = 0;
+                if (found) {
+                    quantity = visit.insect_quantities && visit.insect_quantities[insect] 
+                        ? parseInt(visit.insect_quantities[insect]) 
+                        : 1;
+                }
+                quantityData[insect].data.push(quantity);
             });
         });
         
         // Convert to array for ApexCharts
         const series = Object.values(seriesData);
+        const quantitySeries = Object.values(quantityData);
         
         // Only show top 5 insects for readability
         const topInsects = series.slice(0, 5);
+        const topQuantityInsects = quantitySeries.slice(0, 5);
         
         // Insect Trends Chart
         const trendsOptions = {
@@ -299,17 +472,66 @@
             }
         };
         
+        // Insect Quantities Chart
+        const quantitiesOptions = {
+            series: topQuantityInsects,
+            chart: {
+                height: 350,
+                type: 'line',
+                toolbar: {
+                    show: false
+                }
+            },
+            colors: ['#3461ff', '#12bf24', '#ff6632', '#8932ff', '#ffcb32'],
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'smooth',
+                width: 3
+            },
+            xaxis: {
+                categories: visitDates
+            },
+            yaxis: {
+                title: {
+                    text: 'Number of Insects'
+                },
+                min: 0
+            },
+            tooltip: {
+                y: {
+                    formatter: function(value) {
+                        return value + " insects";
+                    }
+                }
+            },
+            legend: {
+                position: 'top'
+            }
+        };
+        
         if (visitData.length > 0) {
             const trendsChart = new ApexCharts(document.querySelector("#insectTrendsChart"), trendsOptions);
             trendsChart.render();
+            
+            const quantitiesChart = new ApexCharts(document.querySelector("#insectQuantitiesChart"), quantitiesOptions);
+            quantitiesChart.render();
         } else {
             document.querySelector("#insectTrendsChart").innerHTML = '<div class="py-5 text-center">No trend data available</div>';
+            document.querySelector("#insectQuantitiesChart").innerHTML = '<div class="py-5 text-center">No quantity data available</div>';
         }
         
         // Insect Distribution Chart
         const insectStats = @json($insectStats);
         const distributionLabels = insectStats.map(stat => stat.name);
         const distributionData = insectStats.map(stat => stat.count);
+        const insectQuantityData = insectStats.map(stat => stat.quantity ?? stat.count);
+        
+        console.log('Insect Stats:', insectStats);
+        console.log('Distribution Labels:', distributionLabels);
+        console.log('Distribution Data:', distributionData);
+        console.log('Quantity Data:', insectQuantityData);
         
         const distributionOptions = {
             series: distributionData,
@@ -342,11 +564,46 @@
             }
         };
         
+        const quantityChartOptions = {
+            series: insectQuantityData,
+            chart: {
+                type: 'pie',
+                height: 350
+            },
+            labels: distributionLabels,
+            colors: ['#3461ff', '#12bf24', '#ff6632', '#8932ff', '#ffcb32', '#ff3e1d', '#299cdb', '#6c757d', '#0dcaf0', '#fd7e14'],
+            legend: {
+                position: 'bottom'
+            },
+            tooltip: {
+                y: {
+                    formatter: function(value) {
+                        return value + " insects found";
+                    }
+                }
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        height: 360
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }]
+        };
+        
         if (distributionData.length > 0) {
             const distributionChart = new ApexCharts(document.querySelector("#insectDistributionChart"), distributionOptions);
             distributionChart.render();
+            
+            const quantityChart = new ApexCharts(document.querySelector("#insectQuantityChart"), quantityChartOptions);
+            quantityChart.render();
         } else {
             document.querySelector("#insectDistributionChart").innerHTML = '<div class="py-5 text-center">No distribution data available</div>';
+            document.querySelector("#insectQuantityChart").innerHTML = '<div class="py-5 text-center">No quantity data available</div>';
         }
     });
 </script>

@@ -137,18 +137,24 @@
                                 @endif
                             </td>
                             <td>
+                                @if($visit->status == 'completed')
                                 <div class="btn-group">
                                     <a href="{{ route('team-leader.visit.show', $visit->id) }}" 
                                         class="btn btn-sm btn-info" title="View Details">
-                                        <i class="bx bx-show me-1"></i>View
+                                        <i class="bx bx-file me-1"></i>View Report
                                     </a>
-                                    @if($visit->status != 'completed' && date('Y-m-d') == $visit->visit_date || date('Y-m-d') > $visit->visit_date)
+                                </div>
+                                @else
+                                {{-- create report button if visit is scheduled and date is today or before --}}
+                                @if($visit->status == 'scheduled' && $visit->visit_date <= now()->format('Y-m-d'))
+                                <div class="btn-group">
                                     <a href="{{ route('team-leader.visit.report.create', $visit->id) }}" 
                                         class="btn btn-sm btn-primary" title="Create Report">
-                                        <i class="bx bx-file me-1"></i>Report
+                                        <i class="bx bx-file me-1"></i>Create Report
                                     </a>
-                                    @endif
                                 </div>
+                                @endif
+                                @endif
                             </td>
                         </tr>
                         @endforeach

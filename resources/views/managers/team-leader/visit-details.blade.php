@@ -149,10 +149,19 @@
                                                 $insects = is_array($visit->report->target_insects) 
                                                     ? $visit->report->target_insects 
                                                     : json_decode($visit->report->target_insects, true);
+                                                $insectQuantities = is_array($visit->report->insect_quantities) 
+                                                    ? $visit->report->insect_quantities 
+                                                    : json_decode($visit->report->insect_quantities, true);
                                             @endphp
                                             <ul class="list-unstyled">
                                                 @foreach($insects as $insect)
-                                                <li><i class="bx bx-check text-success me-2"></i>{{ ucfirst(str_replace('_', ' ', $insect)) }}</li>
+                                                <li>
+                                                    <i class="bx bx-check text-success me-2"></i>
+                                                    {{ ucfirst(str_replace('_', ' ', $insect)) }}
+                                                    @if(isset($insectQuantities[$insect]))
+                                                        - <span class="badge bg-info">{{ $insectQuantities[$insect] }} {{ $insectQuantities[$insect] == 1 ? 'piece' : 'pieces' }}</span>
+                                                    @endif
+                                                </li>
                                                 @endforeach
                                             </ul>
                                         </div>

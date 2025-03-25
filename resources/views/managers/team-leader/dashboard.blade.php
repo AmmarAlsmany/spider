@@ -127,6 +127,7 @@
                                 <tr>
                                     <th>Time</th>
                                     <th>Contract #</th>
+                                    <th>Type</th>
                                     <th>Customer</th>
                                     <th>Location</th>
                                     <th>Status</th>
@@ -138,44 +139,54 @@
                                 <tr>
                                     <td>{{ date('h:i A', strtotime($visit->visit_time)) }}</td>
                                     <td>
-                                        <a href="{{ route('team-leader.contract.show', $visit->contract->id) }}" class="text-primary">
+                                        <a href="{{ route('team-leader.contract.show', $visit->contract->id) }}"
+                                            class="text-primary">
                                             {{ $visit->contract->contract_number }}
                                         </a>
                                     </td>
+                                    <td>{{ $visit->contract->type->name }}</td>
                                     <td>{{ $visit->contract->customer->name }}</td>
                                     <td>
                                         @if($visit->branch_id)
-                                            {{ $visit->branch->branch_name }}
-                                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($visit->branch->branch_address) }}"
-                                                target="_blank" class="text-primary"><i class="bx bx-map me-1">{{ $visit->branch->branch_address }}</i></a>
+                                        {{ $visit->branch->branch_name }}
+                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($visit->branch->branch_address) }}"
+                                            target="_blank" class="text-primary"><i class="bx bx-map me-1">{{
+                                                $visit->branch->branch_address }}</i></a>
                                         @else
-                                            Main Location
-                                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($visit->contract->customer->address) }}"
-                                                target="_blank" class="text-primary"><i class="bx bx-map me-1">{{ $visit->contract->customer->address }}</i></a>
+                                        Main Location
+                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($visit->contract->customer->address) }}"
+                                            target="_blank" class="text-primary"><i class="bx bx-map me-1">{{
+                                                $visit->contract->customer->address }}</i></a>
                                         @endif
                                     </td>
                                     <td>
                                         @if($visit->status == 'completed')
-                                            <span class="badge bg-success">
-                                                <i class="bx bx-check-circle me-1"></i>Completed
-                                            </span>
+                                        <span class="badge bg-success">
+                                            <i class="bx bx-check-circle me-1"></i>Completed
+                                        </span>
                                         @else
-                                            <span class="badge bg-warning">
-                                                <i class="bx bx-time me-1"></i>Pending
-                                            </span>
+                                        <span class="badge bg-warning">
+                                            <i class="bx bx-time me-1"></i>Pending
+                                        </span>
                                         @endif
                                     </td>
                                     <td>
                                         <div class="btn-group">
-                                            <a href="{{ route('team-leader.visit.show', $visit->id) }}" 
-                                               class="btn btn-sm btn-info">
-                                                <i class="bx bx-show me-1"></i>View
-                                            </a>
-                                            @if($visit->status != 'completed')
-                                            <a href="{{ route('team-leader.visit.report.create', $visit->id) }}" 
-                                               class="btn btn-sm btn-primary">
-                                                <i class="bx bx-file me-1"></i>Create Report
-                                            </a>
+                                            @if ($visit->status == 'completed')
+                                                <a href="{{ route('team-leader.visit.show', $visit->id) }}"
+                                                    class="btn btn-sm btn-info">
+                                                    <i class="bx bx-show me-1"></i>View Report
+                                                </a>
+                                            @elseif($visit->status != 'completed' && $visit->visit_date <= now()->format('Y-m-d'))
+                                                <a href="{{ route('team-leader.visit.report.create', $visit->id) }}"
+                                                    class="btn btn-sm btn-primary">
+                                                    <i class="bx bx-file me-1"></i>Create Report
+                                                </a>
+                                            @else
+                                                <a href="{{ route('team-leader.visit.show', $visit->id) }}"
+                                                    class="btn btn-sm btn-info">
+                                                    <i class="bx bx-show me-1"></i>View Details
+                                                </a>
                                             @endif
                                         </div>
                                     </td>
@@ -210,6 +221,7 @@
                                 <tr>
                                     <th>Date & Time</th>
                                     <th>Contract #</th>
+                                    <th>Type</th>
                                     <th>Customer</th>
                                     <th>Location</th>
                                     <th>Actions</th>
@@ -220,30 +232,49 @@
                                 <tr>
                                     <td>
                                         <span class="d-block">{{ date('M d, Y', strtotime($visit->visit_date)) }}</span>
-                                        <small class="text-muted">{{ date('h:i A', strtotime($visit->visit_time)) }}</small>
+                                        <small class="text-muted">{{ date('h:i A', strtotime($visit->visit_time))
+                                            }}</small>
                                     </td>
                                     <td>
-                                        <a href="{{ route('team-leader.contract.show', $visit->contract->id) }}" class="text-primary">
+                                        <a href="{{ route('team-leader.contract.show', $visit->contract->id) }}"
+                                            class="text-primary">
                                             {{ $visit->contract->contract_number }}
                                         </a>
                                     </td>
+                                    <td>{{ $visit->contract->type->name }}</td>
                                     <td>{{ $visit->contract->customer->name }}</td>
                                     <td>
                                         @if($visit->branch_id)
-                                            {{ $visit->branch->branch_name }}
-                                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($visit->branch->branch_address) }}"
-                                                target="_blank" class="text-primary"><i class="bx bx-map me-1">{{ $visit->branch->branch_address }}</i></a>
+                                        {{ $visit->branch->branch_name }}
+                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($visit->branch->branch_address) }}"
+                                            target="_blank" class="text-primary"><i class="bx bx-map me-1">{{
+                                                $visit->branch->branch_address }}</i></a>
                                         @else
-                                            Main Location
-                                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($visit->contract->customer->address) }}"
-                                                target="_blank" class="text-primary"><i class="bx bx-map me-1">{{ $visit->contract->customer->address }}</i></a>
+                                        Main Location
+                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($visit->contract->customer->address) }}"
+                                            target="_blank" class="text-primary"><i class="bx bx-map me-1">{{
+                                                $visit->contract->customer->address }}</i></a>
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('team-leader.visit.show', $visit->id) }}" 
-                                           class="btn btn-sm btn-info">
-                                            <i class="bx bx-show me-1"></i>View
-                                        </a>
+                                        <div class="btn-group">
+                                            @if ($visit->status == 'completed')
+                                                <a href="{{ route('team-leader.visit.show', $visit->id) }}"
+                                                    class="btn btn-sm btn-info">
+                                                    <i class="bx bx-show me-1"></i>View Report
+                                                </a>
+                                            @elseif($visit->status != 'completed' && $visit->visit_date <= now()->format('Y-m-d'))
+                                                <a href="{{ route('team-leader.visit.report.create', $visit->id) }}"
+                                                    class="btn btn-sm btn-primary">
+                                                    <i class="bx bx-file me-1"></i>Create Report
+                                                </a>
+                                            @else
+                                                <a href="{{ route('team-leader.visit.show', $visit->id) }}"
+                                                    class="btn btn-sm btn-primary">
+                                                    <i class="bx bx-show me-1"></i>View Details
+                                                </a>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                                 @endforeach

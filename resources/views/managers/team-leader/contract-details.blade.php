@@ -186,10 +186,24 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <a href="{{ route('team-leader.visit.show', $visit->id) }}" 
-                                                    class="btn btn-sm btn-info">
-                                                    <i class="bx bx-show me-1"></i>View
-                                                </a>
+                                                <div class="btn-group">
+                                                    @if ($visit->status == 'completed')
+                                                        <a href="{{ route('team-leader.visit.show', $visit->id) }}"
+                                                            class="btn btn-sm btn-info">
+                                                            <i class="bx bx-show me-1"></i>View Report
+                                                        </a>
+                                                    @elseif($visit->status != 'completed' && $visit->visit_date <= now()->format('Y-m-d'))
+                                                        <a href="{{ route('team-leader.visit.report.create', $visit->id) }}"
+                                                            class="btn btn-sm btn-primary">
+                                                            <i class="bx bx-file me-1"></i>Create Report
+                                                        </a>
+                                                    @else
+                                                        <a href="{{ route('team-leader.visit.show', $visit->id) }}"
+                                                            class="btn btn-sm btn-primary">
+                                                            <i class="bx bx-show me-1"></i>View Details
+                                                        </a>
+                                                    @endif
+                                                </div>
                                             </td>
                                         </tr>
                                         @endforeach

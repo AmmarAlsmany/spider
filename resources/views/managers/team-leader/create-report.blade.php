@@ -105,7 +105,7 @@
                         </div>
                         <div class="mb-3 col-md-3">
                             <label class="form-label">Region</label>
-                            <input type="text" class="form-control" value="{{ $visit->branch ? $visit->branch->region : 'Main' }}" readonly>
+                            <input type="text" class="form-control" value="{{ $visit->branch ? $visit->branch->branch_name : 'Main' }}" readonly>
                         </div>
                         <div class="mb-3 col-md-3">
                             <label class="form-label">Date</label>
@@ -171,23 +171,41 @@
                     <div class="col-12 col-lg-6">
                         <div class="card h-100">
                             <div class="card-header">
-                                <h6 class="mb-0">Type of Target Insects</h6>
+                                <h6 class="mb-0">Observed insects</h6>
                             </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
                                         @foreach($targetInsects->take(ceil($targetInsects->count() / 2)) as $insect)
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="target_insects[]" value="{{ $insect->value }}" id="{{ $insect->value }}">
-                                            <label class="form-check-label" for="{{ $insect->value }}">{{ $insect->name }}</label>
+                                        <div class="mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <div class="form-check me-2">
+                                                    <input type="checkbox" class="form-check-input insect-checkbox" name="target_insects[]" value="{{ $insect->value }}" id="{{ $insect->value }}">
+                                                    <label class="form-check-label" for="{{ $insect->value }}">{{ $insect->name }}</label>
+                                                </div>
+                                                <div class="insect-quantity-container d-none">
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="number" class="form-control form-control-sm" name="insect_quantity[{{ $insect->value }}]" min="1" value="1" placeholder="Qty">
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                         @endforeach
                                     </div>
                                     <div class="col-md-6">
                                         @foreach($targetInsects->skip(ceil($targetInsects->count() / 2)) as $insect)
-                                        <div class="mb-2 form-check">
-                                            <input type="checkbox" class="form-check-input" name="target_insects[]" value="{{ $insect->value }}" id="{{ $insect->value }}">
-                                            <label class="form-check-label" for="{{ $insect->value }}">{{ $insect->name }}</label>
+                                        <div class="mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <div class="form-check me-2">
+                                                    <input type="checkbox" class="form-check-input insect-checkbox" name="target_insects[]" value="{{ $insect->value }}" id="{{ $insect->value }}">
+                                                    <label class="form-check-label" for="{{ $insect->value }}">{{ $insect->name }}</label>
+                                                </div>
+                                                <div class="insect-quantity-container d-none">
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="number" class="form-control form-control-sm" name="insect_quantity[{{ $insect->value }}]" min="1" value="1" placeholder="Qty">
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                         @endforeach
                                     </div>
@@ -383,6 +401,20 @@
                 quantityInput.classList.add('d-none');
                 // Clear the inputs when unchecked
                 quantityInput.querySelector('input[type="number"]').value = '';
+            }
+        });
+    });
+
+    // Handle insect quantity inputs
+    document.querySelectorAll('.insect-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const quantityInput = this.closest('.d-flex').querySelector('.insect-quantity-container');
+            if (this.checked) {
+                quantityInput.classList.remove('d-none');
+            } else {
+                quantityInput.classList.add('d-none');
+                // Clear the inputs when unchecked
+                quantityInput.querySelector('input[type="number"]').value = '1';
             }
         });
     });

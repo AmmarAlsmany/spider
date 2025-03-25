@@ -23,6 +23,7 @@ class VisitReport extends Model
         'insect_quantities',
         'recommendations',
         'customer_notes',
+        'customer_satisfaction',
         'customer_signature',
         'phone_signature',
         'created_by'

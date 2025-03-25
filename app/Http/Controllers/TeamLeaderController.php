@@ -209,6 +209,7 @@ class TeamLeaderController extends Controller
                 'elimination_steps' => 'required|string|min:10',
                 'recommendations' => 'required|string',
                 'customer_notes' => 'nullable|string',
+                'customer_satisfaction' => 'required|integer|min:1|max:5',
                 'customer_signature' => 'required|string',
                 'phone_signature' => 'required|string'
             ]);
@@ -261,6 +262,7 @@ class TeamLeaderController extends Controller
                 'elimination_steps' => $request->elimination_steps,
                 'recommendations' => $request->recommendations,
                 'customer_notes' => $request->customer_notes,
+                'customer_satisfaction' => $request->customer_satisfaction,
                 'customer_signature' => $request->customer_signature,
                 'phone_signature' => $request->phone_signature,
                 'created_by' => Auth::id()

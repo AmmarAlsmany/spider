@@ -201,6 +201,7 @@
                                                         <tr>
                                                             <th class="py-3 border-0">Time</th>
                                                             <th class="py-3 border-0">Contract #</th>
+                                                            <th class="py-3 border-0">Contract Type</th>
                                                             <th class="py-3 border-0">Customer</th>
                                                             <th class="py-3 border-0">Team</th>
                                                             <th class="py-3 border-0">Status</th>
@@ -217,6 +218,13 @@
                                                                     class="text-primary fw-medium hover:text-primary-dark">
                                                                     {{ $schedule->contract->contract_number }}
                                                                 </a>
+                                                                @else
+                                                                <span class="text-muted">N/A</span>
+                                                                @endif
+                                                            </td>
+                                                            <td class="py-3">
+                                                                @if($schedule->contract && $schedule->contract->type)
+                                                                <div class="fw-medium">{{ $schedule->contract->type->name }}</div>
                                                                 @else
                                                                 <span class="text-muted">N/A</span>
                                                                 @endif
@@ -330,9 +338,9 @@
                                                 // Group upcoming visits by branch for this contract - with improved error handling
                                                 $contractBranchVisits = [];
                                                 // Filter to only include visits after today
-                                                $today = \Carbon\Carbon::today()->format('Y-m-d');
+                                                $today = \Carbon\Carbon::today();
                                                 $upcomingVisits = $contract->visitSchedules->filter(function($visit) use ($today) {
-                                                    return \Carbon\Carbon::parse($visit->visit_date)->format('Y-m-d') > $today;
+                                                    return \Carbon\Carbon::parse($visit->visit_date)->startOfDay()->gt($today);
                                                 });
                                                 
                                                 if($upcomingVisits->count() > 0) {
@@ -397,6 +405,9 @@
                                                                         <tr>
                                                                             <th>Date</th>
                                                                             <th>Time</th>
+                                                                            <th>Contract #</th>
+                                                                            <th>Contract Type</th>
+                                                                            <th>Customer</th>
                                                                             <th>Team</th>
                                                                             <th>Status</th>
                                                                             <th>Actions</th>
@@ -414,6 +425,26 @@
                                                                                 <div class="text-wrap" style="max-width: 200px;">
                                                                                     {{ $visit->visit_time }}
                                                                                 </div>
+                                                                            </td>
+                                                                            <td class="py-3">
+                                                                                @if($visit->contract)
+                                                                                <a href="{{ route('technical.contract.show', $visit->contract->id) }}"
+                                                                                    class="text-primary fw-medium hover:text-primary-dark">
+                                                                                    {{ $visit->contract->contract_number }}
+                                                                                </a>
+                                                                                @else
+                                                                                    <span class="text-muted">N/A</span>
+                                                                                @endif
+                                                                            </td>
+                                                                            <td class="py-3">
+                                                                                @if($visit->contract && $visit->contract->type)
+                                                                                    <div class="fw-medium">{{ $visit->contract->type->name }}</div>
+                                                                                @else
+                                                                                    <span class="text-muted">N/A</span>
+                                                                                @endif
+                                                                            </td>
+                                                                            <td class="py-3">
+                                                                                {{ $visit->contract->customer->name }}
                                                                             </td>
                                                                             <td class="py-3">
                                                                                 <span class="badge bg-soft-info text-info">{{ $visit->team->name }}</span>

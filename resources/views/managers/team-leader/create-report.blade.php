@@ -24,6 +24,38 @@
         border-color: #0d6efd;
     }
 
+    /* Emoji Rating Styles */
+    .emoji-rating-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .emoji-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 15px 10px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        border: 1px solid #dee2e6;
+        min-width: 100px;
+    }
+
+    .emoji-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .btn-check:checked + .emoji-btn {
+        background-color: #f8f9fa;
+        border-color: #0d6efd;
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.2);
+        transform: translateY(-5px);
+    }
+
     @media (min-width: 768px) {
         .visit-type-group {
             flex-direction: row;
@@ -66,6 +98,15 @@
         }
         .form-check {
             margin-bottom: 10px;
+        }
+        .emoji-rating-container {
+            flex-direction: row;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        .emoji-btn {
+            min-width: 80px;
+            font-size: 0.8rem;
         }
     }
 </style>
@@ -297,6 +338,59 @@
                     </div>
                 </div>
 
+                <!-- Customer Evaluation -->
+                <div class="mb-4 row g-3">
+                    <div class="col-12">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0">Customer Evaluation</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">How satisfied was the customer with our service?</label>
+                                    <div class="emoji-rating-container row row-cols-1 row-cols-sm-3 row-cols-md-5 g-3 mt-2">
+                                        <div class="col text-center">
+                                            <input type="radio" class="btn-check" name="customer_satisfaction" id="rating-1" value="1" required>
+                                            <label class="btn btn-outline-light emoji-btn w-100" for="rating-1">
+                                                <span style="font-size: 2rem;">😡</span>
+                                                <div class="mt-1">Very Dissatisfied</div>
+                                            </label>
+                                        </div>
+                                        <div class="col text-center">
+                                            <input type="radio" class="btn-check" name="customer_satisfaction" id="rating-2" value="2">
+                                            <label class="btn btn-outline-light emoji-btn w-100" for="rating-2">
+                                                <span style="font-size: 2rem;">😕</span>
+                                                <div class="mt-1">Dissatisfied</div>
+                                            </label>
+                                        </div>
+                                        <div class="col text-center">
+                                            <input type="radio" class="btn-check" name="customer_satisfaction" id="rating-3" value="3">
+                                            <label class="btn btn-outline-light emoji-btn w-100" for="rating-3">
+                                                <span style="font-size: 2rem;">😐</span>
+                                                <div class="mt-1">Neutral</div>
+                                            </label>
+                                        </div>
+                                        <div class="col text-center">
+                                            <input type="radio" class="btn-check" name="customer_satisfaction" id="rating-4" value="4">
+                                            <label class="btn btn-outline-light emoji-btn w-100" for="rating-4">
+                                                <span style="font-size: 2rem;">🙂</span>
+                                                <div class="mt-1">Satisfied</div>
+                                            </label>
+                                        </div>
+                                        <div class="col text-center">
+                                            <input type="radio" class="btn-check" name="customer_satisfaction" id="rating-5" value="5">
+                                            <label class="btn btn-outline-light emoji-btn w-100" for="rating-5">
+                                                <span style="font-size: 2rem;">😄</span>
+                                                <div class="mt-1">Very Satisfied</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Signatures -->
                 <div class="mb-4 row g-3">
                     <div class="col-12 col-lg-6">
@@ -373,6 +467,13 @@
         var pesticides = document.querySelectorAll('input[name="pesticides_used[]"]:checked');
         if (pesticides.length === 0) {
             alert('Please select at least one pesticide used');
+            return false;
+        }
+
+        // Check if customer satisfaction rating is selected
+        var satisfactionRating = document.querySelector('input[name="customer_satisfaction"]:checked');
+        if (!satisfactionRating) {
+            alert('Please select a customer satisfaction rating');
             return false;
         }
 

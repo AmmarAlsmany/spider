@@ -186,6 +186,55 @@
                                             <p>{{ $visit->report->customer_notes ?: 'No notes provided' }}</p>
                                         </div>
                                     </div>
+                                    <!-- Customer Satisfaction Rating -->
+                                    @if(isset($visit->report->customer_satisfaction))
+                                    <div class="mt-4 row">
+                                        <div class="col-12">
+                                            <h6>Customer Satisfaction</h6>
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-3">
+                                                    @php
+                                                        $satisfactionEmoji = '';
+                                                        $satisfactionText = '';
+                                                        $badgeClass = '';
+                                                        
+                                                        switch($visit->report->customer_satisfaction) {
+                                                            case 1:
+                                                                $satisfactionEmoji = '😡';
+                                                                $satisfactionText = 'Very Dissatisfied';
+                                                                $badgeClass = 'bg-danger';
+                                                                break;
+                                                            case 2:
+                                                                $satisfactionEmoji = '😕';
+                                                                $satisfactionText = 'Dissatisfied';
+                                                                $badgeClass = 'bg-warning';
+                                                                break;
+                                                            case 3:
+                                                                $satisfactionEmoji = '😐';
+                                                                $satisfactionText = 'Neutral';
+                                                                $badgeClass = 'bg-secondary';
+                                                                break;
+                                                            case 4:
+                                                                $satisfactionEmoji = '🙂';
+                                                                $satisfactionText = 'Satisfied';
+                                                                $badgeClass = 'bg-info';
+                                                                break;
+                                                            case 5:
+                                                                $satisfactionEmoji = '😄';
+                                                                $satisfactionText = 'Very Satisfied';
+                                                                $badgeClass = 'bg-success';
+                                                                break;
+                                                        }
+                                                    @endphp
+                                                    <span style="font-size: 2rem;">{{ $satisfactionEmoji }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="badge {{ $badgeClass }}">{{ $satisfactionText }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endif
                                     @if($visit->report->customer_signature)
                                     <div class="mt-4 row">
                                         <div class="col-md-6">

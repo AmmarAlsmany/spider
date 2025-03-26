@@ -213,7 +213,9 @@
                                 <tr>
                                     <th>Payment ID</th>
                                     <th>Contract</th>
-                                    <th>Amount</th>
+                                    <th>Amount With Out VAT</th>
+                                    <th>VAT</th>
+                                    <th>Amount With VAT</th>
                                     <th>Status</th>
                                     <th>Due Date</th>
                                 </tr>
@@ -223,6 +225,8 @@
                                 <tr>
                                     <td>{{ $payment->id }}</td>
                                     <td>{{ $payment->contract->contract_number }}</td>
+                                    <td>{{ number_format($payment->payment_amount / 1.15, 2) }}</td>
+                                    <td>{{ number_format($payment->payment_amount / 1.15 * 0.15, 2) }}</td>
                                     <td>{{ number_format($payment->payment_amount, 2) }}</td>
                                     <td>
                                         <span

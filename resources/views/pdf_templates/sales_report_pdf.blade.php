@@ -189,7 +189,9 @@
                 <tr>
                     <th>Due Date</th>
                     <th>Contract</th>
-                    <th>Amount</th>
+                    <th>Amount With Out VAT</th>
+                    <th>VAT</th>
+                    <th>Amount With VAT</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -198,6 +200,8 @@
                 <tr>
                     <td>{{ date('Y-m-d', strtotime($payment->due_date)) }}</td>
                     <td>{{ $payment->contract->contract_number }}</td>
+                    <td class="text-right">{{ number_format($payment->payment_amount / 1.15, 2) }}</td>
+                    <td class="text-right">{{ number_format($payment->payment_amount / 1.15 * 0.15, 2) }}</td>
                     <td class="text-right">{{ number_format($payment->payment_amount, 2) }}</td>
                     <td>{{ ucfirst($payment->payment_status) }}</td>
                 </tr>

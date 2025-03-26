@@ -11,7 +11,10 @@ use App\Models\tikets;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Mpdf\Mpdf;
+use App\Services\VisitScheduleService;
 
 class sales extends Controller
 {
@@ -399,35 +402,41 @@ class sales extends Controller
         return $mpdf->Output($periodInfo['period_label'] . '.pdf', 'D');
     }
 
-    private function getContractsForPeriod($startDate, $endDate)
-    {
-        $salesId = Auth::user()->id;
-        return contracts::where('sales_id', $salesId)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->with(['customer', 'type', 'payments'])
-            ->get()
-            ->groupBy('contract_status');
-    }
-
-    private function getPaymentsForPeriod($startDate, $endDate)
-    {
-        $salesId = Auth::user()->id;
-        return payments::whereHas('contract', function ($query) use ($salesId) {
-            $query->where('sales_id', $salesId);
-        })
-            ->whereBetween('due_date', [$startDate, $endDate])
-            ->with('contract')
-            ->get()
-            ->groupBy('payment_status');
-    }
-
-    // chnage status of the cancled or not approved contracts
+    // change status of the cancelled contracts
     public function return_contract(Request $request)
     {
-        $contract = contracts::findOrFail($request->id);
-        $contract->contract_status = $request->status;
-        $contract->rejection_reason = null;
-        $contract->save();
-        return redirect()->back()->with('success', 'Contract status changed successfully');
+        try {
+            DB::beginTransaction();
+            
+            $contract = contracts::findOrFail($request->id);
+            $oldStatus = $contract->contract_status;
+            $contract->contract_status = $request->status;
+            $contract->rejection_reason = null;
+            $contract->save();
+            
+            // If contract is being reactivated (status changed from stopped to approved)
+            // then restore the cancelled visits
+            if ($oldStatus === 'stopped' && $request->status === 'approved') {
+                // Get the VisitScheduleService instance
+                $visitScheduleService = app(VisitScheduleService::class);
+                $restoredVisits = $visitScheduleService->restoreContractVisits($contract);
+                
+                // Prepare success message
+                $message = 'Contract status changed successfully';
+                if ($restoredVisits > 0) {
+                    $message .= " and $restoredVisits cancelled visits were restored";
+                }
+                
+                DB::commit();
+                return redirect()->back()->with('success', $message);
+            }
+            
+            DB::commit();
+            return redirect()->back()->with('success', 'Contract status changed successfully');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Contract status change error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error changing contract status: ' . $e->getMessage());
+        }
     }
 }

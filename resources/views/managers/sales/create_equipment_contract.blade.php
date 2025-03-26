@@ -152,8 +152,8 @@ sort($saudiCities);
                         <div class="step-trigger" role="tab" id="stepper1trigger3" aria-controls="test-l-3">
                             <div class="bs-stepper-circle">3</div>
                             <div class="">
-                                <h5 class="mb-0 steper-title">Payment Information</h5>
-                                <p class="mb-0 steper-sub-title">Enter payment details and schedule</p>
+                                <h5 class="mb-0 steper-title">Branch Information</h5>
+                                <p class="mb-0 steper-sub-title">Enter branch details</p>
                             </div>
                         </div>
                     </div>
@@ -161,6 +161,16 @@ sort($saudiCities);
                     <div class="step" data-target="#test-l-4">
                         <div class="step-trigger" role="tab" id="stepper1trigger4" aria-controls="test-l-4">
                             <div class="bs-stepper-circle">4</div>
+                            <div class="">
+                                <h5 class="mb-0 steper-title">Payment Information</h5>
+                                <p class="mb-0 steper-sub-title">Enter payment details and schedule</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bs-stepper-line"></div>
+                    <div class="step" data-target="#test-l-5">
+                        <div class="step-trigger" role="tab" id="stepper1trigger5" aria-controls="test-l-5">
+                            <div class="bs-stepper-circle">5</div>
                             <div class="">
                                 <h5 class="mb-0 steper-title">Summary</h5>
                                 <p class="mb-0 steper-sub-title">Review and submit</p>
@@ -240,7 +250,6 @@ sort($saudiCities);
 
                         <div id="test-l-2" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger2">
                             <div class="step-indicator">
-                                <div class="step-number">2</div>
                                 <h5 class="mb-1">Equipment Details</h5>
                             </div>
                             <p class="mb-4">Enter equipment and warranty details</p>
@@ -293,54 +302,73 @@ sort($saudiCities);
                         </div>
 
                         <div id="test-l-3" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger3">
+                            <div class="step-indicator">
+                                <h5 class="mb-1">Branch Information</h5>
+                            </div>
+                            <p class="mb-4">Enter branch details. You can add multiple branches if needed.</p>
+                            
+                            <div id="branches-container">
+                                <!-- Initial branch form -->
+                                <div class="p-3 mb-4 rounded border branch-form" data-branch-index="0">
+                                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">Branch #1</h6>
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-branch-btn" style="display: none;">
+                                            <i class='bx bx-trash'></i> Remove
+                                        </button>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="branchName0" class="form-label">Branch Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="branchName0" name="branchName[0]" required>
+                                            <div class="invalid-feedback">Please enter the branch name</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="branchmanager0" class="form-label">Branch Manager Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="branchmanager0" name="branchmanager[0]" required>
+                                            <div class="invalid-feedback">Please enter the branch manager name</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="branchmanagerPhone0" class="form-label">Manager Phone <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="branchmanagerPhone0" name="branchmanagerPhone[0]" 
+                                                pattern="^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$" required>
+                                            <div class="invalid-feedback">Please enter a valid Saudi mobile number (05xxxxxxxx)</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="branchCity0" class="form-label">City <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="branchCity0" name="branchCity[0]" required>
+                                                <option value="">Select a city...</option>
+                                                @foreach($saudiCities as $city)
+                                                    <option value="{{ $city }}">{{ $city }}</option>
+                                                @endforeach
+                                            </select>
+                                            <div class="invalid-feedback">Please select the branch city</div>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="branchAddress0" class="form-label">Address <span class="text-danger">*</span></label>
+                                            <textarea class="form-control" id="branchAddress0" name="branchAddress[0]" rows="2" required></textarea>
+                                            <div class="invalid-feedback">Please enter the branch address</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-outline-primary" id="add-branch-btn">
+                                    <i class='bx bx-plus me-1'></i> Add Another Branch
+                                </button>
+                            </div>
+
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-primary" onclick="handlePreviousStep()"><i class='bx bx-left-arrow-alt me-2'></i>Previous</button>
+                                <button type="button" class="btn btn-primary" onclick="handleNextStep()">Next<i class='bx bx-right-arrow-alt ms-2'></i></button>
+                            </div>
+                        </div>
+
+                        <div id="test-l-4" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger4">
                             <h5 class="mb-1">Payment Information</h5>
                             <p class="mb-4">Enter payment information and the number of payments</p>
 
-                            <div class="row g-3" x-data="{
-                                contractAmount: 0,
-                                payment_type: 'prepaid',
-                                payment_schedule: 'monthly',
-                                numberOfPayments: 1,
-                                first_payment_date: '',
-                                vatAmount: 0,
-                                totalAmount: 0,
-                                installmentAmount: 0,
-                                // Calculate amounts
-                                calculateAmounts() {
-                                    this.vatAmount = parseFloat((this.contractAmount * 0.15).toFixed(2));
-                                    this.totalAmount = parseFloat((this.contractAmount * 1.15).toFixed(2));
-                                    if (this.payment_type === 'postpaid' && this.numberOfPayments > 0) {
-                                        this.installmentAmount = parseFloat((this.totalAmount / this.numberOfPayments).toFixed(2));
-                                    }
-                                },
-                                initPaymentDates() {
-                                    if (this.payment_schedule === 'monthly') {
-                                        // Clear custom payment date fields when switching to monthly
-                                        const container = document.getElementById('custom-payment-dates');
-                                        if (container) {
-                                            container.innerHTML = '';
-                                        }
-                                    } else if (this.payment_schedule === 'custom') {
-                                        // Generate custom payment date fields
-                                        setTimeout(() => {
-                                            generateCustomPaymentDateFields(this.numberOfPayments);
-                                        }, 50);
-                                    }
-                                },
-                                // Initialize with a small delay to avoid blocking rendering
-                                init() {
-                                    setTimeout(() => {
-                                        this.calculateAmounts();
-                                    }, 100);
-                                }
-                            }" x-init="init();
-                            $watch('contractAmount', value => calculateAmounts());
-                            $watch('numberOfPayments', value => {
-                                calculateAmounts();
-                                initPaymentDates();
-                            });
-                            $watch('payment_schedule', value => initPaymentDates());
-                            $watch('payment_type', value => calculateAmounts())">
+                            <div class="row g-3">
                                 <div class="col-12 col-lg-6">
                                     <label for="Contractamount" class="form-label">Contract Amount (without VAT) <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control" name="contractamount" id="Contractamount"
@@ -422,9 +450,8 @@ sort($saudiCities);
                             </div>
                         </div>
 
-                        <div id="test-l-4" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger4">
+                        <div id="test-l-5" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger5">
                             <div class="step-indicator">
-                                <div class="step-number">4</div>
                                 <h5 class="mb-1">Summary</h5>
                             </div>
                             <p class="mb-4">Review your contract details</p>
@@ -446,6 +473,25 @@ sort($saudiCities);
                                                     <h6 class="mb-3">Payment Information</h6>
                                                     <table class="table table-borderless">
                                                         <tbody id="payment-summary">
+                                                            <!-- Will be populated by JavaScript -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="mb-4 card-title">Branch Information</h5>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-3">Branch Details</h6>
+                                                    <table class="table table-borderless">
+                                                        <tbody id="branch-summary">
                                                             <!-- Will be populated by JavaScript -->
                                                         </tbody>
                                                     </table>
@@ -522,6 +568,33 @@ sort($saudiCities);
     }
 
     function validateStep3() {
+        const branches = document.querySelectorAll('.branch-form');
+        let isValid = true;
+
+        branches.forEach((branch, index) => {
+            // Use safer selectors that work with both naming patterns
+            const branchName = branch.querySelector('input[id^="branchName"]') || branch.querySelector('input[name^="branchName"]');
+            const branchManager = branch.querySelector('input[id^="branchmanager"]') || branch.querySelector('input[name^="branchmanager"]');
+            const branchManagerPhone = branch.querySelector('input[id^="branchmanagerPhone"]') || branch.querySelector('input[name^="branchmanagerPhone"]');
+            const branchCity = branch.querySelector('select[id^="branchCity"]') || branch.querySelector('select[name^="branchCity"]');
+            const branchAddress = branch.querySelector('textarea[id^="branchAddress"]') || branch.querySelector('textarea[name^="branchAddress"]');
+
+            // Safely check values
+            if (!branchName?.value || !branchManager?.value || !branchManagerPhone?.value || 
+                !branchCity?.value || !branchAddress?.value) {
+                isValid = false;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please fill in all branch details'
+                });
+            }
+        });
+
+        return isValid;
+    }
+
+    function validateStep4() {
         const form = document.getElementById('contractForm');
         let isValid = true;
         let errorMessage = '';
@@ -673,6 +746,8 @@ sort($saudiCities);
             case 2:
                 return validateStep3();
             case 3:
+                return validateStep4();
+            case 4:
                 return true; // Summary step, no validation needed
             default:
                 return false;
@@ -792,11 +867,70 @@ sort($saudiCities);
             
             paymentSummary.innerHTML = paymentDetails;
         }
+        
+        // Update branch summary
+        const branchSummary = document.getElementById('branch-summary');
+        if (branchSummary) {
+            const branches = document.querySelectorAll('.branch-form');
+            
+            let branchDetails = '';
+            
+            branches.forEach((branch, index) => {
+                // Use safer selectors
+                const branchName = branch.querySelector('input[id^="branchName"]') || branch.querySelector('input[name^="branchName"]');
+                const branchManager = branch.querySelector('input[id^="branchmanager"]') || branch.querySelector('input[name^="branchmanager"]');
+                const branchManagerPhone = branch.querySelector('input[id^="branchmanagerPhone"]') || branch.querySelector('input[name^="branchmanagerPhone"]');
+                const branchCity = branch.querySelector('select[id^="branchCity"]') || branch.querySelector('select[name^="branchCity"]');
+                const branchAddress = branch.querySelector('textarea[id^="branchAddress"]') || branch.querySelector('textarea[name^="branchAddress"]');
+                
+                // Only add to the summary if all values exist
+                if (branchName?.value && branchManager?.value && branchManagerPhone?.value && 
+                    branchCity?.value && branchAddress?.value) {
+                    
+                    // For city, get the selected option text
+                    let cityText = branchCity.value;
+                    if (branchCity.selectedIndex !== -1) {
+                        cityText = branchCity.options[branchCity.selectedIndex].text;
+                    }
+                    
+                    branchDetails += `
+                        <tr>
+                            <td colspan="2"><strong>Branch #${index + 1}</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Branch Name:</strong></td>
+                            <td>${branchName.value}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Branch Manager:</strong></td>
+                            <td>${branchManager.value}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Manager Phone:</strong></td>
+                            <td>${branchManagerPhone.value}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>City:</strong></td>
+                            <td>${cityText}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Address:</strong></td>
+                            <td>${branchAddress.value}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><hr></td>
+                        </tr>
+                    `;
+                }
+            });
+            
+            branchSummary.innerHTML = branchDetails || '<tr><td colspan="2">No branch information available</td></tr>';
+        }
     }
     
     function handleNextStep() {
         if (validateCurrentStep()) {
-            if (currentStep === 2) {
+            if (currentStep === 3) {
                 // Update summary before showing the summary step
                 updateSummary();
             }
@@ -955,7 +1089,261 @@ sort($saudiCities);
                     }
                 });
             }
+            
+            // Initialize the branch counter
+            let branchCounter = 1;
+
+            // Add Branch button functionality
+            document.getElementById('add-branch-btn').addEventListener('click', function() {
+                const branchesContainer = document.getElementById('branches-container');
+                const newIndex = branchCounter;
+                
+                // Create a new branch form
+                const branchForm = document.createElement('div');
+                branchForm.className = 'p-3 mb-4 rounded border branch-form';
+                branchForm.setAttribute('data-branch-index', newIndex);
+                
+                // Create the branch form HTML
+                branchForm.innerHTML = `
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Branch #${newIndex + 1}</h6>
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-branch-btn">
+                            <i class='bx bx-trash'></i> Remove
+                        </button>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="branchName${newIndex}" class="form-label">Branch Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="branchName${newIndex}" name="branchName[${newIndex}]" required>
+                            <div class="invalid-feedback">Please enter the branch name</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="branchmanager${newIndex}" class="form-label">Branch Manager Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="branchmanager${newIndex}" name="branchmanager[${newIndex}]" required>
+                            <div class="invalid-feedback">Please enter the branch manager name</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="branchmanagerPhone${newIndex}" class="form-label">Manager Phone <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="branchmanagerPhone${newIndex}" name="branchmanagerPhone[${newIndex}]" 
+                                pattern="^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$" required>
+                            <div class="invalid-feedback">Please enter a valid Saudi mobile number (05xxxxxxxx)</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="branchCity${newIndex}" class="form-label">City <span class="text-danger">*</span></label>
+                            <select class="form-select" id="branchCity${newIndex}" name="branchCity[${newIndex}]" required>
+                                <option value="">Select a city...</option>
+                                ${getSaudiCitiesOptions()}
+                            </select>
+                            <div class="invalid-feedback">Please select the branch city</div>
+                        </div>
+                        <div class="col-12">
+                            <label for="branchAddress${newIndex}" class="form-label">Address <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="branchAddress${newIndex}" name="branchAddress[${newIndex}]" rows="2" required></textarea>
+                            <div class="invalid-feedback">Please enter the branch address</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add the new branch form to the container
+                branchesContainer.appendChild(branchForm);
+                
+                // Add event listener to the remove button
+                branchForm.querySelector('.remove-branch-btn').addEventListener('click', function() {
+                    branchForm.remove();
+                    // Reindex the remaining branches to ensure proper array indexing
+                    reindexBranches();
+                    updateRemoveButtons();
+                });
+                
+                // Show the remove button on the first branch if we have more than one branch
+                updateRemoveButtons();
+                
+                // Increment the counter
+                branchCounter++;
+            });
+            
+            // Function to update remove buttons visibility
+            function updateRemoveButtons() {
+                const branches = document.querySelectorAll('.branch-form');
+                const firstBranchRemoveBtn = branches[0]?.querySelector('.remove-branch-btn');
+                
+                if (firstBranchRemoveBtn) {
+                    // Show the remove button on the first branch only if we have more than one branch
+                    if (branches.length > 1) {
+                        firstBranchRemoveBtn.style.display = 'block';
+                    } else {
+                        firstBranchRemoveBtn.style.display = 'none';
+                    }
+                }
+                
+                // Make sure we always have at least one branch
+                if (branches.length === 1) {
+                    branches[0].querySelector('.remove-branch-btn').style.display = 'none';
+                }
+            }
+            
+            // Add event listener to the first branch's remove button
+            document.querySelector('.branch-form .remove-branch-btn').addEventListener('click', function() {
+                this.closest('.branch-form').remove();
+                reindexBranches();
+                updateRemoveButtons();
+            });
+            
+            // Function to reindex branches after removal
+            function reindexBranches() {
+                const branches = document.querySelectorAll('.branch-form');
+                branches.forEach((branch, index) => {
+                    branch.setAttribute('data-branch-index', index);
+                    
+                    // Update the branch title
+                    const title = branch.querySelector('h6');
+                    if (title) {
+                        title.textContent = `Branch #${index + 1}`;
+                    }
+                    
+                    // Update input names and IDs
+                    updateInputAttributes(branch, 'branchName', index);
+                    updateInputAttributes(branch, 'branchmanager', index);
+                    updateInputAttributes(branch, 'branchmanagerPhone', index);
+                    updateInputAttributes(branch, 'branchCity', index);
+                    updateInputAttributes(branch, 'branchAddress', index);
+                });
+                
+                // Update branch counter
+                branchCounter = branches.length;
+            }
+            
+            // Helper function to update input attributes
+            function updateInputAttributes(branch, baseName, index) {
+                const input = branch.querySelector(`[name^="${baseName}["]`);
+                if (input) {
+                    input.name = `${baseName}[${index}]`;
+                    input.id = `${baseName}${index}`;
+                    
+                    // Update label for attribute
+                    const label = branch.querySelector(`label[for^="${baseName}"]`);
+                    if (label) {
+                        label.setAttribute('for', `${baseName}${index}`);
+                    }
+                }
+            }
+
+            // Helper function to generate Saudi cities options
+            function getSaudiCitiesOptions() {
+                const cities = @json($saudiCities);
+                return cities.map(city => `<option value="${city}">${city}</option>`).join('');
+            }
         });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Branch counter for new branches
+        let branchCounter = 1;
+        
+        // Get the add branch button
+        const addBranchBtn = document.getElementById('add-branch-btn');
+        if (!addBranchBtn) {
+            console.error('Add branch button not found');
+            return;
+        }
+        
+        // Add click event listener
+        addBranchBtn.onclick = function() {
+            console.log('Add branch button clicked');
+            
+            // Get the branches container
+            const branchesContainer = document.getElementById('branches-container');
+            if (!branchesContainer) {
+                console.error('Branches container not found');
+                return;
+            }
+            
+            // Create new branch element
+            const newBranch = document.createElement('div');
+            newBranch.className = 'p-3 mb-4 rounded border branch-form';
+            newBranch.dataset.branchIndex = branchCounter;
+            
+            // Generate the HTML for the new branch
+            newBranch.innerHTML = `
+                <div class="mb-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Branch #${branchCounter + 1}</h6>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-branch-btn">
+                        <i class='bx bx-trash'></i> Remove
+                    </button>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="branchName${branchCounter}" class="form-label">Branch Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="branchName${branchCounter}" name="branchName[${branchCounter}]" required>
+                        <div class="invalid-feedback">Please enter the branch name</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="branchmanager${branchCounter}" class="form-label">Branch Manager Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="branchmanager${branchCounter}" name="branchmanager[${branchCounter}]" required>
+                        <div class="invalid-feedback">Please enter the branch manager name</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="branchmanagerPhone${branchCounter}" class="form-label">Manager Phone <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="branchmanagerPhone${branchCounter}" name="branchmanagerPhone[${branchCounter}]" 
+                            pattern="^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$" required>
+                        <div class="invalid-feedback">Please enter a valid Saudi mobile number (05xxxxxxxx)</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="branchCity${branchCounter}" class="form-label">City <span class="text-danger">*</span></label>
+                        <select class="form-select" id="branchCity${branchCounter}" name="branchCity[${branchCounter}]" required>
+                            <option value="">Select a city...</option>
+                            @foreach($saudiCities as $city)
+                                <option value="{{ $city }}">{{ $city }}</option>
+                            @endforeach
+                        </select>
+                        <div class="invalid-feedback">Please select the branch city</div>
+                    </div>
+                    <div class="col-12">
+                        <label for="branchAddress${branchCounter}" class="form-label">Address <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="branchAddress${branchCounter}" name="branchAddress[${branchCounter}]" rows="2" required></textarea>
+                        <div class="invalid-feedback">Please enter the branch address</div>
+                    </div>
+                </div>
+            `;
+            
+            // Add the new branch to the container
+            branchesContainer.appendChild(newBranch);
+            
+            // Add remove button event listener
+            const removeBtn = newBranch.querySelector('.remove-branch-btn');
+            if (removeBtn) {
+                removeBtn.onclick = function() {
+                    newBranch.remove();
+                };
+            }
+            
+            // Increment the counter
+            branchCounter++;
+            
+            // Show the remove button on the first branch
+            const firstBranch = branchesContainer.querySelector('.branch-form:first-child');
+            const firstBranchRemoveBtn = firstBranch.querySelector('.remove-branch-btn');
+            if (firstBranchRemoveBtn) {
+                firstBranchRemoveBtn.style.display = 'inline-block';
+            }
+        };
+        
+        // Add event listener to the first branch's remove button
+        const firstBranch = document.querySelector('.branch-form:first-child');
+        if (firstBranch) {
+            const removeBtn = firstBranch.querySelector('.remove-branch-btn');
+            if (removeBtn) {
+                removeBtn.onclick = function() {
+                    // Only remove if there are other branches
+                    const branches = document.querySelectorAll('.branch-form');
+                    if (branches.length > 1) {
+                        firstBranch.remove();
+                    }
+                };
+            }
+        }
     });
 </script>
 @endsection

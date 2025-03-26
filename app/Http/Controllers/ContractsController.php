@@ -382,9 +382,6 @@ class ContractsController extends Controller
     {
         try {
             DB::beginTransaction();
-
-            // Validate the request
-            // dd($request->all());
             $rules = [
                 'equipment_type_id' => 'required|exists:equipment_types,id',
                 'equipment_model' => 'required|string',
@@ -394,6 +391,11 @@ class ContractsController extends Controller
                 'warranty' => 'required|numeric|min:0',
                 'payment_type' => 'required|in:postpaid,prepaid',
                 'number_of_payments' => 'required_if:payment_type,postpaid|integer|min:1|max:12',
+                'branchName.*' => 'required|string',
+                'branchmanager.*' => 'required|string',
+                'branchmanagerPhone.*' => ['required', 'string', 'regex:/^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$/'],
+                'branchAddress.*' => 'required|string',
+                'branchCity.*' => 'required|string',
             ];
 
             $request->validate($rules);
@@ -470,6 +472,27 @@ class ContractsController extends Controller
                 'total_with_vat' => $total_with_vat,
             ]);
             $equipmentContract->save();
+
+            // Create branch records for the contract
+            if ($request->has('branchName') && is_array($request->branchName)) {
+                foreach ($request->branchName as $index => $branchName) {
+                    $branchContract = new branchs([
+                        'branch_name' => $branchName,
+                        'branch_manager_name' => $request->branchmanager[$index],
+                        'branch_manager_phone' => $request->branchmanagerPhone[$index],
+                        'branch_address' => $request->branchAddress[$index],
+                        'branch_city' => $request->branchCity[$index],
+                        'contracts_id' => $contract->id,
+                    ]);
+                    $branchContract->save();
+                }
+                
+                // If there are multiple branches, update the contract to indicate it's a multi-branch contract
+                if (count($request->branchName) > 1) {
+                    $contract->is_multi_branch = 'yes';
+                    $contract->save();
+                }
+            }
 
             // Create payment record(s)
             if ($request->payment_type === 'prepaid') {
@@ -1275,6 +1298,10 @@ class ContractsController extends Controller
             $contract->update([
                 'contract_status' => 'stopped'
             ]);
+            
+            // Cancel all scheduled visits for this contract
+            $cancelledVisits = $this->visitScheduleService->cancelContractVisits($contract);
+            
             DB::commit();
 
             // Notify the team leader,client,sales manager,technical
@@ -1286,7 +1313,13 @@ class ContractsController extends Controller
                 'priority' => 'high',
             ];
             $this->notifyRoles(['team_leader', 'client', 'sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id);
-            return redirect()->route('contract.show')->with('success', 'Contract stopped successfully');
+            
+            $message = 'Contract stopped successfully';
+            if ($cancelledVisits > 0) {
+                $message .= " and $cancelledVisits scheduled visits were cancelled";
+            }
+            
+            return redirect()->route('contract.show')->with('success', $message);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Contract stop error: ' . $e->getMessage());

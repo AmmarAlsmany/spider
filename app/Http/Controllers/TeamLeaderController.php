@@ -115,7 +115,7 @@ class TeamLeaderController extends Controller
 
     public function completeVisit($id)
     {
-        $visit = VisitSchedule::findOrFail($id);
+        $visit = VisitSchedule::with('contract')->findOrFail($id);
 
         // Check if the visit belongs to the team leader's team
         if ($visit->team->team_leader_id !== Auth::id()) {
@@ -125,6 +125,11 @@ class TeamLeaderController extends Controller
         // Check if visit is scheduled for today or a future date
         if (!Carbon::parse($visit->visit_date)->isToday() && Carbon::parse($visit->visit_date)->isFuture()) {
             return redirect()->back()->with('error', 'Can only complete today\'s or future visits.');
+        }
+        
+        // Check if the contract is stopped
+        if ($visit->contract->contract_status === 'stopped') {
+            return redirect()->back()->with('error', 'Cannot complete a visit associated with a stopped contract.');
         }
 
         // Mark visit as completed
@@ -166,6 +171,12 @@ class TeamLeaderController extends Controller
             return redirect()->route('team-leader.visit.show', $visit->id)
                 ->with('error', 'Report already exists for this visit.');
         }
+        
+        // Check if the contract is stopped
+        if ($visit->contract->contract_status === 'stopped') {
+            return redirect()->route('team-leader.visit.show', $visit->id)
+                ->with('error', 'Cannot create report for a visit associated with a stopped contract.');
+        }
 
         // Notify sales manager,sales representative about visit report creation
         $data = [
@@ -188,11 +199,17 @@ class TeamLeaderController extends Controller
     public function storeReport(Request $request, $visitId)
     {
         try {
-            $visit = VisitSchedule::findOrFail($visitId);
+            $visit = VisitSchedule::with('contract')->findOrFail($visitId);
 
             // Check if visit is completed
             if ($visit->status !== 'completed') {
                 return redirect()->back()->with('error', 'Visit must be marked as completed before creating a report.');
+            }
+            
+            // Check if the contract is stopped
+            if ($visit->contract->contract_status === 'stopped') {
+                return redirect()->route('team-leader.visit.show', $visit->id)
+                    ->with('error', 'Cannot create report for a visit associated with a stopped contract.');
             }
 
             // dd($request->all());

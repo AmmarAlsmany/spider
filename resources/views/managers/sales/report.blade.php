@@ -162,6 +162,8 @@
                             <thead>
                                 <tr>
                                     <th>Contract ID</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
                                     <th>Client</th>
                                     <th>Type</th>
                                     <th>Value</th>
@@ -172,9 +174,11 @@
                             <tbody>
                                 @foreach($contracts->flatten() as $contract)
                                 <tr>
-                                    <td>{{ $contract->contract_number }}</td>
-                                    <td>{{ $contract->customer->name }}</td>
-                                    <td>{{ $contract->type->name }}</td>
+                                    <td>{{ $contract->contract_number ?? 'N/A' }}</td>
+                                    <td>{{ date('Y-m-d', strtotime($contract->contract_start_date)) }}</td>
+                                    <td>{{ date('Y-m-d', strtotime($contract->contract_end_date)) }}</td>
+                                    <td>{{ $contract->customer->name ?? 'N/A' }}</td>
+                                    <td>{{ $contract->type->name ?? 'N/A' }}</td>
                                     <td>{{ number_format($contract->contract_price, 2) }}</td>
                                     <td>
                                         <span

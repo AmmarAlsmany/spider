@@ -185,6 +185,52 @@
         </table>
     </div>
 
+    {{-- if the contract type is equipment we need to show the equipment details --}}
+
+    @if($contract->type->name == 'Buy equipment')
+    <div class="section">
+        <h3 class="section-title">Equipment Details</h3>
+        <table>
+            <tr>
+                <th width="30%">Equipment Type</th>
+                <td>{{ $contract->equipment->equipmentType->name ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th>Model</th>
+                <td>{{ $contract->equipment->equipment_model ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th>Quantity</th>
+                <td>{{ $contract->equipment->equipment_quantity ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th>Unit Price</th>
+                <td>SAR {{ number_format($contract->equipment->unit_price ?? 0, 2) }}</td>
+            </tr>
+            <tr>
+                <th>Total Price (without VAT)</th>
+                <td>SAR {{ number_format($contract->equipment->total_price ?? 0, 2) }}</td>
+            </tr>
+            <tr>
+                <th>VAT Amount (15%)</th>
+                <td>SAR {{ number_format($contract->equipment->vat_amount ?? 0, 2) }}</td>
+            </tr>
+            <tr>
+                <th>Total with VAT</th>
+                <td>SAR {{ number_format($contract->equipment->total_with_vat ?? 0, 2) }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ $contract->equipment->equipment_description ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th>Warranty Period</th>
+                <td>{{ $contract->warranty ?? 0 }} months</td>
+            </tr>
+        </table>
+    </div>
+    @endif
+
     @if($contract->branchs && count($contract->branchs) > 0)
     <div class="section">
         <h3 class="section-title">Service Locations</h3>

@@ -164,9 +164,17 @@
                                         <span class="badge bg-success">
                                             <i class="bx bx-check-circle me-1"></i>Completed
                                         </span>
-                                        @else
+                                        @elseif($visit->status == 'pending')
                                         <span class="badge bg-warning">
                                             <i class="bx bx-time me-1"></i>Pending
+                                        </span>
+                                        @elseif($visit->status == 'in_progress')
+                                        <span class="badge bg-primary">
+                                            <i class="bx bx-loader-alt me-1"></i>In Progress
+                                        </span>
+                                        @else
+                                        <span class="badge bg-danger">
+                                            <i class="bx bx-x me-1"></i>Cancelled
                                         </span>
                                         @endif
                                     </td>
@@ -177,7 +185,7 @@
                                                     class="btn btn-sm btn-info">
                                                     <i class="bx bx-show me-1"></i>View Report
                                                 </a>
-                                            @elseif($visit->status != 'completed' && $visit->visit_date <= now()->format('Y-m-d'))
+                                            @elseif($visit->status == 'scheduled' && $visit->visit_date <= now()->format('Y-m-d'))
                                                 <a href="{{ route('team-leader.visit.report.create', $visit->id) }}"
                                                     class="btn btn-sm btn-primary">
                                                     <i class="bx bx-file me-1"></i>Create Report
@@ -224,6 +232,7 @@
                                     <th>Type</th>
                                     <th>Customer</th>
                                     <th>Location</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -254,6 +263,29 @@
                                         <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($visit->contract->customer->address) }}"
                                             target="_blank" class="text-primary"><i class="bx bx-map me-1">{{
                                                 $visit->contract->customer->address }}</i></a>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($visit->status == 'scheduled')
+                                        <span class="badge bg-primary">
+                                            <i class="bx bx-calendar me-1"></i>Scheduled
+                                        </span>
+                                        @elseif($visit->status == 'completed')
+                                        <span class="badge bg-success">
+                                            <i class="bx bx-check me-1"></i>Completed
+                                        </span>
+                                        @elseif($visit->status == 'pending')
+                                        <span class="badge bg-warning">
+                                            <i class="bx bx-time me-1"></i>Pending
+                                        </span>
+                                        @elseif($visit->status == 'in_progress')
+                                        <span class="badge bg-primary">
+                                            <i class="bx bx-loader-alt me-1"></i>In Progress
+                                        </span>
+                                        @else
+                                        <span class="badge bg-danger">
+                                            <i class="bx bx-x me-1"></i>Cancelled
+                                        </span>
                                         @endif
                                     </td>
                                     <td>

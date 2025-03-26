@@ -212,11 +212,9 @@ class ClientController extends Controller
             $contract->contract_status = 'approved';
             $contract->save();
 
-            if($contract->type->name != 'Buy equipment') {
-                // Create visit schedule
-                $visitScheduleService = new VisitScheduleService();
-                $visitScheduleService->createVisitSchedule($contract);
-            }
+            // Create visit schedule
+            $visitScheduleService = new VisitScheduleService();
+            $visitScheduleService->createVisitSchedule($contract);
 
             // Notify sales manager,sales representative about contract approval
             $data = [

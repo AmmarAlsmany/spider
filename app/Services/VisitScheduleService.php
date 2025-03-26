@@ -438,4 +438,80 @@ class VisitScheduleService
             throw $e;
         }
     }
+
+    /**
+     * Cancel scheduled visits for a contract when it's stopped
+     * 
+     * @param contracts $contract The contract that has been stopped
+     * @return int Number of scheduled visits that were cancelled
+     */
+    public function cancelContractVisits(contracts $contract): int
+    {
+        try {
+            DB::beginTransaction();
+            
+            // Find only visits with 'scheduled' status for this contract
+            $scheduledVisits = VisitSchedule::where('contract_id', $contract->id)
+                ->where('status', 'scheduled')
+                ->get();
+            
+            $cancelledCount = 0;
+            
+            // Update each scheduled visit to cancelled status
+            foreach ($scheduledVisits as $visit) {
+                $visit->status = 'cancelled';
+                $visit->save();
+                $cancelledCount++;
+                
+                // Log the cancellation
+                Log::info('Scheduled visit cancelled due to contract stop: Visit ID ' . $visit->id);
+            }
+            
+            DB::commit();
+            return $cancelledCount;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error cancelling scheduled visits for stopped contract: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Restore cancelled visits for a contract when it's reactivated (changed from stopped to approved)
+     * 
+     * @param contracts $contract The contract that has been reactivated
+     * @return int Number of visits that were restored
+     */
+    public function restoreContractVisits(contracts $contract): int
+    {
+        try {
+            DB::beginTransaction();
+            
+            // Find only visits with 'cancelled' status for this contract that were cancelled due to contract stop
+            // We'll only restore visits that are still in the future
+            $cancelledVisits = VisitSchedule::where('contract_id', $contract->id)
+                ->where('status', 'cancelled')
+                ->whereDate('visit_date', '>=', now()->format('Y-m-d'))
+                ->get();
+            
+            $restoredCount = 0;
+            
+            // Update each cancelled visit back to scheduled status
+            foreach ($cancelledVisits as $visit) {
+                $visit->status = 'scheduled';
+                $visit->save();
+                $restoredCount++;
+                
+                // Log the restoration
+                Log::info('Visit restored due to contract reactivation: Visit ID ' . $visit->id);
+            }
+            
+            DB::commit();
+            return $restoredCount;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error restoring visits for reactivated contract: ' . $e->getMessage());
+            throw $e;
+        }
+    }
 }

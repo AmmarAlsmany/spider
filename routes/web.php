@@ -66,39 +66,32 @@ Route::middleware(['prevent-back-history', 'auth:web,client'])->group(function (
     Route::get('/contract/{contract}/insect-analytics', [TargetInsectAnalyticsController::class, 'contractAnalytics'])
         ->middleware(['auth'])
         ->name('contract.insect-analytics');
-});
+        
+    // Branch-specific Insect Analytics
+    Route::get('/contract/{contractId}/branches', [TargetInsectAnalyticsController::class, 'contractBranchSelection'])
+        ->middleware(['auth'])
+        ->name('analytics.contract.branches');
+        
+    Route::get('/contract/{contractId}/branch/{branchId}/analytics', [TargetInsectAnalyticsController::class, 'branchAnalytics'])
+        ->middleware(['auth'])
+        ->name('analytics.branch');
 
-// Admin Routes
-Route::middleware(['auth', 'role:admin', 'prevent-back-history'])->group(function () {
-    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-    Route::resource('managers', ManagerController::class)->names([
-        'index' => 'admin.managers.index',
-        'create' => 'admin.managers.create',
-        'store' => 'admin.managers.store',
-        'edit' => 'admin.managers.edit',
-        'update' => 'admin.managers.update',
-        'destroy' => 'admin.managers.destroy',
-    ]);
+    // sales.show.ticket
+    Route::get('/sales/tikets', [TiketsController::class, 'index'])->name('sales.show.ticket');
 
-    Route::get('/admin/contracts/reports', [DashboardController::class, 'reports'])->name('admin.contracts.reports');
-    Route::get('/admin/contracts/reports/data', [DashboardController::class, 'getReportsData'])->name('admin.contracts.reports.data');
-    Route::get('/admin/contracts/{contract}/show', [DashboardController::class, 'show'])->name('admin.contracts.show');
-    Route::get('/admin/contracts/{status}', [DashboardController::class, 'contractsIndex'])->name('admin.contracts.status');
-    Route::get('/admin/contracts', [DashboardController::class, 'contractsIndex'])->name('admin.contracts.index');
-    Route::get('/admin/tickets', [DashboardController::class, 'ticketsIndex'])->name('admin.tickets.index');
-    Route::get('/admin/tickets/{ticket}/show', [DashboardController::class, 'ticketShow'])->name('admin.tickets.show');
-    Route::post('/admin/tickets/{ticket}/reply', [DashboardController::class, 'ticketReply'])->name('admin.tickets.reply');
-    Route::get('/admin/tickets/reports', [DashboardController::class, 'ticketsReports'])->name('admin.tickets.reports');
-    Route::get('/admin/tickets/reports/data', [DashboardController::class, 'getTicketsReportsData'])->name('admin.tickets.reports.data');
-    
-    // Payment Routes
-    Route::get('/admin/payments', [DashboardController::class, 'paymentsIndex'])->name('admin.payments.index');
-    Route::get('/admin/payments/{payment}/show', [DashboardController::class, 'paymentShow'])->name('admin.payments.show');
-    Route::post('/admin/payments/{payment}/status', [DashboardController::class, 'updatePaymentStatus'])->name('admin.payments.status.update');
-    Route::get('/admin/payments/reports', [DashboardController::class, 'paymentsReports'])->name('admin.payments.reports');
-    Route::get('/admin/payments/reports/data', [DashboardController::class, 'getPaymentsReportsData'])->name('admin.payments.reports.data');
-    Route::get('/admin/reports/general', [DashboardController::class, 'generalReport'])->name('admin.reports.general');
-    Route::get('/admin/reports/general/data', [DashboardController::class, 'getGeneralReportData'])->name('admin.reports.general.data');
+    // Contract Annex Routes
+    Route::get('/contracts/{contract}/annex/create', [ContractsController::class, 'createAnnex'])->name('contracts.annex.create');
+    Route::post('/contracts/{contract}/annex', [ContractsController::class, 'storeAnnex'])->name('contracts.annex.store');
+    Route::get('/contracts/{contract}/annex/{annex}/edit', [ContractsController::class, 'editAnnex'])->name('contracts.annex.edit');
+    Route::put('/contracts/{contract}/annex/{annex}', [ContractsController::class, 'updateAnnex'])->name('contracts.annex.update');
+    Route::delete('/contracts/{contract}/annex/{annex}', [ContractsController::class, 'destroyAnnex'])->name('contracts.annex.destroy');
+    Route::get('/contracts/annex/{id}/details', [ContractsController::class, 'getAnnexDetails'])->name('contracts.annex.details');
+
+    // Branch Management Routes
+    Route::get('/api/branches/{id}', [BranchsController::class, 'index'])->name('branches.get');
+    Route::put('/branches/{id}', [BranchsController::class, 'update'])->name('branches.update');
+
+    Route::get('/reports/sales/pdf', [sales::class, 'generatePDF'])->name('sales.report.pdf');
 });
 
 // Sales Routes

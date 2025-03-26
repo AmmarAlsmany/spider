@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\contracts;
 use App\Models\TargetInsect;
 use App\Models\VisitReport;
-use Illuminate\Http\Request;
+use App\Models\branchs;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -33,7 +33,7 @@ class TargetInsectAnalyticsController extends Controller
      */
     public function contractAnalytics($contractId)
     {
-        $contract = contracts::with(['customer', 'visitSchedules.report'])->findOrFail($contractId);
+        $contract = contracts::with(['customer', 'visitSchedules.report', 'branchs'])->findOrFail($contractId);
         
         // Check authorization based on user role
         if (!$this->canViewContractAnalytics($contract)) {
@@ -50,6 +50,56 @@ class TargetInsectAnalyticsController extends Controller
         $visitData = $this->getVisitInsectData($contract);
         
         return view('shared.analytics.contract-insects', compact('contract', 'targetInsects', 'insectStats', 'visitData'));
+    }
+    
+    /**
+     * Display analytics for a specific branch within a contract
+     */
+    public function branchAnalytics($contractId, $branchId)
+    {
+        $contract = contracts::with(['customer', 'visitSchedules.report', 'branchs'])->findOrFail($contractId);
+        $branch = branchs::findOrFail($branchId);
+        
+        // Check if branch belongs to this contract
+        if ($branch->contracts_id != $contract->id) {
+            return redirect()->back()->with('error', 'This branch does not belong to the specified contract.');
+        }
+        
+        // Check authorization based on user role
+        if (!$this->canViewContractAnalytics($contract)) {
+            return redirect()->back()->with('error', 'You are not authorized to view this contract\'s analytics.');
+        }
+        
+        // Get all active target insects
+        $targetInsects = TargetInsect::where('active', true)->get();
+        
+        // Get insect statistics for this specific branch
+        $insectStats = $this->getBranchInsectStatistics($contract, $branch);
+        
+        // Get visit-by-visit data for this branch
+        $visitData = $this->getBranchVisitInsectData($contract, $branch);
+        
+        return view('shared.analytics.branch-insects', compact('contract', 'branch', 'targetInsects', 'insectStats', 'visitData'));
+    }
+    
+    /**
+     * Display the branch selection page for a contract with multiple branches
+     */
+    public function contractBranchSelection($contractId)
+    {
+        $contract = contracts::with(['customer', 'branchs'])->findOrFail($contractId);
+        
+        // Check authorization based on user role
+        if (!$this->canViewContractAnalytics($contract)) {
+            return redirect()->back()->with('error', 'You are not authorized to view this contract\'s analytics.');
+        }
+        
+        // If contract has only one branch, redirect directly to branch analytics
+        if ($contract->branchs->count() == 1) {
+            return redirect()->route('analytics.branch', ['contractId' => $contractId, 'branchId' => $contract->branchs->first()->id]);
+        }
+        
+        return view('shared.analytics.branch-selection', compact('contract'));
     }
     
     /**
@@ -230,6 +280,112 @@ class TargetInsectAnalyticsController extends Controller
         
         foreach ($contract->visitSchedules as $visit) {
             if ($visit->report) {
+                // Ensure we have a string before json_decode
+                $insectsJson = $visit->report->target_insects;
+                if (!is_string($insectsJson)) {
+                    $insectsJson = '[]';
+                }
+                $insects = json_decode($insectsJson, true) ?: [];
+                
+                // Get insect quantities if available
+                $insectQuantities = is_array($visit->report->insect_quantities) ? 
+                    $visit->report->insect_quantities : [];
+                
+                $visitData[] = [
+                    'visit_id' => $visit->id,
+                    'visit_date' => $visit->visit_date,
+                    'target_insects' => is_array($insects) ? $insects : [],
+                    'insect_quantities' => $insectQuantities,
+                    'recommendations' => $visit->report->recommendations
+                ];
+            }
+        }
+        
+        // Sort by visit date (newest first)
+        usort($visitData, function($a, $b) {
+            return strtotime($b['visit_date']) - strtotime($a['visit_date']);
+        });
+        
+        return $visitData;
+    }
+    
+    /**
+     * Get insect statistics for a specific branch
+     */
+    private function getBranchInsectStatistics($contract, $branch)
+    {
+        $reports = collect();
+        foreach ($contract->visitSchedules as $visit) {
+            // Only include reports for the specified branch
+            if ($visit->branch_id == $branch->id && $visit->report) {
+                $reports->push($visit->report);
+            }
+        }
+        
+        $insectCounts = [];
+        $insectQuantities = [];
+        
+        foreach ($reports as $report) {
+            // Ensure we have a string before json_decode
+            $targetInsectsJson = $report->target_insects;
+            if (!is_string($targetInsectsJson)) {
+                $targetInsectsJson = '[]';
+            }
+            $targetInsects = json_decode($targetInsectsJson, true) ?: [];
+            
+            // Get insect quantities if available
+            $quantities = is_array($report->insect_quantities) ? $report->insect_quantities : [];
+            
+            if (is_array($targetInsects)) {
+                foreach ($targetInsects as $insect) {
+                    if (!isset($insectCounts[$insect])) {
+                        $insectCounts[$insect] = 0;
+                        $insectQuantities[$insect] = 0;
+                    }
+                    $insectCounts[$insect]++;
+                    
+                    // Add quantities if available
+                    if (is_array($quantities) && isset($quantities[$insect])) {
+                        $insectQuantities[$insect] += (int)$quantities[$insect];
+                    } else {
+                        // If no quantity data, use a default of 1 per report
+                        $insectQuantities[$insect] += 1;
+                    }
+                }
+            }
+        }
+        
+        // Sort by frequency (highest first)
+        arsort($insectCounts);
+        
+        // Get insect names for the values
+        $result = [];
+        foreach ($insectCounts as $value => $count) {
+            $insect = TargetInsect::where('value', $value)->first();
+            $name = $insect ? $insect->name : $value;
+            $result[] = [
+                'name' => $name,
+                'value' => $value,
+                'count' => $count,
+                'quantity' => $insectQuantities[$value] ?? $count, // Fallback to count if no quantity
+                'avg_per_report' => $count > 0 ? round(($insectQuantities[$value] ?? $count) / $count, 1) : 0,
+                'percentage' => $reports->count() > 0 ? round(($count / $reports->count()) * 100, 1) : 0
+            ];
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Get visit-by-visit insect data for a specific branch
+     */
+    private function getBranchVisitInsectData($contract, $branch)
+    {
+        $visitData = [];
+        
+        foreach ($contract->visitSchedules as $visit) {
+            // Only include visits for the specified branch
+            if ($visit->branch_id == $branch->id && $visit->report) {
                 // Ensure we have a string before json_decode
                 $insectsJson = $visit->report->target_insects;
                 if (!is_string($insectsJson)) {

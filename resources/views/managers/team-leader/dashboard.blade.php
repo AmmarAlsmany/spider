@@ -164,13 +164,9 @@
                                         <span class="badge bg-success">
                                             <i class="bx bx-check-circle me-1"></i>Completed
                                         </span>
-                                        @elseif($visit->status == 'pending')
-                                        <span class="badge bg-warning">
-                                            <i class="bx bx-time me-1"></i>Pending
-                                        </span>
-                                        @elseif($visit->status == 'in_progress')
-                                        <span class="badge bg-primary">
-                                            <i class="bx bx-loader-alt me-1"></i>In Progress
+                                        @elseif($visit->status == 'scheduled')
+                                        <span class="badge bg-info">
+                                            <i class="bx bx-time me-1"></i>Scheduled
                                         </span>
                                         @else
                                         <span class="badge bg-danger">
@@ -273,14 +269,6 @@
                                         @elseif($visit->status == 'completed')
                                         <span class="badge bg-success">
                                             <i class="bx bx-check me-1"></i>Completed
-                                        </span>
-                                        @elseif($visit->status == 'pending')
-                                        <span class="badge bg-warning">
-                                            <i class="bx bx-time me-1"></i>Pending
-                                        </span>
-                                        @elseif($visit->status == 'in_progress')
-                                        <span class="badge bg-primary">
-                                            <i class="bx bx-loader-alt me-1"></i>In Progress
                                         </span>
                                         @else
                                         <span class="badge bg-danger">

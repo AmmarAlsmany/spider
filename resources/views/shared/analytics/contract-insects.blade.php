@@ -91,9 +91,16 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Insect Analytics for Contract #{{ $contract->id }}</h5>
-                    <a href="{{ url()->previous() }}" class="btn btn-sm btn-primary">
-                        <i class="bx bx-arrow-back me-1"></i> Back
-                    </a>
+                    <div>
+                        @if($contract->is_multi_branch && $contract->branchs->count() > 0)
+                            <a href="{{ route('analytics.contract.branches', ['contractId' => $contract->id]) }}" class="btn btn-sm btn-outline-primary me-2">
+                                <i class="bx bx-building me-1"></i> Branch Analytics
+                            </a>
+                        @endif
+                        <a href="{{ url()->previous() }}" class="btn btn-sm btn-primary">
+                            <i class="bx bx-arrow-back me-1"></i> Back
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">

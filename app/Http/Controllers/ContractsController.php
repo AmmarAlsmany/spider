@@ -1235,6 +1235,7 @@ class ContractsController extends Controller
                 if (isset($branchData['id'])) {
                     // Update existing branch
                     $branch = branchs::findOrFail($branchData['id']);
+                    
                     if ($branch) {
                         $branch->update([
                             'branch_name' => $branchData['branch_name'],
@@ -1441,7 +1442,10 @@ class ContractsController extends Controller
         $property_types = ['Residential', 'Commercial', 'Industrial', 'Government'];
         $saudiCities = $this->getSaudiCities();
         
-        return view('contracts.renewal_form', compact('contract', 'contract_types', 'property_types', 'saudiCities'));
+        // Get equipment types for Buy equipment contracts
+        $equipment_types = EquipmentType::where('is_active', true)->get();
+        
+        return view('contracts.renewal_form', compact('contract', 'contract_types', 'property_types', 'saudiCities', 'equipment_types'));
     }
     
     /**
@@ -1468,7 +1472,7 @@ class ContractsController extends Controller
                 'Property_type' => 'required|in:Residential,Commercial,Industrial,Government',
                 'contract_description' => 'required|string',
                 'warranty' => 'required|integer|min:0',
-                'number_of_visits' => 'required|integer|min:1',
+                'number_of_visits' => 'required_if:contract_type,!=,Buy equipment|integer|min:1',
                 'contract_price' => 'required|numeric|min:0',
                 'payment_type' => 'required|in:prepaid,postpaid',
                 'number_of_payments' => 'required_if:payment_type,postpaid|integer|min:1',
@@ -1484,6 +1488,11 @@ class ContractsController extends Controller
                 'new_branch_data.*.branch_manager_phone' => 'sometimes|required|string',
                 'new_branch_data.*.branch_address' => 'sometimes|required|string',
                 'new_branch_data.*.branch_city' => 'sometimes|required|string',
+                // Equipment contract fields
+                'equipment_type_id' => 'required_if:contract_type,Buy equipment|exists:equipment_types,id',
+                'equipment_model' => 'required_if:contract_type,Buy equipment|string',
+                'equipment_quantity' => 'required_if:contract_type,Buy equipment|integer|min:1',
+                'equipment_description' => 'required_if:contract_type,Buy equipment|string',
             ]);
             
             // Generate a new contract number
@@ -1507,7 +1516,17 @@ class ContractsController extends Controller
             $newContract->contract_description = $request->contract_description;
             $newContract->contract_price = $total_amount;
             $newContract->warranty = $request->warranty;
-            $newContract->number_of_visits = $request->number_of_visits;
+            
+            // Set number of visits only for non-equipment contracts
+            $contractType = contracts_types::find($request->contract_type);
+            $isBuyEquipment = $contractType && $contractType->name === 'Buy equipment';
+            
+            if (!$isBuyEquipment) {
+                $newContract->number_of_visits = $request->number_of_visits;
+            } else {
+                $newContract->number_of_visits = 0; // Set to 0 for equipment contracts
+            }
+            
             $newContract->payment_type = $request->payment_type;
             $newContract->contract_status = 'pending';
             
@@ -1526,6 +1545,24 @@ class ContractsController extends Controller
             }
             
             $newContract->save();
+            
+            // Create equipment contract data if this is a Buy equipment contract
+            if ($isBuyEquipment) {
+                $equipmentType = EquipmentType::find($request->equipment_type_id);
+                $unitPrice = $amount / intval($request->equipment_quantity);
+                
+                $equipmentContract = new EquipmentContract();
+                $equipmentContract->contract_id = $newContract->id;
+                $equipmentContract->equipment_type = $request->equipment_type_id;
+                $equipmentContract->equipment_model = $request->equipment_model;
+                $equipmentContract->equipment_quantity = $request->equipment_quantity;
+                $equipmentContract->equipment_description = $request->equipment_description;
+                $equipmentContract->unit_price = $unitPrice;
+                $equipmentContract->total_price = $amount;
+                $equipmentContract->vat_amount = $vat;
+                $equipmentContract->total_with_vat = $total_amount;
+                $equipmentContract->save();
+            }
             
             // Copy selected branches from the original contract
             if ($request->has('include_branches')) {

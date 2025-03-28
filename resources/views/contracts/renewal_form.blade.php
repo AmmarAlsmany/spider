@@ -264,6 +264,74 @@
                 </div>
             </fieldset>
 
+            <fieldset class="mb-4" id="buy-equipment-fields" style="display: none;">
+                <legend>Equipment Information</legend>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="equipment_type_id">Equipment Type <span data-toggle="tooltip"
+                                    title="Select the type of equipment">(?)</span></label>
+                            <select class="form-select @error('equipment_type_id') is-invalid @enderror" id="equipment_type_id"
+                                name="equipment_type_id" value="{{ $contract->equipment_type_id ?? '' }}">
+                                <option value="">Select Equipment Type</option>
+                                @foreach($equipment_types ?? [] as $type)
+                                    <option value="{{ $type->id }}" {{ isset($contract->equipment_type_id) && $contract->equipment_type_id == $type->id ? 'selected' : '' }}>
+                                        {{ $type->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('equipment_type_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="equipment_model">Equipment Model <span data-toggle="tooltip"
+                                    title="Enter the model of the equipment">(?)</span></label>
+                            <input type="text" class="form-control @error('equipment_model') is-invalid @enderror"
+                                id="equipment_model" name="equipment_model" value="{{ $contract->equipment_model ?? '' }}">
+                            @error('equipment_model')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="equipment_quantity">Quantity <span data-toggle="tooltip"
+                                    title="Enter the quantity of equipment">(?)</span></label>
+                            <input type="number" class="form-control @error('equipment_quantity') is-invalid @enderror"
+                                id="equipment_quantity" name="equipment_quantity" value="{{ $contract->equipment_quantity ?? 1 }}" min="1">
+                            @error('equipment_quantity')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="warranty">Warranty Period (Months) <span data-toggle="tooltip"
+                                    title="Enter the warranty period in months">(?)</span></label>
+                            <input type="number" class="form-control @error('warranty') is-invalid @enderror"
+                                id="warranty" name="warranty" value="{{ $contract->warranty ?? 0 }}" min="0">
+                            @error('warranty')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="equipment_description">Equipment Description <span data-toggle="tooltip"
+                            title="Provide a detailed description of the equipment">(?)</span></label>
+                    <textarea class="form-control @error('equipment_description') is-invalid @enderror" id="equipment_description"
+                        name="equipment_description" rows="4">{{ $contract->equipment_description ?? '' }}</textarea>
+                    @error('equipment_description')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </fieldset>
+
             <fieldset class="mb-4">
                 <legend>Client Information</legend>
                 <div class="row g-3">
@@ -470,6 +538,41 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Contract type toggle for Buy equipment
+        const contractTypeSelect = document.getElementById('contract_type');
+        const buyEquipmentFields = document.getElementById('buy-equipment-fields');
+        const visitFields = document.getElementById('number_of_visits').closest('.col-md-4');
+        
+        // Check initial state
+        checkContractType();
+        
+        // Add event listener for contract type changes
+        contractTypeSelect.addEventListener('change', checkContractType);
+        
+        function checkContractType() {
+            // Find the selected option text
+            const selectedOption = contractTypeSelect.options[contractTypeSelect.selectedIndex];
+            const contractTypeName = selectedOption.textContent.trim();
+            
+            if (contractTypeName === 'Buy equipment') {
+                buyEquipmentFields.style.display = 'block';
+                visitFields.style.display = 'none'; // Hide visits field for Buy equipment
+                document.getElementById('number_of_visits').removeAttribute('required');
+                document.getElementById('equipment_type_id').setAttribute('required', 'required');
+                document.getElementById('equipment_model').setAttribute('required', 'required');
+                document.getElementById('equipment_quantity').setAttribute('required', 'required');
+                document.getElementById('equipment_description').setAttribute('required', 'required');
+            } else {
+                buyEquipmentFields.style.display = 'none';
+                visitFields.style.display = 'block'; // Show visits field for other contract types
+                document.getElementById('number_of_visits').setAttribute('required', 'required');
+                document.getElementById('equipment_type_id').removeAttribute('required');
+                document.getElementById('equipment_model').removeAttribute('required');
+                document.getElementById('equipment_quantity').removeAttribute('required');
+                document.getElementById('equipment_description').removeAttribute('required');
+            }
+        }
+        
         // Payment type toggle
         const paymentTypeSelect = document.getElementById('payment_type');
         const postpaidDetails = document.getElementById('postpaid-details');

@@ -688,6 +688,7 @@ class TechnicalController extends Controller
             $visit->update([
                 'visit_date' => $visitDateTime->format('Y-m-d'),
                 'visit_time' => $visitDateTime->format('H:i:s'),
+                'team_id' => $request->team_id,
                 'status' => 'scheduled'
             ]);
 

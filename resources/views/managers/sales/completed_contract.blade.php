@@ -40,20 +40,28 @@
                     <table id="example2" class="table table-hover">
                         <thead class="bg-light">
                             <tr>
+                                <th>Id</th>
+                                <th>Contract Number</th>
                                 <th>Client Name</th>
                                 <th>Client Email</th>
                                 <th>Client Phone</th>
-                                <th>Contract Number</th>
                                 <th>Contract Type</th>
                                 <th>Contract amount</th>
                                 <th>Start Date</th>
                                 <th>Contract Status</th>
-                                <th>View Visit Details</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($contracts as $contract)
                                 <tr>
+                                    <td>{{ $contract->id }}</td>
+                                    <td>
+                                        <a href="{{ route('contract.show.details', ['id' => $contract->id]) }}"
+                                           class="text-primary text-decoration-none">
+                                            <i class="bi bi-file-text me-2"></i>{{ $contract->contract_number }}
+                                        </a>
+                                    </td>
                                     <td>
                                         <a href="{{ route('view.my.clients.details', ['id' => $contract->customer->id]) }}"
                                            class="text-primary text-decoration-none">
@@ -67,16 +75,10 @@
                                         <i class="bi bi-phone me-2 text-muted"></i>{{ $contract->customer->phone }}
                                     </td>
                                     <td>
-                                        <a href="{{ route('contract.show.details', ['id' => $contract->id]) }}"
-                                           class="text-primary text-decoration-none">
-                                            <i class="bi bi-file-text me-2"></i>{{ $contract->contract_number }}
-                                        </a>
-                                    </td>
-                                    <td>
                                         <i class="bi bi-tag me-2 text-muted"></i>{{ $contract->type->name }} {{ $contract->type->type }}
                                     </td>
                                     <td>
-                                        <i class="bi bi-currency-dollar me-2 text-muted"></i>{{ $contract->contract_price }} SAR
+                                        <i class="bi bi-currency-dollar me-2 text-muted"></i>{{ number_format($contract->contract_price, 2) }} SAR
                                     </td>
                                     <td>
                                         <i class="bi bi-calendar-event me-2 text-muted"></i>
@@ -98,14 +100,11 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if ($contract->contract_status == 'approved')
-                                            <a href="{{ route('sales_person.view.contract', ['id' => $contract->id]) }}"
-                                               class="shadow-sm btn btn-primary btn-sm">
-                                                <i class="bi bi-eye me-1"></i>View Visit Details
-                                            </a>
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
+                                        {{-- renew the contract --}}
+                                        <a href="{{ route('contract.renewal.form', ['id' => $contract->id]) }}"
+                                            class="shadow-sm btn btn-primary btn-sm">
+                                            <i class="bi bi-calendar-plus me-1"></i>Renew
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach

@@ -219,6 +219,7 @@
                 </div>
                 <form id="rescheduleForm" action="" method="POST">
                     @csrf
+                    @method('PUT')
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="new_date" class="form-label">New Date</label>
@@ -230,6 +231,16 @@
                             <label for="new_time" class="form-label">New Time</label>
                             <input type="time" class="form-control" id="new_time" name="visit_time" required>
                             <small class="text-muted">Regular working hours are 8:00 AM to 2:00 PM</small>
+                        </div>
+                        {{-- choose team --}}
+                        <div class="mb-3">
+                            <label for="team" class="form-label">Team</label>
+                            <select class="form-select" id="team" name="team_id" required>
+                                <option value="">Select a Team</option>
+                                @foreach ($teams as $team)
+                                    <option value="{{ $team->id }}">{{ $team->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div id="schedule_warnings" class="alert alert-warning d-none">
                             <ul class="mb-0" id="warning_list"></ul>

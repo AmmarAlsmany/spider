@@ -47,6 +47,14 @@
                 <div class="menu-title">{{ __('messages.workers') }}</div>
             </a>
         </li>
+        
+        <li>
+            <a href="{{ route('technical.team.kpi') }}">
+                <div class="parent-icon"><i class='bx bx-line-chart'></i>
+                </div>
+                <div class="menu-title">Team KPI Dashboard</div>
+            </a>
+        </li>
 
         <li class="menu-label">{{ __('messages.inventory') }}</li>
         <li>

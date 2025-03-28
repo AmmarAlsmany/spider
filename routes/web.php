@@ -25,6 +25,7 @@ use App\Http\Controllers\TeamLeaderController;
 use App\Http\Controllers\TechnicalController;
 use App\Http\Controllers\TiketsController;
 use App\Http\Controllers\ValidationController;
+use App\Http\Controllers\TeamKpiController;
 use Illuminate\Support\Facades\Route;
 
 // Language Switching Route
@@ -121,6 +122,12 @@ Route::middleware(['auth', 'role:sales', 'prevent-back-history'])->group(functio
     Route::get('/sales/Show All canceled Contract', [ContractsController::class, 'view_cancelled_contracts'])->name('canceled.show.all');
     Route::patch('/sales/return-contract/{id}', [sales::class, 'return_contract'])->name('contract.return');
     Route::get('/sales/show Tikets', [TiketsController::class, 'index'])->name('sales.tikets');
+    
+    // Contract Renewal Routes
+    Route::get('/contracts/{id}/renewal', [ContractsController::class, 'showRenewalForm'])->name('contract.renewal.form');
+    Route::post('/contracts/{id}/renewal', [ContractsController::class, 'processRenewal'])->name('contract.renewal.process');
+    Route::post('/contracts/{id}/renewal-response', [ContractsController::class, 'handleRenewalResponse'])->name('contract.renewal.response');
+    
     // Postponement Request Routes
     Route::get('/postponement-requests', [ContractsController::class, 'postponement_requests'])
         ->name('postponement.requests');
@@ -233,9 +240,15 @@ Route::middleware(['auth', 'role:technical'])->group(function () {
     // Team management Routes
     Route::get('/teams', [TechnicalController::class, 'index'])->name('teams.index');
     Route::post('/teams', [TechnicalController::class, 'create'])->name('teams.create');
+    
+    // Team KPI Routes
+    Route::get('/technical/team-kpi', [TeamKpiController::class, 'index'])->name('technical.team.kpi');
+    Route::get('/technical/team-kpi/compare', [TeamKpiController::class, 'compareTeams'])->name('technical.team.kpi.compare');
+    Route::get('/technical/team-kpi/{id}', [TeamKpiController::class, 'teamDetail'])->name('technical.team.kpi.detail');
+    Route::post('/technical/team-kpi/pdf', [TeamKpiController::class, 'generatePdfReport'])->name('technical.team.kpi.pdf');
+    
     Route::put('/teams/{id}', [TechnicalController::class, 'modify'])->name('teams.modify');
     Route::delete('/teams/{id}', [TechnicalController::class, 'delete'])->name('teams.delete');
-    
     // Pesticide Management Routes
     Route::prefix('technical/pesticides')->name('technical.pesticides.')->group(function () {
         Route::get('/', [PesticideController::class, 'index'])->name('index');

@@ -1247,14 +1247,13 @@ class ContractsController extends Controller
                     }
                 } else {
                     // Create new branch
-                    $branch = new branchs([
-                        'branch_name' => $branchData['branch_name'],
-                        'branch_manager_name' => $branchData['branch_manager_name'],
-                        'branch_manager_phone' => $branchData['branch_manager_phone'],
-                        'branch_address' => $branchData['branch_address'],
-                        'branch_city' => $branchData['branch_city'],
-                        'contracts_id' => $contract->id
-                    ]);
+                    $branch = new branchs();
+                    $branch->contracts_id = $contract->id;
+                    $branch->branch_name = $branchData['branch_name'];
+                    $branch->branch_manager_name = $branchData['branch_manager_name'];
+                    $branch->branch_manager_phone = $branchData['branch_manager_phone'];
+                    $branch->branch_address = $branchData['branch_address'];
+                    $branch->branch_city = $branchData['branch_city'];
                     $branch->save();
                     $existingBranchIds[] = $branch->id;
                 }
@@ -1419,5 +1418,235 @@ class ContractsController extends Controller
         return response($pdf)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+    }
+
+    /**
+     * Display contract renewal form
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function showRenewalForm($id)
+    {
+        $contract = contracts::with(['customer', 'branchs', 'type'])->findOrFail($id);
+        
+        // Check if the contract is completed and belongs to the current sales rep
+        if ($contract->contract_status !== 'completed' || $contract->sales_id != auth()->id()) {
+            return redirect()->route('sales.dashboard')
+                ->with('error', 'You can only renew completed contracts assigned to you.');
+        }
+        
+        // Get contract types for the form
+        $contract_types = contracts_types::all();
+        $property_types = ['Residential', 'Commercial', 'Industrial', 'Government'];
+        $saudiCities = $this->getSaudiCities();
+        
+        return view('contracts.renewal_form', compact('contract', 'contract_types', 'property_types', 'saudiCities'));
+    }
+    
+    /**
+     * Process contract renewal
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function processRenewal(Request $request, $id)
+    {
+        try {
+            DB::beginTransaction();
+            
+            // Find the original contract
+            $originalContract = contracts::with(['customer', 'branchs'])->findOrFail($id);
+            
+            // Validate the request
+            $request->validate([
+                'contract_start_date' => 'required|date|after_or_equal:today',
+                'contract_end_date' => 'required|date|after:contract_start_date',
+                'visit_start_date' => 'required|date|after_or_equal:contract_start_date|before_or_equal:contract_end_date',
+                'contract_type' => 'required|exists:contracts_types,id',
+                'Property_type' => 'required|in:Residential,Commercial,Industrial,Government',
+                'contract_description' => 'required|string',
+                'warranty' => 'required|integer|min:0',
+                'number_of_visits' => 'required|integer|min:1',
+                'contract_price' => 'required|numeric|min:0',
+                'payment_type' => 'required|in:prepaid,postpaid',
+                'number_of_payments' => 'required_if:payment_type,postpaid|integer|min:1',
+                'first_payment_date' => 'required|date|after_or_equal:contract_start_date',
+                'include_branches.*' => 'nullable',
+                'branch_data.*.branch_name' => 'sometimes|required|string|max:255',
+                'branch_data.*.branch_manager_name' => 'sometimes|required|string|max:255',
+                'branch_data.*.branch_manager_phone' => 'sometimes|required|string',
+                'branch_data.*.branch_address' => 'sometimes|required|string',
+                'branch_data.*.branch_city' => 'sometimes|required|string',
+                'new_branch_data.*.branch_name' => 'sometimes|required|string|max:255',
+                'new_branch_data.*.branch_manager_name' => 'sometimes|required|string|max:255',
+                'new_branch_data.*.branch_manager_phone' => 'sometimes|required|string',
+                'new_branch_data.*.branch_address' => 'sometimes|required|string',
+                'new_branch_data.*.branch_city' => 'sometimes|required|string',
+            ]);
+            
+            // Generate a new contract number
+            $contract_number = $this->generator_contract_number();
+            
+            // Calculate VAT and total amount
+            $amount = floatval($request->contract_price);
+            $vat = $amount * 0.15;
+            $total_amount = $amount + $vat;
+            
+            // Create new contract based on the original one
+            $newContract = new contracts();
+            $newContract->customer_id = $originalContract->customer_id;
+            $newContract->sales_id = auth()->id();
+            $newContract->contract_number = $contract_number;
+            $newContract->contract_start_date = $request->contract_start_date;
+            $newContract->contract_end_date = $request->contract_end_date;
+            $newContract->visit_start_date = $request->visit_start_date;
+            $newContract->Property_type = $request->Property_type;
+            $newContract->contract_type = $request->contract_type;
+            $newContract->contract_description = $request->contract_description;
+            $newContract->contract_price = $total_amount;
+            $newContract->warranty = $request->warranty;
+            $newContract->number_of_visits = $request->number_of_visits;
+            $newContract->payment_type = $request->payment_type;
+            $newContract->contract_status = 'pending';
+            
+            if ($request->payment_type === 'postpaid') {
+                $newContract->number_Payments = $request->number_of_payments;
+            }
+            
+            // Check if we're including branches
+            $hasBranches = false;
+            
+            // Check if the original contract had multiple branches or if we're adding new branches
+            if (($request->has('include_branches') && count($request->include_branches) > 0) || 
+                ($request->has('new_branch_data') && count($request->new_branch_data) > 0)) {
+                $hasBranches = true;
+                $newContract->is_multi_branch = "yes";
+            }
+            
+            $newContract->save();
+            
+            // Copy selected branches from the original contract
+            if ($request->has('include_branches')) {
+                foreach ($request->include_branches as $branchId) {
+                    // Skip if the branch ID starts with 'new_' as these are handled separately
+                    if (is_string($branchId) && strpos($branchId, 'new_') === 0) {
+                        continue;
+                    }
+                    
+                    $originalBranch = $originalContract->branchs->firstWhere('id', $branchId);
+                    
+                    if ($originalBranch) {
+                        // Get updated branch data if available
+                        $branchData = $request->branch_data[$branchId] ?? null;
+                        
+                        $newBranch = new branchs();
+                        $newBranch->contracts_id = $newContract->id;
+                        $newBranch->branch_name = $branchData['branch_name'] ?? $originalBranch->branch_name;
+                        $newBranch->branch_manager_name = $branchData['branch_manager_name'] ?? $originalBranch->branch_manager_name;
+                        $newBranch->branch_manager_phone = $branchData['branch_manager_phone'] ?? $originalBranch->branch_manager_phone;
+                        $newBranch->branch_address = $branchData['branch_address'] ?? $originalBranch->branch_address;
+                        $newBranch->branch_city = $branchData['branch_city'] ?? $originalBranch->branch_city;
+                        $newBranch->save();
+                    }
+                }
+            }
+            
+            // Add new branches if any
+            if ($request->has('new_branch_data') && is_array($request->new_branch_data)) {
+                foreach ($request->new_branch_data as $key => $branchData) {
+                    // Only process if this new branch is included
+                    if (!$request->has('include_branches') || !in_array($key, $request->include_branches)) {
+                        continue;
+                    }
+                    
+                    $newBranch = new branchs();
+                    $newBranch->contracts_id = $newContract->id;
+                    $newBranch->branch_name = $branchData['branch_name'];
+                    $newBranch->branch_manager_name = $branchData['branch_manager_name'];
+                    $newBranch->branch_manager_phone = $branchData['branch_manager_phone'];
+                    $newBranch->branch_address = $branchData['branch_address'];
+                    $newBranch->branch_city = $branchData['branch_city'];
+                    $newBranch->save();
+                }
+            }
+            
+            // Create payments
+            if ($request->payment_type === 'prepaid') {
+                $this->create_payment($newContract->id, $originalContract->customer_id, $total_amount, $request->first_payment_date);
+            } else {
+                $payment_amount = $total_amount / intval($request->number_of_payments);
+                
+                // Create first payment
+                $this->create_payment($newContract->id, $originalContract->customer_id, $payment_amount, $request->first_payment_date);
+                
+                // Create remaining payments
+                $payment_date = Carbon::parse($request->first_payment_date);
+                for ($i = 2; $i <= $request->number_of_payments; $i++) {
+                    $payment_date->addMonth();
+                    $this->create_payment($newContract->id, $originalContract->customer_id, $payment_amount, $payment_date->copy());
+                }
+            }
+            
+            // Send notification to technical and sales managers
+            $notificationData = [
+                'title' => 'Contract Renewed',
+                'message' => 'Contract ' . $originalContract->contract_number . ' has been renewed with new contract number ' . $newContract->contract_number,
+                'type' => 'info',
+                'url' => route('contract.show.details', $newContract->id),
+                'priority' => 'normal'
+            ];
+            
+            $this->notifyRoles(['technical', 'sales_manager', 'client'], $notificationData, $newContract->customer_id, $newContract->sales_id);
+            
+            DB::commit();
+            
+            return redirect()->route('contract.show.details', $newContract->id)
+                ->with('success', 'Contract renewed successfully with new contract number: ' . $newContract->contract_number);
+                
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Contract renewal error: ' . $e->getMessage(), [
+                'user_id' => auth()->id(),
+                'original_contract_id' => $id,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            
+            return back()
+                ->with('error', 'Error renewing contract: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+    
+    /**
+     * Handle contract renewal response
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function handleRenewalResponse(Request $request, $id)
+    {
+        $contract = contracts::findOrFail($id);
+        
+        // Validate the request
+        $request->validate([
+            'response' => 'required|in:yes,no',
+        ]);
+        
+        if ($request->response === 'yes') {
+            return redirect()->route('contract.renewal.form', ['id' => $id]);
+        } else {
+            // Log the decision not to renew
+            Log::info('Sales representative decided not to renew contract #' . $contract->contract_number, [
+                'user_id' => auth()->id(),
+                'contract_id' => $id
+            ]);
+            
+            return redirect()->route('sales.dashboard')
+                ->with('info', 'You chose not to renew contract #' . $contract->contract_number);
+        }
     }
 }

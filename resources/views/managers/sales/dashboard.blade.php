@@ -126,7 +126,7 @@
                                     <td>{{ $contract->type->name }}</td>
                                     <td>
                                         <span
-                                            class="badge bg-{{ $contract->contract_status == 'approved' ? 'success' : ($contract->contract_status == 'pending' ? 'warning' : 'danger') }}">
+                                            class="badge bg-{{ $contract->contract_status == 'approved' ? 'success' : ($contract->contract_status == 'completed' ? 'primary' : 'danger') }}">
                                             {{ ucfirst($contract->contract_status) }}
                                         </span>
                                     </td>

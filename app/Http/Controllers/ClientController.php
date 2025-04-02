@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\client;
 use App\Http\Controllers\Controller;
+use App\Models\ContractAnnex;
 use App\Models\contracts;
 use App\Models\tikets;
 use App\Models\ContractUpdateRequest; 
@@ -166,7 +167,13 @@ class ClientController extends Controller
         $data = [
             'title' => "Update Request for Contract " . $contract->contract_number,
             'message' =>$contract->customer->name ."Ask for update on contract". $request->request_details,
-            'url' => '#',
+            'url' => route('contracts.show', $contract->id),
+        ];
+        
+        // Different URLs for different roles
+        $roleUrls = [
+            'sales' => route('contracts.show', $contract->id),
+            'sales_manager' => route('contracts.show', $contract->id)
         ];
 
         $this->notifyRoles(['sales', 'sales_manager'], $data);
@@ -198,6 +205,16 @@ class ClientController extends Controller
         //
     }
 
+    public function pendingAnnexes()
+    {
+        $annexes = ContractAnnex::with(['contract', 'creator'])
+            ->where('status', 'pending')
+            ->latest()
+            ->paginate(10);
+
+        return view('clients.pending_annexes', compact('annexes'));
+    }
+
     public function approveContract($id)
     {
         try {
@@ -220,10 +237,15 @@ class ClientController extends Controller
             $data = [
                 'title' => "Contract Approved: " . $contract->contract_number,
                 'message' => 'Your contract has been approved',
-                'url' => '#',
+            ];
+            
+            // Different URLs for different roles
+            $roleUrls = [
+                'sales' => route('contract.show.details', $contract->id),
+                'sales_manager' => route('sales_manager.contract.view', $contract->id)
             ];
 
-            $this->notifyRoles(['sales', 'sales_manager'], $data);
+            $this->notifyRoles(['sales', 'sales_manager'], $data, null, null, $roleUrls);
 
             return redirect()->back()->with('success', 'Contract has been approved successfully.');
         } catch (\Exception $e) {
@@ -249,10 +271,15 @@ class ClientController extends Controller
             $data = [
                 'title' => "Contract Rejection: " . $contract->contract_number,
                 'message' => 'Your contract has been rejected',
-                'url' => '#',
+            ];
+            
+            // Different URLs for different roles
+            $roleUrls = [
+                'sales' => route('contract.show.details', $contract->id),
+                'sales_manager' => route('sales_manager.contract.view', $contract->id)
             ];
 
-            $this->notifyRoles(['sales', 'sales_manager'], $data);
+            $this->notifyRoles(['sales', 'sales_manager'], $data, null, null, $roleUrls);
 
             return redirect()->back()->with('success', 'Contract has been rejected.');
         } catch (\Exception $e) {
@@ -283,10 +310,15 @@ class ClientController extends Controller
             $data = [
                 'title' => "Update Request for Contract " . $contract->contract_number,
                 'message' => $updateRequest->request_details,
-                'url' => '#',
+            ];
+            
+            // Different URLs for different roles
+            $roleUrls = [
+                'sales' => route('contract.show.details', $contract->id),
+                'sales_manager' => route('sales_manager.contract.view', $contract->id)
             ];
 
-            $this->notifyRoles(['sales', 'sales_manager'], $data);
+            $this->notifyRoles(['sales', 'sales_manager'], $data, null, null, $roleUrls);
 
             return redirect()->back()->with('success', 'Update request has been submitted successfully.');
             // use 
@@ -335,7 +367,7 @@ class ClientController extends Controller
 
     public function showContractDetails(contracts $contract)
     {
-        return view('clients.contract_details', compact('contract'));
+        return view('clients.contract-details', compact('contract'));
     }
 
     public function showContractVisitDetails(contracts $contract)
@@ -408,10 +440,17 @@ class ClientController extends Controller
             'message' => "Payment of {$payment->payment_amount} SAR requested to be postponed from " .
                 Carbon::parse($payment->due_date)->format('M d, Y') .
                 " to " . Carbon::parse($request->requested_date)->format('M d, Y'),
-            'url' => '#',
+            'url' => route('payments.show', $payment->id),
+        ];
+        
+        // Different URLs for different roles
+        $roleUrls = [
+            'sales' => route('payments.show', $payment->id),
+            'sales_manager' => route('payments.show', $payment->id),
+            'finance' => route('payments.show', $payment->id)
         ];
 
-        $this->notifyRoles(['sales', 'sales_manager', 'finance'], $data);
+        $this->notifyRoles(['sales', 'sales_manager', 'finance'], $data, null, null, $roleUrls);
 
         return redirect()->back()->with('success', 'Payment postponement request has been submitted successfully.');
     }
@@ -451,7 +490,6 @@ class ClientController extends Controller
         $data = [
             'title' => "Visit Change Request" . ($visit->team ? " for " . $visit->team->name : "") . " - Contract #" . $visit->contract->contract_number,
             'message' => "Visit on " . Carbon::parse($visit->visit_date)->format('M d, Y') . " at " . $visit->visit_time . " the client has requested a change.",
-            'url' => "#",
         ];
 
         $this->notifyRoles(['technical'], $data);
@@ -500,7 +538,6 @@ class ClientController extends Controller
         $data = [
             'title' => "Visit Change Request for " . $visit->contract->customer->name,
             'message' => $message,
-            'url' =>"#",
         ];
 
         $this->notifyRoles(['client', 'team_leader', 'sales'], $data, $visit->contract->customer_id, $salesId);
@@ -557,7 +594,6 @@ class ClientController extends Controller
             'title' => 'Test Notification',
             'message' => 'This is a test notification to verify that client notifications are working correctly.',
             'type' => 'info',
-            'url' => '#',
             'priority' => 'normal',
         ];
         

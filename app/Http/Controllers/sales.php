@@ -416,7 +416,7 @@ class sales extends Controller
             
             // If contract is being reactivated (status changed from stopped to approved)
             // then restore the cancelled visits
-            if ($oldStatus === 'stopped' && $request->status === 'approved') {
+            if ($oldStatus === 'stopped') {
                 // Get the VisitScheduleService instance
                 $visitScheduleService = app(VisitScheduleService::class);
                 $restoredVisits = $visitScheduleService->restoreContractVisits($contract);

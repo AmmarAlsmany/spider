@@ -23,7 +23,7 @@
             <div class="ps-3">
                 <nav aria-label="breadcrumb">
                     <ol class="p-0 mb-0 breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}"><i class="bx bx-home-alt"></i></a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('client.dashboard') }}"><i class="bx bx-home-alt"></i></a></li>
                         <li class="breadcrumb-item active" aria-current="page">Pending Annexes</li>
                     </ol>
                 </nav>
@@ -67,13 +67,13 @@
                                         @foreach($annexes as $annex)
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('sales_manager.contract.view', $annex->contract->id) }}" 
+                                                    <a href="{{ route('client.contract.details', $annex->contract->id) }}" 
                                                        class="text-primary text-decoration-none">
                                                         {{ $annex->contract->contract_number }}
                                                     </a>
                                                 </td>
                                                 <td>{{ $annex->annex_number }}</td>
-                                                <td>{{ number_format($annex->additional_amount, 2) }} SAR</td>
+                                                <td>{{ number_format($annex->additional_amount * 1.15, 2) }} SAR</td>
                                                 <td>
                                                     <span class="fw-semibold">
                                                         {{ \Carbon\Carbon::parse($annex->due_date)->format('M d, Y') }}

@@ -1,5 +1,58 @@
 @extends('shared.dashboard')
 @section('content')
+<script>
+    function printAnalyticsReport() {
+        // Create an iframe element
+        var printFrame = document.createElement('iframe');
+        
+        // Make it invisible
+        printFrame.style.position = 'fixed';
+        printFrame.style.right = '0';
+        printFrame.style.bottom = '0';
+        printFrame.style.width = '0';
+        printFrame.style.height = '0';
+        printFrame.style.border = '0';
+        
+        document.body.appendChild(printFrame);
+        
+        // Get the iframe document
+        var frameDoc = printFrame.contentWindow || printFrame.contentDocument.document || printFrame.contentDocument;
+        
+        // Write the HTML content to the iframe
+        frameDoc.document.open();
+        frameDoc.document.write('<html><head><title>Financial Analytics Report</title>');
+        frameDoc.document.write('<link rel="stylesheet" href="{{ asset("assets/css/bootstrap.min.css") }}" type="text/css" />');
+        frameDoc.document.write('<style>body { padding: 20px; } .actions-column { display: none; }</style>');
+        frameDoc.document.write('</head><body>');
+        frameDoc.document.write('<h3 class="mb-4 text-center">Advanced Financial Analytics</h3>');
+        
+        // Get the content we want to print - all reports and charts
+        var kpiSection = document.querySelector('.card-body .row:nth-child(2)').outerHTML;
+        var chartsRow = document.querySelector('.card-body .row:nth-child(3)').outerHTML;
+        var agingAnalysis = document.querySelector('.card-body .card.radius-10:last-child').outerHTML;
+        
+        // Add to iframe document
+        frameDoc.document.write('<div class="container">');
+        frameDoc.document.write(kpiSection);
+        frameDoc.document.write(chartsRow);
+        frameDoc.document.write(agingAnalysis);
+        frameDoc.document.write('</div>');
+        
+        frameDoc.document.write('</body></html>');
+        frameDoc.document.close();
+        
+        // Use setTimeout to ensure the content is loaded before printing
+        setTimeout(function () {
+            frameDoc.focus();
+            frameDoc.print();
+            
+            // Remove the iframe after printing
+            setTimeout(function() {
+                document.body.removeChild(printFrame);
+            }, 1000);
+        }, 500);
+    }
+</script>
 <div class="page-content">
     @if(session('error'))
     <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
@@ -24,7 +77,7 @@
                     <h6 class="mb-0">Advanced Financial Analytics</h6>
                 </div>
                 <div class="ms-auto">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="printAnalyticsReport()">
                         <i class='bx bx-printer'></i> Print Report
                     </button>
                 </div>
@@ -89,10 +142,10 @@
                                 @endphp
                                 
                                 @foreach($statuses as $status => $count)
-                                    <div class="col-md-3 text-center">
+                                    <div class="text-center col-md-3">
                                         <h4 class="text-{{ $colors[$status] ?? 'primary' }}">{{ $count }}</h4>
                                         <p class="mb-0">{{ ucfirst($status) }}</p>
-                                        <div class="progress mt-2" style="height: 5px;">
+                                        <div class="mt-2 progress" style="height: 5px;">
                                             <div class="progress-bar bg-{{ $colors[$status] ?? 'primary' }}" role="progressbar" 
                                                 style="width: {{ $total > 0 ? ($count / $total * 100) : 0 }}%" 
                                                 aria-valuenow="{{ $total > 0 ? ($count / $total * 100) : 0 }}" 

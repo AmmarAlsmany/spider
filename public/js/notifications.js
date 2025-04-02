@@ -263,10 +263,52 @@ function formatTimeAgo(date) {
 }
 
 function handleNotificationClick(event, id, url) {
+    console.log('Notification clicked:', id, url);
+    // Mark notification as read
+    markAsReadAndNavigate(id, url);
+    
+    // Prevent default only if URL is empty or javascript:void(0)
     if (!url || url === 'javascript:void(0)') {
         event.preventDefault();
     }
-    markAsRead(id);
+}
+
+function markAsReadAndNavigate(id, url) {
+    console.log('Marking notification as read and navigating to:', id, url);
+    fetch(`/notifications/mark-as-read/${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error('Network response was not ok');
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data && data.redirect_url && data.redirect_url !== '#' && data.redirect_url !== '') {
+            console.log('Navigating to URL:', data.redirect_url);
+            // Navigate to the URL after marking as read
+            window.location.href = data.redirect_url;
+        } else {
+            console.log('No valid redirect URL found in response');
+            // Refresh notifications without redirecting
+            return fetchNotifications();
+        }
+    })
+    .catch(error => {
+        console.error('Error marking notification as read:', error);
+        // Refresh notifications even on error
+        return fetchNotifications();
+    });
 }
 
 function markAsRead(id) {
@@ -285,6 +327,7 @@ function markAsRead(id) {
 }
 
 function markAllAsRead() {
+    console.log('Marking all notifications as read');
     fetch('/notifications/mark-all-as-read', {
         method: 'POST',
         headers: {
@@ -295,8 +338,23 @@ function markAllAsRead() {
         },
         credentials: 'same-origin'
     })
-        .then(() => fetchNotifications())
-        .catch(error => console.error('Error marking all notifications as read:', error));
+    .then(response => {
+        console.log('Mark all as read response status:', response.status);
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error('Network response was not ok');
+    })
+    .then(data => {
+        console.log('Mark all as read response data:', data);
+        // Refresh notifications list
+        return fetchNotifications();
+    })
+    .catch(error => {
+        console.error('Error marking all notifications as read:', error);
+        // Refresh notifications even on error
+        return fetchNotifications();
+    });
 }
 
 // Initialize when document is ready

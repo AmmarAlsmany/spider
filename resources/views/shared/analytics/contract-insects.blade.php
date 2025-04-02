@@ -97,6 +97,9 @@
                                 <i class="bx bx-building me-1"></i> Branch Analytics
                             </a>
                         @endif
+                        <a href="{{ route('contract.insect-analytics.pdf', ['contract' => $contract->id]) }}" class="btn btn-sm btn-outline-danger me-2" target="_blank">
+                            <i class="bx bx-download me-1"></i> Download PDF
+                        </a>
                         <a href="{{ url()->previous() }}" class="btn btn-sm btn-primary">
                             <i class="bx bx-arrow-back me-1"></i> Back
                         </a>

@@ -34,13 +34,6 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('sales_manager.pending_annexes') }}">
-                <div class="parent-icon"><i class='bx bx-folder-plus'></i>
-                </div>
-                <div class="menu-title">{{ __('messages.pending_annexes') }}</div>
-            </a>
-        </li>
-        <li>
             <a href="{{ route('sales_manager.manage_clients') }}">
                 <div class="parent-icon"><i class='bx bx-group'></i>
                 </div>

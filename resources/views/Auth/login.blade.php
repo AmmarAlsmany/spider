@@ -3,7 +3,8 @@
 <html lang="en" dir="ltr">
 
 <head>
-    <title>Login</title>
+    <title>Login - Spider Web</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/spider.webp') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
@@ -139,19 +140,19 @@
     </style>
 </head>
 
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="flex justify-center items-center p-4 min-h-screen">
     <div class="login-container">
         <div class="mb-8 text-center">
             <img src="/images/spider.webp" alt="Spider Web Logo" class="mx-auto spider-logo">
-            <h1 class="mt-4 text-3xl sm:text-4xl font-bold text-highlight">Spider Web</h1>
-            <p class="text-lg mt-2">Pest Control Services</p>
+            <h1 class="mt-4 text-3xl font-bold sm:text-4xl text-highlight">Spider Web</h1>
+            <p class="mt-2 text-lg">Pest Control Services</p>
         </div>
 
         <form method="POST" action="{{ route('login') }}" class="space-y-6">
             @csrf
 
             <div>
-                <label for="email" class="block font-medium">Email</label>
+                <label for="email" class="block font-medium">Email Address</label>
                 <input id="email" name="email" type="email" required
                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
             </div>
@@ -168,15 +169,15 @@
             </div>
             @endif
 
-            <div class="remember-forgot flex items-center">
+            <div class="flex items-center remember-forgot">
                 <div class="flex items-center">
                     <input type="checkbox" name="remember" id="remember" class="mr-2">
                     <label for="remember" class="text-sm">Remember Me</label>
                 </div>
-                <a href="#" class="text-sm text-red-500 hover:underline ml-auto">Forgot Password?</a>
+                <a href="#" class="ml-auto text-sm text-red-500 hover:underline">Forgot Password?</a>
             </div>
 
-            <button type="submit" class="btn-primary flex items-center justify-center">
+            <button type="submit" class="flex justify-center items-center btn-primary">
                 Login
             </button>
         </form>

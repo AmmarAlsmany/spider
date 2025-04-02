@@ -77,16 +77,18 @@ trait NotificationDispatcher
     }
 
     // Helper method to notify multiple roles at once
-    protected function notifyRoles(array $roles, array $data, $specificClientId = null, $specificSalesId = null)
+    protected function notifyRoles(array $roles, array $data, $specificClientId = null, $specificSalesId = null, array $roleUrls = [])
     {
         foreach ($roles as $role) {
             $specificUserId = null;
+            $roleSpecificData = $data;
             if ($role === 'client' && $specificClientId) {
                 $specificUserId = $specificClientId;
             } elseif ($role === 'sales' && $specificSalesId) {
                 $specificUserId = $specificSalesId;
             }
-            $this->notifyByRole($role, $data, $specificUserId);
+            $roleSpecificData['url'] = $roleSpecificData['url'] ?? $roleUrls[$role] ?? null;
+            $this->notifyByRole($role, $roleSpecificData, $specificUserId);
         }
     }
 

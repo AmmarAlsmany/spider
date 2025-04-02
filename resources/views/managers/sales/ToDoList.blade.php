@@ -27,8 +27,8 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="p-0 mb-0 breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item active" aria-current="page">To Do List</li>
+                    <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}" class="text-decoration-none"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item active text-muted" aria-current="page">To Do List</li>
                 </ol>
             </nav>
         </div>

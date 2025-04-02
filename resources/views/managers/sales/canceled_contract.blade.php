@@ -26,7 +26,7 @@
             <div class="ps-3">
                 <nav aria-label="breadcrumb">
                     <ol class="p-0 mb-0 breadcrumb">
-                        <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}"><i class="bx bx-home-alt"></i></a></li>
                         <li class="breadcrumb-item active" aria-current="page">Canceled Contract</li>
                     </ol>
                 </nav>
@@ -49,7 +49,6 @@
                                 <th>Start Date</th>
                                 <th>End Date</th>
                                 <th>Contract Status</th>
-                                <th>Rejection Reason</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -94,7 +93,6 @@
                                             {{ strtoupper($contract->contract_status) }}
                                         </div>
                                     </td>
-                                    <td>{{ $contract->rejection_reason }}</td>
                                     <td>
                                         <form action="{{ route('contract.return', ['id' => $contract->id]) }}" method="POST">
                                             @csrf

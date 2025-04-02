@@ -52,6 +52,7 @@
                             <select name="status" class="form-select">
                                 <option value="">All Status</option>
                                 <option value="scheduled" {{ request('status') == 'scheduled' ? 'selected' : '' }}>Pending</option>
+                                <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
                                 <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
                                 <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                             </select>
@@ -130,6 +131,14 @@
                                     <span class="badge bg-danger">
                                         <i class="bx bx-x-circle me-1"></i>Cancelled
                                     </span>
+                                @elseif($visit->status == 'in_progress')
+                                    <span class="badge bg-warning">
+                                        <i class="bx bx-time me-1"></i>In Progress
+                                    </span>
+                                @elseif($visit->status == 'scheduled')
+                                    <span class="badge bg-info">
+                                        <i class="bx bx-time me-1"></i>Scheduled
+                                    </span>
                                 @else
                                     <span class="badge bg-warning">
                                         <i class="bx bx-time me-1"></i>Pending
@@ -146,7 +155,7 @@
                                 </div>
                                 @else
                                 {{-- create report button if visit is scheduled and date is today or before --}}
-                                @if($visit->status == 'scheduled' && $visit->visit_date <= now()->format('Y-m-d'))
+                                @if($visit->status == 'scheduled' && $visit->visit_date <= now()->format('Y-m-d') || $visit->status == 'in_progress')
                                 <div class="btn-group">
                                     <a href="{{ route('team-leader.visit.report.create', $visit->id) }}" 
                                         class="btn btn-sm btn-primary" title="Create Report">

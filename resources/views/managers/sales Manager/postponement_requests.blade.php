@@ -18,7 +18,7 @@
     @endif
     <div class="mb-4 page-breadcrumb d-flex align-items-center">
         <div class="pe-3 breadcrumb-title d-flex align-items-center">
-            <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
+            <a href="{{url()->previous()}}" class="btn btn-secondary me-3">
                 <i class="bx bx-arrow-back"></i> Back
             </a>
             <h4 class="mb-0 text-primary"><i class="bx bx-time"></i> Payment Postponement Requests</h4>
@@ -26,7 +26,7 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="p-0 mb-0 breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('sales_manager.dashboard') }}"><i class="bx bx-home-alt"></i></a></li>
                     <li class="breadcrumb-item active" aria-current="page">Postponement Requests</li>
                 </ol>
             </nav>

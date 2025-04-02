@@ -363,19 +363,30 @@ class SalesManagerController extends Controller
     public function deleteContract($id)
     {
         try {
+            DB::beginTransaction();
+            
             $contract = contracts::findOrFail($id);
 
             // Check if contract has any payments paid
             if ($contract->payments->where('payment_status', 'paid')->count()) {
                 return redirect()->back()->with('error', 'Cannot delete contract with existing payments');
             }
-            $contract->contract_status = 'stopped';
+            
+            // Update the contract status to 'canceled' (with one 'l')
+            // This is the correct enum value as defined in the database migration
+            $contract->contract_status = 'canceled';
             $contract->save();
-            $contract->forceDelete();
-
-            return redirect()->back()->with('success', 'Contract deleted successfully');
+            
+            // Cancel all visit schedules for this contract
+            DB::table('visit_schedules')
+                ->where(['contract_id' => $id, 'status' => 'scheduled'])
+                ->delete();
+            
+            DB::commit();
+            return redirect()->back()->with('success', 'Contract canceled successfully');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error deleting contract: ' . $e->getMessage());
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Error canceling contract: ' . $e->getMessage());
         }
     }
 
@@ -644,10 +655,17 @@ class SalesManagerController extends Controller
                 'title' => 'Payment Postponement Request Approved',
                 'message' => 'Payment postponement request has been approved.',
                 'type' => 'info',
-                'url' => "#",
+                'url' => route('payments.show', $postponementRequest->payment->id),
                 'priority' => 'normal',
             ];
-            $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $postponementRequest->payment->customer_id, $postponementRequest->payment->sales_id);
+            
+            // Different URLs for different roles
+            $roleUrls = [
+                'client' => route('client.contract.visits', $postponementRequest->payment->contract_id),
+                'sales' => route('payments.show', $postponementRequest->payment->id),
+                'finance' => route('finance.payments.show', $postponementRequest->payment->id)
+            ];
+            $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $postponementRequest->payment->customer_id, $postponementRequest->payment->sales_id, $roleUrls);
 
             return redirect()->back()->with('success', 'Payment postponement request has been approved.');
         } catch (\Exception $e) {
@@ -673,10 +691,17 @@ class SalesManagerController extends Controller
                 'title' => 'Payment Postponement Request Rejected',
                 'message' => 'Payment postponement request has been rejected.',
                 'type' => 'info',
-                'url' => "#",
+                'url' => route('payments.show', $postponementRequest->payment->id),
                 'priority' => 'normal',
             ];
-            $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $postponementRequest->payment->customer_id, $postponementRequest->payment->sales_id);
+            
+            // Different URLs for different roles
+            $roleUrls = [
+                'client' => route('client.contract.visits', $postponementRequest->payment->contract_id),
+                'sales' => route('payments.show', $postponementRequest->payment->id),
+                'finance' => route('finance.payments.show', $postponementRequest->payment->id)
+            ];
+            $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $postponementRequest->payment->customer_id, $postponementRequest->payment->sales_id, $roleUrls);
 
             return redirect()->back()->with('success', 'Payment postponement request has been rejected.');
         } catch (\Exception $e) {
@@ -819,15 +844,5 @@ class SalesManagerController extends Controller
             ->withQueryString();
 
         return view('managers.sales manager.reports.contacts', compact('customers'));
-    }
-
-    public function pendingAnnexes()
-    {
-        $annexes = ContractAnnex::with(['contract', 'creator'])
-            ->where('status', 'pending')
-            ->latest()
-            ->paginate(10);
-
-        return view('managers.sales manager.pending_annexes', compact('annexes'));
     }
 }

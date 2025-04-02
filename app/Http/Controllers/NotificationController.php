@@ -50,11 +50,19 @@ class NotificationController extends Controller
                 ->where('notifiable_id', $user->id)
                 ->where('notifiable_type', get_class($user))
                 ->firstOrFail();
-            $notification->delete();
+            
+            // Store the URL before marking as read
+            $redirectUrl = $notification->data['url'] ?? '';
+            
+            // Mark as read instead of deleting
+            $notification->markAsRead();
 
-            return response()->json(['message' => 'Notification deleted']);
+            return response()->json([
+                'message' => 'Notification marked as read',
+                'redirect_url' => $redirectUrl
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error deleting notification'], 500);
+            return response()->json(['message' => 'Error marking notification as read: ' . $e->getMessage()], 500);
         }
     }
 
@@ -66,13 +74,15 @@ class NotificationController extends Controller
         }
 
         try {
+            // Mark all notifications as read instead of deleting them
             DatabaseNotification::where('notifiable_id', $user->id)
                 ->where('notifiable_type', get_class($user))
-                ->delete();
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
 
-            return response()->json(['message' => 'All notifications deleted']);
+            return response()->json(['message' => 'All notifications marked as read']);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error deleting notifications'], 500);
+            return response()->json(['message' => 'Error marking notifications as read: ' . $e->getMessage()], 500);
         }
     }
 

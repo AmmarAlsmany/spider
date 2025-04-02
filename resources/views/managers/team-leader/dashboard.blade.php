@@ -168,6 +168,10 @@
                                         <span class="badge bg-info">
                                             <i class="bx bx-time me-1"></i>Scheduled
                                         </span>
+                                        @elseif($visit->status == 'in_progress')
+                                        <span class="badge bg-warning">
+                                            <i class="bx bx-time me-1"></i>In Progress
+                                        </span>
                                         @else
                                         <span class="badge bg-danger">
                                             <i class="bx bx-x me-1"></i>Cancelled
@@ -181,7 +185,7 @@
                                                     class="btn btn-sm btn-info">
                                                     <i class="bx bx-show me-1"></i>View Report
                                                 </a>
-                                            @elseif($visit->status == 'scheduled' && $visit->visit_date <= now()->format('Y-m-d'))
+                                            @elseif($visit->status == 'scheduled' && $visit->visit_date <= now()->format('Y-m-d') || $visit->status == 'in_progress')
                                                 <a href="{{ route('team-leader.visit.report.create', $visit->id) }}"
                                                     class="btn btn-sm btn-primary">
                                                     <i class="bx bx-file me-1"></i>Create Report
@@ -270,6 +274,10 @@
                                         <span class="badge bg-success">
                                             <i class="bx bx-check me-1"></i>Completed
                                         </span>
+                                        @elseif($visit->status == 'in_progress')
+                                        <span class="badge bg-warning">
+                                            <i class="bx bx-time me-1"></i>In Progress
+                                        </span>
                                         @else
                                         <span class="badge bg-danger">
                                             <i class="bx bx-x me-1"></i>Cancelled
@@ -283,7 +291,7 @@
                                                     class="btn btn-sm btn-info">
                                                     <i class="bx bx-show me-1"></i>View Report
                                                 </a>
-                                            @elseif($visit->status != 'completed' && $visit->visit_date <= now()->format('Y-m-d'))
+                                            @elseif($visit->status == 'scheduled' && $visit->visit_date <= now()->format('Y-m-d') || $visit->status == 'in_progress')
                                                 <a href="{{ route('team-leader.visit.report.create', $visit->id) }}"
                                                     class="btn btn-sm btn-primary">
                                                     <i class="bx bx-file me-1"></i>Create Report

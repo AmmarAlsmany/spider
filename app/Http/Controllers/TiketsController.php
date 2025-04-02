@@ -72,10 +72,17 @@ class TiketsController extends Controller
         $data = [
             'title' => "New Ticket Created: " . $ticket->tiket_number . "from " . Auth::guard('client')->user()->name,
             'message' => $ticket->tiket_title,
-            'url' => '#',
+            'url' => route('technical.client_tickets.show', $ticket->id),
+        ];
+        
+        // Different URLs for different roles
+        $roleUrls = [
+            'technical' => route('technical.client_tickets.show', $ticket->id),
+            'sales' => route('sales.show.ticket'),
+            'sales_manager' => route('sales.show.ticket')
         ];
 
-        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data, $ticket->customer_id, $ticket->created_by);
+        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data, $ticket->customer_id, $ticket->created_by, $roleUrls);
 
         return redirect()->route('client.tikets')->with('success', 'Ticket created successfully');
     }
@@ -102,10 +109,17 @@ class TiketsController extends Controller
         $data = [
             'title' => "New Reply: " . $ticket->tiket_number . "from " . Auth::guard('client')->user()->name,
             'message' => $request->reply,
-            'url' => '#',
+            'url' => route('technical.client_tickets.show', $ticket->id),
+        ];
+        
+        // Different URLs for different roles
+        $roleUrls = [
+            'technical' => route('technical.client_tickets.show', $ticket->id),
+            'sales' => route('sales.show.ticket'),
+            'sales_manager' => route('sales.show.ticket')
         ];
 
-        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data, $ticket->customer_id, $ticket->created_by);
+        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data, $ticket->customer_id, $ticket->created_by, $roleUrls);
 
         return redirect()->back()->with('success', 'Reply added successfully');
     }
@@ -128,10 +142,17 @@ class TiketsController extends Controller
         $data = [
             'title' => "Ticket Status Updated: " . $ticket->tiket_number . "from " . Auth::guard('client')->user()->name,
             'message' => 'Status changed to ' . $request->status,
-            'url' => '#',
+            'url' => route('technical.client_tickets.show', $ticket->id),
+        ];
+        
+        // Different URLs for different roles
+        $roleUrls = [
+            'technical' => route('technical.client_tickets.show', $ticket->id),
+            'sales' => route('sales.show.ticket'),
+            'sales_manager' => route('sales.show.ticket')
         ];
 
-        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data, $ticket->customer_id, $ticket->created_by);
+        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data, $ticket->customer_id, $ticket->created_by, $roleUrls);
 
         return redirect()->back()->with('success', 'Ticket status updated successfully');
     }

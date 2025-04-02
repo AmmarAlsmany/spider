@@ -159,7 +159,7 @@
                                         <td>{{ $teamData['visit_count'] }}</td>
                                         <td>
                                             @foreach($teamData['pesticides'] as $pesticide => $pesticideData)
-                                                <span class="badge badge-primary">
+                                                <span class="d-block">
                                                     {{ $pesticideData['name'] }}: 
                                                     @if($pesticideData['unit_counts']['g'] > 0)
                                                         {{ $pesticideData['unit_counts']['g'] }}g

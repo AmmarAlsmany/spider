@@ -1,534 +1,496 @@
 @extends('shared.dashboard')
 @section('content')
-    @php
-        $saudiCities = [
-            'Riyadh',
-            'Jeddah',
-            'Mecca',
-            'Medina',
-            'Dammam',
-            'Taif',
-            'Tabuk',
-            'Buraidah',
-            'Khamis Mushait',
-            'Abha',
-            'Al-Khobar',
-            'Al-Ahsa',
-            'Najran',
-            'Yanbu',
-            'Al-Qatif',
-            'Al-Jubail',
-            "Ha'il",
-            'Al-Hofuf',
-            'Al-Mubarraz',
-            'Kharj',
-            'Qurayyat',
-            'Hafr Al-Batin',
-            'Al-Kharj',
-            'Arar',
-            'Sakaka',
-            'Jizan',
-            'Al-Qunfudhah',
-            'Bisha',
-            'Al-Bahah',
-            'Unaizah',
-            'Rafha',
-            'Dawadmi',
-            'Ar Rass',
-            "Al Majma'ah",
-            'Tarut',
-            'Baljurashi',
-            'Shaqra',
-            'Al-Zilfi',
-            'Ar Rayn',
-            'Wadi ad-Dawasir',
-            'Badr',
-            'Al Ula',
-            'Tharmada',
-            'Turabah',
-            'Tayma',
-        ];
-        sort($saudiCities);
-        $property_types = ['Residential', 'Commercial'];
-    @endphp
+@php
+$saudiCities = [
+'Riyadh',
+'Jeddah',
+'Mecca',
+'Medina',
+'Dammam',
+'Taif',
+'Tabuk',
+'Buraidah',
+'Khamis Mushait',
+'Abha',
+'Al-Khobar',
+'Al-Ahsa',
+'Najran',
+'Yanbu',
+'Al-Qatif',
+'Al-Jubail',
+"Ha'il",
+'Al-Hofuf',
+'Al-Mubarraz',
+'Kharj',
+'Qurayyat',
+'Hafr Al-Batin',
+'Al-Kharj',
+'Arar',
+'Sakaka',
+'Jizan',
+'Al-Qunfudhah',
+'Bisha',
+'Al-Bahah',
+'Unaizah',
+'Rafha',
+'Dawadmi',
+'Ar Rass',
+"Al Majma'ah",
+'Tarut',
+'Baljurashi',
+'Shaqra',
+'Al-Zilfi',
+'Ar Rayn',
+'Wadi ad-Dawasir',
+'Badr',
+'Al Ula',
+'Tharmada',
+'Turabah',
+'Tayma',
+];
+sort($saudiCities);
+$property_types = ['Residential', 'Commercial', 'Industrial', 'Agricultural', 'Other'];
+@endphp
 
-    <style>
-        .bs-stepper .bs-stepper-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            color: #fff;
-            background-color: #4361ee;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+<style>
+    .bs-stepper .bs-stepper-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        color: #fff;
+        background-color: #4361ee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .form-control:focus {
+        border-color: #4361ee;
+        box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+    }
+
+    .btn-primary {
+        background-color: #4361ee;
+        border-color: #4361ee;
+    }
+
+    .map-container {
+        height: 300px;
+        margin-bottom: 15px;
+    }
+
+    .map {
+        height: 100%;
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    /* Add loading indicator styles */
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #4361ee;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
         }
 
-        .card {
-            border: none;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        100% {
+            transform: rotate(360deg);
         }
+    }
+</style>
 
-        .form-control:focus {
-            border-color: #4361ee;
-            box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
-        }
+<!-- Load scripts with defer attribute to prevent blocking rendering -->
+<script src="https://cdn.jsdelivr.net/npm/bs-stepper/dist/js/bs-stepper.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-        .btn-primary {
-            background-color: #4361ee;
-            border-color: #4361ee;
-        }
-
-        .map-container {
-            height: 300px;
-            margin-bottom: 15px;
-        }
-
-        .map {
-            height: 100%;
-            width: 100%;
-            border-radius: 8px;
-        }
-
-        /* Add loading indicator styles */
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #4361ee;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
-
-    <!-- Load scripts with defer attribute to prevent blocking rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/bs-stepper/dist/js/bs-stepper.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-    <!-- Preload Saudi cities data to avoid processing during page load -->
-    <script>
-        // Preload Saudi cities data
+<!-- Preload Saudi cities data to avoid processing during page load -->
+<script>
+    // Preload Saudi cities data
         window.saudiCities = @json($saudiCities);
-    </script>
+</script>
 
-    <div class="page-content">
-        <div class="container">
-            <div id="stepper1" class="bs-stepper">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="d-lg-flex flex-lg-row align-items-lg-center justify-content-lg-between" role="tablist">
-                            <div class="step" data-target="#test-l-1">
-                                <div class="step-trigger" role="tab" id="stepper1trigger1" aria-controls="test-l-1">
-                                    <div class="bs-stepper-circle">1</div>
-                                    <div class="">
-                                        <h5 class="mb-0 steper-title">Personal information</h5>
-                                        <p class="mb-0 steper-sub-title">Enter customer information</p>
-                                    </div>
+<div class="page-content">
+    <div class="container">
+        <div id="stepper1" class="bs-stepper">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-lg-flex flex-lg-row align-items-lg-center justify-content-lg-between" role="tablist">
+                        <div class="step" data-target="#test-l-1">
+                            <div class="step-trigger" role="tab" id="stepper1trigger1" aria-controls="test-l-1">
+                                <div class="bs-stepper-circle">1</div>
+                                <div class="">
+                                    <h5 class="mb-0 steper-title">Personal information</h5>
+                                    <p class="mb-0 steper-sub-title">Enter customer information</p>
                                 </div>
                             </div>
-                            <div class="bs-stepper-line"></div>
-                            <div class="step" data-target="#test-l-2">
-                                <div class="step-trigger" role="tab" id="stepper1trigger2" aria-controls="test-l-2">
-                                    <div class="bs-stepper-circle">2</div>
-                                    <div class="">
-                                        <h5 class="mb-0 steper-title">Contract Details</h5>
-                                        <p class="mb-0 steper-sub-title">Setup Contract Details</p>
-                                    </div>
+                        </div>
+                        <div class="bs-stepper-line"></div>
+                        <div class="step" data-target="#test-l-2">
+                            <div class="step-trigger" role="tab" id="stepper1trigger2" aria-controls="test-l-2">
+                                <div class="bs-stepper-circle">2</div>
+                                <div class="">
+                                    <h5 class="mb-0 steper-title">Contract Details</h5>
+                                    <p class="mb-0 steper-sub-title">Setup Contract Details</p>
                                 </div>
                             </div>
-                            <div class="bs-stepper-line"></div>
-                            @if ($branches >= 1)
-                                <div class="step" data-target="#test-l-3">
-                                    <div class="step-trigger" role="tab" id="stepper1trigger3" aria-controls="test-l-3">
-                                        <div class="bs-stepper-circle">3</div>
-                                        <div class="">
-                                            <h5 class="mb-0 steper-title">Branch information</h5>
-                                            <p class="mb-0 steper-sub-title">branch information</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-                            <div class="bs-stepper-line"></div>
-                            <div class="step" data-target="#test-l-4">
-                                <div class="step-trigger" role="tab" id="stepper1trigger4" aria-controls="test-l-4">
-                                    <div class="bs-stepper-circle">4</div>
-                                    <div class="">
-                                        <h5 class="mb-0 steper-title">payment information</h5>
-                                        <p class="mb-0 steper-sub-title">payment Details</p>
-                                    </div>
+                        </div>
+                        <div class="bs-stepper-line"></div>
+                        @if ($branches >= 1)
+                        <div class="step" data-target="#test-l-3">
+                            <div class="step-trigger" role="tab" id="stepper1trigger3" aria-controls="test-l-3">
+                                <div class="bs-stepper-circle">3</div>
+                                <div class="">
+                                    <h5 class="mb-0 steper-title">Branch information</h5>
+                                    <p class="mb-0 steper-sub-title">branch information</p>
                                 </div>
                             </div>
-                            <div class="bs-stepper-line"></div>
-                            <div class="step" data-target="#test-l-5">
-                                <div class="step-trigger" role="tab" id="stepper1trigger5" aria-controls="test-l-5">
-                                    <div class="bs-stepper-circle">5</div>
-                                    <div class="">
-                                        <h5 class="mb-0 steper-title">Summary</h5>
-                                        <p class="mb-0 steper-sub-title">Review the information you entered</p>
-                                    </div>
+                        </div>
+                        @endif
+                        <div class="bs-stepper-line"></div>
+                        <div class="step" data-target="#test-l-4">
+                            <div class="step-trigger" role="tab" id="stepper1trigger4" aria-controls="test-l-4">
+                                <div class="bs-stepper-circle">4</div>
+                                <div class="">
+                                    <h5 class="mb-0 steper-title">payment information</h5>
+                                    <p class="mb-0 steper-sub-title">payment Details</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bs-stepper-line"></div>
+                        <div class="step" data-target="#test-l-5">
+                            <div class="step-trigger" role="tab" id="stepper1trigger5" aria-controls="test-l-5">
+                                <div class="bs-stepper-circle">5</div>
+                                <div class="">
+                                    <h5 class="mb-0 steper-title">Summary</h5>
+                                    <p class="mb-0 steper-sub-title">Review the information you entered</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="card-body position-relative">
-                        <!-- Add loading overlay -->
-                        <div id="loading-overlay" class="loading-overlay">
-                            <div class="spinner"></div>
-                        </div>
-                        <div class="bs-stepper-content">
-                            <form action="{{ route('contract.create') }}" method="POST" id="contractForm"
-                                onsubmit="return validateForm(event)">
-                                @csrf
-                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                <input type="hidden" name="contract_type_id" value="{{ $contract_type_id->id }}">
-                                <input type="hidden" name="client_id"
-                                    value="@isset($client_info){{ $client_info->id }}@endisset">
-                                <input type="text" name="is_multi_branch"
-                                    @if ($branches > 1) value="yes" @else value="no" @endif hidden readonly>
-                                <input type="number" id="branchs_number" name="branchs_number" value={{ $branches }}
-                                    hidden readonly>
-                                <input type="hidden" name="Property_type" value="{{ $contract_type_id->name }}">
-                                <div id="test-l-1" role="tabpanel" class="bs-stepper-pane"
-                                    aria-labelledby="stepper1trigger1">
-                                    <h5 class="mb-1">Client Personal Information</h5>
-                                    <p class="mb-4">Enter the Client personal information to get closer Your Deal</p>
-                                    <div class="row g-3">
-                                        <div class="col-12 col-lg-6">
-                                            <label for="FullName" class="form-label">Full Name <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="clientName" id="FullName"
-                                                placeholder="Full Name" required
-                                                @isset($client_info)
+                </div>
+                <div class="card-body position-relative">
+                    <!-- Add loading overlay -->
+                    <div id="loading-overlay" class="loading-overlay">
+                        <div class="spinner"></div>
+                    </div>
+                    <div class="bs-stepper-content">
+                        <form action="{{ route('contract.create') }}" method="POST" id="contractForm"
+                            onsubmit="return validateForm(event)">
+                            @csrf
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="contract_type_id" value="{{ $contract_type_id->id }}">
+                            <input type="hidden" name="client_id"
+                                value="@isset($client_info){{ $client_info->id }}@endisset">
+                            <input type="text" name="is_multi_branch" @if ($branches> 1) value="yes" @else value="no"
+                            @endif hidden readonly>
+                            <input type="number" id="branchs_number" name="branchs_number" value={{ $branches }} hidden
+                                readonly>
+                            <input type="hidden" name="Property_type" value="{{ $contract_type_id->name }}">
+                            <div id="test-l-1" role="tabpanel" class="bs-stepper-pane"
+                                aria-labelledby="stepper1trigger1">
+                                <h5 class="mb-1">Client Personal Information</h5>
+                                <p class="mb-4">Enter the Client personal information to get closer Your Deal</p>
+                                <div class="row g-3">
+                                    <div class="col-12 col-lg-6">
+                                        <label for="FullName" class="form-label">Full Name <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="clientName" id="FullName"
+                                            placeholder="Full Name" required @isset($client_info)
                                             value="{{ $client_info->name }}" @endisset>
-                                            <div class="invalid-feedback">Please enter client's full name</div>
-                                        </div>
-                                        <div class="col-12 col-lg-6">
-                                            <label for="Phone" class="form-label">Phone Number <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="tel" class="form-control" name="clientPhone" id="Phone"
-                                                placeholder="05xxxxxxxx" pattern="^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$"
-                                                required
-                                                @isset($client_info) value="{{ $client_info->phone }}" @endisset>
-                                            <div class="invalid-feedback">Please enter a valid Saudi phone number</div>
-                                        </div>
-                                        <div class="col-12 col-lg-6">
-                                            <label for="Mobile" class="form-label">Mobile Number <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="tel" class="form-control" name="clientMobile"
-                                                id="Mobile" placeholder="05xxxxxxxx"
-                                                pattern="^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$" required
-                                                @isset($client_info) value="{{ $client_info->mobile }}" @endisset>
-                                            <div class="invalid-feedback">Please enter a valid Saudi mobile number</div>
-                                        </div>
-                                        <div class="col-12 col-lg-6">
-                                            <label for="Email" class="form-label">Email <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="email" class="form-control" name="clientEmail" id="Email"
-                                                placeholder="example@domain.com" required
-                                                @isset($client_info)
+                                        <div class="invalid-feedback">Please enter client's full name</div>
+                                    </div>
+                                    <div class="col-12 col-lg-6">
+                                        <label for="Phone" class="form-label">Phone Number <span
+                                                class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" name="clientPhone" id="Phone"
+                                            placeholder="05xxxxxxxx" pattern="^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$"
+                                            required @isset($client_info) value="{{ $client_info->phone }}" @endisset>
+                                        <div class="invalid-feedback">Please enter a valid Saudi phone number</div>
+                                    </div>
+                                    <div class="col-12 col-lg-6">
+                                        <label for="Mobile" class="form-label">Mobile Number <span
+                                                class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" name="clientMobile" id="Mobile"
+                                            placeholder="05xxxxxxxx" pattern="^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$"
+                                            required @isset($client_info) value="{{ $client_info->mobile }}" @endisset>
+                                        <div class="invalid-feedback">Please enter a valid Saudi mobile number</div>
+                                    </div>
+                                    <div class="col-12 col-lg-6">
+                                        <label for="Email" class="form-label">Email <span
+                                                class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" name="clientEmail" id="Email"
+                                            placeholder="example@domain.com" required @isset($client_info)
                                             value="{{ $client_info->email }}" @endisset>
-                                            <div class="invalid-feedback">Please enter a valid email address</div>
-                                        </div>
-                                        <div class="col-12 col-lg-6">
-                                            <label for="taxNumber" class="form-label">Tax Number <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="client_tax_number"
-                                                id="taxNumber" placeholder="Enter Tax Number" pattern="^[0-9]{15}$"
-                                                required
-                                                @isset($client_info) value="{{ $client_info->tax_number }}" @endisset>
-                                            <div class="invalid-feedback">Please enter a valid 15-digit tax number</div>
-                                        </div>
-                                        <div class="col-12 col-lg-6">
-                                            <label for="zipCode" class="form-label">Zip Code</label>
-                                            <input type="text" class="form-control" name="client_zipcode"
-                                                id="zipCode" placeholder="Enter Zip Code" pattern="^[0-9]{5}$"
-                                                @isset($client_info)
+                                        <div class="invalid-feedback">Please enter a valid email address</div>
+                                    </div>
+                                    <div class="col-12 col-lg-6">
+                                        <label for="taxNumber" class="form-label">Tax Number <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="client_tax_number" id="taxNumber"
+                                            placeholder="Enter Tax Number" pattern="^[0-9]{15}$" required
+                                            @isset($client_info) value="{{ $client_info->tax_number }}" @endisset>
+                                        <div class="invalid-feedback">Please enter a valid 15-digit tax number</div>
+                                    </div>
+                                    <div class="col-12 col-lg-6">
+                                        <label for="zipCode" class="form-label">Zip Code</label>
+                                        <input type="text" class="form-control" name="client_zipcode" id="zipCode"
+                                            placeholder="Enter Zip Code" pattern="^[0-9]{5}$" @isset($client_info)
                                             value="{{ $client_info->zip_code }}" @endisset>
-                                            <div class="invalid-feedback">Please enter a valid 5-digit zip code</div>
-                                        </div>
-                                        <div class="col-12 col-lg-6">
-                                            <label for="City" class="form-label">City <span
-                                                    class="text-danger">*</span></label>
-                                            <select class="form-select" name="clientCity" id="City" required>
-                                                <option value="">Select City</option>
-                                                <script>
-                                                    // Use the preloaded Saudi cities array to populate the dropdown
-                                                    if (window.saudiCities) {
-                                                        window.saudiCities.forEach(city => {
-                                                            const selected = @json(isset($client_info) && $client_info->city) === city ? 'selected' : '';
-                                                            document.write(`<option value="${city}" ${selected}>${city}</option>`);
-                                                        });
-                                                    } else {
-                                                        // Fallback if preloaded data is not available
-                                                        @foreach ($saudiCities as $city)
-                                                            document.write(`<option value="{{ $city }}" 
-                                                                @isset($client_info) @if ($client_info->city == $city) selected @endif @endisset>
-                                                                {{ $city }}</option>`);
-                                                        @endforeach
-                                                    }
-                                                </script>
-                                            </select>
-                                            <div class="invalid-feedback">Please select a city</div>
-                                        </div>
-                                        <div class="col-12">
-                                            <label for="Address" class="form-label">Address <span
-                                                    class="text-danger">*</span></label>
-                                            <textarea class="form-control" name="clientAddress" id="Address" rows="3" placeholder="Enter full address"
-                                                required>
+                                        <div class="invalid-feedback">Please enter a valid 5-digit zip code</div>
+                                    </div>
+                                    <div class="col-12 col-lg-6">
+                                        <label for="City" class="form-label">City <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select" name="clientCity" id="City" required>
+                                            <option value="">Select City</option>
+                                            @foreach ($saudiCities as $city)
+                                            <option value="{{ $city }}" @isset($client_info) @if ($client_info->city ==
+                                                $city) selected @endif @endisset>
+                                                {{ $city }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                        <div class="invalid-feedback">Please select a city</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="Address" class="form-label">Address <span
+                                                class="text-danger">*</span></label>
+                                        <textarea class="form-control" name="clientAddress" id="Address" rows="3"
+                                            placeholder="Enter full address" required>
 @isset($client_info)
 {{ $client_info->address }}
 @endisset
 </textarea>
-                                            <div class="invalid-feedback">Please enter the client's address</div>
+                                        <div class="invalid-feedback">Please enter the client's address</div>
+                                    </div>
+                                    <div class="mb-3 col-12">
+                                        <button type="button" class="px-4 btn btn-primary"
+                                            onclick="handleNextStep();">Next<i
+                                                class='bx bx-right-arrow-alt ms-2'></i></button>
+                                    </div>
+                                </div>
+                                <!---end row-->
+
+                            </div>
+                            <div id="test-l-2" role="tabpanel" class="bs-stepper-pane"
+                                aria-labelledby="stepper1trigger2">
+
+                                <h5 class="mb-1">Contracts Details</h5>
+                                <p class="mb-4">Enter Your Contract Details.</p>
+
+                                <div class="row g-3" x-data="{
+                                        branchCount: {{ $branches }},
+                                    }">
+
+                                    <div class="row g-3">
+                                        <div class="col-12 col-lg-6">
+                                            <label for="contractNumber" class="form-label">Contract Number <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="contractnumber"
+                                                id="contractNumber" placeholder="123.." value="{{ $contract_number }}"
+                                                readonly>
                                         </div>
-                                        <div class="mb-3 col-12">
-                                            <button type="button" class="px-4 btn btn-primary"
-                                                onclick="handleNextStep();">Next<i
-                                                    class='bx bx-right-arrow-alt ms-2'></i></button>
+                                        <div class="col-12 col-lg-6">
+                                            <label for="contractstartdate" class="form-label">Start Date <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="date" class="form-control" name="contractstartdate"
+                                                id="contractstartdate" required>
+                                            <div class="invalid-feedback">Please select a start date</div>
+                                        </div>
+                                        <div class="col-12 col-lg-6">
+                                            <label for="contractenddate" class="form-label">End Date <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="date" class="form-control" name="contractenddate"
+                                                id="contractenddate" required>
+                                            <div class="invalid-feedback">Please select an end date that's after the
+                                                start date</div>
+                                        </div>
+
+                                        <div class="col-12 col-lg-6">
+                                            <label for="visit_start_date" class="form-label">Visit Start Date <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="date" class="form-control" name="visit_start_date"
+                                                id="visit_start_date" required>
+                                            <div class="invalid-feedback">Please select a visit start date between
+                                                contract start and end dates</div>
+                                        </div>
+
+                                        <div class="col-12 col-lg-6">
+                                            <label for="contract_type_id" class="form-label">Contract Type <span
+                                                    class="text-danger">*</span></label>
+                                            <select class="form-select" name="contract_type_id" id="contract_type_id"
+                                                required>
+                                                @foreach ($contract_types as $type)
+                                                <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <div class="invalid-feedback">Please select a contract type</div>
+                                        </div>
+
+                                        <div class="col-12 col-lg-6">
+                                            <label for="Property_type" class="form-label">Property Type <span
+                                                    class="text-danger">*</span></label>
+                                            <select class="form-select" name="Property_type" id="Property_type"
+                                                required>
+                                                @foreach ($property_types as $type)
+                                                <option value="{{ $type }}">{{ $type }}</option>
+                                                @endforeach
+                                            </select>
+                                            <div class="invalid-feedback">Please select a property type</div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label for="contractDescription" class="form-label">Contract Description
+                                                <span class="text-danger">*</span></label>
+                                            <div class="form-group">
+                                                <textarea class="form-control" id="contractDescription"
+                                                    name="contract_description"
+                                                    placeholder="Enter contract description..." rows="3" required
+                                                    minlength="10"></textarea>
+                                                <div class="invalid-feedback">
+                                                    Please enter a description (minimum 10 characters)
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-lg-6">
+                                            <label for="number_of_visits" class="form-label">Number of Visits <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" name="number_of_visits"
+                                                id="number_of_visits" min="1" required value="1">
+                                            <div class="invalid-feedback">Please enter at least 1 visit</div>
+                                            <div class="form-text">Minimum 1 visit required</div>
+                                        </div>
+
+                                        <div class="col-12 col-lg-6">
+                                            <label for="warranty" class="form-label">Warranty Period (Months) <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" name="warranty" id="warranty"
+                                                min="0" required value="0">
+                                            <div class="invalid-feedback">Please enter a valid warranty period</div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <div class="gap-3 d-flex align-items-center">
+                                                <button type="button" class="px-4 btn btn-outline-secondary"
+                                                    onclick="handlePreviousStep()"><i
+                                                        class='bx bx-left-arrow-alt me-2'></i>Previous</button>
+                                                <button type="button" class="px-4 btn btn-primary"
+                                                    onclick="handleNextStep();">Next<i
+                                                        class='bx bx-right-arrow-alt ms-2'></i></button>
+                                            </div>
                                         </div>
                                     </div>
                                     <!---end row-->
 
                                 </div>
-                                <div id="test-l-2" role="tabpanel" class="bs-stepper-pane"
-                                    aria-labelledby="stepper1trigger2">
-
-                                    <h5 class="mb-1">Contracts Details</h5>
-                                    <p class="mb-4">Enter Your Contract Details.</p>
-
-                                    <div class="row g-3" x-data="{
-                                        branchCount: {{ $branches }},
-                                    }">
-
+                            </div>
+                            @if ($branches >= 1)
+                            <div id="test-l-3" role="tabpanel" class="bs-stepper-pane"
+                                aria-labelledby="stepper1trigger3">
+                                <h5 class="mb-1">Branchs Information</h5>
+                                @for ($i = 0; $i < $branches; $i++) <div class="mb-3 card">
+                                    <div class="card-header">
+                                        <h5 class="mb-1">Branch {{ $i + 1 }}</h5>
+                                    </div>
+                                    <div class="card-body">
                                         <div class="row g-3">
                                             <div class="col-12 col-lg-6">
-                                                <label for="contractNumber" class="form-label">Contract Number <span
+                                                <label for="branchName{{ $i }}" class="form-label">Branch Name <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" name="contractnumber"
-                                                    id="contractNumber" placeholder="123.."
-                                                    value="{{ $contract_number }}" readonly>
+                                                <input type="text" class="form-control" name="branchName{{ $i }}"
+                                                    id="branchName{{ $i }}" placeholder="Branch Name" required>
+                                                <div class="invalid-feedback">Please enter the branch name
+                                                </div>
                                             </div>
                                             <div class="col-12 col-lg-6">
-                                                <label for="contractstartdate" class="form-label">Start Date <span
-                                                        class="text-danger">*</span></label>
-                                                <input type="date" class="form-control" name="contractstartdate"
-                                                    id="contractstartdate" required>
-                                                <div class="invalid-feedback">Please select a start date</div>
-                                            </div>
-                                            <div class="col-12 col-lg-6">
-                                                <label for="contractenddate" class="form-label">End Date <span
-                                                        class="text-danger">*</span></label>
-                                                <input type="date" class="form-control" name="contractenddate"
-                                                    id="contractenddate" required>
-                                                <div class="invalid-feedback">Please select an end date that's after the
-                                                    start date</div>
-                                            </div>
-
-                                            <div class="col-12 col-lg-6">
-                                                <label for="visit_start_date" class="form-label">Visit Start Date <span
-                                                        class="text-danger">*</span></label>
-                                                <input type="date" class="form-control" name="visit_start_date"
-                                                    id="visit_start_date" required>
-                                                <div class="invalid-feedback">Please select a visit start date between contract start and end dates</div>
-                                            </div>
-
-                                            <div class="col-12 col-lg-6">
-                                                <label for="contract_type_id" class="form-label">Contract Type <span
-                                                        class="text-danger">*</span></label>
-                                                <select class="form-select" name="contract_type_id" id="contract_type_id"
+                                                <label for="branchmanager{{ $i }}" class="form-label">Branch Manager
+                                                    Name <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" name="branchmanager{{ $i }}"
+                                                    id="branchmanager{{ $i }}" placeholder="Branch Manager Name"
                                                     required>
-                                                    @foreach ($contract_types as $type)
-                                                        <option value="{{ $type->id }}">{{ $type->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <div class="invalid-feedback">Please select a contract type</div>
+                                                <div class="invalid-feedback">Please enter the branch manager
+                                                    name</div>
                                             </div>
-
                                             <div class="col-12 col-lg-6">
-                                                <label for="Property_type" class="form-label">Property Type <span
-                                                        class="text-danger">*</span></label>
-                                                <select class="form-select" name="Property_type" id="Property_type"
-                                                    required>
-                                                    @foreach ($property_types as $type)
-                                                        <option value="{{ $type }}">{{ $type }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <div class="invalid-feedback">Please select a property type</div>
-                                            </div>
-
-                                            <div class="col-12">
-                                                <label for="contractDescription" class="form-label">Contract Description
+                                                <label for="branchphone{{ $i }}" class="form-label">Branch Manager Phone
                                                     <span class="text-danger">*</span></label>
-                                                <div class="form-group">
-                                                    <textarea class="form-control" id="contractDescription" name="contract_description"
-                                                        placeholder="Enter contract description..." rows="3" required minlength="10"></textarea>
-                                                    <div class="invalid-feedback">
-                                                        Please enter a description (minimum 10 characters)
-                                                    </div>
+                                                <input type="text" class="form-control" name="branchphone{{ $i }}"
+                                                    id="branchphone{{ $i }}" placeholder="05xxxxxxxx" required
+                                                    pattern="^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$">
+                                                <div class="invalid-feedback">Please enter a valid Saudi phone
+                                                    number
+                                                    (e.g., 05xxxxxxxx)</div>
+                                            </div>
+                                            <div class="col-12 col-lg-6">
+                                                <label for="branchAddress{{ $i }}" class="form-label">Branch Address
+                                                    <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" name="branchAddress{{ $i }}"
+                                                    id="branchAddress{{ $i }}" placeholder="Branch Address" required>
+                                                <div class="invalid-feedback">Please enter the branch address
                                                 </div>
                                             </div>
-
                                             <div class="col-12 col-lg-6">
-                                                <label for="number_of_visits" class="form-label">Number of Visits <span
+                                                <label for="branchcity{{ $i }}" class="form-label">City <span
                                                         class="text-danger">*</span></label>
-                                                <input type="number" class="form-control" name="number_of_visits"
-                                                    id="number_of_visits" min="1" required value="1">
-                                                <div class="invalid-feedback">Please enter at least 1 visit</div>
-                                                <div class="form-text">Minimum 1 visit required</div>
-                                            </div>
-
-                                            <div class="col-12 col-lg-6">
-                                                <label for="warranty" class="form-label">Warranty Period (Months) <span
-                                                        class="text-danger">*</span></label>
-                                                <input type="number" class="form-control" name="warranty"
-                                                    id="warranty" min="0" required value="0">
-                                                <div class="invalid-feedback">Please enter a valid warranty period</div>
-                                            </div>
-
-                                            <div class="col-12">
-                                                <div class="gap-3 d-flex align-items-center">
-                                                    <button type="button" class="px-4 btn btn-outline-secondary"
-                                                        onclick="handlePreviousStep()"><i
-                                                            class='bx bx-left-arrow-alt me-2'></i>Previous</button>
-                                                    <button type="button" class="px-4 btn btn-primary"
-                                                        onclick="handleNextStep();">Next<i
-                                                            class='bx bx-right-arrow-alt ms-2'></i></button>
-                                                </div>
+                                                <select class="form-select" name="branchcity{{ $i }}"
+                                                    id="branchcity{{ $i }}" required>
+                                                    <option value="">Select City</option>
+                                                    @foreach ($saudiCities as $city)
+                                                    <option value="{{ $city }}">{{ $city }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="invalid-feedback">Please select a city</div>
                                             </div>
                                         </div>
-                                        <!---end row-->
-
+                                    </div>
+                            </div>
+                            @endfor
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="gap-3 d-flex align-items-center">
+                                        <button type="button" class="px-4 btn btn-outline-secondary"
+                                            onclick="handlePreviousStep()"><i
+                                                class='bx bx-left-arrow-alt me-2'></i>Previous</button>
+                                        <button type="button" class="px-4 btn btn-primary"
+                                            onclick="handleNextStep()">Next<i
+                                                class='bx bx-right-arrow-alt ms-2'></i></button>
                                     </div>
                                 </div>
-                                @if ($branches >= 1)
-                                    <div id="test-l-3" role="tabpanel" class="bs-stepper-pane"
-                                        aria-labelledby="stepper1trigger3">
-                                        <h5 class="mb-1">Branchs Information</h5>
-                                        @for ($i = 0; $i < $branches; $i++)
-                                            <div class="mb-3 card">
-                                                <div class="card-header">
-                                                    <h5 class="mb-1">Branch {{ $i + 1 }}</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="row g-3">
-                                                        <div class="col-12 col-lg-6">
-                                                            <label for="branchName{{ $i }}"
-                                                                class="form-label">Branch Name <span
-                                                                    class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control"
-                                                                name="branchName{{ $i }}"
-                                                                id="branchName{{ $i }}"
-                                                                placeholder="Branch Name" required>
-                                                            <div class="invalid-feedback">Please enter the branch name
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12 col-lg-6">
-                                                            <label for="branchmanager{{ $i }}"
-                                                                class="form-label">Branch Manager
-                                                                Name <span class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control"
-                                                                name="branchmanager{{ $i }}"
-                                                                id="branchmanager{{ $i }}"
-                                                                placeholder="Branch Manager Name" required>
-                                                            <div class="invalid-feedback">Please enter the branch manager
-                                                                name</div>
-                                                        </div>
-                                                        <div class="col-12 col-lg-6">
-                                                            <label for="branchphone{{ $i }}"
-                                                                class="form-label">Branch Manager Phone
-                                                                <span class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control"
-                                                                name="branchphone{{ $i }}"
-                                                                id="branchphone{{ $i }}"
-                                                                placeholder="05xxxxxxxx" required
-                                                                pattern="^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$">
-                                                            <div class="invalid-feedback">Please enter a valid Saudi phone
-                                                                number
-                                                                (e.g., 05xxxxxxxx)</div>
-                                                        </div>
-                                                        <div class="col-12 col-lg-6">
-                                                            <label for="branchAddress{{ $i }}"
-                                                                class="form-label">Branch Address
-                                                                <span class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control"
-                                                                name="branchAddress{{ $i }}"
-                                                                id="branchAddress{{ $i }}"
-                                                                placeholder="Branch Address" required>
-                                                            <div class="invalid-feedback">Please enter the branch address
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12 col-lg-6">
-                                                            <label for="branchcity{{ $i }}"
-                                                                class="form-label">City <span
-                                                                    class="text-danger">*</span></label>
-                                                            <select class="form-select"
-                                                                name="branchcity{{ $i }}"
-                                                                id="branchcity{{ $i }}" required>
-                                                                <option value="">Select City</option>
-                                                                <script>
-                                                                    // Use the preloaded Saudi cities array to populate the dropdown
-                                                                    if (window.saudiCities) {
-                                                                        window.saudiCities.forEach(city => {
-                                                                            document.write(`<option value="${city}">${city}</option>`);
-                                                                        });
-                                                                    } else {
-                                                                        // Fallback if preloaded data is not available
-                                                                        @foreach ($saudiCities as $city)
-                                                                            document.write(`<option value="{{ $city }}">{{ $city }}</option>`);
-                                                                        @endforeach
-                                                                    }
-                                                                </script>
-                                                            </select>
-                                                            <div class="invalid-feedback">Please select a city</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endfor
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="gap-3 d-flex align-items-center">
-                                                    <button type="button" class="px-4 btn btn-outline-secondary"
-                                                        onclick="handlePreviousStep()"><i
-                                                            class='bx bx-left-arrow-alt me-2'></i>Previous</button>
-                                                    <button type="button" class="px-4 btn btn-primary"
-                                                        onclick="handleNextStep()">Next<i
-                                                            class='bx bx-right-arrow-alt ms-2'></i></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endif
-                                <div id="test-l-4" role="tabpanel" class="bs-stepper-pane"
-                                    aria-labelledby="stepper1trigger4">
-                                    <h5 class="mb-1">Payment Information</h5>
-                                    <p class="mb-4">Enter payment information and the number of payments</p>
+                            </div>
+                    </div>
+                    @endif
+                    <div id="test-l-4" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger4">
+                        <h5 class="mb-1">Payment Information</h5>
+                        <p class="mb-4">Enter payment information and the number of payments</p>
 
-                                    <div class="row g-3" x-data="{
+                        <div class="row g-3" x-data="{
                                         contractAmount: 0,
                                         payment_type: 'prepaid',
                                         payment_schedule: 'monthly',
@@ -573,256 +535,249 @@
                                     });
                                     $watch('payment_schedule', value => initPaymentDates());
                                     $watch('payment_type', value => calculateAmounts());">
-                                        <div class="col-12 col-lg-6">
-                                            <label for="Contractamount" class="form-label">Contract Amount (without VAT)
-                                                <span class="text-danger">*</span></label>
-                                            <input type="number" class="form-control" name="contractamount"
-                                                id="Contractamount" x-model="contractAmount" required min="1"
-                                                step="0.01">
-                                            <div class="invalid-feedback">Please enter a valid contract amount</div>
-                                        </div>
+                            <div class="col-12 col-lg-6">
+                                <label for="Contractamount" class="form-label">Contract Amount (without VAT)
+                                    <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="contractamount" id="Contractamount"
+                                    x-model="contractAmount" required min="1" step="0.01">
+                                <div class="invalid-feedback">Please enter a valid contract amount</div>
+                            </div>
 
-                                        <div class="col-12 col-lg-6">
-                                            <label for="first_payment_date" class="form-label">First Payment Date <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="date" class="form-control" name="first_payment_date"
-                                                id="first_payment_date" x-model="first_payment_date" required
-                                                min="{{ date('Y-m-d') }}">
-                                            <div class="invalid-feedback">Please select a valid payment date</div>
-                                        </div>
+                            <div class="col-12 col-lg-6">
+                                <label for="first_payment_date" class="form-label">First Payment Date <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="first_payment_date"
+                                    id="first_payment_date" x-model="first_payment_date" required
+                                    min="{{ date('Y-m-d') }}">
+                                <div class="invalid-feedback">Please select a valid payment date</div>
+                            </div>
 
-                                        <div class="col-12 col-lg-6">
-                                            <label for="payment_type" class="form-label">Payment Type <span
-                                                    class="text-danger">*</span></label>
-                                            <select class="form-select" name="payment_type" id="payment_type"
-                                                x-model="payment_type" required>
-                                                <option value="prepaid">Prepaid (Full Amount)</option>
-                                                <option value="postpaid">Postpaid (Installments)</option>
-                                            </select>
-                                            <div class="invalid-feedback">Please select a payment type</div>
-                                        </div>
+                            <div class="col-12 col-lg-6">
+                                <label for="payment_type" class="form-label">Payment Type <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" name="payment_type" id="payment_type" x-model="payment_type"
+                                    required>
+                                    <option value="prepaid">Prepaid (Full Amount)</option>
+                                    <option value="postpaid">Postpaid (Installments)</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a payment type</div>
+                            </div>
 
-                                        <template x-if="payment_type === 'postpaid'">
-                                            <div class="col-12 col-lg-6">
-                                                <label for="number_of_payments" class="form-label">Number of Payments
-                                                    <span class="text-danger">*</span></label>
-                                                <input type="number" class="form-control" name="number_of_payments"
-                                                    id="number_of_payments" x-model="numberOfPayments" required
-                                                    min="1" max="24">
-                                                <div class="invalid-feedback">Please enter a valid number of payments
-                                                    (1-24)</div>
-                                            </div>
-                                        </template>
+                            <template x-if="payment_type === 'postpaid'">
+                                <div class="col-12 col-lg-6">
+                                    <label for="number_of_payments" class="form-label">Number of Payments
+                                        <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="number_of_payments"
+                                        id="number_of_payments" x-model="numberOfPayments" required min="1" max="24">
+                                    <div class="invalid-feedback">Please enter a valid number of payments
+                                        (1-24)</div>
+                                </div>
+                            </template>
 
-                                        <template x-if="payment_type === 'postpaid'">
-                                            <div class="col-12 col-lg-6">
-                                                <label for="payment_schedule" class="form-label">Payment Schedule <span
-                                                        class="text-danger">*</span></label>
-                                                <select class="form-select" name="payment_schedule" id="payment_schedule"
-                                                    x-model="payment_schedule" required>
-                                                    <option value="monthly">Monthly</option>
-                                                    <option value="custom">Custom Dates</option>
-                                                </select>
-                                                <div class="invalid-feedback">Please select a payment schedule</div>
-                                            </div>
-                                        </template>
+                            <template x-if="payment_type === 'postpaid'">
+                                <div class="col-12 col-lg-6">
+                                    <label for="payment_schedule" class="form-label">Payment Schedule <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-select" name="payment_schedule" id="payment_schedule"
+                                        x-model="payment_schedule" required>
+                                        <option value="monthly">Monthly</option>
+                                        <option value="custom">Custom Dates</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a payment schedule</div>
+                                </div>
+                            </template>
 
-                                        <template x-if="payment_type === 'postpaid'">
-                                            <div class="col-12 col-lg-6">
-                                                <label for="first_payment_date" class="form-label">First Payment Date
-                                                    <span class="text-danger">*</span></label>
-                                                <input type="date" class="form-control" name="first_payment_date"
-                                                    id="first_payment_date" x-model="first_payment_date" required
-                                                    min="{{ date('Y-m-d') }}">
-                                                <div class="invalid-feedback">Please select a valid first payment date
-                                                </div>
-                                            </div>
-                                        </template>
-
-                                        <template x-if="payment_type === 'postpaid' && payment_schedule === 'custom'">
-                                            <div class="col-12">
-                                                <div class="p-3 rounded border">
-                                                    <h6 class="mb-3">Custom Payment Dates</h6>
-                                                    <div id="custom-payment-dates">
-                                                        <!-- Custom payment date fields will be generated here -->
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </template>
-
-                                        <div class="col-12">
-                                            <div class="alert alert-info">
-                                                <strong>VAT (15%):</strong> <span x-text="vatAmount.toFixed(2)"></span>
-                                                SAR<br>
-                                                <strong>Total Amount:</strong> <span
-                                                    x-text="totalAmount.toFixed(2)"></span>
-                                                SAR
-                                                <template x-if="payment_type === 'postpaid'">
-                                                    <div>
-                                                        <strong>Payment per Installment:</strong> <span
-                                                            x-text="installmentAmount.toFixed(2)"></span>
-                                                        SAR
-                                                    </div>
-                                                </template>
-                                            </div>
-                                        </div>
+                            <template x-if="payment_type === 'postpaid'">
+                                <div class="col-12 col-lg-6">
+                                    <label for="first_payment_date" class="form-label">First Payment Date
+                                        <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" name="first_payment_date"
+                                        id="first_payment_date" x-model="first_payment_date" required
+                                        min="{{ date('Y-m-d') }}">
+                                    <div class="invalid-feedback">Please select a valid first payment date
                                     </div>
-                                    <div class="col-12">
-                                        <div class="gap-3 d-flex align-items-center">
-                                            <button type="button" class="px-4 btn btn-outline-secondary"
-                                                onclick="handlePreviousStep()">
-                                                <i class='bx bx-left-arrow-alt me-2'></i>Previous
-                                            </button>
-                                            <button type="button" class="px-4 btn btn-primary"
-                                                onclick="handleNextStep()">
-                                                Next<i class='bx bx-right-arrow-alt ms-2'></i>
-                                            </button>
+                                </div>
+                            </template>
+
+                            <template x-if="payment_type === 'postpaid' && payment_schedule === 'custom'">
+                                <div class="col-12">
+                                    <div class="p-3 rounded border">
+                                        <h6 class="mb-3">Custom Payment Dates</h6>
+                                        <div id="custom-payment-dates">
+                                            <!-- Custom payment date fields will be generated here -->
                                         </div>
                                     </div>
                                 </div>
-                                <div id="test-l-5" role="tabpanel" class="bs-stepper-pane"
-                                    aria-labelledby="stepper1trigger5">
-                                    <h5 class="mb-1">Summary</h5>
-                                    <p class="mb-4">Review the information you entered</p>
+                            </template>
 
-                                    <div class="row g-3">
-                                        <div class="col-12">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h5 class="mb-4 card-title">Contract Summary</h5>
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <h6 class="mb-3">Client Information</h6>
-                                                            <table class="table table-borderless">
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td><strong>Full Name:</strong></td>
-                                                                        <td id="summary-client-name"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Mobile:</strong></td>
-                                                                        <td id="summary-client-mobile"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Email:</strong></td>
-                                                                        <td id="summary-client-email"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Tax Number:</strong></td>
-                                                                        <td id="summary-tax-number"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>City:</strong></td>
-                                                                        <td id="summary-client-city"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Address:</strong></td>
-                                                                        <td id="summary-client-address"></td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <h6 class="mb-3">Contract Details</h6>
-                                                            <table class="table table-borderless">
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td><strong>Contract Number:</strong></td>
-                                                                        <td id="summary-contract-number"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Start Date:</strong></td>
-                                                                        <td id="summary-contract-date-start"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>End Date:</strong></td>
-                                                                        <td id="summary-contract-date-end"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Visit Start Date:</strong></td>
-                                                                        <td id="summary-contract-date-visit-start"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Warranty Period:</strong></td>
-                                                                        <td id="summary-warranty"></td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="mt-4 row">
-                                                        <div class="col-md-6">
-                                                            <h6 class="mb-3">Payment Information</h6>
-                                                            <table class="table table-borderless">
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td><strong>Payment Type:</strong></td>
-                                                                        <td id="summary-payment-type"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Payment Schedule:</strong></td>
-                                                                        <td id="summary-payment-schedule"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Number of Payments:</strong></td>
-                                                                        <td id="summary-number-payments"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Contract Amount:</strong></td>
-                                                                        <td id="summary-contract-amount"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>VAT (15%):</strong></td>
-                                                                        <td id="summary-vat-amount"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Total Amount:</strong></td>
-                                                                        <td id="summary-total-amount"></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>First Payment Date:</strong></td>
-                                                                        <td id="summary-first-payment-date"></td>
-                                                                    </tr>
-                                                                    <tr id="summary-payment-dates-row"
-                                                                        style="display: none;">
-                                                                        <td colspan="2">
-                                                                            <strong>Payment Schedule:</strong>
-                                                                            <div id="summary-payment-dates"
-                                                                                class="mt-2">
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                        <div class="col-md-6" id="summary-payment-dates">
-                                                            <h6 class="mb-3">Payment Schedule</h6>
-                                                            <div id="payment-dates-list"></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <strong>VAT (15%):</strong> <span x-text="vatAmount.toFixed(2)"></span>
+                                    SAR<br>
+                                    <strong>Total Amount:</strong> <span x-text="totalAmount.toFixed(2)"></span>
+                                    SAR
+                                    <template x-if="payment_type === 'postpaid'">
+                                        <div>
+                                            <strong>Payment per Installment:</strong> <span
+                                                x-text="installmentAmount.toFixed(2)"></span>
+                                            SAR
                                         </div>
-                                        <div class="col-12">
-                                            <div class="mt-4 d-flex justify-content-between">
-                                                <button type="button" class="btn btn-secondary"
-                                                    onclick="handlePreviousStep()">Edit</button>
-                                                <button type="button" class="btn btn-danger"
-                                                    onclick="cancelContract()">Cancel</button>
-                                                <button type="submit" class="btn btn-success">Save Contract</button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    </template>
                                 </div>
-                            </form>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="gap-3 d-flex align-items-center">
+                                <button type="button" class="px-4 btn btn-outline-secondary"
+                                    onclick="handlePreviousStep()">
+                                    <i class='bx bx-left-arrow-alt me-2'></i>Previous
+                                </button>
+                                <button type="button" class="px-4 btn btn-primary" onclick="handleNextStep()">
+                                    Next<i class='bx bx-right-arrow-alt ms-2'></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
+                    <div id="test-l-5" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger5">
+                        <h5 class="mb-1">Summary</h5>
+                        <p class="mb-4">Review the information you entered</p>
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="mb-4 card-title">Contract Summary</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6 class="mb-3">Client Information</h6>
+                                                <table class="table table-borderless">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><strong>Full Name:</strong></td>
+                                                            <td id="summary-client-name"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>Mobile:</strong></td>
+                                                            <td id="summary-client-mobile"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>Email:</strong></td>
+                                                            <td id="summary-client-email"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>Tax Number:</strong></td>
+                                                            <td id="summary-tax-number"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>City:</strong></td>
+                                                            <td id="summary-client-city"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>Address:</strong></td>
+                                                            <td id="summary-client-address"></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="mb-3">Contract Details</h6>
+                                                <table class="table table-borderless">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><strong>Contract Number:</strong></td>
+                                                            <td id="summary-contract-number"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>Start Date:</strong></td>
+                                                            <td id="summary-contract-date-start"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>End Date:</strong></td>
+                                                            <td id="summary-contract-date-end"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>Visit Start Date:</strong></td>
+                                                            <td id="summary-contract-date-visit-start"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>Warranty Period:</strong></td>
+                                                            <td id="summary-warranty"></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 row">
+                                            <div class="col-md-6">
+                                                <h6 class="mb-3">Payment Information</h6>
+                                                <table class="table table-borderless">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><strong>Payment Type:</strong></td>
+                                                            <td id="summary-payment-type"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>Payment Schedule:</strong></td>
+                                                            <td id="summary-payment-schedule"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>Number of Payments:</strong></td>
+                                                            <td id="summary-number-payments"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>Contract Amount:</strong></td>
+                                                            <td id="summary-contract-amount"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>VAT (15%):</strong></td>
+                                                            <td id="summary-vat-amount"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>Total Amount:</strong></td>
+                                                            <td id="summary-total-amount"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>First Payment Date:</strong></td>
+                                                            <td id="summary-first-payment-date"></td>
+                                                        </tr>
+                                                        <tr id="summary-payment-dates-row" style="display: none;">
+                                                            <td colspan="2">
+                                                                <strong>Payment Schedule:</strong>
+                                                                <div id="summary-payment-dates" class="mt-2">
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6" id="summary-payment-dates">
+                                                <h6 class="mb-3">Payment Schedule</h6>
+                                                <div id="payment-dates-list"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mt-4 d-flex justify-content-between">
+                                    <button type="button" class="btn btn-secondary"
+                                        onclick="handlePreviousStep()">Edit</button>
+                                    <button type="button" class="btn btn-danger"
+                                        onclick="cancelContract()">Cancel</button>
+                                    <button type="submit" class="btn btn-success">Save Contract</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-    <script>
-        var stepper;
+</div>
+</div>
+<script>
+    var stepper;
         var currentStep = 0;
         var branchCount = 0;
         var validationCache = {}; // Cache validation results
@@ -862,21 +817,25 @@
 
         // Function to lazy load content for other steps
         function lazyLoadStepContent() {
-            // We'll initialize date inputs for other steps only when they become visible
-            stepper.stepContent.forEach((content, index) => {
-                content.addEventListener('transitionend', function(e) {
-                    if (e.propertyName === 'transform' && window.getComputedStyle(content).display !==
-                        'none') {
-                        const dateInputs = content.querySelectorAll('input[type="date"]');
-                        const today = new Date().toISOString().split('T')[0];
-                        dateInputs.forEach(input => {
-                            if (!input.min) {
-                                input.min = today;
-                            }
-                        });
-                    }
+            // Get all step content elements directly instead of using stepper.stepContent
+            const stepContents = document.querySelectorAll('.bs-stepper-pane');
+            
+            if (stepContents && stepContents.length > 0) {
+                stepContents.forEach((content, index) => {
+                    content.addEventListener('transitionend', function(e) {
+                        if (e.propertyName === 'transform' && window.getComputedStyle(content).display !==
+                            'none') {
+                            const dateInputs = content.querySelectorAll('input[type="date"]');
+                            const today = new Date().toISOString().split('T')[0];
+                            dateInputs.forEach(input => {
+                                if (!input.min) {
+                                    input.min = today;
+                                }
+                            });
+                        }
+                    });
                 });
-            });
+            }
         }
 
         // Add function to check for duplicates with caching
@@ -1742,5 +1701,5 @@
             // Reset validation cache
             validationCache = {};
         }
-    </script>
+</script>
 @endsection

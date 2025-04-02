@@ -30,7 +30,7 @@
                             <a href="{{ route('team-leader.visits') }}" class="btn btn-secondary btn-sm">
                                 <i class="bx bx-arrow-back me-1"></i>Back to Visits
                             </a>
-                            @if($visit->status != 'completed' && (date('Y-m-d') == $visit->visit_date || date('Y-m-d') > $visit->visit_date))
+                            @if($visit->status == 'scheduled' && (date('Y-m-d') == $visit->visit_date || date('Y-m-d') > $visit->visit_date) || $visit->status == 'in_progress')
                             <form action="{{ route('team-leader.visit.complete', $visit->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to mark this visit as completed?')">
@@ -65,12 +65,16 @@
                                                 <span class="badge bg-success">
                                                     <i class="bx bx-check-circle me-1"></i>Completed
                                                 </span>
+                                                @elseif($visit->status == 'in_progress')
+                                                <span class="badge bg-warning">
+                                                    <i class="bx bx-time me-1"></i>In Progress
+                                                </span>
                                                 @elseif($visit->status == 'cancelled')
                                                 <span class="badge bg-danger">
                                                     <i class="bx bx-x-circle me-1"></i>Cancelled
                                                 </span>
                                                 @else
-                                                <span class="badge bg-warning">
+                                                <span class="badge bg-info">
                                                     <i class="bx bx-time me-1"></i>Pending
                                                 </span>
                                                 @endif

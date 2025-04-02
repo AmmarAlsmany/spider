@@ -103,6 +103,7 @@
                                 </span>
                             </td>
                             <td>{{ $contract->created_at ? date('Y-m-d', strtotime($contract->created_at)) : 'Not set' }}</td>
+                            @if($contract->contract_status == 'approved')
                             <td>
                                 <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" 
                                     data-bs-target="#transferModal{{ $contract->id }}">
@@ -116,6 +117,7 @@
                                     <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                 </form>
                             </td>
+                            @endif
                         </tr>
 
                         <!-- Transfer Modal -->

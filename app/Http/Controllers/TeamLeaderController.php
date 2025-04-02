@@ -132,22 +132,29 @@ class TeamLeaderController extends Controller
             return redirect()->back()->with('error', 'Cannot complete a visit associated with a stopped contract.');
         }
 
-        // Mark visit as completed
-        $visit->status = 'completed';
+        // Mark visit as in-progress instead of completed
+        $visit->status = 'in_progress';
         $visit->save();
 
         // Notify sales manager,sales representative about visit completion
         $data = [
-            'title' => "Visit Completed: " . $visit->contract->contract_number,
-            'message' => 'Your visit has been completed',
-            'url' => '#',
+            'title' => "Visit In Progress: " . $visit->contract->contract_number,
+            'message' => 'Your visit is in progress and awaiting report submission',
+            'url' => route('team-leader.visit.show', $visit->id),
+        ];
+        
+        // Different URLs for different roles
+        $roleUrls = [
+            'sales' => route('view.contract.visit', $visit->contract->id),
+            'sales_manager' => route('view.contract.visit', $visit->contract->id),
+            'technical' => route('technical.visit.report.view', $visit->id)
         ];
 
-        $this->notifyRoles(['sales', 'sales_manager', 'technical'], $data, $visit->contract->customer_id, $visit->contract->sales_id);
+        $this->notifyRoles(['sales', 'sales_manager', 'technical'], $data, $visit->contract->customer_id, $visit->contract->sales_id, $roleUrls);
 
         // Redirect to create report
         return redirect()->route('team-leader.visit.report.create', $visit->id)
-            ->with('success', 'Visit marked as completed. Please fill out the visit report.');
+            ->with('success', 'Visit marked as in-progress. Please fill out the visit report to complete it.');
     }
 
     public function createReport($visitId)
@@ -160,10 +167,10 @@ class TeamLeaderController extends Controller
             return redirect()->back()->with('error', 'Unauthorized access.');
         }
 
-        // Check if visit is completed
-        if ($visit->status !== 'completed') {
+        // Check if visit is in-progress
+        if ($visit->status !== 'in_progress') {
             return redirect()->route('team-leader.visit.show', $visit->id)
-                ->with('error', 'Visit must be marked as completed before creating a report.');
+                ->with('error', 'Visit must be marked as in-progress before creating a report.');
         }
 
         // Check if report already exists
@@ -182,10 +189,17 @@ class TeamLeaderController extends Controller
         $data = [
             'title' => "Visit Report Created: " . $visit->contract->contract_number,
             'message' => 'Your visit has been completed and report is ready to download',
-            'url' => '#',
+            'url' => route('team-leader.visit.show', $visit->id),
+        ];
+        
+        // Different URLs for different roles
+        $roleUrls = [
+            'sales' => route('contract.visit.report', $visit->id),
+            'sales_manager' => route('contract.visit.report', $visit->id),
+            'technical' => route('technical.visit.report.view', $visit->id)
         ];
 
-        $this->notifyRoles(['sales', 'sales_manager', 'technical'], $data, $visit->contract->customer_id, $visit->contract->sales_id);
+        $this->notifyRoles(['sales', 'sales_manager', 'technical'], $data, $visit->contract->customer_id, $visit->contract->sales_id, $roleUrls);
 
         // Get active target insects for the form
         $targetInsects = TargetInsect::where('active', true)->orderBy('name')->get();
@@ -201,9 +215,9 @@ class TeamLeaderController extends Controller
         try {
             $visit = VisitSchedule::with('contract')->findOrFail($visitId);
 
-            // Check if visit is completed
-            if ($visit->status !== 'completed') {
-                return redirect()->back()->with('error', 'Visit must be marked as completed before creating a report.');
+            // Check if visit is in-progress
+            if ($visit->status !== 'in_progress') {
+                return redirect()->back()->with('error', 'Visit must be marked as in-progress before creating a report.');
             }
             
             // Check if the contract is stopped
@@ -212,7 +226,11 @@ class TeamLeaderController extends Controller
                     ->with('error', 'Cannot create report for a visit associated with a stopped contract.');
             }
 
-            // dd($request->all());
+            // Check if the form was actually submitted by the user
+            // This helps prevent saving incomplete data when users navigate away
+            if (!$request->has('_token')) {
+                return redirect()->back()->with('error', 'Form submission error. Please try again.');
+            }
 
             // First validate the basic required fields
             $request->validate([
@@ -286,6 +304,10 @@ class TeamLeaderController extends Controller
             ]);
 
             $report->save();
+
+            // Mark visit as completed
+            $visit->status = 'completed';
+            $visit->save();
         } catch (\Exception  $e) {
             return redirect()->back()->with('error', 'Failed to create visit report: ' . $e->getMessage());
         }

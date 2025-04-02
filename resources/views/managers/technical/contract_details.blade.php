@@ -187,6 +187,12 @@
                                                     <span class="badge bg-success">Completed</span>
                                                 @elseif($visit->status == 'cancelled')
                                                     <span class="badge bg-danger">Cancelled</span>
+                                                @elseif($visit->status == 'in_progress')
+                                                    <span class="badge bg-warning">In Progress</span>
+                                                @elseif($visit->status == 'stopped')
+                                                    <span class="badge bg-danger">Stopped</span>
+                                                @elseif($visit->status == 'scheduled')
+                                                    <span class="badge bg-info">Scheduled</span>
                                                 @else
                                                     <span class="badge bg-warning">Pending</span>
                                                 @endif

@@ -588,7 +588,7 @@
                                         <td>{{ $annex->annex_number }}</td>
                                         <td>{{ $annex->annex_date->format('M d, Y') }}</td>
                                         <td>
-                                            {{ number_format($annex->additional_amount, 2) }} SAR
+                                            {{ number_format($annex->additional_amount * 1.15, 2) }} SAR
                                         </td>
                                         <td>
                                             <span

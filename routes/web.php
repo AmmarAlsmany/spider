@@ -67,6 +67,11 @@ Route::middleware(['prevent-back-history', 'auth:web,client'])->group(function (
     Route::get('/contract/{contract}/insect-analytics', [TargetInsectAnalyticsController::class, 'contractAnalytics'])
         ->middleware(['auth'])
         ->name('contract.insect-analytics');
+    
+    // PDF Download for Contract Insect Analytics
+    Route::get('/contract/{contract}/insect-analytics/pdf', [TargetInsectAnalyticsController::class, 'generateContractAnalyticsPDF'])
+        ->middleware(['auth'])
+        ->name('contract.insect-analytics.pdf');
         
     // Branch-specific Insect Analytics
     Route::get('/contract/{contractId}/branches', [TargetInsectAnalyticsController::class, 'contractBranchSelection'])
@@ -76,6 +81,11 @@ Route::middleware(['prevent-back-history', 'auth:web,client'])->group(function (
     Route::get('/contract/{contractId}/branch/{branchId}/analytics', [TargetInsectAnalyticsController::class, 'branchAnalytics'])
         ->middleware(['auth'])
         ->name('analytics.branch');
+    
+    // PDF Download for Branch Insect Analytics
+    Route::get('/contract/{contractId}/branch/{branchId}/analytics/pdf', [TargetInsectAnalyticsController::class, 'generateBranchAnalyticsPDF'])
+        ->middleware(['auth'])
+        ->name('analytics.branch.pdf');
 
     // sales.show.ticket
     Route::get('/sales/tikets', [TiketsController::class, 'index'])->name('sales.show.ticket');
@@ -93,6 +103,44 @@ Route::middleware(['prevent-back-history', 'auth:web,client'])->group(function (
     Route::put('/branches/{id}', [BranchsController::class, 'update'])->name('branches.update');
 
     Route::get('/reports/sales/pdf', [sales::class, 'generatePDF'])->name('sales.report.pdf');
+});
+
+// Admin Routes
+Route::middleware(['auth', 'role:admin', 'prevent-back-history'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard Routes
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Contract Management Routes
+    Route::get('/contracts', [DashboardController::class, 'contractsIndex'])->name('contracts.index');
+    Route::get('/contracts/reports', [DashboardController::class, 'reports'])->name('contracts.reports');
+    Route::get('/contracts/reports/data', [DashboardController::class, 'getReportsData'])->name('contracts.reports.data');
+    Route::get('/contracts/{contract}', [DashboardController::class, 'show'])->name('contracts.show');
+    
+    // Ticket Management Routes
+    Route::get('/tickets', [DashboardController::class, 'ticketsIndex'])->name('tickets.index');
+    Route::get('/tickets/reports', [DashboardController::class, 'ticketsReports'])->name('tickets.reports');
+    Route::get('/tickets/reports/data', [DashboardController::class, 'getTicketsReportsData'])->name('tickets.reports.data');
+    Route::get('/tickets/{ticket}', [DashboardController::class, 'ticketShow'])->name('tickets.show');
+    Route::post('/tickets/{ticket}/reply', [DashboardController::class, 'ticketReply'])->name('tickets.reply');
+    
+    // Payment Management Routes
+    Route::get('/payments', [DashboardController::class, 'paymentsIndex'])->name('payments.index');
+    Route::get('/payments/reports', [DashboardController::class, 'paymentsReports'])->name('payments.reports');
+    Route::get('/payments/reports/data', [DashboardController::class, 'getPaymentsReportsData'])->name('payments.reports.data');
+    Route::get('/payments/{payment}', [DashboardController::class, 'paymentShow'])->name('payments.show');
+    Route::patch('/payments/{payment}/status', [DashboardController::class, 'updatePaymentStatus'])->name('payments.update-status');
+    
+    // General Reports
+    Route::get('/reports/general', [DashboardController::class, 'generalReport'])->name('reports.general');
+    Route::get('/reports/general/data', [DashboardController::class, 'getGeneralReportData'])->name('reports.general.data');
+    
+    // Manager Management Routes
+    Route::get('/managers', [ManagerController::class, 'index'])->name('managers.index');
+    Route::get('/managers/create', [ManagerController::class, 'create'])->name('managers.create');
+    Route::post('/managers', [ManagerController::class, 'store'])->name('managers.store');
+    Route::get('/managers/{manager}/edit', [ManagerController::class, 'edit'])->name('managers.edit');
+    Route::patch('/managers/{manager}', [ManagerController::class, 'update'])->name('managers.update');
+    Route::delete('/managers/{manager}', [ManagerController::class, 'destroy'])->name('managers.destroy');
 });
 
 // Sales Routes
@@ -199,13 +247,6 @@ Route::middleware(['auth', 'role:sales_manager', 'prevent-back-history'])->group
         ->name('sales_manager.client.details');
     Route::get('/sales-manager/clients/{id}/edit', [SalesManagerController::class, 'editClient'])->name('sales.clients.edit');
     Route::put('/sales-manager/clients/{id}', [SalesManagerController::class, 'updateClient'])->name('sales.clients.update');
-
-    // Contract Annex Routes
-
-    Route::post('/contracts/annex/{annex}/approve', [ContractsController::class, 'approveAnnex'])->name('contracts.annex.approve');
-    Route::post('/contracts/annex/{annex}/reject', [ContractsController::class, 'rejectAnnex'])->name('contracts.annex.reject');
-    Route::get('/sales-manager/pending-annexes', [SalesManagerController::class, 'pendingAnnexes'])
-        ->name('sales_manager.pending_annexes');
 
     // Equipment Types Management
     Route::resource('equipment-types', EquipmentTypeController::class);
@@ -391,6 +432,13 @@ Route::middleware(['role:client', 'prevent-back-history'])->group(function () {
     Route::post('/client/contract/{id}/submit-update-request', [ClientController::class, 'submitContractUpdateRequest'])->name('client.contract.submit-update');
     Route::get('/client/contract/{id}/visits', [ClientController::class, 'contractVisits'])->name('client.contract.visits');
     Route::get('/client/test-notification', [ClientController::class, 'testNotification'])->name('client.test-notification');
+
+    // Contract Annex Routes
+
+    Route::post('/client/contract/annex/{annex}/approve', [ContractsController::class, 'approveAnnex'])->name('contracts.annex.approve');
+    Route::post('/client/contract/annex/{annex}/reject', [ContractsController::class, 'rejectAnnex'])->name('contracts.annex.reject');
+    Route::get('/client/contract/pending-annexes', [ClientController::class, 'pendingAnnexes'])
+        ->name('client.contract.pending_annexes');
 });
 
 // Alert Routes

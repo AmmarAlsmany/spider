@@ -149,7 +149,7 @@
                                                     $quantity = $pesticideQuantities[$pesticide]['quantity'] ?? 0;
                                                     $unit = $pesticideQuantities[$pesticide]['unit'] ?? 'g';
                                                 @endphp
-                                                <span class="badge badge-primary">
+                                                <span class="d-block">
                                                     {{ $pesticide }}: {{ $quantity }}{{ $unit }}
                                                 </span>
                                             @endforeach

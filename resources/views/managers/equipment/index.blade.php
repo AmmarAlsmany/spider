@@ -19,6 +19,9 @@
     <!--breadcrumb-->
     <div class="mb-4 page-breadcrumb d-flex align-items-center">
         <div class="pe-3 breadcrumb-title d-flex align-items-center">
+            <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
+                <i class="bx bx-arrow-back"></i> Back
+            </a>
             <h4 class="mb-0 text-primary"><i class="bx bx-list-ul"></i> Equipment Types</h4>
         </div>
     </div>

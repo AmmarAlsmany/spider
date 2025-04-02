@@ -437,6 +437,44 @@
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
 <script>
+    // Track if the form has been modified
+    let formModified = false;
+    let formSubmitting = false;
+    
+    // Set up form tracking
+    document.getElementById('reportForm').addEventListener('input', function() {
+        formModified = true;
+    });
+    
+    // Handle form submission
+    document.getElementById('reportForm').addEventListener('submit', function() {
+        formSubmitting = true;
+        // Save submission state to localStorage
+        localStorage.setItem('reportFormSubmitting', 'true');
+    });
+    
+    // Warn user before leaving page with unsaved changes
+    window.addEventListener('beforeunload', function(e) {
+        if (formModified && !formSubmitting) {
+            // Standard way of showing a confirmation dialog
+            e.preventDefault();
+            e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+            
+            // Clear any previous submission state
+            localStorage.removeItem('reportFormSubmitting');
+            return e.returnValue;
+        }
+    });
+    
+    // Check if we're returning from a navigation without proper submission
+    window.addEventListener('load', function() {
+        const wasSubmitting = localStorage.getItem('reportFormSubmitting');
+        // If we were submitting but returned to this page, clear the flag
+        if (wasSubmitting) {
+            localStorage.removeItem('reportFormSubmitting');
+        }
+    });
+
     var canvas = document.getElementById('signatureCanvas');
     var signaturePad = new SignaturePad(canvas, {
         backgroundColor: 'rgb(255, 255, 255)',

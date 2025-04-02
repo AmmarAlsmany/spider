@@ -219,11 +219,14 @@ class ContractsController extends Controller
                 'title' => 'New Contract Created',
                 'message' => 'Contract ' . $contract->contract_number . ' has been created.',
                 'type' => 'info',
-                'url' => "#",
                 'priority' => 'normal'
             ];
 
-            $this->notifyRoles(['technical', 'sales_manager', 'client'], $notificationData, $contract->customer_id, $contract->sales_id);
+            $this->notifyRoles(['technical', 'sales_manager', 'client'], $notificationData, $contract->customer_id, $contract->sales_id, [
+                'technical' => route('technical.contract.show', $contract->id),
+                'sales_manager' => route('sales_manager.contract.view', $contract->id),
+                'client' => route('client.contract.details', $contract->id)
+            ]);
 
             return redirect()->route('sales.dashboard')
                 ->with('success', 'New Contract Created Successfully');
@@ -727,25 +730,18 @@ class ContractsController extends Controller
             DB::commit();
 
             // Send notifications to relevant roles
-            if (Auth::user()->role === 'technical') {
-                $url = route('technical.contract.show', $contract->id);
-            } elseif (Auth::user()->role === 'sales') {
-                $url = route('contract.show.details', $contract->id);
-            } elseif (Auth::user()->role === 'sales_manager') {
-                $url = route('sales_manager.contract.view', $contract->id);
-            } elseif (Auth::user()->role === 'client') {
-                $url = route('client.payment.details', $contract->id);
-            }
-
             $notificationData = [
                 'title' => 'Contract Updated Successfully',
-                'message' => 'Contract ' . $contract->contract_number . ' has been updated.',
+                'message' => "Contract {$contract->contract_number} has been updated.",
                 'type' => 'info',
-                'url' => $url,
                 'priority' => 'normal',
             ];
 
-            $this->notifyRoles(['client', 'sales', 'sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id);
+            $this->notifyRoles(['client', 'sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id, [
+                'client' => route('client.contract.details', $contract->id),
+                'sales_manager' => route('sales_manager.contract.view', $contract->id),
+                'technical' => route('technical.contract.show', $contract->id)
+            ]);
 
             return redirect('/sales/Show contracts Details/' . $contract->id)
                 ->with('success', 'Contract updated successfully');
@@ -784,13 +780,19 @@ class ContractsController extends Controller
 
         $notificationData = [
             'title' => 'Payment Postponement Approved',
-            'message' => 'Payment of ' . $payment->payment_amount . ' SAR has been postponed to ' . Carbon::parse($postponement->requested_date)->format('M d, Y'),
+            'message' => "Payment of " . $payment->payment_amount . " SAR has been postponed to " . Carbon::parse($postponement->requested_date)->format('M d, Y'),
             'type' => 'info',
-            'url' => "#",
             'priority' => 'normal'
         ];
+        
+        // Different URLs for different roles
+        $roleUrls = [
+            'sales' => route('payments.show', $payment->id),
+            'financial' => route('payments.show', $payment->id),
+            'client' => route('payments.show', $payment->id)
+        ];
 
-        $this->notifyRoles(['sales', 'financial', 'client'], $notificationData, $payment->customer_id, $payment->sales_id);
+        $this->notifyRoles(['sales', 'financial', 'client'], $notificationData, $payment->customer_id, $payment->sales_id, $roleUrls);
 
         return back()->with('status', 'Payment postponement request approved successfully');
     }
@@ -805,13 +807,19 @@ class ContractsController extends Controller
 
         $notificationData = [
             'title' => 'Payment Postponement Rejected',
-            'message' => 'Payment of ' . $postponement->payment->payment_amount . ' SAR has been rejected',
+            'message' => "Payment of " . $postponement->payment->payment_amount . " SAR has been rejected",
             'type' => 'info',
-            'url' => "#",
             'priority' => 'normal',
         ];
+        
+        // Different URLs for different roles
+        $roleUrls = [
+            'sales' => route('payments.show', $postponement->payment->id),
+            'financial' => route('payments.show', $postponement->payment->id),
+            'client' => route('payments.show', $postponement->payment->id)
+        ];
 
-        $this->notifyRoles(['sales', 'financial', 'client'], $notificationData, $postponement->payment->customer_id, $postponement->payment->sales_id);
+        $this->notifyRoles(['sales', 'financial', 'client'], $notificationData, $postponement->payment->customer_id, $postponement->payment->sales_id, $roleUrls);
 
         return back()->with('status', 'Payment postponement request rejected successfully');
     }
@@ -847,7 +855,7 @@ class ContractsController extends Controller
     public function view_cancelled_contracts()
     {
         $contracts = contracts::where('sales_id', Auth::user()->id)
-            ->where('contract_status', 'cancelled')
+            ->where('contract_status', 'canceled')
             ->orWhere('contract_status', 'Not approved')
             ->with('customer') // Eager load customer relationship
             ->get();
@@ -961,6 +969,11 @@ class ContractsController extends Controller
             // Generate annex number
             $annex_number = $contract->contract_number . '-A' . ($contract->annexes()->count() + 1);
 
+            // Calculate payment amounts
+            $amount = floatval($request->additional_amount);
+            $vat = $amount * 0.15;
+            $total_amount = $amount + $vat;
+
             // Create annex
             $annex = new ContractAnnex([
                 'contract_id' => $contract_id,
@@ -988,20 +1001,23 @@ class ContractsController extends Controller
             }
 
             // create payment for the annex
-            $this->create_payment($contract_id, $contract->customer_id, $request->additional_amount, $request->due_date, $annex);
+            $this->create_payment($contract->id, $contract->customer_id, $total_amount, $request->due_date, $annex);
 
             DB::commit();
 
-            // Notify the team leader,client,sales manager,technical
+            // Notify the client,sales manager,technical
             $notificationData = [
                 'title' => 'New Annex Created',
                 'message' => "Annex {$annex->annex_number} has been created for contract {$contract->contract_number}",
                 'type' => 'info',
-                'url' => "#",
                 'priority' => 'high',
             ];
 
-            $this->notifyRoles(['team_leader', 'client', 'sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id);
+            $this->notifyRoles(['client', 'sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id, [
+                'client' => route('client.contract.pending_annexes'),
+                'sales_manager' => route('sales_manager.contract.view', $contract->id),
+                'technical' => route('technical.contract.show', $contract->id)
+            ]);
 
             DB::commit();
 
@@ -1055,9 +1071,9 @@ class ContractsController extends Controller
     public function approveAnnex($id)
     {
         try {
-            // Check if user is a sales manager
-            if (Auth::user()->role !== 'sales_manager') {
-                return back()->with('error', 'Only sales managers can approve annexes');
+            // Check if user is a client
+            if (Auth::guard('client')->user()->role !== 'client') {
+                return back()->with('error', 'Only clients can approve annexes');
             }
 
             $annex = ContractAnnex::findOrFail($id);
@@ -1118,11 +1134,14 @@ class ContractsController extends Controller
                 'title' => 'Annex Approved',
                 'message' => "Annex {$annex->annex_number} has been approved and visits scheduled for " . $newBranches->count() . " new branches",
                 'type' => 'info',
-                'url' => "#",
                 'priority' => 'normal'
             ];
 
-            $this->notifyRoles(['client', 'sales', 'sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id);
+            $this->notifyRoles(['client', 'sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id, [
+                'client' => route('client.contract.details', $contract->id),
+                'sales_manager' => route('sales_manager.contract.view', $contract->id),
+                'technical' => route('technical.contract.show', $contract->id)
+            ]);
 
             DB::commit();
 
@@ -1137,9 +1156,9 @@ class ContractsController extends Controller
     public function rejectAnnex($id)
     {
         try {
-            // Check if user is a sales manager
-            if (Auth::user()->role !== 'sales_manager') {
-                return back()->with('error', 'Only sales managers can reject annexes');
+            // Check if user is a client
+            if (Auth::guard('client')->user()->role !== 'client') {
+                return back()->with('error', 'Only clients can reject annexes');
             }
 
             $annex = ContractAnnex::findOrFail($id);
@@ -1168,11 +1187,14 @@ class ContractsController extends Controller
                 'title' => 'Annex Rejected',
                 'message' => "Annex {$annex->annex_number} has been rejected for contract {$annex->contract->contract_number}",
                 'type' => 'info',
-                'url' => "#",
                 'priority' => 'normal'
             ];
 
-            $this->notifyRoles(['client', 'sales', 'sales_manager', 'technical'], $notificationData, $annex->contract->customer_id, $annex->contract->sales_id);
+            $this->notifyRoles(['client', 'sales_manager', 'technical'], $notificationData, $annex->contract->customer_id, $annex->contract->sales_id, [
+                'client' => route('client.contract.details', $annex->contract->id),
+                'sales_manager' => route('sales_manager.contract.view', $annex->contract->id),
+                'technical' => route('technical.contract.show', $annex->contract->id)
+            ]);
 
             DB::commit();
 
@@ -1272,11 +1294,15 @@ class ContractsController extends Controller
                 'title' => 'Annex Updated',
                 'message' => "Annex {$annex->annex_number} has been updated for contract {$contract->contract_number}",
                 'type' => 'info',
-                'url' => "#",
                 'priority' => 'high',
             ];
 
-            $this->notifyRoles(['team_leader', 'client', 'sales_manager', 'technical'], $notificationData, $annex->contract->customer_id, $annex->contract->sales_id);
+            $this->notifyRoles(['team_leader', 'client', 'sales_manager', 'technical'], $notificationData, $annex->contract->customer_id, $annex->contract->sales_id, [
+                'team_leader' => route('team-leader.contract.show', $contract->id),
+                'client' => route('client.contract.details', $contract->id),
+                'sales_manager' => route('sales_manager.contract.view', $contract->id),
+                'technical' => route('technical.contract.show', $contract->id)
+            ]);
 
             return redirect()->route('contract.show.details', $contract->id)
                 ->with('success', 'Contract annex updated successfully');
@@ -1299,8 +1325,8 @@ class ContractsController extends Controller
                 'contract_status' => 'stopped'
             ]);
             
-            // Cancel all scheduled visits for this contract
-            $cancelledVisits = $this->visitScheduleService->cancelContractVisits($contract);
+            // stop all scheduled visits for this contract
+            $stoppedVisits = $this->stopContractVisits($contract);
             
             DB::commit();
 
@@ -1309,14 +1335,18 @@ class ContractsController extends Controller
                 'title' => 'Contract Stopped',
                 'message' => "Contract {$contract->contract_number} has been stopped",
                 'type' => 'info',
-                'url' => "#",
                 'priority' => 'high',
             ];
-            $this->notifyRoles(['team_leader', 'client', 'sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id);
+            $this->notifyRoles(['team_leader', 'client', 'sales_manager', 'technical'], $notificationData, $contract->customer_id, $contract->sales_id, [
+                'team_leader' => route('team-leader.contract.show', $contract->id),
+                'client' => route('client.contract.details', $contract->id),
+                'sales_manager' => route('sales_manager.contract.view', $contract->id),
+                'technical' => route('technical.contract.show', $contract->id)
+            ]);
             
             $message = 'Contract stopped successfully';
-            if ($cancelledVisits > 0) {
-                $message .= " and $cancelledVisits scheduled visits were cancelled";
+            if ($stoppedVisits > 0) {
+                $message .= " and $stoppedVisits scheduled visits were cancelled";
             }
             
             return redirect()->route('contract.show')->with('success', $message);
@@ -1326,6 +1356,37 @@ class ContractsController extends Controller
             return redirect()->back()
                 ->with('error', 'Error stopping contract: ' . $e->getMessage())
                 ->withInput();
+        }
+    }
+
+    public function stopContractVisits(contracts $contract): int
+    {
+        try {
+            DB::beginTransaction();
+            
+            // Find all visits with 'scheduled' status for this contract
+            $visits = VisitSchedule::where('contract_id', $contract->id)
+                ->where('status', 'scheduled')
+                ->get();
+            
+            $stoppedCount = 0;
+            
+            // Update each visit to 'stopped' status
+            foreach ($visits as $visit) {
+                $visit->status = 'stopped';
+                $visit->save();
+                $stoppedCount++;
+                
+                // Log the stop
+                Log::info('Visit stopped due to contract stop: Visit ID ' . $visit->id);
+            }
+            
+            DB::commit();
+            return $stoppedCount;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Visit stop error: ' . $e->getMessage());
+            return 0;
         }
     }
 
@@ -1359,11 +1420,15 @@ class ContractsController extends Controller
                 'title' => 'Annex Deleted',
                 'message' => "Annex {$annex->annex_number} has been deleted for contract {$contract->contract_number}",
                 'type' => 'info',
-                'url' => "#",
                 'priority' => 'high',
             ];
 
-            $this->notifyRoles(['sales_manager', 'technical', 'client', 'team_leader',], $notificationData, $annex->contract->customer_id, $annex->contract->sales_id);
+            $this->notifyRoles(['sales_manager', 'technical', 'client', 'team_leader',], $notificationData, $annex->contract->customer_id, $annex->contract->sales_id, [
+                'sales_manager' => route('sales_manager.contract.view', $contract->id),
+                'technical' => route('technical.contract.show', $contract->id),
+                'client' => route('client.contract.details', $contract->id),
+                'team_leader' => route('team_leader.contract.show', $contract->id)
+            ]);
 
             return redirect()->route('contract.show.details', $contract->id)
                 ->with('success', 'Annex deleted successfully');
@@ -1631,11 +1696,14 @@ class ContractsController extends Controller
                 'title' => 'Contract Renewed',
                 'message' => 'Contract ' . $originalContract->contract_number . ' has been renewed with new contract number ' . $newContract->contract_number,
                 'type' => 'info',
-                'url' => route('contract.show.details', $newContract->id),
                 'priority' => 'normal'
             ];
             
-            $this->notifyRoles(['technical', 'sales_manager', 'client'], $notificationData, $newContract->customer_id, $newContract->sales_id);
+            $this->notifyRoles(['technical', 'sales_manager', 'client'], $notificationData, $newContract->customer_id, $newContract->sales_id, [
+                'technical' => route('technical.contract.show', $newContract->id),
+                'sales_manager' => route('contract.show.details', $newContract->id),
+                'client' => route('client.contract.details', $newContract->id)
+            ]);
             
             DB::commit();
             

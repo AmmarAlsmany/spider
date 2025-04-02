@@ -74,10 +74,17 @@ class PaymentsController extends Controller
             'title' => 'New Payment Created',
             'message' => 'A new payment of ' . $payment->payment_amount . ' SAR has been created with due date ' . $payment->due_date,
             'type' => 'info',
-            'url' => "#",
+            'url' => route('payments.show', $payment->id),
             'priority' => 'normal',
         ];
-        $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $payment->customer_id);
+        
+        // Different URLs for different roles
+        $roleUrls = [
+            'client' => route('client.contract.visits', $payment->contract_id),
+            'sales' => route('payments.show', $payment->id),
+            'finance' => route('payments.show', $payment->id)
+        ];
+        $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $payment->customer_id, null, $roleUrls);
 
         return redirect()->route('payments.show', $payment->id)
             ->with('success', 'تم إنشاء الدفعة والفاتورة بنجاح');
@@ -152,10 +159,17 @@ class PaymentsController extends Controller
                 'title' => 'Payment Marked as Paid',
                 'message' => 'Payment of ' . $payment->payment_amount . ' SAR has been paid',
                 'type' => 'info',
-                'url' => "#",
+                'url' => route('payments.show', $payment->id),
                 'priority' => 'normal',
             ];
-            $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $payment->customer_id, $payment->sales_id);
+            
+            // Different URLs for different roles
+            $roleUrls = [
+                'client' => route('payments.show', $payment->id),
+                'sales' => route('payments.show', $payment->id),
+                'finance' => route('payments.show', $payment->id)
+            ];
+            $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $payment->customer_id, $payment->sales_id, $roleUrls);
 
             return response()->json([
                 'success' => true,

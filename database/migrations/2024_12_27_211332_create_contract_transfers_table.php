@@ -22,9 +22,9 @@ class CreateContractTransfersTable extends Migration
             $table->timestamps();
 
             // Foreign keys
-            $table->foreign('contract_id')->references('id')->on('contracts')->onDelete('restrict')->onUpdate('cascade');
-            $table->foreign('from_agent_id')->references('id')->on('users')->onDelete('restrict')->onUpdate('cascade');
-            $table->foreign('to_agent_id')->references('id')->on('users')->onDelete('restrict')->onUpdate('cascade');
+            $table->foreign('contract_id')->references('id')->on('contracts')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('from_agent_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('to_agent_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

@@ -95,6 +95,9 @@
                         <a href="{{ route('analytics.contract.branches', ['contractId' => $contract->id]) }}" class="btn btn-sm btn-outline-primary me-2">
                             <i class="bx bx-building me-1"></i> All Branches
                         </a>
+                        <a href="{{ route('analytics.branch.pdf', ['contractId' => $contract->id, 'branchId' => $branch->id]) }}" class="btn btn-sm btn-outline-danger me-2" target="_blank">
+                            <i class="bx bx-download me-1"></i> Download PDF
+                        </a>
                         <a href="{{ url()->previous() }}" class="btn btn-sm btn-primary">
                             <i class="bx bx-arrow-back me-1"></i> Back
                         </a>

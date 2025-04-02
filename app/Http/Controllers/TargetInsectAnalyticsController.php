@@ -508,4 +508,310 @@ class TargetInsectAnalyticsController extends Controller
         
         return $trends;
     }
+    
+    /**
+     * Generate PDF for contract insect analytics
+     */
+    public function generateContractAnalyticsPDF($contractId)
+    {
+        $contract = contracts::with(['customer', 'visitSchedules.report', 'branchs'])->findOrFail($contractId);
+        
+        // Check authorization based on user role
+        if (!$this->canViewContractAnalytics($contract)) {
+            return redirect()->back()->with('error', 'You are not authorized to view this contract\'s analytics.');
+        }
+        
+        // Get all active target insects
+        $targetInsects = TargetInsect::where('active', true)->get();
+        
+        // Get insect statistics for this specific contract
+        $insectStats = $this->getContractInsectStatistics($contract);
+        
+        // Get visit-by-visit data
+        $visitData = $this->getVisitInsectData($contract);
+        
+        // Generate HTML content for PDF
+        $htmlContent = view('shared.analytics.pdf.contract-insects', compact('contract', 'targetInsects', 'insectStats', 'visitData'))->render();
+        
+        // Initialize mPDF with specific settings
+        $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4-L', // Landscape orientation
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+            'default_font' => 'cairo'
+        ]);
+        
+        // Create a complete HTML document with proper structure
+        $html = '<!DOCTYPE html>
+        <html>
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+            <style>
+                @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap");
+                body {
+                    font-family: "Cairo", sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    font-size: 12px;
+                }
+                .header {
+                    text-align: center;
+                    padding-bottom: 10px;
+                    border-bottom: 2px solid #ffcc00;
+                    margin-bottom: 20px;
+                }
+                .logo {
+                    max-width: 100px;
+                    margin: 0 auto;
+                    display: block;
+                }
+                .company-name {
+                    font-weight: bold;
+                    margin: 5px 0;
+                    font-size: 14px;
+                }
+                .report-title {
+                    font-size: 16px;
+                    font-weight: bold;
+                    margin: 10px 0;
+                    background-color: #ffcc00;
+                    padding: 5px;
+                    color: #000;
+                }
+                .report-period {
+                    font-size: 12px;
+                    margin-bottom: 10px;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }
+                table, th, td {
+                    border: 1px solid #ddd;
+                }
+                th {
+                    background-color: #f2f2f2;
+                    font-weight: bold;
+                    padding: 8px;
+                    text-align: center;
+                }
+                td {
+                    padding: 8px;
+                    text-align: left;
+                }
+                .text-center {
+                    text-align: center;
+                }
+                .text-right {
+                    text-align: right;
+                }
+                .fw-bold {
+                    font-weight: bold;
+                }
+                .stats-card {
+                    border: 1px solid #ddd;
+                    padding: 10px;
+                    margin-bottom: 15px;
+                    background-color: #f9f9f9;
+                }
+                .stats-title {
+                    font-weight: bold;
+                    margin-bottom: 5px;
+                }
+                .stats-value {
+                    font-size: 16px;
+                    font-weight: bold;
+                }
+                .row {
+                    display: flex;
+                    flex-wrap: wrap;
+                    margin-right: -15px;
+                    margin-left: -15px;
+                }
+                .col-4 {
+                    flex: 0 0 33.333333%;
+                    max-width: 33.333333%;
+                    padding-right: 15px;
+                    padding-left: 15px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <img src="' . public_path('backend/assets/images/logo-icon.png') . '" alt="Spider Web Logo" class="logo">
+                <div class="company-name">خيوط العنكبوت لمكافحة الحشرات</div>
+                <div class="company-name">Spider Web For Pest Control</div>
+                <div class="report-title">Insect Analytics for Contract #' . $contract->contract_number . '</div>
+                <div class="report-period">Customer: ' . $contract->customer->name . ' | Contract Period: ' . date('d M Y', strtotime($contract->contract_start_date)) . ' to ' . date('d M Y', strtotime($contract->contract_end_date)) . '</div>
+            </div>
+            <div class="content">' . $htmlContent . '</div>
+        </body>
+        </html>';
+        
+        // Write the complete HTML to the PDF
+        $mpdf->WriteHTML($html);
+        
+        // Return the PDF as a download
+        return $mpdf->Output('contract_' . $contract->id . '_insect_analytics.pdf', 'D');
+    }
+
+    /**
+     * Generate PDF for branch insect analytics
+     */
+    public function generateBranchAnalyticsPDF($contractId, $branchId)
+    {
+        $contract = contracts::with(['customer', 'visitSchedules.report', 'branchs'])->findOrFail($contractId);
+        $branch = branchs::findOrFail($branchId);
+        
+        // Check if branch belongs to this contract
+        if ($branch->contracts_id != $contract->id) {
+            return redirect()->back()->with('error', 'This branch does not belong to the specified contract.');
+        }
+        
+        // Check authorization based on user role
+        if (!$this->canViewContractAnalytics($contract)) {
+            return redirect()->back()->with('error', 'You are not authorized to view this contract\'s analytics.');
+        }
+        
+        // Get all active target insects
+        $targetInsects = TargetInsect::where('active', true)->get();
+        
+        // Get insect statistics for this specific branch
+        $insectStats = $this->getBranchInsectStatistics($contract, $branch);
+        
+        // Get visit-by-visit data for this branch
+        $visitData = $this->getBranchVisitInsectData($contract, $branch);
+        
+        // Generate HTML content for PDF
+        $htmlContent = view('shared.analytics.pdf.branch-insects', compact('contract', 'branch', 'targetInsects', 'insectStats', 'visitData'))->render();
+        
+        // Initialize mPDF with specific settings
+        $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4-L', // Landscape orientation
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+            'default_font' => 'cairo'
+        ]);
+        
+        // Create a complete HTML document with proper structure
+        $html = '<!DOCTYPE html>
+        <html>
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+            <style>
+                @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap");
+                body {
+                    font-family: "Cairo", sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    font-size: 12px;
+                }
+                .header {
+                    text-align: center;
+                    padding-bottom: 10px;
+                    border-bottom: 2px solid #ffcc00;
+                    margin-bottom: 20px;
+                }
+                .logo {
+                    max-width: 100px;
+                    margin: 0 auto;
+                    display: block;
+                }
+                .company-name {
+                    font-weight: bold;
+                    margin: 5px 0;
+                    font-size: 14px;
+                }
+                .report-title {
+                    font-size: 16px;
+                    font-weight: bold;
+                    margin: 10px 0;
+                    background-color: #ffcc00;
+                    padding: 5px;
+                    color: #000;
+                }
+                .report-period {
+                    font-size: 12px;
+                    margin-bottom: 10px;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }
+                table, th, td {
+                    border: 1px solid #ddd;
+                }
+                th {
+                    background-color: #f2f2f2;
+                    font-weight: bold;
+                    padding: 8px;
+                    text-align: center;
+                }
+                td {
+                    padding: 8px;
+                    text-align: left;
+                }
+                .text-center {
+                    text-align: center;
+                }
+                .text-right {
+                    text-align: right;
+                }
+                .fw-bold {
+                    font-weight: bold;
+                }
+                .stats-card {
+                    border: 1px solid #ddd;
+                    padding: 10px;
+                    margin-bottom: 15px;
+                    background-color: #f9f9f9;
+                }
+                .stats-title {
+                    font-weight: bold;
+                    margin-bottom: 5px;
+                }
+                .stats-value {
+                    font-size: 16px;
+                    font-weight: bold;
+                }
+                .row {
+                    display: flex;
+                    flex-wrap: wrap;
+                    margin-right: -15px;
+                    margin-left: -15px;
+                }
+                .col-4 {
+                    flex: 0 0 33.333333%;
+                    max-width: 33.333333%;
+                    padding-right: 15px;
+                    padding-left: 15px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <img src="' . public_path('backend/assets/images/logo-icon.png') . '" alt="Spider Web Logo" class="logo">
+                <div class="company-name">خيوط العنكبوت لمكافحة الحشرات</div>
+                <div class="company-name">Spider Web For Pest Control</div>
+                <div class="report-title">Branch Insect Analytics for Contract #' . $contract->contract_number . '</div>
+                <div class="report-period">Customer: ' . $contract->customer->name . ' | Branch: ' . $branch->branch_name . '</div>
+            </div>
+            <div class="content">' . $htmlContent . '</div>
+        </body>
+        </html>';
+        
+        // Write the complete HTML to the PDF
+        $mpdf->WriteHTML($html);
+        
+        // Return the PDF as a download
+        return $mpdf->Output('branch_' . $branch->id . '_insect_analytics.pdf', 'D');
+    }
 }

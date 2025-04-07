@@ -52,6 +52,11 @@
             }
         }
     </style>
+    <script>
+        function printReport() {
+            window.print();
+        }
+    </script>
 @endsection
 
 @section('content')
@@ -85,7 +90,7 @@
                                 <div class="col-md-6">
                                     <p class="card-text">Visit Date:
                                         {{ \Carbon\Carbon::parse($visit->visit_date)->format('d
-                                                                                                                    M, Y') }}
+                                                                                                                                                                                                    M, Y') }}
                                     </p>
                                     <p class="card-text">Visit Time In:
                                         {{ \Carbon\Carbon::parse($visit->report->time_in)->format('h:i A') }}</p>
@@ -257,13 +262,4 @@
             </div>
         </div>
     </div>
-@endsection
-
-@section('scripts')
-    <script>
-        function printReport() {
-            // Hide any elements that need to be hidden before printing
-            window.print();
-        }
-    </script>
 @endsection

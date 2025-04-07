@@ -292,321 +292,83 @@
                 if (printButton) {
                     printButton.addEventListener('click', function() {
                         try {
-                            // Create a new window for printing
-                            const printWindow = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes');
+                            // Add print-specific CSS to the current page
+                            const style = document.createElement('style');
+                            style.id = 'print-style';
+                            style.innerHTML = `
+                                @media print {
+                                    body * {
+                                        visibility: hidden;
+                                    }
+                                    .page-content, .page-content * {
+                                        visibility: visible;
+                                    }
+                                    .card-body {
+                                        break-inside: avoid;
+                                    }
+                                    .page-content {
+                                        position: absolute;
+                                        left: 0;
+                                        top: 0;
+                                        width: 100%;
+                                    }
+                                    .no-print, .no-print * {
+                                        display: none !important;
+                                    }
+                                    .header, .footer, nav, aside, button, .btn {
+                                        display: none !important;
+                                    }
+                                    @page {
+                                        size: A4;
+                                        margin: 1cm;
+                                    }
+                                }`;
+                            document.head.appendChild(style);
 
-                            if (!printWindow) {
-                                alert('Please allow popups for this website to print the report.');
-                                return;
-                            }
+                            // Hide elements that shouldn't be printed
+                            const elementsToHide = document.querySelectorAll('.no-print');
+                            Array.from(elementsToHide).forEach(el => {
+                                el.classList.add('d-none');
+                            });
 
-                            // Create print-friendly HTML with complete styling
-                            printWindow.document.write(`
-                                <!DOCTYPE html>
-                                <html lang="en">
-                                <head>
-                                    <meta charset="UTF-8">
-                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                    <title>Visit Report #{{ $visit->id }}</title>
-                                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-                                    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.0/css/boxicons.min.css" rel="stylesheet">
-                                    <style>
-                                        body { 
-                                            padding: 20px; 
-                                            font-family: Arial, sans-serif;
-                                        }
-                                        .report-header {
-                                            margin-bottom: 30px;
-                                            text-align: center;
-                                            border-bottom: 1px solid #dee2e6;
-                                            padding-bottom: 15px;
-                                        }
-                                        .report-section {
-                                            margin-bottom: 20px;
-                                        }
-                                        .section-title {
-                                            font-weight: bold;
-                                            margin-bottom: 10px;
-                                            color: #333;
-                                        }
-                                        .badge {
-                                            display: inline-block;
-                                            padding: 0.25em 0.4em;
-                                            font-size: 75%;
-                                            font-weight: 700;
-                                            line-height: 1;
-                                            text-align: center;
-                                            white-space: nowrap;
-                                            vertical-align: baseline;
-                                            border-radius: 0.25rem;
-                                        }
-                                        .bg-info {
-                                            background-color: #0dcaf0 !important;
-                                            color: #fff;
-                                        }
-                                        .bg-success {
-                                            background-color: #198754 !important;
-                                            color: #fff;
-                                        }
-                                        .bg-warning {
-                                            background-color: #ffc107 !important;
-                                            color: #000;
-                                        }
-                                        .bg-danger {
-                                            background-color: #dc3545 !important;
-                                            color: #fff;
-                                        }
-                                        .bg-secondary {
-                                            background-color: #6c757d !important;
-                                            color: #fff;
-                                        }
-                                        .list-unstyled {
-                                            list-style: none;
-                                            padding-left: 0;
-                                        }
-                                        .list-unstyled li {
-                                            margin-bottom: 5px;
-                                        }
-                                        .text-success {
-                                            color: #198754 !important;
-                                        }
-                                        @media print {
-                                            .no-print { 
-                                                display: none !important; 
-                                            }
-                                            body {
-                                                print-color-adjust: exact;
-                                                -webkit-print-color-adjust: exact;
-                                            }
-                                            .card {
-                                                border: none !important;
-                                                box-shadow: none !important;
-                                            }
-                                            .card-header {
-                                                background-color: #f8f9fa !important;
-                                                border-bottom: 1px solid #dee2e6 !important;
-                                            }
-                                            @page {
-                                                size: A4;
-                                                margin: 1cm;
-                                            }
-                                        }
-                                    </style>
-                                </head>
-                                <body>
-                                    <div class="container">
-                                        <div class="report-header">
-                                            <h3>Visit Report</h3>
-                                            <p>Visit #{{ $visit->id }} - {{ date('M d, Y', strtotime($visit->visit_date)) }}</p>
-                                            <p>Customer: {{ $visit->contract->customer->name }}</p>
-                                            <p>Location: {{ $visit->branch_id ? $visit->branch->branch_name : 'Main Location' }}</p>
-                                        </div>
-                                        
-                                        <div class="report-content">
-                                            <!-- Visit Information -->
-                                            <div class="card mb-4">
-                                                <div class="card-header bg-light">
-                                                    <h6 class="mb-0">Visit Information</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <p><strong>Visit Date:</strong> {{ date('M d, Y', strtotime($visit->visit_date)) }}</p>
-                                                            <p><strong>Visit Time:</strong> {{ date('h:i A', strtotime($visit->visit_time)) }}</p>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <p><strong>Visit Number:</strong> {{ $visit->visit_number }} of {{ $visit->total_visits }}</p>
-                                                            <p><strong>Contract Number:</strong> {{ $visit->contract->contract_number }}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                            // Add a header to the report for printing only
+                            const reportContainer = document.querySelector('.card-body');
+                            const printHeader = document.createElement('div');
+                            printHeader.className = 'print-only mb-4 d-none';
+                            printHeader.innerHTML = `
+                                <div class="text-center">
+                                    <h3>Visit Report</h3>
+                                    <p>Visit #{{ $visit->id }} - {{ date('M d, Y', strtotime($visit->visit_date)) }}</p>
+                                    <p>Customer: {{ $visit->contract->customer->name }}</p>
+                                    <p>Location: {{ $visit->branch_id ? $visit->branch->branch_name : 'Main Location' }}</p>
+                                </div>
+                            `;
+                            reportContainer.prepend(printHeader);
 
-                                            <!-- Target Insects & Pesticides -->
-                                            <div class="card mb-4">
-                                                <div class="card-header bg-light">
-                                                    <h6 class="mb-0">Treatment Details</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <h6 class="section-title">Target Insects</h6>
-                                                            <ul class="list-unstyled">
-                                                                @foreach (is_array($visit->report->target_insects) ? $visit->report->target_insects : json_decode($visit->report->target_insects, true) as $insect)
-                                                                <li>
-                                                                    <i class="bx bx-check text-success me-2"></i>
-                                                                    {{ ucfirst(str_replace('_', ' ', $insect)) }}
-                                                                    @php
-                                                                        $insectQuantities = is_array($visit->report->insect_quantities) ? $visit->report->insect_quantities : json_decode($visit->report->insect_quantities, true);
-                                                                    @endphp
-                                                                    @if (isset($insectQuantities[$insect]))
-                                                                    - <span class="badge bg-info">{{ $insectQuantities[$insect] }} {{ $insectQuantities[$insect] == 1 ? 'piece' : 'pieces' }}</span>
-                                                                    @endif
-                                                                </li>
-                                                                @endforeach
-                                                            </ul>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <h6 class="section-title">Pesticides Used with Quantities</h6>
-                                                            <ul class="list-unstyled">
-                                                                @foreach (is_array($visit->report->pesticides_used) ? $visit->report->pesticides_used : json_decode($visit->report->pesticides_used, true) as $pesticide)
-                                                                <li>
-                                                                    <i class="bx bx-check text-success me-2"></i>
-                                                                    {{ ucfirst(str_replace('_', ' ', $pesticide)) }}
-                                                                    @php
-                                                                        $quantities = is_array($visit->report->pesticide_quantities) ? $visit->report->pesticide_quantities : json_decode($visit->report->pesticide_quantities, true);
-                                                                    @endphp
-                                                                    @if (isset($quantities[$pesticide]))
-                                                                    - <span class="badge bg-info">{{ $quantities[$pesticide]['quantity'] }} {{ $quantities[$pesticide]['unit'] }}</span>
-                                                                    @endif
-                                                                </li>
-                                                                @endforeach
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                            // Remove the d-none class for printing
+                            printHeader.classList.remove('d-none');
 
-                                            <!-- Treatment Details -->
-                                            <div class="card mb-4">
-                                                <div class="card-header bg-light">
-                                                    <h6 class="mb-0">Treatment Process & Notes</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="row mb-4">
-                                                        <div class="col-12">
-                                                            <h6 class="section-title">Elimination Steps</h6>
-                                                            <p>{{ $visit->report->elimination_steps }}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <h6 class="section-title">Recommendations & Observations</h6>
-                                                            <p>{{ $visit->report->recommendations }}</p>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <h6 class="section-title">Customer Notes</h6>
-                                                            <p>{{ $visit->report->customer_notes ?: 'No notes provided' }}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                            // Print the page
+                            window.print();
 
-                                            <!-- Customer Satisfaction -->
-                                            @if (isset($visit->report->customer_satisfaction))
-                                            <div class="card mb-4">
-                                                <div class="card-header bg-light">
-                                                    <h6 class="mb-0">Customer Feedback</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="row">
-                                                        <div class="col-12">
-                                                            <h6 class="section-title">Customer Satisfaction</h6>
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="me-3">
-                                                                    @php
-                                                                        $satisfactionEmoji = '';
-                                                                        $satisfactionText = '';
-                                                                        $badgeClass = '';
-
-                                                                        switch ($visit->report->customer_satisfaction) {
-                                                                            case 1:
-                                                                                $satisfactionEmoji = '😡';
-                                                                                $satisfactionText = 'Very Dissatisfied';
-                                                                                $badgeClass = 'bg-danger';
-                                                                                break;
-                                                                            case 2:
-                                                                                $satisfactionEmoji = '😕';
-                                                                                $satisfactionText = 'Dissatisfied';
-                                                                                $badgeClass = 'bg-warning';
-                                                                                break;
-                                                                            case 3:
-                                                                                $satisfactionEmoji = '😐';
-                                                                                $satisfactionText = 'Neutral';
-                                                                                $badgeClass = 'bg-secondary';
-                                                                                break;
-                                                                            case 4:
-                                                                                $satisfactionEmoji = '🙂';
-                                                                                $satisfactionText = 'Satisfied';
-                                                                                $badgeClass = 'bg-info';
-                                                                                break;
-                                                                            case 5:
-                                                                                $satisfactionEmoji = '😄';
-                                                                                $satisfactionText = 'Very Satisfied';
-                                                                                $badgeClass = 'bg-success';
-                                                                                break;
-                                                                        }
-                                                                    @endphp
-                                                                    <span style="font-size: 2rem;">{{ $satisfactionEmoji }}</span>
-                                                                </div>
-                                                                <div>
-                                                                    <span class="badge {{ $badgeClass }}">{{ $satisfactionText }}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @endif
-
-                                            <!-- Signatures -->
-                                            <div class="card mb-4">
-                                                <div class="card-header bg-light">
-                                                    <h6 class="mb-0">Verification</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="row">
-                                                        @if ($visit->report->customer_signature)
-                                                        <div class="col-md-6">
-                                                            <h6 class="section-title">Customer Signature</h6>
-                                                            <img src="{{ $visit->report->customer_signature }}" alt="Customer Signature"
-                                                                class="img-fluid" style="max-height: 100px;">
-                                                        </div>
-                                                        @endif
-                                                        @if ($visit->report->phone_signature)
-                                                        <div class="col-md-6">
-                                                            <h6 class="section-title">Phone Signature</h6>
-                                                            <p>{{ $visit->report->phone_signature }}</p>
-                                                        </div>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mt-4 text-center no-print">
-                                            <button class="btn btn-primary" onclick="window.print(); return false;">Print Report</button>
-                                            <button class="btn btn-secondary ms-2" onclick="window.close(); return false;">Close</button>
-                                        </div>
-                                        <div class="mt-4 text-center">
-                                            <p class="small text-muted">Report generated on {{ date('M d, Y h:i A') }}</p>
-                                        </div>
-                                    </div>
-
-                                    <script>
-                                        // Wait for all resources to load before enabling print
-                                        window.onload = function() {
-                                            // Focus the window to bring it to front
-                                            window.focus();
-                                        }
-                                    </script>
-                                </body>
-                                </html>
-                            `);
-
-                            // Ensure content is fully written before proceeding
-                            printWindow.document.close();
-
-                            // Set up onload handler with error handling
-                            printWindow.onload = function() {
-                                try {
-                                    printWindow.focus();
-                                    setTimeout(function() {
-                                        printWindow.print();
-                                    }, 500);
-                                } catch (e) {
-                                    console.error('Print error:', e);
-                                    alert('Error during printing: ' + e.message);
+                            // After printing, restore the page
+                            setTimeout(() => {
+                                // Remove the print style
+                                const printStyle = document.getElementById('print-style');
+                                if (printStyle) {
+                                    printStyle.parentNode.removeChild(printStyle);
                                 }
+
+                                // Remove the print header
+                                if (printHeader.parentNode) {
+                                    printHeader.parentNode.removeChild(printHeader);
+                                }
+
+                                // Show elements again
+                                Array.from(elementsToHide).forEach(el => {
+                                    el.classList.remove('d-none');
+                                });
+                            }, 1000);
                             };
                         } catch (e) {
                             console.error('Print setup error:', e);

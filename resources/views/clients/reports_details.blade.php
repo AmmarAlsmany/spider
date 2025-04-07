@@ -286,175 +286,204 @@
 @if ($visit->status == 'completed' && $visit->report)
     @section('scripts')
         <script>
-            document.getElementById('printReportBtn').addEventListener('click', function() {
-                // Create a new window for printing
-                const printWindow = window.open('', '_blank');
+            document.addEventListener('DOMContentLoaded', function() {
+                const printButton = document.getElementById('printReportBtn');
 
-                // Get report content
-                const reportContent = document.querySelector('.card-body').innerHTML;
+                if (printButton) {
+                    printButton.addEventListener('click', function() {
+                        try {
+                            // Create a new window for printing
+                            const printWindow = window.open('', '_blank');
 
-                // Create print-friendly HTML
-                printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Visit Report #{{ $visit->id }}</title>
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-                <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.0/css/boxicons.min.css" rel="stylesheet">
-                <style>
-                    body { padding: 20px; }
-                    @media print {
-                        .no-print { display: none !important; }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="mb-4 text-center">
-                        <h3>Visit Report</h3>
-                        <p>Visit #{{ $visit->id }} - {{ date('M d, Y', strtotime($visit->visit_date)) }}</p>
-                        <p>Customer: {{ $visit->contract->customer->name }}</p>
-                    </div>
-                    
-                    <div class="report-content">
-                        <!-- Visit Report -->
-                        <div class="border card">
-                            <div class="card-header bg-light">
-                                <h6 class="mb-0">Visit Report Details</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h6>Target Insects</h6>
-                                        <ul class="list-unstyled">
-                                            @foreach (is_array($visit->report->target_insects) ? $visit->report->target_insects : json_decode($visit->report->target_insects, true) as $insect)
-                                            <li>
-                                                <i class="bx bx-check text-success me-2"></i>
-                                                {{ ucfirst(str_replace('_', ' ', $insect)) }}
-                                                @php
-                                                    $insectQuantities = is_array($visit->report->insect_quantities) ? $visit->report->insect_quantities : json_decode($visit->report->insect_quantities, true);
-                                                @endphp
-                                                @if (isset($insectQuantities[$insect]))
-                                                - <span class="badge bg-info">{{ $insectQuantities[$insect] }} {{ $insectQuantities[$insect] == 1 ? 'piece' : 'pieces' }}</span>
-                                                @endif
-                                            </li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6>Pesticides Used with Quantities</h6>
-                                        <ul class="list-unstyled">
-                                            @foreach (is_array($visit->report->pesticides_used) ? $visit->report->pesticides_used : json_decode($visit->report->pesticides_used, true) as $pesticide)
-                                            <li>
-                                                <i class="bx bx-check text-success me-2"></i>
-                                                {{ ucfirst(str_replace('_', ' ', $pesticide)) }}
-                                                @php
-                                                    $quantities = is_array($visit->report->pesticide_quantities) ? $visit->report->pesticide_quantities : json_decode($visit->report->pesticide_quantities, true);
-                                                @endphp
-                                                @if (isset($quantities[$pesticide]))
-                                                - <span class="badge bg-info">{{ $quantities[$pesticide]['quantity'] }} {{ $quantities[$pesticide]['unit'] }}</span>
-                                                @endif
-                                            </li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="mt-4 row">
-                                    <div class="col-12">
-                                        <h6>Elimination Steps</h6>
-                                        <p class="mb-0">{{ $visit->report->elimination_steps }}</p>
-                                    </div>
-                                </div>
-                                <div class="mt-4 row">
-                                    <div class="col-md-6">
-                                        <h6>Recommendations & Observations</h6>
-                                        <p>{{ $visit->report->recommendations }}</p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6>Customer Notes</h6>
-                                        <p>{{ $visit->report->customer_notes ?: 'No notes provided' }}</p>
-                                    </div>
-                                </div>
-                                @if (isset($visit->report->customer_satisfaction))
-                                <div class="mt-4 row">
-                                    <div class="col-12">
-                                        <h6>Customer Satisfaction</h6>
-                                        <div class="d-flex align-items-center">
-                                            <div class="me-3">
-                                                @php
-                                                    $satisfactionEmoji = '';
-                                                    $satisfactionText = '';
-                                                    $badgeClass = '';
+                            if (!printWindow) {
+                                alert('Please allow popups for this website to print the report.');
+                                return;
+                            }
 
-                                                    switch ($visit->report->customer_satisfaction) {
-                                                        case 1:
-                                                            $satisfactionEmoji = '😡';
-                                                            $satisfactionText = 'Very Dissatisfied';
-                                                            $badgeClass = 'bg-danger';
-                                                            break;
-                                                        case 2:
-                                                            $satisfactionEmoji = '😕';
-                                                            $satisfactionText = 'Dissatisfied';
-                                                            $badgeClass = 'bg-warning';
-                                                            break;
-                                                        case 3:
-                                                            $satisfactionEmoji = '😐';
-                                                            $satisfactionText = 'Neutral';
-                                                            $badgeClass = 'bg-secondary';
-                                                            break;
-                                                        case 4:
-                                                            $satisfactionEmoji = '🙂';
-                                                            $satisfactionText = 'Satisfied';
-                                                            $badgeClass = 'bg-info';
-                                                            break;
-                                                        case 5:
-                                                            $satisfactionEmoji = '😄';
-                                                            $satisfactionText = 'Very Satisfied';
-                                                            $badgeClass = 'bg-success';
-                                                            break;
-                                                    }
-                                                @endphp
-                                                <span style="font-size: 2rem;">{{ $satisfactionEmoji }}</span>
-                                            </div>
-                                            <div>
-                                                <span class="badge {{ $badgeClass }}">{{ $satisfactionText }}</span>
+                            // Get report content
+                            const reportContent = document.querySelector('.card-body').innerHTML;
+
+                            // Create print-friendly HTML
+                            printWindow.document.write(`
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
+                                    <title>Visit Report #{{ $visit->id }}</title>
+                                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+                                    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.0/css/boxicons.min.css" rel="stylesheet">
+                                    <style>
+                                        body { padding: 20px; }
+                                        @media print {
+                                            .no-print { display: none !important; }
+                                        }
+                                    </style>
+                                </head>
+                                <body>
+                                    <div class="container">
+                                        <div class="mb-4 text-center">
+                                            <h3>Visit Report</h3>
+                                            <p>Visit #{{ $visit->id }} - {{ date('M d, Y', strtotime($visit->visit_date)) }}</p>
+                                            <p>Customer: {{ $visit->contract->customer->name }}</p>
+                                        </div>
+                                        
+                                        <div class="report-content">
+                                            <!-- Visit Report -->
+                                            <div class="border card">
+                                                <div class="card-header bg-light">
+                                                    <h6 class="mb-0">Visit Report Details</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <h6>Target Insects</h6>
+                                                            <ul class="list-unstyled">
+                                                                @foreach (is_array($visit->report->target_insects) ? $visit->report->target_insects : json_decode($visit->report->target_insects, true) as $insect)
+                                                                <li>
+                                                                    <i class="bx bx-check text-success me-2"></i>
+                                                                    {{ ucfirst(str_replace('_', ' ', $insect)) }}
+                                                                    @php
+                                                                        $insectQuantities = is_array($visit->report->insect_quantities) ? $visit->report->insect_quantities : json_decode($visit->report->insect_quantities, true);
+                                                                    @endphp
+                                                                    @if (isset($insectQuantities[$insect]))
+                                                                    - <span class="badge bg-info">{{ $insectQuantities[$insect] }} {{ $insectQuantities[$insect] == 1 ? 'piece' : 'pieces' }}</span>
+                                                                    @endif
+                                                                </li>
+                                                                @endforeach
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <h6>Pesticides Used with Quantities</h6>
+                                                            <ul class="list-unstyled">
+                                                                @foreach (is_array($visit->report->pesticides_used) ? $visit->report->pesticides_used : json_decode($visit->report->pesticides_used, true) as $pesticide)
+                                                                <li>
+                                                                    <i class="bx bx-check text-success me-2"></i>
+                                                                    {{ ucfirst(str_replace('_', ' ', $pesticide)) }}
+                                                                    @php
+                                                                        $quantities = is_array($visit->report->pesticide_quantities) ? $visit->report->pesticide_quantities : json_decode($visit->report->pesticide_quantities, true);
+                                                                    @endphp
+                                                                    @if (isset($quantities[$pesticide]))
+                                                                    - <span class="badge bg-info">{{ $quantities[$pesticide]['quantity'] }} {{ $quantities[$pesticide]['unit'] }}</span>
+                                                                    @endif
+                                                                </li>
+                                                                @endforeach
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-4 row">
+                                                        <div class="col-12">
+                                                            <h6>Elimination Steps</h6>
+                                                            <p class="mb-0">{{ $visit->report->elimination_steps }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-4 row">
+                                                        <div class="col-md-6">
+                                                            <h6>Recommendations & Observations</h6>
+                                                            <p>{{ $visit->report->recommendations }}</p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <h6>Customer Notes</h6>
+                                                            <p>{{ $visit->report->customer_notes ?: 'No notes provided' }}</p>
+                                                        </div>
+                                                    </div>
+                                                    @if (isset($visit->report->customer_satisfaction))
+                                                    <div class="mt-4 row">
+                                                        <div class="col-12">
+                                                            <h6>Customer Satisfaction</h6>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="me-3">
+                                                                    @php
+                                                                        $satisfactionEmoji = '';
+                                                                        $satisfactionText = '';
+                                                                        $badgeClass = '';
+
+                                                                        switch ($visit->report->customer_satisfaction) {
+                                                                            case 1:
+                                                                                $satisfactionEmoji = '😡';
+                                                                                $satisfactionText = 'Very Dissatisfied';
+                                                                                $badgeClass = 'bg-danger';
+                                                                                break;
+                                                                            case 2:
+                                                                                $satisfactionEmoji = '😕';
+                                                                                $satisfactionText = 'Dissatisfied';
+                                                                                $badgeClass = 'bg-warning';
+                                                                                break;
+                                                                            case 3:
+                                                                                $satisfactionEmoji = '😐';
+                                                                                $satisfactionText = 'Neutral';
+                                                                                $badgeClass = 'bg-secondary';
+                                                                                break;
+                                                                            case 4:
+                                                                                $satisfactionEmoji = '🙂';
+                                                                                $satisfactionText = 'Satisfied';
+                                                                                $badgeClass = 'bg-info';
+                                                                                break;
+                                                                            case 5:
+                                                                                $satisfactionEmoji = '😄';
+                                                                                $satisfactionText = 'Very Satisfied';
+                                                                                $badgeClass = 'bg-success';
+                                                                                break;
+                                                                        }
+                                                                    @endphp
+                                                                    <span style="font-size: 2rem;">{{ $satisfactionEmoji }}</span>
+                                                                </div>
+                                                                <div>
+                                                                    <span class="badge {{ $badgeClass }}">{{ $satisfactionText }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @endif
+                                                    @if ($visit->report->customer_signature)
+                                                    <div class="mt-4 row">
+                                                        <div class="col-md-6">
+                                                            <h6>Customer Signature</h6>
+                                                            <img src="{{ $visit->report->customer_signature }}" alt="Customer Signature"
+                                                                class="img-fluid" style="max-height: 100px;">
+                                                        </div>
+                                                    </div>
+                                                    @endif
+                                                    @if ($visit->report->phone_signature)
+                                                    <div class="mt-4 row">
+                                                        <div class="col-md-6">
+                                                            <h6>Phone Signature</h6>
+                                                            <p>{{ $visit->report->phone_signature }}</p>
+                                                        </div>
+                                                    </div>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </div>
+                                        <div class="mt-4 text-center no-print">
+                                            <button class="btn btn-primary" onclick="window.print()">Print Now</button>
+                                        </div>
                                     </div>
-                                </div>
-                                @endif
-                                @if ($visit->report->customer_signature)
-                                <div class="mt-4 row">
-                                    <div class="col-md-6">
-                                        <h6>Customer Signature</h6>
-                                        <img src="{{ $visit->report->customer_signature }}" alt="Customer Signature"
-                                            class="img-fluid" style="max-height: 100px;">
-                                    </div>
-                                </div>
-                                @endif
-                                @if ($visit->report->phone_signature)
-                                <div class="mt-4 row">
-                                    <div class="col-md-6">
-                                        <h6>Phone Signature</h6>
-                                        <p>{{ $visit->report->phone_signature }}</p>
-                                    </div>
-                                </div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </body>
-            </html>
-        `);
+                                </body>
+                                </html>
+                            `);
 
-                // Trigger print and close window afterward
-                printWindow.document.close();
-                printWindow.onload = function() {
-                    printWindow.focus();
-                    printWindow.print();
-                    // printWindow.close(); // Uncomment to auto-close after print
-                };
+                            // Ensure content is fully written before proceeding
+                            printWindow.document.close();
+
+                            // Set up onload handler with error handling
+                            printWindow.onload = function() {
+                                try {
+                                    printWindow.focus();
+                                    setTimeout(function() {
+                                        printWindow.print();
+                                    }, 500);
+                                } catch (e) {
+                                    console.error('Print error:', e);
+                                    alert('Error during printing: ' + e.message);
+                                }
+                            };
+                        } catch (e) {
+                            console.error('Print setup error:', e);
+                            alert('Error setting up print: ' + e.message);
+                        }
+                    });
+                } else {
+                    console.warn('Print button not found on the page');
+                }
             });
         </script>
     @endsection

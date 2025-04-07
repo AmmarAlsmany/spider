@@ -4,7 +4,17 @@
     <style>
         @media print {
 
-            /* Hide all navigation and system elements */
+            /* Hide everything except the content we want to print */
+            body * {
+                visibility: hidden;
+            }
+
+            .page-content,
+            .page-content * {
+                visibility: visible;
+            }
+
+            /* Remove all navigation elements */
             .sidebar-wrapper,
             .topbar,
             .page-breadcrumb,
@@ -13,12 +23,22 @@
             .back-to-top,
             .btn-outline-primary,
             nav,
-            .header-wrapper {
+            .header-wrapper,
+            .btn {
                 display: none !important;
             }
 
+            /* Position the printable content */
+            .page-content {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 15px !important;
+            }
+
             /* Ensure report takes full width */
-            .page-content,
             .container,
             .card {
                 width: 100% !important;
@@ -50,11 +70,29 @@
                 color: #000 !important;
                 background: none !important;
             }
+
+            /* Ensure proper page breaks */
+            .card {
+                page-break-inside: avoid;
+            }
         }
     </style>
+
     <script>
         function printReport() {
-            window.print();
+            // Hide the print button before printing
+            const printBtn = document.querySelector('.btn-outline-primary');
+            if (printBtn) printBtn.style.display = 'none';
+
+            // Delay to ensure styles are applied
+            setTimeout(function() {
+                window.print();
+
+                // Show the button again after print dialog closes
+                setTimeout(function() {
+                    if (printBtn) printBtn.style.display = 'inline-flex';
+                }, 100);
+            }, 100);
         }
     </script>
 @endsection
@@ -90,7 +128,7 @@
                                 <div class="col-md-6">
                                     <p class="card-text">Visit Date:
                                         {{ \Carbon\Carbon::parse($visit->visit_date)->format('d
-                                                                                                                                                                                                    M, Y') }}
+                                                                                                                                                                                                                                                                                    M, Y') }}
                                     </p>
                                     <p class="card-text">Visit Time In:
                                         {{ \Carbon\Carbon::parse($visit->report->time_in)->format('h:i A') }}</p>

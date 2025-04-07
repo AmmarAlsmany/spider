@@ -67,21 +67,21 @@ Route::middleware(['prevent-back-history', 'auth:web,client'])->group(function (
     Route::get('/contract/{contract}/insect-analytics', [TargetInsectAnalyticsController::class, 'contractAnalytics'])
         ->middleware(['auth'])
         ->name('contract.insect-analytics');
-    
+
     // PDF Download for Contract Insect Analytics
     Route::get('/contract/{contract}/insect-analytics/pdf', [TargetInsectAnalyticsController::class, 'generateContractAnalyticsPDF'])
         ->middleware(['auth'])
         ->name('contract.insect-analytics.pdf');
-        
+
     // Branch-specific Insect Analytics
     Route::get('/contract/{contractId}/branches', [TargetInsectAnalyticsController::class, 'contractBranchSelection'])
         ->middleware(['auth'])
         ->name('analytics.contract.branches');
-        
+
     Route::get('/contract/{contractId}/branch/{branchId}/analytics', [TargetInsectAnalyticsController::class, 'branchAnalytics'])
         ->middleware(['auth'])
         ->name('analytics.branch');
-    
+
     // PDF Download for Branch Insect Analytics
     Route::get('/contract/{contractId}/branch/{branchId}/analytics/pdf', [TargetInsectAnalyticsController::class, 'generateBranchAnalyticsPDF'])
         ->middleware(['auth'])
@@ -109,31 +109,31 @@ Route::middleware(['prevent-back-history', 'auth:web,client'])->group(function (
 Route::middleware(['auth', 'role:admin', 'prevent-back-history'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard Routes
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // Contract Management Routes
     Route::get('/contracts', [DashboardController::class, 'contractsIndex'])->name('contracts.index');
     Route::get('/contracts/reports', [DashboardController::class, 'reports'])->name('contracts.reports');
     Route::get('/contracts/reports/data', [DashboardController::class, 'getReportsData'])->name('contracts.reports.data');
     Route::get('/contracts/{contract}', [DashboardController::class, 'show'])->name('contracts.show');
-    
+
     // Ticket Management Routes
     Route::get('/tickets', [DashboardController::class, 'ticketsIndex'])->name('tickets.index');
     Route::get('/tickets/reports', [DashboardController::class, 'ticketsReports'])->name('tickets.reports');
     Route::get('/tickets/reports/data', [DashboardController::class, 'getTicketsReportsData'])->name('tickets.reports.data');
     Route::get('/tickets/{ticket}', [DashboardController::class, 'ticketShow'])->name('tickets.show');
     Route::post('/tickets/{ticket}/reply', [DashboardController::class, 'ticketReply'])->name('tickets.reply');
-    
+
     // Payment Management Routes
     Route::get('/payments', [DashboardController::class, 'paymentsIndex'])->name('payments.index');
     Route::get('/payments/reports', [DashboardController::class, 'paymentsReports'])->name('payments.reports');
     Route::get('/payments/reports/data', [DashboardController::class, 'getPaymentsReportsData'])->name('payments.reports.data');
     Route::get('/payments/{payment}', [DashboardController::class, 'paymentShow'])->name('payments.show');
     Route::patch('/payments/{payment}/status', [DashboardController::class, 'updatePaymentStatus'])->name('payments.update-status');
-    
+
     // General Reports
     Route::get('/reports/general', [DashboardController::class, 'generalReport'])->name('reports.general');
     Route::get('/reports/general/data', [DashboardController::class, 'getGeneralReportData'])->name('reports.general.data');
-    
+
     // Manager Management Routes
     Route::get('/managers', [ManagerController::class, 'index'])->name('managers.index');
     Route::get('/managers/create', [ManagerController::class, 'create'])->name('managers.create');
@@ -170,12 +170,12 @@ Route::middleware(['auth', 'role:sales', 'prevent-back-history'])->group(functio
     Route::get('/sales/Show All canceled Contract', [ContractsController::class, 'view_cancelled_contracts'])->name('canceled.show.all');
     Route::patch('/sales/return-contract/{id}', [sales::class, 'return_contract'])->name('contract.return');
     Route::get('/sales/show Tikets', [TiketsController::class, 'index'])->name('sales.tikets');
-    
+
     // Contract Renewal Routes
     Route::get('/contracts/{id}/renewal', [ContractsController::class, 'showRenewalForm'])->name('contract.renewal.form');
     Route::post('/contracts/{id}/renewal', [ContractsController::class, 'processRenewal'])->name('contract.renewal.process');
     Route::post('/contracts/{id}/renewal-response', [ContractsController::class, 'handleRenewalResponse'])->name('contract.renewal.response');
-    
+
     // Postponement Request Routes
     Route::get('/postponement-requests', [ContractsController::class, 'postponement_requests'])
         ->name('postponement.requests');
@@ -263,7 +263,7 @@ Route::middleware(['auth', 'role:finance', 'prevent-back-history'])->group(funct
     Route::get('/finance/invoices/{id}', [FinanceController::class, 'showInvoice'])->name('finance.invoices.show');
     Route::get('/finance/reports/financial', [FinanceController::class, 'generateFinancialReport'])->name('finance.reports.financial');
     Route::patch('/finance/payments/{id}/status', [FinanceController::class, 'updatePaymentStatus'])->name('finance.payments.update-status');
-    
+
     // New routes for enhanced functionality
     Route::get('/finance/payments/{id}/record', [FinanceController::class, 'paymentForm'])->name('finance.payments.form');
     Route::post('/finance/payments/{id}/record', [FinanceController::class, 'recordPayment'])->name('finance.payments.record');
@@ -281,13 +281,13 @@ Route::middleware(['auth', 'role:technical'])->group(function () {
     // Team management Routes
     Route::get('/teams', [TechnicalController::class, 'index'])->name('teams.index');
     Route::post('/teams', [TechnicalController::class, 'create'])->name('teams.create');
-    
+
     // Team KPI Routes
     Route::get('/technical/team-kpi', [TeamKpiController::class, 'index'])->name('technical.team.kpi');
     Route::get('/technical/team-kpi/compare', [TeamKpiController::class, 'compareTeams'])->name('technical.team.kpi.compare');
     Route::get('/technical/team-kpi/{id}', [TeamKpiController::class, 'teamDetail'])->name('technical.team.kpi.detail');
     Route::post('/technical/team-kpi/pdf', [TeamKpiController::class, 'generatePdfReport'])->name('technical.team.kpi.pdf');
-    
+
     Route::put('/teams/{id}', [TechnicalController::class, 'modify'])->name('teams.modify');
     Route::delete('/teams/{id}', [TechnicalController::class, 'delete'])->name('teams.delete');
     // Pesticide Management Routes
@@ -309,7 +309,7 @@ Route::middleware(['auth', 'role:technical'])->group(function () {
         Route::get('/{targetInsect}/edit', [TargetInsectController::class, 'edit'])->name('target-insects.edit');
         Route::put('/{targetInsect}', [TargetInsectController::class, 'update'])->name('target-insects.update');
         Route::delete('/{targetInsect}', [TargetInsectController::class, 'destroy'])->name('target-insects.destroy');
-        
+
         // Target Insects Analytics
         Route::get('/analytics', [TargetInsectAnalyticsController::class, 'index'])->name('target-insects.analytics');
     });
@@ -318,7 +318,7 @@ Route::middleware(['auth', 'role:technical'])->group(function () {
     Route::get('technical/pesticides/analytics', [PesticideAnalyticsController::class, 'index'])->name('technical.pesticides.analytics');
     Route::get('technical/pesticides/analytics/team/{teamId}', [PesticideAnalyticsController::class, 'teamReport'])->name('technical.pesticides.analytics.teamReport');
     Route::get('technical/pesticides/analytics/pesticide/{pesticideSlug}', [PesticideAnalyticsController::class, 'pesticideReport'])->name('technical.pesticides.analytics.pesticideReport');
-    
+
     // Workers and Team Leaders management
     Route::get('/workers', [TechnicalController::class, 'workersIndex'])->name('workers.index');
     Route::post('/workers', [TechnicalController::class, 'createWorker'])->name('workers.create');
@@ -359,6 +359,12 @@ Route::middleware(['auth', 'role:technical'])->group(function () {
     // Contract Details
     Route::get('/technical/contract/{id}', [TechnicalController::class, 'viewContractDetails'])
         ->name('technical.contract.show');
+
+    // Contract Visits
+    Route::get('/technical/contract/{contractId}/visits', [TechnicalController::class, 'contractVisits'])
+        ->name('technical.contract.visits');
+    Route::get('/technical/contract/{contractId}/branch/{branchId}/visits', [TechnicalController::class, 'contractVisits'])
+        ->name('technical.contract.branch.visits');
 
     // Client Tickets Routes
     Route::get('/technical/client-tickets', [TechnicalController::class, 'clientTickets'])->name('technical.client_tickets');

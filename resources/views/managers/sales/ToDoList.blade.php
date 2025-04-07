@@ -82,6 +82,7 @@
                             <th>Contract Number</th>
                             <th>Payment Date</th>
                             <th>Amount</th>
+                            <th>Payment Status</th>
                             <th>Payment Method</th>
                             <th>Action</th>
                         </tr>
@@ -93,10 +94,16 @@
                                     $payment->customer->name }}</a>
                             </td>
                             <td> <a href="tel:{{ $payment->customer->phone }}">{{ $payment->customer->phone }}</a></td>
-                            <td><a href="{{ route('contract.show.details', ['id' => $payment->contract->id]) }}"
-                                    rel="noopener noreferrer">{{ $payment->contract->contract_number }}</a></td>
+                            <td><a href="{{ route('contract.show.details', ['id' => $payment->contract->id]) }}" 
+                                {{-- chnage color depending on the contract status if approved or pending --}}
+                                @if ($payment->contract->contract_status == 'approved' || $payment->contract->contract_status == 'pending')
+                                    rel="noopener noreferrer" class="text-primary">{{ $payment->contract->contract_number }}</a></td>
+                                @else
+                                    rel="noopener noreferrer" class="text-danger">{{ $payment->contract->contract_number }}</a></td>
+                                @endif
                             <td>{{ $payment->due_date }}</td>
                             <td>{{ $payment->payment_amount }}</td>
+                            <td class="{{ $payment->payment_status == 'paid' ? 'text-success' : 'text-danger' }}">{{ $payment->payment_status }}</td>
                             <td>{{ $payment->payment_method ? ucfirst($payment->payment_method) : 'N/A' }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
@@ -107,7 +114,7 @@
                                     </a>
 
                                     <!-- Mark as Paid Button -->
-                                    @if ($payment->payment_status != 'paid')
+                                    @if ($payment->payment_status != 'paid' && $payment->contract->contract_status == 'approved' || $payment->contract->contract_status == 'pending')
                                     <button type="button" class="btn btn-success btn-sm me-2 d-flex align-items-center"
                                         onclick="markAsPaid({{ $payment->id }})">
                                         <i class="bx bx-check-circle"></i> <span class="d-none d-sm-inline">Mark as

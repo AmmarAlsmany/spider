@@ -74,19 +74,19 @@ class PaymentsController extends Controller
             'title' => 'New Payment Created',
             'message' => 'A new payment of ' . $payment->payment_amount . ' SAR has been created with due date ' . $payment->due_date,
             'type' => 'info',
-            'url' => route('payments.show', $payment->id),
+            'url' => route('payment.show', $payment->id),
             'priority' => 'normal',
         ];
-        
+
         // Different URLs for different roles
         $roleUrls = [
             'client' => route('client.contract.visits', $payment->contract_id),
-            'sales' => route('payments.show', $payment->id),
-            'finance' => route('payments.show', $payment->id)
+            'sales' => route('payment.show', $payment->id),
+            'finance' => route('payment.show', $payment->id)
         ];
         $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $payment->customer_id, null, $roleUrls);
 
-        return redirect()->route('payments.show', $payment->id)
+        return redirect()->route('payment.show', $payment->id)
             ->with('success', 'تم إنشاء الدفعة والفاتورة بنجاح');
     }
 
@@ -146,7 +146,6 @@ class PaymentsController extends Controller
                 'payment_method' => request('payment_method'),
                 'paid_at' => now(),
             ]);
-
             // Update the corresponding invoice status to 'paid'
             $invoice = $payment->invoice; // Assuming the payment model has an invoice relationship
             if ($invoice) {
@@ -154,20 +153,20 @@ class PaymentsController extends Controller
                 $invoice->payment_date = now()->format('Y-m-d'); // Update payment date
                 $invoice->save();
             }
+            
             // notify the client, sales and finance
             $notificationData = [
                 'title' => 'Payment Marked as Paid',
                 'message' => 'Payment of ' . $payment->payment_amount . ' SAR has been paid',
                 'type' => 'info',
-                'url' => route('payments.show', $payment->id),
                 'priority' => 'normal',
             ];
-            
+
             // Different URLs for different roles
             $roleUrls = [
-                'client' => route('payments.show', $payment->id),
-                'sales' => route('payments.show', $payment->id),
-                'finance' => route('payments.show', $payment->id)
+                'client' => route('payment.show', $payment->id),
+                'sales' => route('payment.show', $payment->id),
+                'finance' => route('payment.show', $payment->id)
             ];
             $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $payment->customer_id, $payment->sales_id, $roleUrls);
 
@@ -178,7 +177,7 @@ class PaymentsController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating payment status'
+                'message' => 'Error updating payment status' . $e->getMessage()
             ], 500);
         }
     }

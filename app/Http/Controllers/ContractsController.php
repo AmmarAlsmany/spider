@@ -42,32 +42,32 @@ class ContractsController extends Controller
     public function index(Request $request)
     {
         // Cache contract types to avoid repeated database queries
-        $contract_types = cache()->remember('contract_types', 60*60, function() {
+        $contract_types = cache()->remember('contract_types', 60 * 60, function () {
             return contracts_types::all();
         });
-        
+
         $property_types = ['Residential', 'Commercial', 'Industrial', 'Government'];
-        
+
         // Only query client info if client_id is provided
         $client_info = null;
         if (isset($request->client_id)) {
             $client_info = client::find($request->client_id);
         }
-        
+
         $branches = $request->branches ?? 0;
-        
+
         // Only query contract type if contract_type_id is provided
         $contract_type_id = null;
         if (isset($request->contract_type_id)) {
             // Now we can use eager loading since the relationship is defined
             $contract_type_id = contracts_types::with('contracts')->find($request->contract_type_id);
         }
-        
+
         // Generate contract number - use caching to avoid repeated queries
-        $contract_number = cache()->remember('latest_contract_number_' . date('Y-m-d'), 60, function() {
+        $contract_number = cache()->remember('latest_contract_number_' . date('Y-m-d'), 60, function () {
             return $this->generator_contract_number();
         });
-        
+
         return view('contracts.index', compact('client_info', 'branches', 'contract_type_id', 'contract_number', 'contract_types', 'property_types'));
     }
 
@@ -96,7 +96,7 @@ class ContractsController extends Controller
 
         // Check if the generated number already exists (use a direct query)
         $exists = contracts::where('contract_number', $contract_number)->exists();
-        
+
         if ($exists) {
             // If it exists, find the max number and increment by 1 (more efficient query)
             $max_number = contracts::where('contract_number', 'like', $prefix . '%')
@@ -489,7 +489,7 @@ class ContractsController extends Controller
                     ]);
                     $branchContract->save();
                 }
-                
+
                 // If there are multiple branches, update the contract to indicate it's a multi-branch contract
                 if (count($request->branchName) > 1) {
                     $contract->is_multi_branch = 'yes';
@@ -784,7 +784,7 @@ class ContractsController extends Controller
             'type' => 'info',
             'priority' => 'normal'
         ];
-        
+
         // Different URLs for different roles
         $roleUrls = [
             'sales' => route('payments.show', $payment->id),
@@ -811,7 +811,7 @@ class ContractsController extends Controller
             'type' => 'info',
             'priority' => 'normal',
         ];
-        
+
         // Different URLs for different roles
         $roleUrls = [
             'sales' => route('payments.show', $postponement->payment->id),
@@ -1103,12 +1103,12 @@ class ContractsController extends Controller
             // Create a temporary contract object for scheduling only the new branches
             $tempContract = clone $contract;
             $tempContract->setRelation('branchs', $newBranches);
-            
+
             // Ensure the temporary contract has all required properties
             if (!isset($tempContract->number_of_visits) || empty($tempContract->number_of_visits)) {
                 $tempContract->number_of_visits = $contract->number_of_visits;
             }
-            
+
             if (!isset($tempContract->visit_start_date) || empty($tempContract->visit_start_date)) {
                 // Use current date as the visit start date for annex branches
                 $tempContract->visit_start_date = now()->format('Y-m-d');
@@ -1121,7 +1121,7 @@ class ContractsController extends Controller
                 if ($activeTeams == 0) {
                     throw new \Exception('No active teams available for scheduling visits');
                 }
-                
+
                 $this->visitScheduleService->createVisitSchedule($tempContract);
             } catch (\Exception $e) {
                 DB::rollback();
@@ -1172,7 +1172,7 @@ class ContractsController extends Controller
 
             // Delete branches associated with this annex
             branchs::where('annex_id', $annex->id)->delete();
-            
+
             // Delete payment associated with this annex
             payments::where('annex_id', $annex->id)->delete();
 
@@ -1257,7 +1257,7 @@ class ContractsController extends Controller
                 if (isset($branchData['id'])) {
                     // Update existing branch
                     $branch = branchs::findOrFail($branchData['id']);
-                    
+
                     if ($branch) {
                         $branch->update([
                             'branch_name' => $branchData['branch_name'],
@@ -1324,10 +1324,10 @@ class ContractsController extends Controller
             $contract->update([
                 'contract_status' => 'stopped'
             ]);
-            
+
             // stop all scheduled visits for this contract
             $stoppedVisits = $this->stopContractVisits($contract);
-            
+
             DB::commit();
 
             // Notify the team leader,client,sales manager,technical
@@ -1343,12 +1343,12 @@ class ContractsController extends Controller
                 'sales_manager' => route('sales_manager.contract.view', $contract->id),
                 'technical' => route('technical.contract.show', $contract->id)
             ]);
-            
+
             $message = 'Contract stopped successfully';
             if ($stoppedVisits > 0) {
                 $message .= " and $stoppedVisits scheduled visits were cancelled";
             }
-            
+
             return redirect()->route('contract.show')->with('success', $message);
         } catch (\Exception $e) {
             DB::rollback();
@@ -1363,24 +1363,24 @@ class ContractsController extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             // Find all visits with 'scheduled' status for this contract
             $visits = VisitSchedule::where('contract_id', $contract->id)
                 ->where('status', 'scheduled')
                 ->get();
-            
+
             $stoppedCount = 0;
-            
+
             // Update each visit to 'stopped' status
             foreach ($visits as $visit) {
                 $visit->status = 'stopped';
                 $visit->save();
                 $stoppedCount++;
-                
+
                 // Log the stop
                 Log::info('Visit stopped due to contract stop: Visit ID ' . $visit->id);
             }
-            
+
             DB::commit();
             return $stoppedCount;
         } catch (\Exception $e) {
@@ -1477,7 +1477,7 @@ class ContractsController extends Controller
         $template = view('pdf_templates.contract_pdf', compact('contract'))->render();
         $filename = 'contract_' . $contract->contract_number . '.pdf';
 
-        $mpdf = new Mpdf(['orientation' => 'L', 'margin' => [10, 10, 10, 10]]);
+        $mpdf = new Mpdf(['orientation' => 'P', 'margin' => [10, 10, 10, 10]]);
         $mpdf->WriteHTML($template);
         $pdf = $mpdf->Output('', 'S');
 
@@ -1495,24 +1495,24 @@ class ContractsController extends Controller
     public function showRenewalForm($id)
     {
         $contract = contracts::with(['customer', 'branchs', 'type'])->findOrFail($id);
-        
+
         // Check if the contract is completed and belongs to the current sales rep
         if ($contract->contract_status !== 'completed' || $contract->sales_id != auth()->id()) {
             return redirect()->route('sales.dashboard')
                 ->with('error', 'You can only renew completed contracts assigned to you.');
         }
-        
+
         // Get contract types for the form
         $contract_types = contracts_types::all();
         $property_types = ['Residential', 'Commercial', 'Industrial', 'Government'];
         $saudiCities = $this->getSaudiCities();
-        
+
         // Get equipment types for Buy equipment contracts
         $equipment_types = EquipmentType::where('is_active', true)->get();
-        
+
         return view('contracts.renewal_form', compact('contract', 'contract_types', 'property_types', 'saudiCities', 'equipment_types'));
     }
-    
+
     /**
      * Process contract renewal
      *
@@ -1524,10 +1524,10 @@ class ContractsController extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             // Find the original contract
             $originalContract = contracts::with(['customer', 'branchs'])->findOrFail($id);
-            
+
             // Validate the request
             $request->validate([
                 'contract_start_date' => 'required|date|after_or_equal:today',
@@ -1559,15 +1559,15 @@ class ContractsController extends Controller
                 'equipment_quantity' => 'required_if:contract_type,Buy equipment|integer|min:1',
                 'equipment_description' => 'required_if:contract_type,Buy equipment|string',
             ]);
-            
+
             // Generate a new contract number
             $contract_number = $this->generator_contract_number();
-            
+
             // Calculate VAT and total amount
             $amount = floatval($request->contract_price);
             $vat = $amount * 0.15;
             $total_amount = $amount + $vat;
-            
+
             // Create new contract based on the original one
             $newContract = new contracts();
             $newContract->customer_id = $originalContract->customer_id;
@@ -1581,41 +1581,42 @@ class ContractsController extends Controller
             $newContract->contract_description = $request->contract_description;
             $newContract->contract_price = $total_amount;
             $newContract->warranty = $request->warranty;
-            
+
             // Set number of visits only for non-equipment contracts
             $contractType = contracts_types::find($request->contract_type);
             $isBuyEquipment = $contractType && $contractType->name === 'Buy equipment';
-            
+
             if (!$isBuyEquipment) {
                 $newContract->number_of_visits = $request->number_of_visits;
             } else {
                 $newContract->number_of_visits = 0; // Set to 0 for equipment contracts
             }
-            
+
             $newContract->payment_type = $request->payment_type;
             $newContract->contract_status = 'pending';
-            
+
             if ($request->payment_type === 'postpaid') {
                 $newContract->number_Payments = $request->number_of_payments;
             }
-            
+
             // Check if we're including branches
             $hasBranches = false;
-            
+
             // Check if the original contract had multiple branches or if we're adding new branches
-            if (($request->has('include_branches') && count($request->include_branches) > 0) || 
-                ($request->has('new_branch_data') && count($request->new_branch_data) > 0)) {
+            if (($request->has('include_branches') && count($request->include_branches) > 0) ||
+                ($request->has('new_branch_data') && count($request->new_branch_data) > 0)
+            ) {
                 $hasBranches = true;
                 $newContract->is_multi_branch = "yes";
             }
-            
+
             $newContract->save();
-            
+
             // Create equipment contract data if this is a Buy equipment contract
             if ($isBuyEquipment) {
                 $equipmentType = EquipmentType::find($request->equipment_type_id);
                 $unitPrice = $amount / intval($request->equipment_quantity);
-                
+
                 $equipmentContract = new EquipmentContract();
                 $equipmentContract->contract_id = $newContract->id;
                 $equipmentContract->equipment_type = $request->equipment_type_id;
@@ -1628,7 +1629,7 @@ class ContractsController extends Controller
                 $equipmentContract->total_with_vat = $total_amount;
                 $equipmentContract->save();
             }
-            
+
             // Copy selected branches from the original contract
             if ($request->has('include_branches')) {
                 foreach ($request->include_branches as $branchId) {
@@ -1636,13 +1637,13 @@ class ContractsController extends Controller
                     if (is_string($branchId) && strpos($branchId, 'new_') === 0) {
                         continue;
                     }
-                    
+
                     $originalBranch = $originalContract->branchs->firstWhere('id', $branchId);
-                    
+
                     if ($originalBranch) {
                         // Get updated branch data if available
                         $branchData = $request->branch_data[$branchId] ?? null;
-                        
+
                         $newBranch = new branchs();
                         $newBranch->contracts_id = $newContract->id;
                         $newBranch->branch_name = $branchData['branch_name'] ?? $originalBranch->branch_name;
@@ -1654,7 +1655,7 @@ class ContractsController extends Controller
                     }
                 }
             }
-            
+
             // Add new branches if any
             if ($request->has('new_branch_data') && is_array($request->new_branch_data)) {
                 foreach ($request->new_branch_data as $key => $branchData) {
@@ -1662,7 +1663,7 @@ class ContractsController extends Controller
                     if (!$request->has('include_branches') || !in_array($key, $request->include_branches)) {
                         continue;
                     }
-                    
+
                     $newBranch = new branchs();
                     $newBranch->contracts_id = $newContract->id;
                     $newBranch->branch_name = $branchData['branch_name'];
@@ -1673,16 +1674,16 @@ class ContractsController extends Controller
                     $newBranch->save();
                 }
             }
-            
+
             // Create payments
             if ($request->payment_type === 'prepaid') {
                 $this->create_payment($newContract->id, $originalContract->customer_id, $total_amount, $request->first_payment_date);
             } else {
                 $payment_amount = $total_amount / intval($request->number_of_payments);
-                
+
                 // Create first payment
                 $this->create_payment($newContract->id, $originalContract->customer_id, $payment_amount, $request->first_payment_date);
-                
+
                 // Create remaining payments
                 $payment_date = Carbon::parse($request->first_payment_date);
                 for ($i = 2; $i <= $request->number_of_payments; $i++) {
@@ -1690,7 +1691,7 @@ class ContractsController extends Controller
                     $this->create_payment($newContract->id, $originalContract->customer_id, $payment_amount, $payment_date->copy());
                 }
             }
-            
+
             // Send notification to technical and sales managers
             $notificationData = [
                 'title' => 'Contract Renewed',
@@ -1698,18 +1699,17 @@ class ContractsController extends Controller
                 'type' => 'info',
                 'priority' => 'normal'
             ];
-            
+
             $this->notifyRoles(['technical', 'sales_manager', 'client'], $notificationData, $newContract->customer_id, $newContract->sales_id, [
                 'technical' => route('technical.contract.show', $newContract->id),
                 'sales_manager' => route('contract.show.details', $newContract->id),
                 'client' => route('client.contract.details', $newContract->id)
             ]);
-            
+
             DB::commit();
-            
+
             return redirect()->route('contract.show.details', $newContract->id)
                 ->with('success', 'Contract renewed successfully with new contract number: ' . $newContract->contract_number);
-                
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Contract renewal error: ' . $e->getMessage(), [
@@ -1718,13 +1718,13 @@ class ContractsController extends Controller
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
             ]);
-            
+
             return back()
                 ->with('error', 'Error renewing contract: ' . $e->getMessage())
                 ->withInput();
         }
     }
-    
+
     /**
      * Handle contract renewal response
      * 
@@ -1735,12 +1735,12 @@ class ContractsController extends Controller
     public function handleRenewalResponse(Request $request, $id)
     {
         $contract = contracts::findOrFail($id);
-        
+
         // Validate the request
         $request->validate([
             'response' => 'required|in:yes,no',
         ]);
-        
+
         if ($request->response === 'yes') {
             return redirect()->route('contract.renewal.form', ['id' => $id]);
         } else {
@@ -1749,7 +1749,7 @@ class ContractsController extends Controller
                 'user_id' => auth()->id(),
                 'contract_id' => $id
             ]);
-            
+
             return redirect()->route('sales.dashboard')
                 ->with('info', 'You chose not to renew contract #' . $contract->contract_number);
         }

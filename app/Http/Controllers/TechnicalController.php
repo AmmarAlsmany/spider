@@ -93,7 +93,7 @@ class TechnicalController extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'team_leader_id' => 'required|exists:users,id',
@@ -132,7 +132,7 @@ class TechnicalController extends Controller
                     ->join('users', 'team_members.user_id', '=', 'users.id')
                     ->whereIn('team_members.user_id', $members)
                     ->first();
-                
+
                 if ($existingMembers) {
                     return redirect()->back()->with('error', "User {$existingMembers->name} is already a member in team: {$existingMembers->name}");
                 }
@@ -159,7 +159,6 @@ class TechnicalController extends Controller
 
             DB::commit();
             return redirect()->back()->with('success', 'Team created successfully');
-            
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Error creating team: ' . $e->getMessage());
@@ -183,7 +182,7 @@ class TechnicalController extends Controller
 
             // Initialize members array if not set
             $members = isset($validated['members']) ? $validated['members'] : [];
-            
+
             // Remove team leader from members if present
             if (isset($validated['team_leader_id'])) {
                 $members = array_diff($members, [$validated['team_leader_id']]);
@@ -210,7 +209,7 @@ class TechnicalController extends Controller
                     ->where('team_members.user_id', $validated['team_leader_id'])
                     ->where('teams.id', '!=', $team->id)
                     ->first();
-                
+
                 if ($leaderMemberTeam) {
                     return redirect()->back()->with('error', "The selected team leader is already a member in team: {$leaderMemberTeam->name}");
                 }
@@ -236,7 +235,7 @@ class TechnicalController extends Controller
                         ->whereIn('team_members.user_id', $newMembers)
                         ->where('teams.id', '!=', $team->id)
                         ->first();
-                    
+
                     if ($existingMembers) {
                         return redirect()->back()->with('error', "User {$existingMembers->name} is already a member in team: {$existingMembers->name}");
                     }
@@ -254,10 +253,9 @@ class TechnicalController extends Controller
             }
 
             $team->update($validated);
-            
+
             DB::commit();
             return redirect()->back()->with('success', 'Team updated successfully');
-            
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Error updating team: ' . $e->getMessage());
@@ -473,12 +471,12 @@ class TechnicalController extends Controller
     {
         // Base query for visit schedules with relationships
         $baseQuery = VisitSchedule::with([
-            'contract', 
-            'contract.customer', 
+            'contract',
+            'contract.customer',
             'contract.branchs',
             'team',
             'branch'
-        ])->whereHas('contract', function($q) {
+        ])->whereHas('contract', function ($q) {
             $q->where('contract_status', 'approved');
         });
 
@@ -527,11 +525,35 @@ class TechnicalController extends Controller
 
         // Get paginated visits for each contract
         $contractVisits = [];
+        $branchVisitsPagination = [];
+
         foreach ($contracts as $contract) {
+            // Get the contract's visits
             $contractVisits[$contract->id] = VisitSchedule::with(['team', 'branch'])
                 ->where('contract_id', $contract->id)
                 ->orderBy('visit_date', 'desc')
                 ->paginate(5, ['*'], 'contract_' . $contract->id . '_page');
+
+            // Group visits by branch for branch-specific pagination
+            if ($contract->branchs->count() > 0) {
+                foreach ($contract->branchs as $branch) {
+                    $branchVisitsPagination[$branch->id] = VisitSchedule::with(['team', 'branch'])
+                        ->where('contract_id', $contract->id)
+                        ->where('branch_id', $branch->id)
+                        ->orderBy('visit_date', 'desc')
+                        ->paginate(6, ['*'], 'branch_' . $branch->id . '_page');
+                }
+            }
+
+            // Also handle main location (no branch_id or null branch_id)
+            $branchVisitsPagination['main'] = VisitSchedule::with(['team', 'branch'])
+                ->where('contract_id', $contract->id)
+                ->where(function ($query) {
+                    $query->whereNull('branch_id')
+                        ->orWhere('branch_id', 0);
+                })
+                ->orderBy('visit_date', 'desc')
+                ->paginate(6, ['*'], 'branch_main_' . $contract->id . '_page');
         }
 
         // Get teams for assignment
@@ -545,6 +567,7 @@ class TechnicalController extends Controller
         return view('managers.technical.scheduled_appointments', compact(
             'contracts',
             'contractVisits',
+            'branchVisitsPagination',
             'pendingVisits',
             'todayVisits',
             'todayCompletedVisits',
@@ -749,14 +772,14 @@ class TechnicalController extends Controller
             $baseQuery = VisitSchedule::where('team_id', $team->id)
                 ->with(['contract.customer'])
                 ->orderBy('visit_date', 'asc');
-            
+
             // Apply date filters to a clone of the base query
             $query = clone $baseQuery;
 
             // Handle month/year filter
             if ($request->filled('month') && $request->filled('year')) {
                 $query->whereMonth('visit_date', $request->month)
-                      ->whereYear('visit_date', $request->year);
+                    ->whereYear('visit_date', $request->year);
             }
             // Handle single date filter
             elseif ($request->filled('date')) {
@@ -765,7 +788,7 @@ class TechnicalController extends Controller
             // Handle custom date range filter
             elseif ($request->filled('from_date') && $request->filled('to_date')) {
                 $query->whereDate('visit_date', '>=', $request->from_date)
-                      ->whereDate('visit_date', '<=', $request->to_date);
+                    ->whereDate('visit_date', '<=', $request->to_date);
             }
             // Handle just from_date without to_date (filter from a date onwards)
             elseif ($request->filled('from_date')) {
@@ -778,11 +801,11 @@ class TechnicalController extends Controller
 
             // Count total filtered records before pagination
             $team->totalSchedules = $query->count();
-            
+
             // Apply pagination after count
-            $team->paginatedSchedules = $query->paginate(10, ['*'], 'page_'.$team->id)
-                ->appends($request->except('page_'.$team->id));
-                
+            $team->paginatedSchedules = $query->paginate(10, ['*'], 'page_' . $team->id)
+                ->appends($request->except('page_' . $team->id));
+
             return $team;
         });
 
@@ -898,7 +921,7 @@ class TechnicalController extends Controller
 
             // Get the contract
             $contract = contracts::findOrFail($request->contract_id);
-            
+
             // Count existing visits for this contract
             $visitCount = VisitSchedule::where('contract_id', $contract->id)->count();
 
@@ -911,7 +934,7 @@ class TechnicalController extends Controller
             $visit->team_id = $request->team_id;
             $visit->status = 'scheduled';
             $visit->visit_number = $visitCount + 1;
-            
+
             // If branch is selected, validate it belongs to the contract
             if ($request->branch_id) {
                 $branch = branchs::where('id', $request->branch_id)
@@ -960,7 +983,7 @@ class TechnicalController extends Controller
     public function updateVisit(Request $request, $id)
     {
         $visit = VisitSchedule::findOrFail($id);
-        
+
         // Update the visit schedule with the new date and time
         $visit->update([
             'visit_date' => $request->visit_date,
@@ -969,5 +992,85 @@ class TechnicalController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Visit schedule has been updated successfully.');
+    }
+
+    /**
+     * Display visits for a specific contract (optionally filtered by branch)
+     */
+    public function contractVisits(Request $request, $contractId, $branchId = null)
+    {
+        // Get the contract with customer and branches
+        $contract = contracts::with(['customer', 'branchs'])
+            ->where('contract_status', 'approved')
+            ->findOrFail($contractId);
+
+        // Base query for visits of this contract
+        $visitsQuery = VisitSchedule::with(['team', 'branch'])
+            ->where('contract_id', $contract->id);
+
+        // If branch ID is provided and not 'all', filter by branch
+        if ($branchId && $branchId != 'all') {
+            if ($branchId == 'main') {
+                // Check if there are any visits without a branch assigned
+                $mainVisitsCheck = VisitSchedule::where('contract_id', $contract->id)
+                    ->where(function ($q) {
+                        $q->whereNull('branch_id')
+                            ->orWhere('branch_id', 0);
+                    })->count();
+
+                if ($mainVisitsCheck > 0) {
+                    // Filter for main location (no branch_id or branch_id = 0)
+                    $visitsQuery->where(function ($query) {
+                        $query->whereNull('branch_id')
+                            ->orWhere('branch_id', 0);
+                    });
+                }
+            } else {
+                $visitsQuery->where('branch_id', $branchId);
+                $branch = branchs::findOrFail($branchId);
+            }
+        } else {
+            $branch = null;
+        }
+
+        // Apply date filters if provided
+        if ($request->filled('start_date')) {
+            $visitsQuery->whereDate('visit_date', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $visitsQuery->whereDate('visit_date', '<=', $request->end_date);
+        }
+
+        // Filter by status if provided
+        if ($request->filled('status')) {
+            $visitsQuery->where('status', $request->status);
+        }
+
+        // Order visits by visit_number, then date and time
+        $visits = $visitsQuery->orderBy('visit_number', 'asc')
+            ->orderBy('visit_date', 'desc')
+            ->orderBy('visit_time', 'desc')
+            ->paginate(12)
+            ->withQueryString();
+
+        // Get teams for edit modal
+        $teams = Team::all();
+
+        // Statistics for this contract/branch
+        $totalVisits = $visitsQuery->count();
+        $completedVisits = $visitsQuery->where('status', 'completed')->count();
+        $pendingVisits = $visitsQuery->where('status', 'scheduled')->count();
+        $cancelledVisits = $visitsQuery->where('status', 'cancelled')->count();
+
+        return view('managers.technical.contract_visits', compact(
+            'contract',
+            'branch',
+            'visits',
+            'teams',
+            'totalVisits',
+            'completedVisits',
+            'pendingVisits',
+            'cancelledVisits'
+        ));
     }
 }

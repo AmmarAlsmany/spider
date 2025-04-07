@@ -49,6 +49,7 @@
                                 <th>Start Date</th>
                                 <th>End Date</th>
                                 <th>Contract Status</th>
+                                <th>Rejection Reason</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -92,6 +93,10 @@
                                             <i class="bi bi-x-circle me-1"></i>
                                             {{ strtoupper($contract->contract_status) }}
                                         </div>
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-exclamation-triangle me-2 text-muted"></i>
+                                        {{ $contract->rejection_reason ? $contract->rejection_reason : 'Stopped from the Sales Manager' }} 
                                     </td>
                                     <td>
                                         <form action="{{ route('contract.return', ['id' => $contract->id]) }}" method="POST">

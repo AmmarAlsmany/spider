@@ -1,13 +1,13 @@
 <div class="content">
     <div class="row">
-        <div class="col-12 text-center mb-4">
+        <div class="mb-4 text-center col-12">
             <h2>Team KPI Report: {{ $team->name }}</h2>
             <p>Period: {{ $startDate->format('d M Y') }} to {{ $endDate->format('d M Y') }}</p>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-12 mb-4">
+        <div class="mb-4 col-12">
             <table class="table table-bordered">
                 <tr>
                     <th colspan="2" class="text-center bg-light">Team Information</th>
@@ -35,7 +35,7 @@
     </div>
 
     <div class="row">
-        <div class="col-12 mb-4">
+        <div class="mb-4 col-12">
             <table class="table table-bordered">
                 <tr>
                     <th colspan="2" class="text-center bg-light">Performance Summary</th>
@@ -77,7 +77,7 @@
     </div>
 
     <div class="row">
-        <div class="col-6 mb-4">
+        <div class="mb-4 col-6">
             <table class="table table-bordered">
                 <tr>
                     <th colspan="2" class="text-center bg-light">Top Target Insects</th>
@@ -94,7 +94,7 @@
                 @endforelse
             </table>
         </div>
-        <div class="col-6 mb-4">
+        <div class="mb-4 col-6">
             <table class="table table-bordered">
                 <tr>
                     <th colspan="2" class="text-center bg-light">Top Pesticides Used</th>
@@ -114,7 +114,7 @@
     </div>
 
     <div class="row">
-        <div class="col-12 mb-4">
+        <div class="mb-4 col-12">
             <div class="text-center">
                 <p>This report was generated on {{ now()->format('d M Y H:i') }}</p>
                 <p>Spider Web For Pest Control</p>

@@ -132,10 +132,27 @@
                                     </td>
                                     <td>{{ $contract->created_at->format('M d, Y') }}</td>
                                     <td>
+                                        @if($contract->contract_status == 'approved' || $contract->contract_status == 'pending')
                                         <a href="{{ route('contract.show.details', $contract->id) }}"
                                             class="btn btn-primary btn-sm">
                                             <i class="bx bx-show"></i> View
                                         </a>
+                                        @elseif($contract->contract_status == 'completed')
+                                        <a href="{{ route('completed.show.all') }}"
+                                            class="btn btn-primary btn-sm">
+                                            <i class="bx bx-show"></i> View
+                                        </a>
+                                        @elseif($contract->contract_status == 'stopped')
+                                        <a href="{{ route('stopped.show.all') }}"
+                                            class="btn btn-primary btn-sm">
+                                            <i class="bx bx-show"></i> View
+                                        </a>
+                                        @elseif($contract->contract_status == 'canceled' || $contract->contract_status == 'Not approved')
+                                        <a href="{{ route('canceled.show.all') }}"
+                                            class="btn btn-primary btn-sm">
+                                            <i class="bx bx-show"></i> View
+                                        </a>
+                                        @endif
                                     </td>
                                 </tr>
                                 @empty

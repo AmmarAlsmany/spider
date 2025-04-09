@@ -42,7 +42,7 @@
                 </div>
                 
                 <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="active" name="active" checked>
+                    <input type="checkbox" class="form-check-input" id="active" name="active" value="1" checked>
                     <label class="form-check-label" for="active">Active</label>
                     <small class="d-block text-muted">Inactive target insects won't appear in forms</small>
                 </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TargetInsect;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -13,9 +14,27 @@ class TargetInsectController extends Controller
     /**
      * Display a listing of the target insects.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $targetInsects = TargetInsect::all();
+        $query = TargetInsect::query();
+
+        // Apply search filter if needed
+        if ($request->has('search') && $request->search !== '') {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                    ->orWhere('value', 'like', "%{$searchTerm}%")
+                    ->orWhere('description', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        $targetInsects = $query->paginate(10);
+
+        // Preserve query parameters in pagination links
+        if ($request->has('search')) {
+            $targetInsects->appends($request->only(['search']));
+        }
+
         return view('managers.technical.target-insects.index', compact('targetInsects'));
     }
 
@@ -32,12 +51,14 @@ class TargetInsectController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:target_insects,name',
-            'value' => 'required|string|max:255|unique:target_insects,value',
-            'description' => 'nullable|string',
-            'active' => 'boolean'
-        ]);
+        DB::beginTransaction();
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255|unique:target_insects,name',
+                'value' => 'required|string|max:255|unique:target_insects,value',
+                'description' => 'nullable|string',
+                'active' => 'required|boolean'
+            ]);
 
         $targetInsect = new TargetInsect();
         $targetInsect->fill([
@@ -48,8 +69,12 @@ class TargetInsectController extends Controller
             'active' => $request->has('active')
         ]);
         $targetInsect->save();
-
-        return redirect()->route('target-insects.index')->with('success', 'Target insect added successfully');
+        DB::commit();
+            return redirect()->route('target-insects.index')->with('success', 'Target insect added successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('target-insects.index')->with('error', 'Failed to add target insect'.$e->getMessage());
+        }
     }
 
     /**
@@ -74,7 +99,7 @@ class TargetInsectController extends Controller
             'active' => 'string'
         ]);
 
-        
+
         $targetInsect->fill([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
@@ -93,7 +118,7 @@ class TargetInsectController extends Controller
     public function destroy($id)
     {
         $targetInsect = TargetInsect::findOrFail($id);
-        
+
         try {
             $targetInsect->delete();
             return redirect()->route('target-insects.index')->with('success', 'Target insect deleted successfully');

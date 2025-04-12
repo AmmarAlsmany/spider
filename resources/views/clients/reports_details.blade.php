@@ -284,7 +284,7 @@
 @endsection
 
 @if ($visit->status == 'completed' && $visit->report)
-    @section('scripts')
+    @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const printButton = document.getElementById('printReportBtn');
@@ -292,49 +292,10 @@
                 if (printButton) {
                     printButton.addEventListener('click', function() {
                         try {
-                            // Add print-specific CSS to the current page
-                            const style = document.createElement('style');
-                            style.id = 'print-style';
-                            style.innerHTML = `
-                                @media print {
-                                    body * {
-                                        visibility: hidden;
-                                    }
-                                    .page-content, .page-content * {
-                                        visibility: visible;
-                                    }
-                                    .card-body {
-                                        break-inside: avoid;
-                                    }
-                                    .page-content {
-                                        position: absolute;
-                                        left: 0;
-                                        top: 0;
-                                        width: 100%;
-                                    }
-                                    .no-print, .no-print * {
-                                        display: none !important;
-                                    }
-                                    .header, .footer, nav, aside, button, .btn {
-                                        display: none !important;
-                                    }
-                                    @page {
-                                        size: A4;
-                                        margin: 1cm;
-                                    }
-                                }`;
-                            document.head.appendChild(style);
-
-                            // Hide elements that shouldn't be printed
-                            const elementsToHide = document.querySelectorAll('.no-print');
-                            Array.from(elementsToHide).forEach(el => {
-                                el.classList.add('d-none');
-                            });
-
-                            // Add a header to the report for printing only
+                            // Create a print header for the report
                             const reportContainer = document.querySelector('.card-body');
                             const printHeader = document.createElement('div');
-                            printHeader.className = 'print-only mb-4 d-none';
+                            printHeader.className = 'print-only mb-4';
                             printHeader.innerHTML = `
                                 <div class="text-center">
                                     <h3>Visit Report</h3>
@@ -345,30 +306,22 @@
                             `;
                             reportContainer.prepend(printHeader);
 
-                            // Remove the d-none class for printing
-                            printHeader.classList.remove('d-none');
+                            // Mark elements that shouldn't be printed
+                            const buttonsToHide = document.querySelectorAll('.btn');
+                            buttonsToHide.forEach(btn => btn.classList.add('no-print'));
 
                             // Print the page
                             window.print();
 
-                            // After printing, restore the page
-                            setTimeout(() => {
-                                // Remove the print style
-                                const printStyle = document.getElementById('print-style');
-                                if (printStyle) {
-                                    printStyle.parentNode.removeChild(printStyle);
-                                }
-
+                            // Clean up after print dialog closes
+                            window.onafterprint = function() {
                                 // Remove the print header
                                 if (printHeader.parentNode) {
                                     printHeader.parentNode.removeChild(printHeader);
                                 }
 
-                                // Show elements again
-                                Array.from(elementsToHide).forEach(el => {
-                                    el.classList.remove('d-none');
-                                });
-                            }, 1000);
+                                // Remove no-print class from buttons
+                                buttonsToHide.forEach(btn => btn.classList.remove('no-print'));
                             };
                         } catch (e) {
                             console.error('Print setup error:', e);
@@ -380,5 +333,46 @@
                 }
             });
         </script>
-    @endsection
+
+        <style>
+            @media print {
+                body * {
+                    visibility: hidden;
+                }
+
+                .page-content {
+                    visibility: visible;
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                }
+
+                .page-content * {
+                    visibility: visible;
+                }
+
+                .card-body {
+                    break-inside: avoid;
+                }
+
+                .no-print,
+                .no-print *,
+                #printReportBtn,
+                .btn,
+                .alert,
+                .header,
+                .footer,
+                nav,
+                aside {
+                    display: none !important;
+                }
+
+                @page {
+                    size: A4;
+                    margin: 1cm;
+                }
+            }
+        </style>
+    @endpush
 @endif

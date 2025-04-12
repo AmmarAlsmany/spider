@@ -834,33 +834,57 @@ class ContractsController extends Controller
 
     public function view_completed_contracts()
     {
-        $contracts = contracts::where('sales_id', Auth::user()->id)
-            ->where('contract_status', 'completed')
-            ->with('customer') // Eager load customer relationship
-            ->get();
+        // Get sort direction from request or default to descending
+        $sortDirection = request()->input('sort_direction', 'desc');
+        // Validate sort direction
+        $sortDirection = in_array($sortDirection, ['asc', 'desc']) ? $sortDirection : 'desc';
 
-        return view('managers.sales.completed_contract', compact('contracts'));
+        // Get contracts where contract end date has passed
+        $contracts = contracts::with('customer', 'visitSchedules', 'type')
+            ->where('sales_id', auth()->id())
+            ->where('contract_status', 'approved')
+            ->where('is_finish', 1)
+            ->orderBy('contract_end_date', $sortDirection)
+            ->paginate(10);
+
+        return view('managers.sales.completed_contract', compact('contracts', 'sortDirection'));
     }
 
     public function view_stopped_contract()
     {
-        $contracts = contracts::where('sales_id', Auth::user()->id)
-            ->where('contract_status', 'stopped')
-            ->with('customer') // Eager load customer relationship
-            ->get();
+        // Get sort direction from request or default to descending
+        $sortDirection = request()->input('sort_direction', 'desc');
+        // Validate sort direction
+        $sortDirection = in_array($sortDirection, ['asc', 'desc']) ? $sortDirection : 'desc';
 
-        return view('managers.sales.stoped_contract', compact('contracts'));
+        // Get contracts that are stopped
+        $contracts = contracts::with('customer', 'visitSchedules', 'type')
+            ->where('sales_id', auth()->id())
+            ->where('contract_status', 'stopped')
+            ->orderBy('updated_at', $sortDirection)
+            ->paginate(10);
+
+        return view('managers.sales.stoped_contract', compact('contracts', 'sortDirection'));
     }
 
     public function view_cancelled_contracts()
     {
-        $contracts = contracts::where('sales_id', Auth::user()->id)
-            ->where('contract_status', 'canceled')
-            ->orWhere('contract_status', 'Not approved')
-            ->with('customer') // Eager load customer relationship
-            ->get();
+        // Get sort direction from request or default to descending
+        $sortDirection = request()->input('sort_direction', 'desc');
+        // Validate sort direction
+        $sortDirection = in_array($sortDirection, ['asc', 'desc']) ? $sortDirection : 'desc';
 
-        return view('managers.sales.canceled_contract', compact('contracts'));
+        // Get contracts that are cancelled
+        $contracts = contracts::with('customer', 'visitSchedules', 'type')
+            ->where('sales_id', auth()->id())
+            ->where(function ($query) {
+                $query->where('contract_status', 'cancelled')
+                    ->orWhere('contract_status', 'Not approved');
+            })
+            ->orderBy('updated_at', $sortDirection)
+            ->paginate(10);
+
+        return view('managers.sales.canceled_contract', compact('contracts', 'sortDirection'));
     }
 
     /**

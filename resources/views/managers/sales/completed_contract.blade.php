@@ -1,20 +1,20 @@
 @extends('shared.dashboard')
 @section('content')
     <div class="page-content">
-        @if(session('error'))
-        <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bx bx-error-circle me-1"></i>
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+        @if (session('error'))
+            <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bx bx-error-circle me-1"></i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         @endif
-    
-        @if(session('success'))
-        <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bx bx-check-circle me-1"></i>
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+
+        @if (session('success'))
+            <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bx bx-check-circle me-1"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         @endif
         <div class="mb-4 page-breadcrumb d-flex align-items-center">
             <div class="pe-3 breadcrumb-title d-flex align-items-center">
@@ -26,7 +26,8 @@
             <div class="ps-3">
                 <nav aria-label="breadcrumb">
                     <ol class="p-0 mb-0 breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}" class="text-decoration-none"><i class="bx bx-home-alt"></i></a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}" class="text-decoration-none"><i
+                                    class="bx bx-home-alt"></i></a></li>
                         <li class="breadcrumb-item active text-muted" aria-current="page">Completed Contract</li>
                     </ol>
                 </nav>
@@ -58,13 +59,13 @@
                                     <td>{{ $contract->id }}</td>
                                     <td>
                                         <a href="{{ route('contract.show.details', ['id' => $contract->id]) }}"
-                                           class="text-primary text-decoration-none">
+                                            class="text-primary text-decoration-none">
                                             <i class="bi bi-file-text me-2"></i>{{ $contract->contract_number }}
                                         </a>
                                     </td>
                                     <td>
                                         <a href="{{ route('view.my.clients.details', ['id' => $contract->customer->id]) }}"
-                                           class="text-primary text-decoration-none">
+                                            class="text-primary text-decoration-none">
                                             <i class="bi bi-person me-2"></i>{{ $contract->customer->name }}
                                         </a>
                                     </td>
@@ -75,10 +76,13 @@
                                         <i class="bi bi-phone me-2 text-muted"></i>{{ $contract->customer->phone }}
                                     </td>
                                     <td>
-                                        <i class="bi bi-tag me-2 text-muted"></i>{{ $contract->type->name }} {{ $contract->type->type }}
+                                        <i class="bi bi-tag me-2 text-muted"></i>{{ $contract->type->name }}
+                                        {{ $contract->type->type }}
                                     </td>
                                     <td>
-                                        <i class="bi bi-currency-dollar me-2 text-muted"></i>{{ number_format($contract->contract_price, 2) }} SAR
+                                        <i
+                                            class="bi bi-currency-dollar me-2 text-muted"></i>{{ number_format($contract->contract_price, 2) }}
+                                        SAR
                                     </td>
                                     <td>
                                         <i class="bi bi-calendar-event me-2 text-muted"></i>
@@ -91,11 +95,13 @@
                                             </span>
                                         @elseif ($contract->contract_status == 'Not approved')
                                             <span class="px-3 py-1 badge rounded-pill bg-success-subtle text-success">
-                                                <i class="bi bi-check-circle me-1"></i>{{ ucfirst($contract->contract_status) }}
+                                                <i
+                                                    class="bi bi-check-circle me-1"></i>{{ ucfirst($contract->contract_status) }}
                                             </span>
                                         @else
                                             <span class="px-3 py-1 badge rounded-pill bg-info-subtle text-info">
-                                                <i class="bi bi-info-circle me-1"></i>{{ ucfirst($contract->contract_status) }}
+                                                <i
+                                                    class="bi bi-info-circle me-1"></i>{{ ucfirst($contract->contract_status) }}
                                             </span>
                                         @endif
                                     </td>
@@ -110,6 +116,9 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <div class="mt-4 d-flex justify-content-center">
+                        {{ $contracts->links('vendor.pagination.custom') }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -133,32 +142,32 @@
     </style>
 
     @push('scripts')
-    <script>
-        $(document).ready(function() {
-            $('#example2').DataTable({
-                lengthChange: false,
-                "pageLength": 10,
-                "dom": '<"row"<"col-md-6"B><"col-md-6"f>>rtip',
-                buttons: [
-                    {
-                        extend: 'copy',
-                        className: 'btn btn-secondary btn-sm'
-                    },
-                    {
-                        extend: 'excel',
-                        className: 'btn btn-secondary btn-sm'
-                    },
-                    {
-                        extend: 'pdf',
-                        className: 'btn btn-secondary btn-sm'
-                    },
-                    {
-                        extend: 'print',
-                        className: 'btn btn-secondary btn-sm'
-                    }
-                ]
+        <script>
+            $(document).ready(function() {
+                $('#example2').DataTable({
+                    lengthChange: false,
+                    paging: false,
+                    info: false,
+                    dom: '<"row"<"col-md-6"B><"col-md-6"f>>rt',
+                    buttons: [{
+                            extend: 'copy',
+                            className: 'btn btn-secondary btn-sm'
+                        },
+                        {
+                            extend: 'excel',
+                            className: 'btn btn-secondary btn-sm'
+                        },
+                        {
+                            extend: 'pdf',
+                            className: 'btn btn-secondary btn-sm'
+                        },
+                        {
+                            extend: 'print',
+                            className: 'btn btn-secondary btn-sm'
+                        }
+                    ]
+                });
             });
-        });
-    </script>
+        </script>
     @endpush
 @endsection

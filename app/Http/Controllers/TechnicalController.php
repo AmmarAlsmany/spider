@@ -523,6 +523,11 @@ class TechnicalController extends Controller
             ->whereHas('visitSchedules')
             ->get();
 
+        // Get sort direction from request or default to descending
+        $sortDirection = $request->input('sort_direction', 'desc');
+        // Validate sort direction
+        $sortDirection = in_array($sortDirection, ['asc', 'desc']) ? $sortDirection : 'desc';
+
         // Get paginated visits for each contract
         $contractVisits = [];
         $branchVisitsPagination = [];
@@ -531,7 +536,8 @@ class TechnicalController extends Controller
             // Get the contract's visits
             $contractVisits[$contract->id] = VisitSchedule::with(['team', 'branch'])
                 ->where('contract_id', $contract->id)
-                ->orderBy('visit_date', 'desc')
+                ->orderBy('visit_date', $sortDirection)
+                ->orderBy('visit_time', $sortDirection)
                 ->paginate(5, ['*'], 'contract_' . $contract->id . '_page');
 
             // Group visits by branch for branch-specific pagination
@@ -540,7 +546,8 @@ class TechnicalController extends Controller
                     $branchVisitsPagination[$branch->id] = VisitSchedule::with(['team', 'branch'])
                         ->where('contract_id', $contract->id)
                         ->where('branch_id', $branch->id)
-                        ->orderBy('visit_date', 'desc')
+                        ->orderBy('visit_date', $sortDirection)
+                        ->orderBy('visit_time', $sortDirection)
                         ->paginate(6, ['*'], 'branch_' . $branch->id . '_page');
                 }
             }
@@ -552,7 +559,8 @@ class TechnicalController extends Controller
                     $query->whereNull('branch_id')
                         ->orWhere('branch_id', 0);
                 })
-                ->orderBy('visit_date', 'desc')
+                ->orderBy('visit_date', $sortDirection)
+                ->orderBy('visit_time', $sortDirection)
                 ->paginate(6, ['*'], 'branch_main_' . $contract->id . '_page');
         }
 
@@ -572,7 +580,8 @@ class TechnicalController extends Controller
             'todayVisits',
             'todayCompletedVisits',
             'teams',
-            'clients'
+            'clients',
+            'sortDirection'
         ));
     }
 
@@ -631,15 +640,20 @@ class TechnicalController extends Controller
             });
         }
 
-        $visits = $query->orderBy('visit_date', 'desc')
-            ->orderBy('visit_time', 'desc')
+        // Get sort direction from request or default to descending
+        $sortDirection = $request->input('sort_direction', 'desc');
+        // Validate sort direction
+        $sortDirection = in_array($sortDirection, ['asc', 'desc']) ? $sortDirection : 'desc';
+
+        $visits = $query->orderBy('visit_date', $sortDirection)
+            ->orderBy('visit_time', $sortDirection)
             ->paginate(10);
 
         $teams = Team::where('type', '=', 'scattered')
             ->where('status', '=', 'active')
             ->get();
 
-        return view('managers.technical.completed_visits', compact('visits', 'teams'));
+        return view('managers.technical.completed_visits', compact('visits', 'teams', 'sortDirection'));
     }
 
     public function viewCancelledVisits(Request $request)
@@ -667,15 +681,20 @@ class TechnicalController extends Controller
             });
         }
 
-        $visits = $query->orderBy('visit_date', 'desc')
-            ->orderBy('visit_time', 'desc')
+        // Get sort direction from request or default to descending
+        $sortDirection = $request->input('sort_direction', 'desc');
+        // Validate sort direction
+        $sortDirection = in_array($sortDirection, ['asc', 'desc']) ? $sortDirection : 'desc';
+
+        $visits = $query->orderBy('visit_date', $sortDirection)
+            ->orderBy('visit_time', $sortDirection)
             ->paginate(10);
 
         $teams = Team::where('type', '=', 'scattered')
             ->where('status', '=', 'active')
             ->get();
 
-        return view('managers.technical.cancelled_visits', compact('visits', 'teams'));
+        return view('managers.technical.cancelled_visits', compact('visits', 'teams', 'sortDirection'));
     }
 
     public function rescheduleVisit(Request $request, $id)

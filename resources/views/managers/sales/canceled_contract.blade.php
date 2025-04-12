@@ -1,20 +1,20 @@
 @extends('shared.dashboard')
 @section('content')
     <div class="page-content">
-        @if(session('error'))
-        <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bx bx-error-circle me-1"></i>
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+        @if (session('error'))
+            <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bx bx-error-circle me-1"></i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         @endif
-    
-        @if(session('success'))
-        <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bx bx-check-circle me-1"></i>
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+
+        @if (session('success'))
+            <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bx bx-check-circle me-1"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         @endif
         <div class="mb-4 page-breadcrumb d-flex align-items-center">
             <div class="pe-3 breadcrumb-title d-flex align-items-center">
@@ -26,7 +26,8 @@
             <div class="ps-3">
                 <nav aria-label="breadcrumb">
                     <ol class="p-0 mb-0 breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}"><i class="bx bx-home-alt"></i></a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}"><i
+                                    class="bx bx-home-alt"></i></a></li>
                         <li class="breadcrumb-item active" aria-current="page">Canceled Contract</li>
                     </ol>
                 </nav>
@@ -57,28 +58,32 @@
                             @foreach ($contracts as $contract)
                                 <tr>
                                     <td>
-                                        <a href="{{ route('view.my.clients.details', ['id' => $contract->customer->id]) }}" 
-                                           class="text-primary text-decoration-none">
+                                        <a href="{{ route('view.my.clients.details', ['id' => $contract->customer->id]) }}"
+                                            class="text-primary text-decoration-none">
                                             <i class="bi bi-person me-2"></i>{{ $contract->customer->name }}
                                         </a>
                                     </td>
                                     <td>
-                                        <a href="mailto:{{ $contract->customer->email }}"><i class="bi bi-envelope me-2 text-muted"></i>{{ $contract->customer->email }}
+                                        <a href="mailto:{{ $contract->customer->email }}"><i
+                                                class="bi bi-envelope me-2 text-muted"></i>{{ $contract->customer->email }}
                                         </a>
                                     </td>
                                     <td>
-                                        <a href="tel:{{ $contract->customer->phone }}"><i class="bi bi-phone me-2 text-muted"></i>{{ $contract->customer->phone }}
+                                        <a href="tel:{{ $contract->customer->phone }}"><i
+                                                class="bi bi-phone me-2 text-muted"></i>{{ $contract->customer->phone }}
                                         </a>
                                     </td>
                                     <td>
                                         <a href="{{ route('contract.show.details', ['id' => $contract->id]) }}"
-                                           class="text-primary text-decoration-none">
+                                            class="text-primary text-decoration-none">
                                             <i class="bi bi-file-text me-2"></i>{{ $contract->contract_number }}
                                         </a>
                                     </td>
                                     <td>{{ $contract->type->name }} {{ $contract->type->type }}</td>
                                     <td>
-                                        <i class="bi bi-currency-dollar me-2 text-muted"></i>{{ $contract->contract_price }} SAR
+                                        <i
+                                            class="bi bi-currency-dollar me-2 text-muted"></i>{{ $contract->contract_price }}
+                                        SAR
                                     </td>
                                     <td>
                                         <i class="bi bi-calendar-event me-2 text-muted"></i>
@@ -96,10 +101,11 @@
                                     </td>
                                     <td>
                                         <i class="bi bi-exclamation-triangle me-2 text-muted"></i>
-                                        {{ $contract->rejection_reason ? $contract->rejection_reason : 'Stopped from the Sales Manager' }} 
+                                        {{ $contract->rejection_reason ? $contract->rejection_reason : 'Stopped from the Sales Manager' }}
                                     </td>
                                     <td>
-                                        <form action="{{ route('contract.return', ['id' => $contract->id]) }}" method="POST">
+                                        <form action="{{ route('contract.return', ['id' => $contract->id]) }}"
+                                            method="POST">
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="status" value="pending">
@@ -112,6 +118,9 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <div class="mt-4 d-flex justify-content-center">
+                        {{ $contracts->links('vendor.pagination.custom') }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -123,54 +132,67 @@
             border-radius: 10px;
             transition: all 0.3s ease;
         }
+
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
+
         .table {
             border-radius: 10px;
             overflow: hidden;
             border: 1px solid #eee;
         }
+
         .table thead {
             background-color: #f8f9fa;
         }
+
         .table thead th {
             border-bottom: none;
             font-weight: 600;
             color: #444;
         }
+
         .table td {
             vertical-align: middle;
             padding: 1rem 0.75rem;
         }
+
         .table tbody tr {
             transition: all 0.2s ease;
         }
+
         .table tbody tr:hover {
             background-color: #f8f9fa;
         }
+
         .badge {
             font-weight: 500;
             letter-spacing: 0.5px;
         }
+
         .text-decoration-none:hover {
             color: #0056b3 !important;
         }
+
         .dataTables_wrapper .dataTables_paginate .paginate-button {
             border-radius: 8px;
             margin: 0 2px;
         }
+
         .dataTables_wrapper .dataTables_filter input {
             border-radius: 8px;
             border: 1px solid #eee;
             padding: 5px 10px;
         }
+
         .dataTables_wrapper .dataTables_length select {
             border-radius: 8px;
             border: 1px solid #eee;
             padding: 5px 10px;
         }
+
         .dt-buttons .btn {
             border-radius: 8px;
             margin-right: 5px;
@@ -186,8 +208,10 @@
         $(document).ready(function() {
             var table = $('#example2').DataTable({
                 lengthChange: false,
-                buttons: [
-                    {
+                paging: false,
+                info: false,
+                dom: '<"row"<"col-md-6"B><"col-md-6"f>>rt',
+                buttons: [{
                         extend: 'copy',
                         className: 'btn btn-light shadow-sm'
                     },
@@ -203,9 +227,7 @@
                         extend: 'print',
                         className: 'btn btn-light shadow-sm'
                     }
-                ],
-                "pageLength": 10,
-                "dom": '<"row"<"col-md-6"B><"col-md-6"f>>rtip'
+                ]
             });
 
             table.buttons().container()

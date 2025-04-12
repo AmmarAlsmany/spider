@@ -23,23 +23,23 @@ class TeamKpiController extends Controller
 
         // Get all teams
         $teams = Team::with(['leader', 'members'])->get();
-        
+
         // Get selected team if provided
         $selectedTeam = null;
         if ($request->filled('team_id')) {
             $selectedTeam = Team::with(['leader', 'members'])->find($request->team_id);
         }
-        
+
         // Get date range
         $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
         $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date) : Carbon::now()->endOfMonth();
-        
+
         // Calculate KPIs for all teams or selected team
         $kpiData = $this->calculateTeamKpis($startDate, $endDate, $selectedTeam ? $selectedTeam->id : null);
-        
+
         return view('managers.technical.kpi.index', compact('teams', 'selectedTeam', 'startDate', 'endDate', 'kpiData'));
     }
-    
+
     /**
      * Display KPIs for a specific team
      */
@@ -49,64 +49,64 @@ class TeamKpiController extends Controller
         if (Auth::user()->role !== 'technical') {
             return redirect()->back()->with('error', 'Unauthorized access.');
         }
-        
+
         $team = Team::with(['leader', 'members'])->findOrFail($teamId);
-        
+
         // Get date range
         $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
         $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date) : Carbon::now()->endOfMonth();
-        
+
         // Calculate KPIs for the team
         $kpiData = $this->calculateTeamKpis($startDate, $endDate, $teamId);
-        
+
         // Get detailed visit data for the team
         $visitData = $this->getTeamVisitData($teamId, $startDate, $endDate);
-        
+
         // Get detailed report data for the team
         $reportData = $this->getTeamReportData($teamId, $startDate, $endDate);
-        
+
         return view('managers.technical.kpi.team_detail', compact('team', 'startDate', 'endDate', 'kpiData', 'visitData', 'reportData'));
     }
-    
+
     /**
      * Calculate KPIs for teams
      */
     private function calculateTeamKpis($startDate, $endDate, $teamId = null)
     {
         $query = Team::with(['leader', 'members']);
-        
+
         if ($teamId) {
             $query->where('id', $teamId);
         }
-        
+
         $teams = $query->get();
         $kpiData = [];
-        
+
         foreach ($teams as $team) {
             // Get all visits for the team in the date range
             $allVisits = VisitSchedule::where('team_id', $team->id)
                 ->whereBetween('visit_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
                 ->get();
-            
+
             // Get completed visits
             $completedVisits = $allVisits->where('status', 'completed')->count();
-            
+
             // Get pending visits
             $pendingVisits = $allVisits->where('status', '!=', 'completed')->count();
-            
+
             // Get reports created
             $reportsCreated = VisitReport::whereIn('visit_id', $allVisits->pluck('id'))->count();
-            
+
             // Calculate completion rate
             $completionRate = $allVisits->count() > 0 ? round(($completedVisits / $allVisits->count()) * 100, 2) : 0;
-            
+
             // Calculate report submission rate
             $reportRate = $completedVisits > 0 ? round(($reportsCreated / $completedVisits) * 100, 2) : 0;
-            
+
             // Calculate average time between visit completion and report submission
             $avgReportTime = 0;
             $reportsWithTime = 0;
-            
+
             foreach ($allVisits->where('status', 'completed') as $visit) {
                 $report = VisitReport::where('visit_id', $visit->id)->first();
                 if ($report) {
@@ -117,13 +117,13 @@ class TeamKpiController extends Controller
                     $reportsWithTime++;
                 }
             }
-            
+
             $avgReportTime = $reportsWithTime > 0 ? round($avgReportTime / $reportsWithTime, 2) : 0;
-            
+
             // Calculate average visit duration
             $avgVisitDuration = 0;
             $visitsWithDuration = 0;
-            
+
             foreach ($allVisits as $visit) {
                 $report = VisitReport::where('visit_id', $visit->id)->first();
                 if ($report && $report->time_in && $report->time_out) {
@@ -134,13 +134,13 @@ class TeamKpiController extends Controller
                     $visitsWithDuration++;
                 }
             }
-            
+
             $avgVisitDuration = $visitsWithDuration > 0 ? round($avgVisitDuration / $visitsWithDuration, 2) : 0;
-            
+
             // Calculate customer satisfaction
             $totalSatisfaction = 0;
             $satisfactionCount = 0;
-            
+
             foreach ($allVisits as $visit) {
                 $report = VisitReport::where('visit_id', $visit->id)->first();
                 if ($report && $report->customer_satisfaction) {
@@ -148,32 +148,68 @@ class TeamKpiController extends Controller
                     $satisfactionCount++;
                 }
             }
-            
+
             $avgSatisfaction = $satisfactionCount > 0 ? round($totalSatisfaction / $satisfactionCount, 2) : 0;
-            
+
             // Get most common target insects
             $targetInsects = [];
+            $insectQuantities = [];
+
             foreach ($allVisits as $visit) {
                 $report = VisitReport::where('visit_id', $visit->id)->first();
                 if ($report && $report->target_insects) {
-                    // Ensure target_insects is an array
-                    $insects = is_string($report->target_insects) ? json_decode($report->target_insects, true) : $report->target_insects;
-                    
-                    if (is_array($insects)) {
-                        foreach ($insects as $insect) {
-                            if (isset($targetInsects[$insect])) {
-                                $targetInsects[$insect]++;
-                            } else {
-                                $targetInsects[$insect] = 1;
-                            }
+                    // Ensure target_insects is properly decoded
+                    $insectsJson = $report->target_insects;
+                    $insects = is_string($insectsJson) ? json_decode($insectsJson, true) : [];
+                    $insects = is_array($insects) ? $insects : [];
+
+                    // Get quantities with proper validation
+                    $quantitiesJson = $report->insect_quantities;
+                    $quantities = is_string($quantitiesJson) ? json_decode($quantitiesJson, true) : [];
+                    $quantities = is_array($quantities) ? $quantities : [];
+
+                    foreach ($insects as $insect) {
+                        if (!isset($targetInsects[$insect])) {
+                            $targetInsects[$insect] = 0;
+                            $insectQuantities[$insect] = 0;
+                        }
+
+                        $targetInsects[$insect]++;
+
+                        // Add quantities with validation
+                        if (isset($quantities[$insect]) && is_numeric($quantities[$insect])) {
+                            $insectQuantities[$insect] += (int)$quantities[$insect];
+                        } else {
+                            $insectQuantities[$insect] += 1;
                         }
                     }
                 }
             }
-            
+
+            // Sort by frequency
             arsort($targetInsects);
-            $topInsects = array_slice($targetInsects, 0, 3, true);
-            
+
+            // Get top insects with more complete information
+            $topInsects = [];
+            $insectCounter = 0;
+            foreach ($targetInsects as $insect => $count) {
+                if ($insectCounter >= 3) break; // Limit to top 3
+
+                // Get the insect name from the database
+                $insectModel = \App\Models\TargetInsect::where('value', $insect)->first();
+                $insectName = $insectModel ? $insectModel->name : $insect;
+
+                $topInsects[$insect] = [
+                    'name' => $insectName,
+                    'count' => $count,
+                    'quantity' => $insectQuantities[$insect] ?? $count,
+                    'avg_per_visit' => $count > 0 ? round(($insectQuantities[$insect] ?? $count) / $count, 1) : 0,
+                    'percentage' => $completedVisits > 0 ? round(($count / $completedVisits) * 100, 1) : 0
+                ];
+
+                $insectCounter++;
+            }
+
             // Get most common pesticides used
             $pesticidesUsed = [];
             foreach ($allVisits as $visit) {
@@ -181,7 +217,7 @@ class TeamKpiController extends Controller
                 if ($report && $report->pesticides_used) {
                     // Ensure pesticides_used is an array
                     $pesticides = is_string($report->pesticides_used) ? json_decode($report->pesticides_used, true) : $report->pesticides_used;
-                    
+
                     if (is_array($pesticides)) {
                         foreach ($pesticides as $pesticide) {
                             if (isset($pesticidesUsed[$pesticide])) {
@@ -193,10 +229,10 @@ class TeamKpiController extends Controller
                     }
                 }
             }
-            
+
             arsort($pesticidesUsed);
             $topPesticides = array_slice($pesticidesUsed, 0, 3, true);
-            
+
             $kpiData[$team->id] = [
                 'team' => $team,
                 'total_visits' => $allVisits->count(),
@@ -212,10 +248,10 @@ class TeamKpiController extends Controller
                 'top_pesticides' => $topPesticides
             ];
         }
-        
+
         return $kpiData;
     }
-    
+
     /**
      * Get detailed visit data for a team
      */
@@ -227,21 +263,21 @@ class TeamKpiController extends Controller
             ->orderBy('visit_date', 'desc')
             ->get();
     }
-    
+
     /**
      * Get detailed report data for a team
      */
     private function getTeamReportData($teamId, $startDate, $endDate)
     {
         return VisitReport::with(['visit.contract.customer', 'createdBy'])
-            ->whereHas('visit', function($query) use ($teamId, $startDate, $endDate) {
+            ->whereHas('visit', function ($query) use ($teamId, $startDate, $endDate) {
                 $query->where('team_id', $teamId)
                     ->whereBetween('visit_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
             })
             ->orderBy('created_at', 'desc')
             ->get();
     }
-    
+
     /**
      * Generate PDF report for team KPIs
      */
@@ -251,14 +287,14 @@ class TeamKpiController extends Controller
         if (Auth::user()->role !== 'technical') {
             return redirect()->back()->with('error', 'Unauthorized access.');
         }
-        
+
         $teamId = $request->team_id;
         $startDate = Carbon::parse($request->start_date);
         $endDate = Carbon::parse($request->end_date);
-        
+
         $team = Team::with(['leader', 'members'])->findOrFail($teamId);
         $kpiData = $this->calculateTeamKpis($startDate, $endDate, $teamId);
-        
+
         // Generate HTML content for the report
         $htmlContent = view('managers.technical.kpi.pdf_report', [
             'team' => $team,
@@ -266,10 +302,10 @@ class TeamKpiController extends Controller
             'startDate' => $startDate,
             'endDate' => $endDate
         ])->render();
-        
+
         // Use the existing ReportsController to generate the PDF
         $reportController = new ReportsController();
-        
+
         return $reportController->generatePDF(new Request([
             'report_type' => 'team_kpi',
             'start_date' => $startDate->format('Y-m-d'),
@@ -278,7 +314,7 @@ class TeamKpiController extends Controller
             'html_content' => $htmlContent
         ]));
     }
-    
+
     /**
      * Compare KPIs between teams
      */
@@ -288,30 +324,30 @@ class TeamKpiController extends Controller
         if (Auth::user()->role !== 'technical') {
             return redirect()->back()->with('error', 'Unauthorized access.');
         }
-        
+
         // Get teams for selection
         $teams = Team::with(['leader'])->get();
-        
+
         // Get selected teams
         $selectedTeams = [];
         if ($request->filled('team_ids')) {
             $selectedTeams = Team::with(['leader', 'members'])->whereIn('id', $request->team_ids)->get();
         }
-        
+
         // Get date range
         $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
         $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date) : Carbon::now()->endOfMonth();
-        
+
         // Calculate KPIs for selected teams
         $kpiData = [];
         if (!empty($selectedTeams)) {
             $kpiData = $this->calculateTeamKpis($startDate, $endDate, null);
             // Filter to only include selected teams
-            $kpiData = array_filter($kpiData, function($key) use ($request) {
+            $kpiData = array_filter($kpiData, function ($key) use ($request) {
                 return in_array($key, $request->team_ids);
             }, ARRAY_FILTER_USE_KEY);
         }
-        
+
         return view('managers.technical.kpi.compare', compact('teams', 'selectedTeams', 'startDate', 'endDate', 'kpiData'));
     }
 }

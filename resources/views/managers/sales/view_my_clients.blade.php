@@ -1,20 +1,20 @@
 @extends('shared.dashboard')
 @section('content')
     <div class="page-content">
-        @if(session('error'))
-        <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bx bx-error-circle me-1"></i>
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+        @if (session('error'))
+            <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bx bx-error-circle me-1"></i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         @endif
-    
-        @if(session('success'))
-        <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bx bx-check-circle me-1"></i>
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+
+        @if (session('success'))
+            <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bx bx-check-circle me-1"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         @endif
         <div class="mb-4 page-breadcrumb d-flex align-items-center">
             <div class="pe-3 breadcrumb-title d-flex align-items-center">
@@ -26,7 +26,8 @@
             <div class="ps-3">
                 <nav aria-label="breadcrumb">
                     <ol class="p-0 mb-0 breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}" class="text-decoration-none"><i class="bx bx-home-alt"></i></a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}" class="text-decoration-none"><i
+                                    class="bx bx-home-alt"></i></a></li>
                         <li class="breadcrumb-item active text-muted" aria-current="page">Clients List</li>
                     </ol>
                 </nav>
@@ -57,8 +58,8 @@
                                                 <i class="bx bx-user-circle"></i>
                                             </div>
                                             <div class="ms-2">
-                                                <a href="{{ route('view.my.clients.details', ['id' => $item->id]) }}" 
-                                                   class="mb-0 text-primary fw-semibold text-decoration-none">
+                                                <a href="{{ route('view.my.clients.details', ['id' => $item->id]) }}"
+                                                    class="mb-0 text-primary fw-semibold text-decoration-none">
                                                     {{ $item->name }}
                                                 </a>
                                             </div>
@@ -77,8 +78,8 @@
                                         {{ $item->address }}
                                     </td>
                                     <td class="align-middle">
-                                        <a href="{{ route('view.my.clients.details', ['id' => $item->id]) }}" 
-                                           class="btn btn-sm btn-primary">
+                                        <a href="{{ route('view.my.clients.details', ['id' => $item->id]) }}"
+                                            class="btn btn-sm btn-primary">
                                             <i class="bi bi-eye me-1"></i>View
                                         </a>
                                     </td>
@@ -86,6 +87,9 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <div class="mt-4 d-flex justify-content-center">
+                        {{ $clients->links('vendor.pagination.custom') }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -97,33 +101,41 @@
             border-radius: 10px;
             transition: all 0.3s ease;
         }
+
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
+
         .table {
             border-radius: 10px;
             overflow: hidden;
             border: 1px solid #eee;
         }
+
         .table thead {
             background-color: #f8f9fa;
         }
+
         .table thead th {
             border-bottom: none;
             font-weight: 600;
             color: #444;
             padding: 1rem 0.75rem;
         }
+
         .table td {
             padding: 1rem 0.75rem;
         }
+
         .table tbody tr {
             transition: all 0.2s ease;
         }
+
         .table tbody tr:hover {
             background-color: #f8f9fa;
         }
+
         .client-icon {
             width: 40px;
             height: 40px;
@@ -133,15 +145,18 @@
             align-items: center;
             justify-content: center;
         }
+
         .client-icon i {
             font-size: 24px;
             color: #6c757d;
         }
+
         .btn {
             padding: 0.5rem 1rem;
             border-radius: 8px;
             transition: all 0.3s ease;
         }
+
         .btn:hover {
             transform: translateY(-2px);
         }
@@ -154,10 +169,11 @@
         $(document).ready(function() {
             $('#clientsTable').DataTable({
                 lengthChange: false,
-                pageLength: 10,
-                dom: '<"row"<"col-md-6"B><"col-md-6"f>>rtip',
-                buttons: [
-                    {
+                paging: false,
+                searching: true,
+                info: false,
+                dom: '<"row"<"col-md-6"B><"col-md-6"f>>rt',
+                buttons: [{
                         extend: 'copy',
                         className: 'btn btn-light shadow-sm'
                     },

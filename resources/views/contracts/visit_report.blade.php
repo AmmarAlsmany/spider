@@ -1,102 +1,5 @@
 @extends('shared.dashboard')
 
-@section('styles')
-    <style>
-        @media print {
-
-            /* Hide everything except the content we want to print */
-            body * {
-                visibility: hidden;
-            }
-
-            .page-content,
-            .page-content * {
-                visibility: visible;
-            }
-
-            /* Remove all navigation elements */
-            .sidebar-wrapper,
-            .topbar,
-            .page-breadcrumb,
-            .simplebar-content-wrapper>*:not(.page-content),
-            .footer,
-            .back-to-top,
-            .btn-outline-primary,
-            nav,
-            .header-wrapper,
-            .btn {
-                display: none !important;
-            }
-
-            /* Position the printable content */
-            .page-content {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 15px !important;
-            }
-
-            /* Ensure report takes full width */
-            .container,
-            .card {
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                border: none !important;
-                box-shadow: none !important;
-            }
-
-            /* Add page title */
-            .card-body:before {
-                content: "Visit Report";
-                display: block;
-                font-size: 24px;
-                font-weight: bold;
-                text-align: center;
-                margin-bottom: 20px;
-            }
-
-            /* Remove background colors for print */
-            .card-header {
-                background: none !important;
-                border-bottom: 1px solid #ddd !important;
-            }
-
-            /* Fix badge printing */
-            .badge {
-                border: 1px solid #000 !important;
-                color: #000 !important;
-                background: none !important;
-            }
-
-            /* Ensure proper page breaks */
-            .card {
-                page-break-inside: avoid;
-            }
-        }
-    </style>
-
-    <script>
-        function printReport() {
-            // Hide the print button before printing
-            const printBtn = document.querySelector('.btn-outline-primary');
-            if (printBtn) printBtn.style.display = 'none';
-
-            // Delay to ensure styles are applied
-            setTimeout(function() {
-                window.print();
-
-                // Show the button again after print dialog closes
-                setTimeout(function() {
-                    if (printBtn) printBtn.style.display = 'inline-flex';
-                }, 100);
-            }, 100);
-        }
-    </script>
-@endsection
-
 @section('content')
     <div class="page-content">
         <div class="mb-3 page-breadcrumb d-none d-sm-flex align-items-center">
@@ -127,8 +30,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <p class="card-text">Visit Date:
-                                        {{ \Carbon\Carbon::parse($visit->visit_date)->format('d
-                                                                                                                                                                                                                                                                                    M, Y') }}
+                                        {{ \Carbon\Carbon::parse($visit->visit_date)->format('d M, Y') }}
                                     </p>
                                     <p class="card-text">Visit Time In:
                                         {{ \Carbon\Carbon::parse($visit->report->time_in)->format('h:i A') }}</p>
@@ -151,9 +53,11 @@
                         <div class="card-header bg-light">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">Visit Report</h6>
-                                <button onclick="printReport()" class="btn btn-sm btn-outline-primary">
-                                    <i class="bx bx-printer me-1"></i>Print Report
-                                </button>
+                                @if ($visit->status == 'completed' && $visit->report)
+                                    <button id="printReportBtn" class="btn btn-primary btn-sm me-2">
+                                        <i class="bx bx-printer me-1"></i>Print Report
+                                    </button>
+                                @endif
                             </div>
                         </div>
                         <div class="card-body">
@@ -301,3 +205,97 @@
         </div>
     </div>
 @endsection
+
+@if ($visit->status == 'completed' && $visit->report)
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const printButton = document.getElementById('printReportBtn');
+
+                if (printButton) {
+                    printButton.addEventListener('click', function() {
+                        try {
+                            // Create a print header for the report
+                            const reportContainer = document.querySelector('.card-body');
+                            const printHeader = document.createElement('div');
+                            printHeader.className = 'print-only mb-4';
+                            printHeader.innerHTML = `
+                                <div class="text-center">
+                                    <h3>Visit Report</h3>
+                                    <p>Visit #{{ $visit->id }} - {{ date('M d, Y', strtotime($visit->visit_date)) }}</p>
+                                    <p>Customer: {{ $visit->contract->customer->name }}</p>
+                                    <p>Location: {{ $visit->branch_id ? $visit->branch->branch_name : 'Main Location' }}</p>
+                                </div>
+                            `;
+                            reportContainer.prepend(printHeader);
+
+                            // Mark elements that shouldn't be printed
+                            const buttonsToHide = document.querySelectorAll('.btn');
+                            buttonsToHide.forEach(btn => btn.classList.add('no-print'));
+
+                            // Print the page
+                            window.print();
+
+                            // Clean up after print dialog closes
+                            window.onafterprint = function() {
+                                // Remove the print header
+                                if (printHeader.parentNode) {
+                                    printHeader.parentNode.removeChild(printHeader);
+                                }
+
+                                // Remove no-print class from buttons
+                                buttonsToHide.forEach(btn => btn.classList.remove('no-print'));
+                            };
+                        } catch (e) {
+                            console.error('Print setup error:', e);
+                            alert('Error setting up print: ' + e.message);
+                        }
+                    });
+                } else {
+                    console.warn('Print button not found on the page');
+                }
+            });
+        </script>
+
+        <style>
+            @media print {
+                body * {
+                    visibility: hidden;
+                }
+
+                .page-content {
+                    visibility: visible;
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                }
+
+                .page-content * {
+                    visibility: visible;
+                }
+
+                .card-body {
+                    break-inside: avoid;
+                }
+
+                .no-print,
+                .no-print *,
+                #printReportBtn,
+                .btn,
+                .alert,
+                .header,
+                .footer,
+                nav,
+                aside {
+                    display: none !important;
+                }
+
+                @page {
+                    size: A4;
+                    margin: 1cm;
+                }
+            }
+        </style>
+    @endpush
+@endif

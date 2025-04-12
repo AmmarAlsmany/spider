@@ -57,8 +57,7 @@ class sales extends Controller
         $recentContracts = contracts::where('sales_id', $userId)
             ->with(['type', 'customer'])
             ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
+            ->paginate(5);
 
         // Get recent tickets
         $recentTickets = tikets::whereHas('client_info', function ($query) use ($userId) {
@@ -70,8 +69,7 @@ class sales extends Controller
             ->orWhere('status', 'resolved')
             ->orWhere('status', 'closed')
             ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
+            ->paginate(5);
 
         return view('managers.sales.dashboard', compact(
             'totalContracts',
@@ -94,7 +92,7 @@ class sales extends Controller
 
     public function view_my_clients()
     {
-        $clients = client::where('sales_id', Auth::user()->id)->get();
+        $clients = client::where('sales_id', Auth::user()->id)->paginate(10);
         return view('managers.sales.view_my_clients', compact('clients'));
     }
 
@@ -293,7 +291,7 @@ class sales extends Controller
                 break;
         }
 
-        $payments = $query->orderBy('due_date', 'asc')->get();
+        $payments = $query->orderBy('due_date', 'asc')->paginate(10);
 
         return view('managers.sales.ToDoList', compact('payments', 'filter'));
     }
@@ -407,30 +405,30 @@ class sales extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             $contract = contracts::findOrFail($request->id);
             $oldStatus = $contract->contract_status;
             $contract->contract_status = $request->status;
             $contract->rejection_reason = null;
             $contract->save();
-            
+
             // If contract is being reactivated (status changed from stopped to approved)
             // then restore the cancelled visits
             if ($oldStatus === 'stopped') {
                 // Get the VisitScheduleService instance
                 $visitScheduleService = app(VisitScheduleService::class);
                 $restoredVisits = $visitScheduleService->restoreContractVisits($contract);
-                
+
                 // Prepare success message
                 $message = 'Contract status changed successfully';
                 if ($restoredVisits > 0) {
                     $message .= " and $restoredVisits cancelled visits were restored";
                 }
-                
+
                 DB::commit();
                 return redirect()->back()->with('success', $message);
             }
-            
+
             DB::commit();
             return redirect()->back()->with('success', 'Contract status changed successfully');
         } catch (\Exception $e) {

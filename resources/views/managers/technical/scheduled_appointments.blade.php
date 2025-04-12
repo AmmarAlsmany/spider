@@ -132,6 +132,19 @@
                                                 placeholder="Enter contract #">
                                         </div>
                                     </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="sort_direction">Sort Order</label>
+                                            <select class="form-control" id="sort_direction" name="sort_direction">
+                                                <option value="desc"
+                                                    {{ isset($sortDirection) && $sortDirection == 'desc' ? 'selected' : '' }}>
+                                                    Newest First</option>
+                                                <option value="asc"
+                                                    {{ isset($sortDirection) && $sortDirection == 'asc' ? 'selected' : '' }}>
+                                                    Oldest First</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="col-md-2 d-flex align-items-end">
                                         <div class="mb-0 form-group">
                                             <button type="submit" class="btn btn-primary me-2">Filter</button>
@@ -302,7 +315,8 @@
                                                                                         {{ $contract->visitSchedules->where('branch_id', $branch->id)->count() }}
                                                                                         Visits
                                                                                     </div>
-                                                                                    <small class="ms-1 badge rounded-pill bg-info">{{ $branch->branch_address }}</small>
+                                                                                    <small
+                                                                                        class="ms-1 badge rounded-pill bg-info">{{ $branch->branch_address }}</small>
                                                                                 </div>
                                                                             </div>
                                                                             <div class="mt-2 d-flex justify-content-end">

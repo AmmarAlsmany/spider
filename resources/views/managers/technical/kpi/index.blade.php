@@ -147,7 +147,9 @@
                                             <ul class="mt-2 list-unstyled">
                                                 @forelse($data['top_insects'] as $insect => $count)
                                                     <li><i class="mdi mdi-circle-medium text-primary"></i>
-                                                        {{ $insect }} ({{ $count }})</li>
+                                                        {{ is_string($insect) ? $insect : json_encode($insect) }}
+                                                        ({{ is_scalar($count) ? $count : count((array) $count) }})
+                                                    </li>
                                                 @empty
                                                     <li class="text-muted">No data available</li>
                                                 @endforelse
@@ -160,7 +162,9 @@
                                             <ul class="mt-2 list-unstyled">
                                                 @forelse($data['top_pesticides'] as $pesticide => $count)
                                                     <li><i class="mdi mdi-circle-medium text-success"></i>
-                                                        {{ $pesticide }} ({{ $count }})</li>
+                                                        {{ is_string($pesticide) ? $pesticide : json_encode($pesticide) }}
+                                                        ({{ is_scalar($count) ? $count : count((array) $count) }})
+                                                    </li>
                                                 @empty
                                                     <li class="text-muted">No data available</li>
                                                 @endforelse

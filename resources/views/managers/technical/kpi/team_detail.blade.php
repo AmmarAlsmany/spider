@@ -260,7 +260,9 @@
                                                     <div class="d-flex align-items-center">
                                                         <i class="mdi mdi-circle-medium text-primary"></i>
                                                         <div class="flex-grow-1">
-                                                            <p class="mb-0">{{ $insect }}</p>
+                                                            <p class="mb-0">
+                                                                {{ is_string($insect) ? $insect : (is_array($insect) ? json_encode($insect) : (string) $insect) }}
+                                                            </p>
                                                             <div class="progress" style="height: 5px;">
                                                                 <div class="progress-bar bg-primary" role="progressbar"
                                                                     style="width: {{ ((is_scalar($count) ? $count : 1) / max(1, is_array($kpiData[$team->id]['top_insects']) ? array_sum($kpiData[$team->id]['top_insects']) : 1)) * 100 }}%;"
@@ -270,7 +272,8 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <span class="ms-2">{{ $count }}</span>
+                                                        <span
+                                                            class="ms-2">{{ is_scalar($count) ? $count : count((array) $count) }}</span>
                                                     </div>
                                                 </li>
                                             @empty
@@ -288,7 +291,9 @@
                                                     <div class="d-flex align-items-center">
                                                         <i class="mdi mdi-circle-medium text-success"></i>
                                                         <div class="flex-grow-1">
-                                                            <p class="mb-0">{{ $pesticide }}</p>
+                                                            <p class="mb-0">
+                                                                {{ is_string($pesticide) ? $pesticide : (is_array($pesticide) ? json_encode($pesticide) : (string) $pesticide) }}
+                                                            </p>
                                                             <div class="progress" style="height: 5px;">
                                                                 <div class="progress-bar bg-success" role="progressbar"
                                                                     style="width: {{ ((is_scalar($count) ? $count : 1) / max(1, is_array($kpiData[$team->id]['top_pesticides']) ? array_sum($kpiData[$team->id]['top_pesticides']) : 1)) * 100 }}%;"
@@ -298,7 +303,8 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <span class="ms-2">{{ $count }}</span>
+                                                        <span
+                                                            class="ms-2">{{ is_scalar($count) ? $count : count((array) $count) }}</span>
                                                     </div>
                                                 </li>
                                             @empty

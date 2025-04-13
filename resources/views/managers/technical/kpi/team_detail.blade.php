@@ -261,7 +261,7 @@
                                                             <p class="mb-0">{{ $insect }}</p>
                                                             <div class="progress" style="height: 5px;">
                                                                 <div class="progress-bar bg-primary" role="progressbar"
-                                                                    style="width: {{ ((is_scalar($count) ? $count : 1) / (is_array($kpiData[$team->id]['top_insects']) ? array_sum($kpiData[$team->id]['top_insects']) : 1)) * 100 }}%;"
+                                                                    style="width: {{ ((is_scalar($count) ? $count : 1) / max(1, is_array($kpiData[$team->id]['top_insects']) ? array_sum($kpiData[$team->id]['top_insects']) : 1)) * 100 }}%;"
                                                                     aria-valuenow="{{ is_scalar($count) ? $count : 1 }}"
                                                                     aria-valuemin="0"
                                                                     aria-valuemax="{{ is_array($kpiData[$team->id]['top_insects']) ? array_sum($kpiData[$team->id]['top_insects']) : 1 }}">
@@ -289,7 +289,7 @@
                                                             <p class="mb-0">{{ $pesticide }}</p>
                                                             <div class="progress" style="height: 5px;">
                                                                 <div class="progress-bar bg-success" role="progressbar"
-                                                                    style="width: {{ ((is_scalar($count) ? $count : 1) / (is_array($kpiData[$team->id]['top_pesticides']) ? array_sum($kpiData[$team->id]['top_pesticides']) : 1)) * 100 }}%;"
+                                                                    style="width: {{ ((is_scalar($count) ? $count : 1) / max(1, is_array($kpiData[$team->id]['top_pesticides']) ? array_sum($kpiData[$team->id]['top_pesticides']) : 1)) * 100 }}%;"
                                                                     aria-valuenow="{{ is_scalar($count) ? $count : 1 }}"
                                                                     aria-valuemin="0"
                                                                     aria-valuemax="{{ is_array($kpiData[$team->id]['top_pesticides']) ? array_sum($kpiData[$team->id]['top_pesticides']) : 1 }}">

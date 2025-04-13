@@ -4,7 +4,7 @@
             <img src="{{ asset('backend/assets/images/logo-icon.png') }}" class="logo-icon" alt="logo icon">
         </div>
         <div>
-            <h4 class="logo-text">Spider Web</h4>
+            <h4 class="logo-text">{{ __('admin.sidebar.logo_text') }}</h4>
         </div>
         <div class="toggle-icon ms-auto"><i class='bx bx-arrow-back'></i>
         </div>
@@ -14,90 +14,90 @@
         <li>
             <a href="{{ route('admin.dashboard') }}">
                 <div class="parent-icon"><i class='bx bx-home-circle'></i></div>
-                <div class="menu-title">Dashboard</div>
+                <div class="menu-title">{{ __('admin.sidebar.dashboard') }}</div>
             </a>
         </li>
 
-        <li class="menu-label">Staff Management</li>
+        <li class="menu-label">{{ __('admin.sidebar.staff_management') }}</li>
         <li>
             <a href="javascript:;" class="has-arrow">
                 <div class="parent-icon"><i class='bx bx-user-circle'></i></div>
-                <div class="menu-title">Managers</div>
+                <div class="menu-title">{{ __('admin.sidebar.managers') }}</div>
             </a>
             <ul>
                 <li>
-                    <a href="{{ route('admin.managers.index') }}"><i class="bx bx-right-arrow-alt"></i>All Managers</a>
+                    <a href="{{ route('admin.managers.index') }}"><i class="bx bx-right-arrow-alt"></i>{{ __('admin.sidebar.all_managers') }}</a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.managers.create') }}"><i class="bx bx-right-arrow-alt"></i>Add Manager</a>
+                    <a href="{{ route('admin.managers.create') }}"><i class="bx bx-right-arrow-alt"></i>{{ __('admin.sidebar.add_manager') }}</a>
                 </li>
             </ul>
         </li>
 
-        <li class="menu-label">Contract Management</li>
+        <li class="menu-label">{{ __('admin.sidebar.contract_management') }}</li>
         <li>
             <a href="javascript:;" class="has-arrow">
                 <div class="parent-icon"><i class='bx bx-file'></i></div>
-                <div class="menu-title">Contracts</div>
+                <div class="menu-title">{{ __('admin.sidebar.contracts') }}</div>
             </a>
             <ul>
                 <li>
                     <a href="{{ route('admin.contracts.index') }}">
-                        <i class="bx bx-right-arrow-alt"></i>All Contracts
+                        <i class="bx bx-right-arrow-alt"></i>{{ __('admin.sidebar.all_contracts') }}
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('admin.contracts.reports') }}">
-                        <i class="bx bx-chart"></i>Contract Reports
+                        <i class="bx bx-chart"></i>{{ __('admin.sidebar.contract_reports') }}
                     </a>
                 </li>
             </ul>
         </li>
 
-        <li class="menu-label">Support Management</li>
+        <li class="menu-label">{{ __('admin.sidebar.support_management') }}</li>
         <li>
             <a href="javascript:;" class="has-arrow">
                 <div class="parent-icon"><i class='bx bx-support'></i></div>
-                <div class="menu-title">Tickets</div>
+                <div class="menu-title">{{ __('admin.sidebar.tickets') }}</div>
             </a>
             <ul>
                 <li>
-                    <a href="{{ route('admin.tickets.index') }}"><i class="bx bx-right-arrow-alt"></i>All Tickets</a>
+                    <a href="{{ route('admin.tickets.index') }}"><i class="bx bx-right-arrow-alt"></i>{{ __('admin.sidebar.all_tickets') }}</a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.tickets.reports') }}"><i class="bx bx-chart"></i>Tickets Reports</a>
+                    <a href="{{ route('admin.tickets.reports') }}"><i class="bx bx-chart"></i>{{ __('admin.sidebar.ticket_reports') }}</a>
                 </li>
             </ul>
         </li>
 
-        <li class="menu-label">Financial Management</li>
+        <li class="menu-label">{{ __('admin.sidebar.financial_management') }}</li>
         <li>
             <a href="javascript:;" class="has-arrow">
                 <div class="parent-icon"><i class='bx bx-money'></i></div>
-                <div class="menu-title">Payments</div>
+                <div class="menu-title">{{ __('admin.sidebar.payments') }}</div>
             </a>
             <ul>
                 <li>
-                    <a href="{{ route('admin.payments.index') }}"><i class="bx bx-right-arrow-alt"></i>All Payments</a>
+                    <a href="{{ route('admin.payments.index') }}"><i class="bx bx-right-arrow-alt"></i>{{ __('admin.sidebar.all_payments') }}</a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.payments.reports') }}"><i class="bx bx-right-arrow-alt"></i>Payment Reports</a>
+                    <a href="{{ route('admin.payments.reports') }}"><i class="bx bx-right-arrow-alt"></i>{{ __('admin.sidebar.payment_reports') }}</a>
                 </li>
             </ul>
         </li>
 
-        <li class="menu-label">My Account</li>
+        <li class="menu-label">{{ __('admin.sidebar.my_account') }}</li>
         <li>
             <a href="{{ route('change.user.profile') }}">
                 <div class="parent-icon"><i class='bx bx-user'></i></div>
-                <div class="menu-title">My Profile</div>
+                <div class="menu-title">{{ __('admin.sidebar.my_profile') }}</div>
             </a>
         </li>
 
         <li>
             <a href="{{ route('change.user.password') }}">
                 <div class="parent-icon"><i class='bx bx-lock'></i></div>
-                <div class="menu-title">Change Password</div>
+                <div class="menu-title">{{ __('admin.sidebar.change_password') }}</div>
             </a>
         </li>
 
@@ -112,14 +112,14 @@
                     <span class="badge bg-danger rounded-pill">{{ $alertCount }}</span>
                     @endif
                 </div>
-                <div class="menu-title">Alerts</div>
+                <div class="menu-title">{{ __('admin.sidebar.alerts') }}</div>
             </a>
         </li>
 
         <li>
             <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <div class="parent-icon"><i class='bx bx-log-out'></i></div>
-                <div class="menu-title">Logout</div>
+                <div class="menu-title">{{ __('admin.sidebar.logout') }}</div>
             </a>
         </li>
     </ul>

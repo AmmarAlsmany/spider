@@ -137,7 +137,8 @@ class DashboardController extends Controller
 
         // Get payment statistics
         $totalPayments = $contract->payments->sum('payment_amount');
-        $remainingAmount = $contract->contract_price - $totalPayments;
+        $payments = $contract->payments->where('payment_status', 'paid')->sum('payment_amount');
+        $remainingAmount = $contract->contract_price - $payments;
         $paymentProgress = $contract->contract_price > 0 
             ? round(($totalPayments / $contract->contract_price) * 100) 
             : 0;
@@ -157,6 +158,7 @@ class DashboardController extends Controller
         return view('admin.contracts.show', compact(
             'contract',
             'totalPayments',
+            'payments',
             'remainingAmount',
             'paymentProgress',
             'duration',

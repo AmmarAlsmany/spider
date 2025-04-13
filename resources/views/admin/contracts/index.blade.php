@@ -5,11 +5,11 @@
         <div class="card-body">
             <div class="mb-4 d-flex align-items-center justify-content-between">
                 <div>
-                    <h4 class="mb-0 text-gray-800">Contracts Overview</h4>
+                    <h4 class="mb-0 text-gray-800">{{ __('admin.contracts.overview') }}</h4>
                     <nav aria-label="breadcrumb">
                         <ol class="mb-0 breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="bx bx-home-alt"></i> Dashboard</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Contracts</li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="bx bx-home-alt"></i> {{ __('admin.sidebar.dashboard') }}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ __('admin.contracts.breadcrumb') }}</li>
                         </ol>
                     </nav>
                 </div>
@@ -25,7 +25,7 @@
                                     <i class="bx bx-file fs-3 text-primary"></i>
                                 </div>
                                 <div class="ms-3">
-                                    <h6 class="mb-1">Total Contracts</h6>
+                                    <h6 class="mb-1">{{ __('admin.contracts.stats.total') }}</h6>
                                     <h4 class="mb-0">{{ $totalContracts }}</h4>
                                 </div>
                             </div>
@@ -40,7 +40,7 @@
                                     <i class="bx bx-check-circle fs-3 text-success"></i>
                                 </div>
                                 <div class="ms-3">
-                                    <h6 class="mb-1">Active Contracts</h6>
+                                    <h6 class="mb-1">{{ __('admin.contracts.stats.active') }}</h6>
                                     <h4 class="mb-0">{{ $activeContracts }}</h4>
                                 </div>
                             </div>
@@ -55,7 +55,7 @@
                                     <i class="bx bx-time fs-3 text-warning"></i>
                                 </div>
                                 <div class="ms-3">
-                                    <h6 class="mb-1">Expiring Soon</h6>
+                                    <h6 class="mb-1">{{ __('admin.contracts.stats.expiring_soon') }}</h6>
                                     <h4 class="mb-0">{{ $expiringSoonContracts }}</h4>
                                 </div>
                             </div>
@@ -70,7 +70,7 @@
                                     <i class="bx bx-x-circle fs-3 text-danger"></i>
                                 </div>
                                 <div class="ms-3">
-                                    <h6 class="mb-1">Expired Contracts</h6>
+                                    <h6 class="mb-1">{{ __('admin.contracts.stats.expired') }}</h6>
                                     <h4 class="mb-0">{{ $expiredContracts }}</h4>
                                 </div>
                             </div>
@@ -83,32 +83,32 @@
             <div class="mb-4 row g-3">
                 <div class="col-12 col-md-3">
                     <select class="form-select" id="statusFilter">
-                        <option value="">All Statuses</option>
-                        <option value="approved">Approved</option>
-                        <option value="Not approved">Not Approved</option>
-                        <option value="completed">Completed</option>
-                        <option value="stopped">Stopped</option>
+                        <option value="">{{ __('admin.contracts.filters.all_statuses') }}</option>
+                        <option value="approved">{{ __('admin.contracts.filters.approved') }}</option>
+                        <option value="Not approved">{{ __('admin.contracts.filters.not_approved') }}</option>
+                        <option value="completed">{{ __('admin.contracts.filters.completed') }}</option>
+                        <option value="stopped">{{ __('admin.contracts.filters.stopped') }}</option>
                     </select>
                 </div>
                 <div class="col-12 col-md-3">
                     <select class="form-select" id="typeFilter">
-                        <option value="">All Types</option>
-                        <option value="Residential">Residential</option>
-                        <option value="Commercial">Commercial</option>
-                        <option value="Industrial">Industrial</option>
-                        <option value="Government">Government</option>
+                        <option value="">{{ __('admin.contracts.filters.all_types') }}</option>
+                        <option value="Residential">{{ __('admin.contracts.filters.residential') }}</option>
+                        <option value="Commercial">{{ __('admin.contracts.filters.commercial') }}</option>
+                        <option value="Industrial">{{ __('admin.contracts.filters.industrial') }}</option>
+                        <option value="Government">{{ __('admin.contracts.filters.government') }}</option>
                     </select>
                 </div>
                 <div class="col-12 col-md-3">
-                    <input type="text" class="form-control" id="searchInput" placeholder="Search contracts...">
+                    <input type="text" class="form-control" id="searchInput" placeholder="{{ __('admin.contracts.filters.search_placeholder') }}">
                 </div>
                 <div class="col-12 col-md-3">
                     <div class="gap-2 d-flex">
                         <button class="btn btn-primary flex-grow-1" id="filterButton">
-                            <i class="bx bx-filter-alt me-1"></i> Filter
+                            <i class="bx bx-filter-alt me-1"></i> {{ __('admin.contracts.filters.filter_button') }}
                         </button>
                         <button class="btn btn-light" id="resetButton">
-                            <i class="bx bx-reset me-1"></i> Reset
+                            <i class="bx bx-reset me-1"></i> {{ __('admin.contracts.filters.reset_button') }}
                         </button>
                     </div>
                 </div>
@@ -119,14 +119,14 @@
                 <table class="table align-middle table-hover">
                     <thead class="table-light">
                         <tr>
-                            <th>Contract #</th>
-                            <th>Client</th>
-                            <th>Type</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Value</th>
-                            <th>Status</th>
-                            <th class="text-end">Actions</th>
+                            <th>{{ __('admin.contracts.table.contract_number') }}</th>
+                            <th>{{ __('admin.contracts.table.client') }}</th>
+                            <th>{{ __('admin.contracts.table.type') }}</th>
+                            <th>{{ __('admin.contracts.table.start_date') }}</th>
+                            <th>{{ __('admin.contracts.table.end_date') }}</th>
+                            <th>{{ __('admin.contracts.table.value') }}</th>
+                            <th>{{ __('admin.contracts.table.status') }}</th>
+                            <th class="text-end">{{ __('admin.contracts.table.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -166,7 +166,7 @@
                             </td>
                             <td>
                                 <div class="gap-2 d-flex justify-content-end">
-                                    <a href="{{ route('admin.contracts.show', $contract->id) }}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="View Details">
+                                    <a href="{{ route('admin.contracts.show', $contract->id) }}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="{{ __('admin.contracts.table.view_details') }}">
                                         <i class="bx bx-show"></i>
                                     </a>
                                 </div>
@@ -177,7 +177,7 @@
                             <td colspan="8" class="py-4 text-center">
                                 <div class="text-muted">
                                     <i class="mb-2 bx bx-folder-open fs-3"></i>
-                                    <p class="mb-0">No contracts found</p>
+                                    <p class="mb-0">{{ __('admin.contracts.table.no_contracts') }}</p>
                                 </div>
                             </td>
                         </tr>
@@ -189,7 +189,7 @@
             <!-- Pagination -->
             <div class="mt-4 d-flex justify-content-between align-items-center">
                 <div class="text-muted">
-                    Showing {{ $contracts->firstItem() ?? 0 }} to {{ $contracts->lastItem() ?? 0 }} of {{ $contracts->total() ?? 0 }} contracts
+                    {{ __('admin.contracts.table.showing', ['from' => $contracts->firstItem() ?? 0, 'to' => $contracts->lastItem() ?? 0, 'total' => $contracts->total() ?? 0]) }}
                 </div>
                 {{ $contracts->links("vendor.pagination.custom") }}
             </div>

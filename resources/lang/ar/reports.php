@@ -20,4 +20,52 @@ return [
     'customer_signature' => 'توقيع العميل',
     'team_leader_signature' => 'توقيع قائد الفريق',
     'signed_on' => 'تم التوقيع في',
+
+    // General Report
+    'general' => [
+        'title' => 'التقارير',
+        'breadcrumb' => 'التقرير العام',
+        'payments_overview' => 'نظرة عامة على المدفوعات',
+        'total_payments' => 'إجمالي المدفوعات',
+        'total_amount_paid' => 'إجمالي المبلغ المدفوع',
+        'total_amount_unpaid' => 'إجمالي المبلغ غير المدفوع',
+        'paid' => 'مدفوع',
+        'unpaid' => 'غير مدفوع',
+        'overdue' => 'متأخر',
+        'contracts_overview' => 'نظرة عامة على العقود',
+        'total_contracts' => 'إجمالي العقود',
+        'ending_soon' => 'تنتهي قريباً',
+        'active' => 'نشط',
+        'pending' => 'معلق',
+        'expired' => 'منتهي',
+        'tickets_overview' => 'نظرة عامة على التذاكر',
+        'total_tickets' => 'إجمالي التذاكر',
+        'open_tickets' => 'التذاكر المفتوحة',
+        'closed' => 'مغلق',
+        'open' => 'مفتوح',
+        'monthly_trends' => 'الاتجاهات الشهرية',
+        'switch_view' => 'تبديل العرض',
+        'top_customers' => 'أفضل العملاء',
+        'recent_activities' => 'الأنشطة الأخيرة',
+        'type' => 'النوع',
+        'title' => 'العنوان',
+        'description' => 'الوصف',
+        'status' => 'الحالة',
+        'date' => 'التاريخ',
+
+        // Chart labels and data
+        'chart' => [
+            'payments' => 'المدفوعات',
+            'contracts' => 'العقود',
+            'tickets' => 'التذاكر',
+            'months' => ['يناير', 'فبراير', 'مارس', 'إبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+        ],
+
+        // Customer card
+        'customer' => [
+            'contracts_count' => 'العقود',
+            'tickets_count' => 'التذاكر',
+            'total_paid' => 'إجمالي المدفوعات'
+        ]
+    ]
 ];

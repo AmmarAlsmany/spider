@@ -5,31 +5,31 @@
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <div>
-                    <h4 class="mb-0 text-gray-800">Managers</h4>
+                    <h4 class="mb-0 text-gray-800">{{ __('admin.managers.title') }}</h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="bx bx-home-alt"></i> Dashboard</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Manage Managers</li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="bx bx-home-alt"></i> {{ __('admin.sidebar.dashboard') }}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ __('admin.managers.breadcrumb') }}</li>
                         </ol>
                     </nav>
                 </div>
                 <div>
                     <a href="{{ route('admin.managers.create') }}" class="btn btn-primary d-flex align-items-center">
-                        <i class="bx bx-plus-circle me-1"></i> Add Manager
+                        <i class="bx bx-plus-circle me-1"></i> {{ __('admin.managers.add') }}
                     </a>
                 </div>
             </div>
 
             @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
+                {{ session('success') ?? __('admin.managers.success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             @endif
 
             @if(session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
+                {{ session('error') ?? __('admin.managers.error') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             @endif
@@ -38,11 +38,11 @@
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th class="text-end">Actions</th>
+                            <th>{{ __('admin.managers.table.name') }}</th>
+                            <th>{{ __('admin.managers.table.email') }}</th>
+                            <th>{{ __('admin.managers.table.role') }}</th>
+                            <th>{{ __('admin.managers.table.status') }}</th>
+                            <th class="text-end">{{ __('admin.managers.table.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -60,9 +60,9 @@
                             <td><span class="badge bg-light text-dark">{{ ucfirst(str_replace('_', ' ', $manager->role)) }}</span></td>
                             <td>
                                 @if($manager->status === 'active')
-                                    <span class="badge bg-success-subtle text-success">Active</span>
+                                    <span class="badge bg-success-subtle text-success">{{ __('admin.managers.table.status.active') }}</span>
                                 @else
-                                    <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                                    <span class="badge bg-danger-subtle text-danger">{{ __('admin.managers.table.status.inactive') }}</span>
                                 @endif
                             </td>
                             <td>
@@ -74,7 +74,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                onclick="return confirm('Are you sure you want to delete this manager?')">
+                                                onclick="return confirm('{{ __('admin.managers.table.delete_confirm') }}')">
                                             <i class="bx bx-trash"></i>
                                         </button>
                                     </form>

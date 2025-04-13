@@ -166,7 +166,9 @@
                             <div class="d-flex">
                                 <div class="flex-grow-1">
                                     <p class="text-muted fw-medium">Customer Satisfaction</p>
-                                    <h4 class="mb-0">{{ $kpiData[$team->id]['avg_satisfaction'] }}/5</h4>
+                                    <h4 class="mb-0">
+                                        {{ is_array($kpiData[$team->id]['avg_satisfaction']) ? number_format(array_sum($kpiData[$team->id]['avg_satisfaction']) / max(1, count($kpiData[$team->id]['avg_satisfaction'])), 1) : $kpiData[$team->id]['avg_satisfaction'] }}/5
+                                    </h4>
                                 </div>
                                 <div class="mini-stat-icon avatar-sm rounded-circle bg-warning align-self-center">
                                     <span class="avatar-title">
@@ -311,10 +313,17 @@
                                     <div class="mb-4">
                                         <h5 class="font-size-15">Customer Satisfaction</h5>
                                         <div class="mt-3 d-flex align-items-center">
-                                            <h4 class="mb-0">{{ $kpiData[$team->id]['avg_satisfaction'] }}</h4>
+                                            <h4 class="mb-0">
+                                                {{ is_array($kpiData[$team->id]['avg_satisfaction']) ? number_format(array_sum($kpiData[$team->id]['avg_satisfaction']) / max(1, count($kpiData[$team->id]['avg_satisfaction'])), 1) : $kpiData[$team->id]['avg_satisfaction'] }}
+                                            </h4>
                                             <div class="ms-2">
                                                 @for ($i = 1; $i <= 5; $i++)
-                                                    @if ($i <= round($kpiData[$team->id]['avg_satisfaction']))
+                                                    @if (
+                                                        $i <=
+                                                            round(is_array($kpiData[$team->id]['avg_satisfaction'])
+                                                                    ? array_sum($kpiData[$team->id]['avg_satisfaction']) /
+                                                                        max(1, count($kpiData[$team->id]['avg_satisfaction']))
+                                                                    : $kpiData[$team->id]['avg_satisfaction']))
                                                         <i class="mdi mdi-star text-warning font-size-20"></i>
                                                     @else
                                                         <i class="mdi mdi-star-outline text-warning font-size-20"></i>

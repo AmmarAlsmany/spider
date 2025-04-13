@@ -23,7 +23,7 @@
                 <tr>
                     <th>Team Members</th>
                     <td>
-                        @if($team->members->count() > 0)
+                        @if ($team->members->count() > 0)
                             {{ $team->members->pluck('name')->implode(', ') }}
                         @else
                             No members assigned
@@ -70,7 +70,8 @@
                 </tr>
                 <tr>
                     <th>Customer Satisfaction</th>
-                    <td>{{ $kpiData['avg_satisfaction'] }}/5</td>
+                    <td>{{ is_array($kpiData['avg_satisfaction']) ? number_format(array_sum($kpiData['avg_satisfaction']) / max(1, count($kpiData['avg_satisfaction'])), 1) : $kpiData['avg_satisfaction'] }}/5
+                    </td>
                 </tr>
             </table>
         </div>
@@ -84,8 +85,10 @@
                 </tr>
                 @forelse($kpiData['top_insects'] as $insect => $count)
                     <tr>
-                        <th width="70%">{{ $insect }}</th>
-                        <td>{{ $count }}</td>
+                        <th width="70%">
+                            {{ is_string($insect) ? $insect : (is_array($insect) ? json_encode($insect) : (string) $insect) }}
+                        </th>
+                        <td>{{ is_scalar($count) ? $count : count((array) $count) }}</td>
                     </tr>
                 @empty
                     <tr>
@@ -101,8 +104,10 @@
                 </tr>
                 @forelse($kpiData['top_pesticides'] as $pesticide => $count)
                     <tr>
-                        <th width="70%">{{ $pesticide }}</th>
-                        <td>{{ $count }}</td>
+                        <th width="70%">
+                            {{ is_string($pesticide) ? $pesticide : (is_array($pesticide) ? json_encode($pesticide) : (string) $pesticide) }}
+                        </th>
+                        <td>{{ is_scalar($count) ? $count : count((array) $count) }}</td>
                     </tr>
                 @empty
                     <tr>

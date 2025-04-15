@@ -14,28 +14,34 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="py-2 dropdown-item d-flex align-items-center" href="{{ route('switch.language', 'en') }}">
-                                    <img src="{{ asset('backend/assets/images/county/01.png') }}" width="20" alt="English">
+                                <a class="py-2 dropdown-item d-flex align-items-center"
+                                    href="{{ route('switch.language', 'en') }}">
+                                    <img src="{{ asset('backend/assets/images/county/01.png') }}" width="20"
+                                        alt="English">
                                     <span class="ms-2">{{ __('messages.english') }}</span>
                                 </a>
                             </li>
                             <li>
-                                <a class="py-2 dropdown-item d-flex align-items-center" href="{{ route('switch.language', 'ar') }}">
-                                    <img src="{{ asset('backend/assets/images/county/02.png') }}" width="20" alt="Arabic">
+                                <a class="py-2 dropdown-item d-flex align-items-center"
+                                    href="{{ route('switch.language', 'ar') }}">
+                                    <img src="{{ asset('backend/assets/images/county/02.png') }}" width="20"
+                                        alt="Arabic">
                                     <span class="ms-2">{{ __('messages.arabic') }}</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
                     <li class="nav-item dark-mode">
-                        <a class="nav-link dark-mode-icon" href="javascript:;" id="darkModeToggle"><i class='bx bx-moon'></i>
+                        <a class="nav-link dark-mode-icon" href="javascript:;" id="darkModeToggle"><i
+                                class='bx bx-moon'></i>
                         </a>
                     </li>
 
                     <li class="nav-item dropdown dropdown-large">
-                        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret position-relative" href="#" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="alert-count animate__animated animate__pulse animate__infinite" id="notification-count">0</span>
+                        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret position-relative" href="#"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="alert-count animate__animated animate__pulse animate__infinite"
+                                id="notification-count">0</span>
                             <i class='bx bx-bell'></i>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end notification-dropdown">
@@ -53,7 +59,8 @@
                                     <p class="mt-2 text-muted">Loading notifications...</p>
                                 </div>
                             </div>
-                            <a href="javascript:;" onclick="markAllAsRead()" id="mark-all-read" class="mark-all-read-btn" style="display: none;">
+                            <a href="javascript:;" onclick="markAllAsRead()" id="mark-all-read"
+                                class="mark-all-read-btn" style="display: none;">
                                 <div class="text-center msg-footer">
                                     <i class='bx bx-check-double me-1'></i>
                                     Mark All As Read
@@ -64,20 +71,27 @@
                 </ul>
             </div>
             @php
-            $profile_data = null;
-            if (Auth::check()) {
-            $id = Auth::id();
-            $profile_data = App\Models\User::find($id);
-            } elseif (Auth::guard('client')->check()) {
-            $client = Auth::guard('client')->user();
-            if ($client) {
-            $profile_data = App\Models\client::find($client->id);
-            }
-            }
+                $profile_data = null;
+                $current_guard = null;
+
+                // First check if user is logged in through web guard (employees)
+                if (Auth::guard('web')->check()) {
+                    $user = Auth::guard('web')->user();
+                    $profile_data = App\Models\User::find($user->id);
+                    $current_guard = 'web';
+                }
+                // Then check if user is logged in through client guard
+                elseif (Auth::guard('client')->check()) {
+                    $client = Auth::guard('client')->user();
+                    if ($client) {
+                        $profile_data = App\Models\client::find($client->id);
+                        $current_guard = 'client';
+                    }
+                }
             @endphp
             <div class="px-3 user-box dropdown">
-                <a class="gap-3 d-flex align-items-center nav-link dropdown-toggle dropdown-toggle-nocaret" href="#"
-                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="gap-3 d-flex align-items-center nav-link dropdown-toggle dropdown-toggle-nocaret"
+                    href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <img src="{{ !empty($profile_data?->avatar) ? url('upload/profile_images/' . $profile_data->avatar) : url('upload/no_image.jpg') }}"
                         class="user-img" alt="user avatar">
                     <div class="user-info">
@@ -89,39 +103,42 @@
                     <li><a class="dropdown-item d-flex align-items-center" href="{{ route('change.user.profile') }}"><i
                                 class="bx bx-user fs-5"></i><span>Profile</span></a>
                     </li>
-                    <li><a class="dropdown-item d-flex align-items-center" href="{{ route('change.user.password') }}"><i
-                                class="bx bx-cog fs-5"></i><span>Change
+                    <li><a class="dropdown-item d-flex align-items-center"
+                            href="{{ route('change.user.password') }}"><i class="bx bx-cog fs-5"></i><span>Change
                                 Password</span></a>
                     </li>
                     <li>
                         @if (Auth::check())
-                        @if (Auth::user()->role === 'admin')
-                        <a class="dropdown-item d-flex align-items-center" href="{{ route('admin.dashboard') }}">
-                            <i class="bx bx-home-circle fs-5"></i>
-                            <span>Dashboard</span>
-                        </a>
-                        @elseif(Auth::user()->role === 'sales')
-                        <a class="dropdown-item d-flex align-items-center" href="{{ route('sales.dashboard') }}">
-                            <i class="bx bx-home-circle fs-5"></i>
-                            <span>Dashboard</span>
-                        </a>
-                        @elseif(Auth::user()->role === 'technical')
-                        <a class="dropdown-item d-flex align-items-center" href="{{ route('technical.dashboard') }}">
-                            <i class="bx bx-home-circle fs-5"></i>
-                            <span>Dashboard</span>
-                        </a>
-                        @elseif(Auth::user()->role === 'sales_manager')
-                        <a class="dropdown-item d-flex align-items-center"
-                            href="{{ route('sales_manager.dashboard') }}">
-                            <i class="bx bx-home-circle fs-5"></i>
-                            <span>Dashboard</span>
-                        </a>
-                        @endif
+                            @if (Auth::user()->role === 'admin')
+                                <a class="dropdown-item d-flex align-items-center"
+                                    href="{{ route('admin.dashboard') }}">
+                                    <i class="bx bx-home-circle fs-5"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            @elseif(Auth::user()->role === 'sales')
+                                <a class="dropdown-item d-flex align-items-center"
+                                    href="{{ route('sales.dashboard') }}">
+                                    <i class="bx bx-home-circle fs-5"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            @elseif(Auth::user()->role === 'technical')
+                                <a class="dropdown-item d-flex align-items-center"
+                                    href="{{ route('technical.dashboard') }}">
+                                    <i class="bx bx-home-circle fs-5"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            @elseif(Auth::user()->role === 'sales_manager')
+                                <a class="dropdown-item d-flex align-items-center"
+                                    href="{{ route('sales_manager.dashboard') }}">
+                                    <i class="bx bx-home-circle fs-5"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            @endif
                         @else
-                        <a class="dropdown-item d-flex align-items-center" href="{{ route('client.dashboard') }}">
-                            <i class="bx bx-home-circle fs-5"></i>
-                            <span>Dashboard</span>
-                        </a>
+                            <a class="dropdown-item d-flex align-items-center" href="{{ route('client.dashboard') }}">
+                                <i class="bx bx-home-circle fs-5"></i>
+                                <span>Dashboard</span>
+                            </a>
                         @endif
                     </li>
                     <li>
@@ -145,37 +162,37 @@
 </header>
 
 @push('scripts')
-<script>
-    // Dark mode functionality - REMOVED (now handled by dark-mode.js)
-    
-    function markAsRead(notificationId) {
-        fetch(`/notifications/${notificationId}/mark-as-read`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        }).then(response => {
-            if (response.ok) {
-                window.location.reload();
-            }
-        });
-    }
+    <script>
+        // Dark mode functionality - REMOVED (now handled by dark-mode.js)
 
-    function markAllAsRead() {
-        fetch('/notifications/mark-all-as-read', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        }).then(response => {
-            if (response.ok) {
-                window.location.reload();
-            }
-        });
-    }
-</script>
+        function markAsRead(notificationId) {
+            fetch(`/notifications/${notificationId}/mark-as-read`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                }
+            });
+        }
+
+        function markAllAsRead() {
+            fetch('/notifications/mark-all-as-read', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                }
+            });
+        }
+    </script>
 @endpush

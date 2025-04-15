@@ -27,7 +27,6 @@ class ClientController extends Controller
     public function index()
     {
         $client = Auth::guard('client')->user();
-
         // Get total contracts and active contracts
         $totalContracts = contracts::where('customer_id', $client->id)->count();
         $activeContracts = contracts::where('customer_id', $client->id)

@@ -8,6 +8,7 @@ use App\Models\VisitReport;
 use App\Models\branchs;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TargetInsectAnalyticsController extends Controller
 {
@@ -107,42 +108,78 @@ class TargetInsectAnalyticsController extends Controller
      */
     private function canViewContractAnalytics($contract)
     {
-        $user = Auth::user();
+        // Get the current authenticated user
+        $currentUser = $this->getCurrentUser();
 
-        // Technical users can view all contracts
-        if ($user->role === 'technical') {
-            return true;
-        }
-
-        // Team leaders can view contracts assigned to their team
-        if ($user->role === 'team_leader') {
-            $teamId = DB::table('teams')->where('team_leader_id', $user->id)->value('id');
-            if ($teamId) {
-                $hasVisit = DB::table('visit_schedules')
-                    ->where('contract_id', $contract->id)
-                    ->where('team_id', $teamId)
-                    ->exists();
-                return $hasVisit;
-            }
+        // If no user is authenticated, deny access
+        if (!$currentUser) {
             return false;
         }
 
-        // Sales users can view their own contracts
-        if ($user->role === 'sales') {
-            return $contract->sales_id === $user->id;
-        }
+        $user = $currentUser['user'];
+        $guard = $currentUser['guard'];
 
-        // Sales managers can view all contracts
-        if ($user->role === 'sales_manager') {
-            return true;
-        }
+        // Web guard users (employees)
+        if ($guard === 'web') {
+            // Admin, Technical and Sales Manager roles have full access
+            if (in_array($user->role, ['admin', 'technical', 'sales_manager'])) {
+                return true;
+            }
 
-        // Clients can view their own contracts
-        if ($user->role === 'client') {
-            return $contract->customer_id === $user->id;
+            // Sales users can only view their own contracts
+            if ($user->role === 'sales') {
+                return (int)$contract->sales_id === (int)$user->id;
+            }
+
+            // Team leaders can view contracts assigned to their team
+            if ($user->role === 'team_leader') {
+                return DB::table('teams')
+                    ->join('visit_schedules', 'teams.id', '=', 'visit_schedules.team_id')
+                    ->where('teams.team_leader_id', $user->id)
+                    ->where('visit_schedules.contract_id', $contract->id)
+                    ->exists();
+            }
+
+            return false;
+        }
+        // Client guard users
+        elseif ($guard === 'client') {
+            // IMPORTANT: When checking a client user against customer_id in contracts table,
+            // we need to be explicit that we're comparing a client ID to avoid confusion with user IDs
+            // For debugging purposes
+            Log::info('Client ID check: Client ID=' . $user->id . ', Contract customer_id=' . $contract->customer_id);
+
+            // Explicitly check if this client ID matches the contract's customer_id
+            return (int)$contract->customer_id === (int)$user->id;
         }
 
         return false;
+    }
+
+    /**
+     * Get the current authenticated user from any available guard
+     * @return object|null The authenticated user or null if no user is authenticated
+     */
+    private function getCurrentUser()
+    {
+        // First check web guard (for employees/staff)
+        if (Auth::guard('web')->check()) {
+            return [
+                'user' => Auth::guard('web')->user(),
+                'guard' => 'web'
+            ];
+        }
+
+        // Then check client guard
+        if (Auth::guard('client')->check()) {
+            return [
+                'user' => Auth::guard('client')->user(),
+                'guard' => 'client'
+            ];
+        }
+
+
+        return null;
     }
 
     /**
@@ -268,6 +305,8 @@ class TargetInsectAnalyticsController extends Controller
 
         $insectCounts = [];
         $insectQuantities = [];
+        $reportsByInsect = [];
+        $totalReports = $reports->count();
 
         foreach ($reports as $report) {
             // Ensure we have a string before json_decode
@@ -277,22 +316,26 @@ class TargetInsectAnalyticsController extends Controller
             }
             $targetInsects = json_decode($targetInsectsJson, true) ?: [];
 
-            // Get insect quantities if available
-            $quantities = is_array($report->insect_quantities) ? $report->insect_quantities : [];
+            // Get insect quantities with better validation
+            $quantitiesJson = $report->insect_quantities;
+            $quantities = is_string($quantitiesJson) ? json_decode($quantitiesJson, true) : [];
+            $quantities = is_array($quantities) ? $quantities : [];
 
             if (is_array($targetInsects)) {
                 foreach ($targetInsects as $insect) {
                     if (!isset($insectCounts[$insect])) {
                         $insectCounts[$insect] = 0;
                         $insectQuantities[$insect] = 0;
+                        $reportsByInsect[$insect] = [];
                     }
                     $insectCounts[$insect]++;
+                    $reportsByInsect[$insect][] = $report->id;
 
-                    // Add quantities if available
-                    if (is_array($quantities) && isset($quantities[$insect])) {
+                    // Add quantities with validation
+                    if (isset($quantities[$insect]) && is_numeric($quantities[$insect])) {
                         $insectQuantities[$insect] += (int)$quantities[$insect];
                     } else {
-                        // If no quantity data, use a default of 1 per report
+                        // If no specific quantity data, use a default of 1 per report
                         $insectQuantities[$insect] += 1;
                     }
                 }
@@ -302,18 +345,38 @@ class TargetInsectAnalyticsController extends Controller
         // Sort by frequency (highest first)
         arsort($insectCounts);
 
-        // Get insect names for the values
+        // Get insect names for the values and calculate more meaningful statistics
         $result = [];
         foreach ($insectCounts as $value => $count) {
             $insect = TargetInsect::where('value', $value)->first();
             $name = $insect ? $insect->name : $value;
+
+            // Calculate temporal distribution (how spread out the sightings are)
+            $temporalSpread = 0;
+            if (count($reportsByInsect[$value] ?? []) >= 2) {
+                $reportDates = VisitReport::whereIn('id', $reportsByInsect[$value])
+                    ->orderBy('created_at')
+                    ->pluck('created_at');
+
+                if ($reportDates->count() >= 2) {
+                    $firstDate = strtotime($reportDates->first());
+                    $lastDate = strtotime($reportDates->last());
+                    $dateSpan = ($lastDate - $firstDate) / (60 * 60 * 24); // Span in days
+                    $temporalSpread = $dateSpan > 0 ? $count / $dateSpan : 0;
+                }
+            }
+
+            $quantity = $insectQuantities[$value] ?? $count;
+            $percentage = $totalReports > 0 ? ($count / $totalReports) * 100 : 0;
+
             $result[] = [
                 'name' => $name,
                 'value' => $value,
                 'count' => $count,
-                'quantity' => $insectQuantities[$value] ?? $count, // Fallback to count if no quantity
-                'avg_per_report' => $count > 0 ? round(($insectQuantities[$value] ?? $count) / $count, 1) : 0,
-                'percentage' => $reports->count() > 0 ? round(($count / $reports->count()) * 100, 1) : 0
+                'quantity' => $quantity,
+                'avg_per_report' => $count > 0 ? round($quantity / $count, 2) : 0,
+                'percentage' => round($percentage, 1),
+                'temporal_spread' => round($temporalSpread, 4),
             ];
         }
 
@@ -335,16 +398,24 @@ class TargetInsectAnalyticsController extends Controller
                     $insectsJson = '[]';
                 }
                 $insects = json_decode($insectsJson, true) ?: [];
+                $insects = is_array($insects) ? $insects : [];
 
-                // Get insect quantities if available
-                $insectQuantities = is_array($visit->report->insect_quantities) ?
-                    $visit->report->insect_quantities : [];
+                // Get insect quantities with better validation
+                $quantitiesJson = $visit->report->insect_quantities;
+                $quantities = is_string($quantitiesJson) ? json_decode($quantitiesJson, true) : [];
+                $quantities = is_array($quantities) ? $quantities : [];
+
+                // Ensure quantities are numeric values
+                $validatedQuantities = [];
+                foreach ($quantities as $insect => $quantity) {
+                    $validatedQuantities[$insect] = is_numeric($quantity) ? (int)$quantity : 1;
+                }
 
                 $visitData[] = [
                     'visit_id' => $visit->id,
                     'visit_date' => $visit->visit_date,
-                    'target_insects' => is_array($insects) ? $insects : [],
-                    'insect_quantities' => $insectQuantities,
+                    'target_insects' => $insects,
+                    'insect_quantities' => $validatedQuantities,
                     'recommendations' => $visit->report->recommendations
                 ];
             }
@@ -373,6 +444,8 @@ class TargetInsectAnalyticsController extends Controller
 
         $insectCounts = [];
         $insectQuantities = [];
+        $reportsByInsect = [];
+        $totalReports = $reports->count();
 
         foreach ($reports as $report) {
             // Ensure we have a string before json_decode
@@ -382,22 +455,26 @@ class TargetInsectAnalyticsController extends Controller
             }
             $targetInsects = json_decode($targetInsectsJson, true) ?: [];
 
-            // Get insect quantities if available
-            $quantities = is_array($report->insect_quantities) ? $report->insect_quantities : [];
+            // Get insect quantities with better validation
+            $quantitiesJson = $report->insect_quantities;
+            $quantities = is_string($quantitiesJson) ? json_decode($quantitiesJson, true) : [];
+            $quantities = is_array($quantities) ? $quantities : [];
 
             if (is_array($targetInsects)) {
                 foreach ($targetInsects as $insect) {
                     if (!isset($insectCounts[$insect])) {
                         $insectCounts[$insect] = 0;
                         $insectQuantities[$insect] = 0;
+                        $reportsByInsect[$insect] = [];
                     }
                     $insectCounts[$insect]++;
+                    $reportsByInsect[$insect][] = $report->id;
 
-                    // Add quantities if available
-                    if (is_array($quantities) && isset($quantities[$insect])) {
+                    // Add quantities with validation
+                    if (isset($quantities[$insect]) && is_numeric($quantities[$insect])) {
                         $insectQuantities[$insect] += (int)$quantities[$insect];
                     } else {
-                        // If no quantity data, use a default of 1 per report
+                        // If no specific quantity data, use a default of 1 per report
                         $insectQuantities[$insect] += 1;
                     }
                 }
@@ -407,18 +484,38 @@ class TargetInsectAnalyticsController extends Controller
         // Sort by frequency (highest first)
         arsort($insectCounts);
 
-        // Get insect names for the values
+        // Get insect names for the values and calculate more meaningful statistics
         $result = [];
         foreach ($insectCounts as $value => $count) {
             $insect = TargetInsect::where('value', $value)->first();
             $name = $insect ? $insect->name : $value;
+
+            // Calculate temporal distribution (how spread out the sightings are)
+            $temporalSpread = 0;
+            if (count($reportsByInsect[$value] ?? []) >= 2) {
+                $reportDates = VisitReport::whereIn('id', $reportsByInsect[$value])
+                    ->orderBy('created_at')
+                    ->pluck('created_at');
+
+                if ($reportDates->count() >= 2) {
+                    $firstDate = strtotime($reportDates->first());
+                    $lastDate = strtotime($reportDates->last());
+                    $dateSpan = ($lastDate - $firstDate) / (60 * 60 * 24); // Span in days
+                    $temporalSpread = $dateSpan > 0 ? $count / $dateSpan : 0;
+                }
+            }
+
+            $quantity = $insectQuantities[$value] ?? $count;
+            $percentage = $totalReports > 0 ? ($count / $totalReports) * 100 : 0;
+
             $result[] = [
                 'name' => $name,
                 'value' => $value,
                 'count' => $count,
-                'quantity' => $insectQuantities[$value] ?? $count, // Fallback to count if no quantity
-                'avg_per_report' => $count > 0 ? round(($insectQuantities[$value] ?? $count) / $count, 1) : 0,
-                'percentage' => $reports->count() > 0 ? round(($count / $reports->count()) * 100, 1) : 0
+                'quantity' => $quantity,
+                'avg_per_report' => $count > 0 ? round($quantity / $count, 2) : 0,
+                'percentage' => round($percentage, 1),
+                'temporal_spread' => round($temporalSpread, 4),
             ];
         }
 
@@ -441,16 +538,24 @@ class TargetInsectAnalyticsController extends Controller
                     $insectsJson = '[]';
                 }
                 $insects = json_decode($insectsJson, true) ?: [];
+                $insects = is_array($insects) ? $insects : [];
 
-                // Get insect quantities if available
-                $insectQuantities = is_array($visit->report->insect_quantities) ?
-                    $visit->report->insect_quantities : [];
+                // Get insect quantities with better validation
+                $quantitiesJson = $visit->report->insect_quantities;
+                $quantities = is_string($quantitiesJson) ? json_decode($quantitiesJson, true) : [];
+                $quantities = is_array($quantities) ? $quantities : [];
+
+                // Ensure quantities are numeric values
+                $validatedQuantities = [];
+                foreach ($quantities as $insect => $quantity) {
+                    $validatedQuantities[$insect] = is_numeric($quantity) ? (int)$quantity : 1;
+                }
 
                 $visitData[] = [
                     'visit_id' => $visit->id,
                     'visit_date' => $visit->visit_date,
-                    'target_insects' => is_array($insects) ? $insects : [],
-                    'insect_quantities' => $insectQuantities,
+                    'target_insects' => $insects,
+                    'insect_quantities' => $validatedQuantities,
                     'recommendations' => $visit->report->recommendations
                 ];
             }

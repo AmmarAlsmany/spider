@@ -9,67 +9,83 @@
 
                 <div class="card-body">
                     @if (session('success'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('success') }}
-                        </div>
+                    <div class="alert alert-success" role="alert">
+                        {{ session('success') }}
+                    </div>
                     @endif
 
                     @if (session('error'))
-                        <div class="alert alert-danger" role="alert">
-                            {{ session('error') }}
-                        </div>
+                    <div class="alert alert-danger" role="alert">
+                        {{ session('error') }}
+                    </div>
                     @endif
 
                     <!-- Filters -->
                     <form method="GET" action="{{ route('technical.pesticides.analytics') }}" class="mb-4">
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label for="start_date">{{ __('messages.start_date') }}</label>
-                                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ $startDate }}">
+                                    <input type="date" class="form-control" id="start_date" name="start_date"
+                                        value="{{ $startDate }}">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label for="end_date">{{ __('messages.end_date') }}</label>
-                                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ $endDate }}">
+                                    <input type="date" class="form-control" id="end_date" name="end_date"
+                                        value="{{ $endDate }}">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label for="team_id">{{ __('messages.team') }}</label>
                                     <select class="form-control" id="team_id" name="team_id">
                                         <option value="">{{ __('messages.all_teams') }}</option>
-                                        @foreach($teams as $team)
-                                            <option value="{{ $team->id }}" {{ $selectedTeam == $team->id ? 'selected' : '' }}>
-                                                {{ $team->name }}
-                                            </option>
+                                        @foreach ($teams as $team)
+                                        <option value="{{ $team->id }}" {{ $selectedTeam==$team->id ? 'selected' : ''
+                                            }}>
+                                            {{ $team->name }}
+                                        </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label for="pesticide_id">{{ __('messages.pesticide') }}</label>
                                     <select class="form-control" id="pesticide_id" name="pesticide_id">
                                         <option value="">{{ __('messages.all_pesticides') }}</option>
-                                        @foreach($pesticides as $pesticide)
-                                            <option value="{{ $pesticide->slug }}" {{ $selectedPesticide == $pesticide->slug ? 'selected' : '' }}>
-                                                {{ $pesticide->name }}
-                                            </option>
+                                        @foreach ($pesticides as $pesticide)
+                                        <option value="{{ $pesticide->slug }}" {{ $selectedPesticide==$pesticide->slug ?
+                                            'selected' : '' }}>
+                                            {{ $pesticide->name }}
+                                        </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="mt-2 row">
-                            <div class="col-md-12">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-filter"></i> {{ __('messages.filter') }}
-                                </button>
-                                <a href="{{ route('technical.pesticides.analytics') }}" class="btn btn-secondary">
-                                    <i class="fas fa-sync"></i> {{ __('messages.reset') }}
-                                </a>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="place_id">{{ __('messages.place') }}</label>
+                                    <select class="form-control" id="place_id" name="place_id">
+                                        <option value="">{{ __('messages.all_places') }}</option>
+                                        @foreach ($places as $place)
+                                        <option value="{{ $place->id }}" {{ $selectedPlace==$place->id ? 'selected' : ''
+                                            }}>
+                                            {{ $place->branch_name }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+                                    <button type="submit" class="btn btn-primary form-control">
+                                        <i class="fas fa-filter"></i> {{ __('messages.filter') }}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -80,7 +96,8 @@
                             <div class="text-white card bg-primary">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ __('messages.total_consumption') }}</h5>
-                                    <h3 class="mb-0">{{ $summaryStats['total_consumption'] }} {{ __('messages.units') }}</h3>
+                                    <h3 class="mb-0">{{ $summaryStats['total_consumption'] }}
+                                        {{ __('messages.units') }}</h3>
                                 </div>
                             </div>
                         </div>
@@ -119,7 +136,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="chart-container">
-                                        <canvas id="pesticideDistributionChart"></canvas>
+                                        <div id="pesticideDistributionChart"></div>
                                     </div>
                                 </div>
                             </div>
@@ -131,7 +148,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="chart-container">
-                                        <canvas id="teamConsumptionChart"></canvas>
+                                        <div id="teamConsumptionChart"></div>
                                     </div>
                                 </div>
                             </div>
@@ -153,34 +170,37 @@
                             </thead>
                             <tbody>
                                 @forelse($consumptionData as $teamId => $teamData)
-                                    <tr>
-                                        <td>{{ $teamData['team_name'] }}</td>
-                                        <td>{{ $teamData['total_quantity'] }}</td>
-                                        <td>{{ $teamData['visit_count'] }}</td>
-                                        <td>
-                                            @foreach($teamData['pesticides'] as $pesticide => $pesticideData)
-                                                <span class="d-block">
-                                                    {{ $pesticideData['name'] }}: 
-                                                    @if($pesticideData['unit_counts']['g'] > 0)
-                                                        {{ $pesticideData['unit_counts']['g'] }}g
-                                                    @endif
-                                                    @if($pesticideData['unit_counts']['ml'] > 0)
-                                                        {{ $pesticideData['unit_counts']['g'] > 0 ? ' + ' : '' }}{{ $pesticideData['unit_counts']['ml'] }}ml
-                                                    @endif
-                                                </span>
-                                            @endforeach
-                                        </td>
-                                        <td>
-                                            <a href="{{ route('technical.pesticides.analytics.teamReport', ['teamId' => $teamId, 'start_date' => $startDate, 'end_date' => $endDate]) }}" 
-                                               class="btn btn-sm btn-info">
-                                                <i class="fas fa-chart-line"></i> {{ __('messages.detailed_report') }}
-                                            </a>
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td>{{ $teamData['team_name'] }}</td>
+                                    <td>{{ $teamData['total_quantity'] }}</td>
+                                    <td>{{ $teamData['visit_count'] }}</td>
+                                    <td>
+                                        @foreach ($teamData['pesticides'] as $pesticide => $pesticideData)
+                                        <span class="d-block">
+                                            {{ $pesticideData['name'] }}:
+                                            @if ($pesticideData['unit_counts']['g'] > 0)
+                                            {{ $pesticideData['unit_counts']['g'] }}g
+                                            @endif
+                                            @if ($pesticideData['unit_counts']['ml'] > 0)
+                                            {{ $pesticideData['unit_counts']['g'] > 0 ? ' + ' : '' }}{{
+                                            $pesticideData['unit_counts']['ml'] }}ml
+                                            @endif
+                                        </span>
+                                        @endforeach
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('technical.pesticides.analytics.teamReport', ['teamId' => $teamId, 'start_date' => $startDate, 'end_date' => $endDate]) }}"
+                                            class="btn btn-sm btn-info">
+                                            <i class="fas fa-chart-line"></i> {{ __('messages.detailed_report') }}
+                                        </a>
+                                    </td>
+                                </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="5" class="text-center">{{ __('messages.no_consumption_data') }}</td>
-                                    </tr>
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        {{ __('messages.no_consumption_data') }}
+                                    </td>
+                                </tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -201,22 +221,23 @@
                             </thead>
                             <tbody>
                                 @forelse($summaryStats['pesticide_usage'] as $pesticideSlug => $pesticideData)
-                                    <tr>
-                                        <td>{{ $pesticideData['name'] }}</td>
-                                        <td>{{ $pesticideData['total_quantity'] }}</td>
-                                        <td>{{ $pesticideData['unit_counts']['g'] }}</td>
-                                        <td>{{ $pesticideData['unit_counts']['ml'] }}</td>
-                                        <td>
-                                            <a href="{{ route('technical.pesticides.analytics.pesticideReport', $pesticideSlug) }}" 
-                                               class="btn btn-sm btn-info">
-                                                <i class="fas fa-chart-line"></i> {{ __('messages.detailed_report') }}
-                                            </a>
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td>{{ $pesticideData['name'] }}</td>
+                                    <td>{{ $pesticideData['total_quantity'] }}</td>
+                                    <td>{{ $pesticideData['unit_counts']['g'] }}</td>
+                                    <td>{{ $pesticideData['unit_counts']['ml'] }}</td>
+                                    <td>
+                                        <a href="{{ route('technical.pesticides.analytics.pesticideReport', $pesticideSlug) }}"
+                                            class="btn btn-sm btn-info">
+                                            <i class="fas fa-chart-line"></i> {{ __('messages.detailed_report') }}
+                                        </a>
+                                    </td>
+                                </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="5" class="text-center">{{ __('messages.no_pesticide_usage_data') }}</td>
-                                    </tr>
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        {{ __('messages.no_pesticide_usage_data') }}</td>
+                                </tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -228,163 +249,236 @@
 </div>
 @endsection
 
-@section('styles')
+@push('styles')
 <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
 <style>
     .chart-container {
         position: relative;
         height: 300px;
         width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    canvas {
+        max-width: 100%;
+        max-height: 100%;
     }
 </style>
-@endsection
+@endpush
 
-@section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+@push('scripts')
+<script src="{{ asset('backend/assets/plugins/apexcharts-bundle/js/apexcharts.min.js') }}"></script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Initialize DataTables
-        $('.datatable').DataTable({
-            "pageLength": 10,
-            "language": {
-                "search": "{{ __('messages.search') }}:",
-                "lengthMenu": "{{ __('messages.show') }} _MENU_ {{ __('messages.entries') }}",
-                "info": "{{ __('messages.showing') }} _START_ {{ __('messages.to') }} _END_ {{ __('messages.of') }} _TOTAL_ {{ __('messages.entries') }}",
-                "paginate": {
-                    "first": "{{ __('messages.first') }}",
-                    "last": "{{ __('messages.last') }}",
-                    "next": "{{ __('messages.next') }}",
-                    "previous": "{{ __('messages.previous') }}"
+            // Debug the summary stats data
+            console.log('Summary Stats:', @json($summaryStats));
+
+            // Initialize DataTables
+            $('.datatable').DataTable({
+                "pageLength": 10,
+                "language": {
+                    "search": "{{ __('messages.search') }}:",
+                    "lengthMenu": "{{ __('messages.show') }} _MENU_ {{ __('messages.entries') }}",
+                    "info": "{{ __('messages.showing') }} _START_ {{ __('messages.to') }} _END_ {{ __('messages.of') }} _TOTAL_ {{ __('messages.entries') }}",
+                    "paginate": {
+                        "first": "{{ __('messages.first') }}",
+                        "last": "{{ __('messages.last') }}",
+                        "next": "{{ __('messages.next') }}",
+                        "previous": "{{ __('messages.previous') }}"
+                    }
                 }
-            }
-        });
+            });
 
-        // Prepare data for Pesticide Distribution Chart
-        const pesticideLabels = [];
-        const pesticideData = [];
-        const pesticideColors = [
-            '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#5a5c69',
-            '#2e59d9', '#17a673', '#2c9faf', '#f4b619', '#e02d1b', '#3a3b45'
-        ];
+            // Debug function to check if Chart.js is loaded
+            console.log('Chart.js loaded:', typeof Chart !== 'undefined');
 
-        @if(isset($summaryStats['pesticide_usage']) && count($summaryStats['pesticide_usage']) > 0)
-            @foreach($summaryStats['pesticide_usage'] as $slug => $data)
-                pesticideLabels.push("{{ $data['name'] }}");
-                pesticideData.push({{ $data['total_quantity'] }});
-            @endforeach
-        @endif
+            // Prepare data for Pesticide Distribution Chart
+            const pesticideLabels = [];
+            const pesticideData = [];
+            const pesticideColors = [
+                '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#5a5c69',
+                '#2e59d9', '#17a673', '#2c9faf', '#f4b619', '#e02d1b', '#3a3b45'
+            ];
 
-        console.log("Pesticide Labels:", pesticideLabels);
-        console.log("Pesticide Data:", pesticideData);
+            const pesticideSeries = [];
 
-        // Create Pesticide Distribution Chart if canvas exists and we have data
-        if (document.getElementById('pesticideDistributionChart') && pesticideLabels.length > 0) {
-            console.log("Creating pesticide chart");
-            const pesticideCtx = document.getElementById('pesticideDistributionChart').getContext('2d');
-            
-            new Chart(pesticideCtx, {
-                type: 'pie',
-                data: {
-                    labels: pesticideLabels,
-                    datasets: [{
-                        data: pesticideData,
-                        backgroundColor: pesticideColors.slice(0, pesticideData.length),
-                        hoverBackgroundColor: pesticideColors.slice(0, pesticideData.length),
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'bottom'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.raw + ' units';
+            @if (isset($summaryStats['pesticide_usage']) && count($summaryStats['pesticide_usage']) > 0)
+                @foreach ($summaryStats['pesticide_usage'] as $slug => $data)
+                    pesticideLabels.push("{{ $data['name'] }}");
+                    pesticideData.push({{ $data['total_quantity'] }});
+                    pesticideSeries.push({{ $data['total_quantity'] }});
+                @endforeach
+            @endif
+
+            console.log("Pesticide Chart Data:", {
+                labels: pesticideLabels,
+                data: pesticideData,
+                hasData: pesticideLabels.length > 0,
+                rawData: @json($summaryStats['pesticide_usage'] ?? [])
+            });
+
+            // Create Pesticide Distribution Chart with ApexCharts
+            const pesticideChartElement = document.getElementById('pesticideDistributionChart');
+            if (pesticideChartElement) {
+                try {
+                    if (pesticideLabels.length > 0) {
+                        // Remove canvas and create div for ApexCharts
+                        const chartContainer = pesticideChartElement.parentNode;
+                        chartContainer.innerHTML = '<div id="apexPesticideChart"></div>';
+                        
+                        const pesticideChartOptions = {
+                            series: pesticideSeries,
+                            chart: {
+                                type: 'pie',
+                                height: 300
+                            },
+                            labels: pesticideLabels,
+                            colors: pesticideColors.slice(0, pesticideLabels.length),
+                            legend: {
+                                position: 'bottom'
+                            },
+                            responsive: [{
+                                breakpoint: 480,
+                                options: {
+                                    chart: {
+                                        width: '100%'
+                                    },
+                                    legend: {
+                                        position: 'bottom'
+                                    }
+                                }
+                            }],
+                            tooltip: {
+                                y: {
+                                    formatter: function(value) {
+                                        return value + ' units';
+                                    }
                                 }
                             }
-                        }
+                        };
+                        
+                        const pesticideChart = new ApexCharts(document.getElementById('apexPesticideChart'), pesticideChartOptions);
+                        pesticideChart.render();
+                        console.log('Pesticide chart created successfully with ApexCharts');
+                    } else {
+                        console.log('No data available for pesticide chart');
+                        pesticideChartElement.parentNode.innerHTML =
+                            '<div class="alert alert-info">{{ __('messages.no_pesticide_usage_data_available') }}</div>';
                     }
+                } catch (error) {
+                    console.error('Error creating pesticide chart:', error);
+                    pesticideChartElement.parentNode.innerHTML =
+                        '<div class="alert alert-danger">Error creating chart: ' + error.message + '</div>';
                 }
-            });
-        } else {
-            console.log("Pesticide chart canvas not found or no data available");
-            if (document.getElementById('pesticideDistributionChart')) {
-                document.getElementById('pesticideDistributionChart').parentNode.innerHTML = 
-                    '<div class="alert alert-info">{{ __("messages.no_pesticide_usage_data_available") }}</div>';
+            } else {
+                console.error('Pesticide chart element not found');
             }
-        }
 
-        // Prepare data for Team Consumption Chart
-        const teamLabels = [];
-        const teamData = [];
-        const teamColors = [
-            'rgba(78, 115, 223, 0.8)',
-            'rgba(28, 200, 138, 0.8)',
-            'rgba(54, 185, 204, 0.8)',
-            'rgba(246, 194, 62, 0.8)',
-            'rgba(231, 74, 59, 0.8)',
-            'rgba(90, 92, 105, 0.8)'
-        ];
+            // Prepare data for Team Consumption Chart
+            const teamLabels = [];
+            const teamData = [];
+            const teamColors = [
+                '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#5a5c69'
+            ];
 
-        @if(isset($summaryStats['team_usage']) && count($summaryStats['team_usage']) > 0)
-            @foreach($summaryStats['team_usage'] as $teamId => $data)
-                teamLabels.push("{{ $data['team_name'] }}");
-                teamData.push({{ $data['total_quantity'] }});
-            @endforeach
-        @endif
+            @if (isset($summaryStats['team_usage']) && count($summaryStats['team_usage']) > 0)
+                @foreach ($summaryStats['team_usage'] as $teamId => $data)
+                    teamLabels.push("{{ $data['team_name'] }}");
+                    teamData.push({{ $data['total_quantity'] }});
+                @endforeach
+            @endif
 
-        console.log("Team Labels:", teamLabels);
-        console.log("Team Data:", teamData);
+            console.log("Team Chart Data:", {
+                labels: teamLabels,
+                data: teamData,
+                hasData: teamLabels.length > 0,
+                rawData: @json($summaryStats['team_usage'] ?? [])
+            });
 
-        // Create Team Consumption Chart if canvas exists and we have data
-        if (document.getElementById('teamConsumptionChart') && teamLabels.length > 0) {
-            console.log("Creating team chart");
-            const teamCtx = document.getElementById('teamConsumptionChart').getContext('2d');
-            
-            new Chart(teamCtx, {
-                type: 'bar',
-                data: {
-                    labels: teamLabels,
-                    datasets: [{
-                        label: '{{ __("messages.consumption_units") }}',
-                        data: teamData,
-                        backgroundColor: teamColors.slice(0, teamLabels.length),
-                        borderColor: teamColors.map(color => color.replace('0.8', '1')).slice(0, teamLabels.length),
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0
+            // Create Team Consumption Chart with ApexCharts
+            const teamChartElement = document.getElementById('teamConsumptionChart');
+            if (teamChartElement) {
+                try {
+                    if (teamLabels.length > 0) {
+                        // Remove canvas and create div for ApexCharts
+                        const chartContainer = teamChartElement.parentNode;
+                        chartContainer.innerHTML = '<div id="apexTeamChart"></div>';
+                        
+                        const teamChartOptions = {
+                            series: [{
+                                name: '{{ __('messages.consumption_units') }}',
+                                data: teamData
+                            }],
+                            chart: {
+                                type: 'bar',
+                                height: 300,
+                                toolbar: {
+                                    show: false
+                                }
+                            },
+                            plotOptions: {
+                                bar: {
+                                    horizontal: false,
+                                    columnWidth: '55%',
+                                    endingShape: 'rounded'
+                                },
+                            },
+                            dataLabels: {
+                                enabled: false
+                            },
+                            colors: teamColors,
+                            stroke: {
+                                show: true,
+                                width: 2,
+                                colors: ['transparent']
+                            },
+                            xaxis: {
+                                categories: teamLabels,
+                            },
+                            yaxis: {
+                                title: {
+                                    text: '{{ __('messages.consumption_units') }}'
+                                },
+                                labels: {
+                                    formatter: function(val) {
+                                        return val.toFixed(0);
+                                    }
+                                }
+                            },
+                            fill: {
+                                opacity: 1
+                            },
+                            tooltip: {
+                                y: {
+                                    formatter: function(val) {
+                                        return val + " units"
+                                    }
+                                }
+                            },
+                            legend: {
+                                position: 'top'
                             }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        }
+                        };
+                        
+                        const teamChart = new ApexCharts(document.getElementById('apexTeamChart'), teamChartOptions);
+                        teamChart.render();
+                        console.log('Team chart created successfully with ApexCharts');
+                    } else {
+                        console.log('No data available for team chart');
+                        teamChartElement.parentNode.innerHTML =
+                            '<div class="alert alert-info">{{ __('messages.no_team_usage_data_available') }}</div>';
                     }
+                } catch (error) {
+                    console.error('Error creating team chart:', error);
+                    teamChartElement.parentNode.innerHTML =
+                        '<div class="alert alert-danger">Error creating chart: ' + error.message + '</div>';
                 }
-            });
-        } else {
-            console.log("Team chart canvas not found or no data available");
-            if (document.getElementById('teamConsumptionChart')) {
-                document.getElementById('teamConsumptionChart').parentNode.innerHTML = 
-                    '<div class="alert alert-info">{{ __("messages.no_team_usage_data_available") }}</div>';
+            } else {
+                console.error('Team chart element not found');
             }
-        }
-    });
+        });
 </script>
-@endsection
+@endpush

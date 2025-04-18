@@ -228,12 +228,12 @@
                             <div class="tab-pane fade show active" id="occurrences" role="tabpanel"
                                 aria-labelledby="occurrences-tab">
                                 <div class="chart-container">
-                                    <canvas id="insectTrendsChart"></canvas>
+                                    <div id="insectTrendsChart"></div>
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="quantities" role="tabpanel" aria-labelledby="quantities-tab">
                                 <div class="chart-container">
-                                    <canvas id="insectQuantitiesChart"></canvas>
+                                    <div id="insectQuantitiesChart"></div>
                                 </div>
                             </div>
                         </div>
@@ -275,7 +275,7 @@
                     </div>
                     <div class="card-body">
                         <div class="chart-container">
-                            <canvas id="insectDensityChart"></canvas>
+                            <div id="insectDensityChart"></div>
                         </div>
                     </div>
                 </div>
@@ -335,340 +335,512 @@
 
 @push('scripts')
     <script src="{{ asset('backend/assets/plugins/apexcharts-bundle/js/apexcharts.min.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         $(document).ready(function() {
-            // Prepare data for insect trends chart
-            const visitData = @json($visitData);
-            const targetInsects = @json($targetInsects);
-            const insectStats = @json($insectStats);
+            // Add a flag to track dummy data state
+            let useDummyData = false;
 
-            console.log('Branch Visit Data:', visitData);
-            console.log('Branch Target Insects:', targetInsects);
-            console.log('Branch Insect Stats:', insectStats);
-
-            // Sort insect stats by count (highest first)
-            const sortedStats = [...insectStats].sort((a, b) => b.count - a.count);
-
-            // Take only top 5 insects for readability
-            const topInsects = sortedStats.slice(0, 5);
-
-            // Create a map for insect names
-            const insectNames = {};
-            targetInsects.forEach(insect => {
-                insectNames[insect.value] = insect.name;
-            });
-
-            // Sort visits by date (oldest first)
-            const sortedVisits = [...visitData].sort((a, b) =>
-                new Date(a.visit_date) - new Date(b.visit_date)
+            // Add Toggle Demo Data button
+            $('.card-header:first').append(
+                '<button id="toggleDummyData" class="btn btn-sm btn-outline-secondary ms-2"><i class="bx bx-data me-1"></i> Toggle Demo Data</button>'
             );
 
-            // Extract all unique dates for x-axis
-            const visitDates = sortedVisits.map(visit => {
-                return new Date(visit.visit_date).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                });
+            // Toggle dummy data button click handler
+            $('#toggleDummyData').on('click', function() {
+                useDummyData = !useDummyData;
+                $(this).toggleClass('btn-outline-secondary btn-secondary');
+
+                if (useDummyData) {
+                    $(this).html('<i class="bx bx-data me-1"></i> Using Demo Data');
+                } else {
+                    $(this).html('<i class="bx bx-data me-1"></i> Toggle Demo Data');
+                }
+
+                // Cleanup existing charts
+                if (window.occurrenceChart) {
+                    window.occurrenceChart.destroy();
+                    window.occurrenceChart = null;
+                }
+                if (window.quantityChart) {
+                    window.quantityChart.destroy();
+                    window.quantityChart = null;
+                }
+                if (window.densityChart) {
+                    window.densityChart.destroy();
+                    window.densityChart = null;
+                }
+
+                // Re-initialize charts with or without dummy data
+                initializeCharts(useDummyData);
             });
 
-            // Prepare datasets for Chart.js
-            const occurrenceDatasets = [];
-            const quantityDatasets = [];
+            // Initialize charts on page load
+            initializeCharts(useDummyData);
 
-            // Colors for the datasets
-            const colors = ['#FFCC00', '#3461ff', '#12bf24', '#ff6632', '#8932ff'];
+            // Function to initialize charts with or without dummy data
+            function initializeCharts(useDummy) {
+                // Clear existing charts
+                document.querySelector("#insectTrendsChart").innerHTML = '';
+                document.querySelector("#insectQuantitiesChart").innerHTML = '';
+                document.querySelector("#insectDensityChart").innerHTML = '';
 
-            // Initialize data for top insects
-            topInsects.forEach((insect, index) => {
-                const insectValue = insect.value;
-                const insectName = insect.name;
-                const color = colors[index % colors.length];
+                // Prepare data for insect trends chart
+                const visitData = @json($visitData);
+                const targetInsects = @json($targetInsects);
+                const insectStats = @json($insectStats);
 
-                // Create occurrence data array (initialize with zeros)
-                const occurrenceData = Array(visitDates.length).fill(0);
-                const quantityData = Array(visitDates.length).fill(0);
+                console.log('Branch Visit Data:', visitData);
+                console.log('Branch Target Insects:', targetInsects);
+                console.log('Branch Insect Stats:', insectStats);
 
-                // Fill in actual data from visits
-                sortedVisits.forEach((visit, vIndex) => {
-                    const foundInsect = visit.target_insects.includes(insectValue);
-                    if (foundInsect) {
-                        occurrenceData[vIndex] = 1; // Mark as present
+                // Sort insect stats by count (highest first)
+                const sortedStats = [...insectStats].sort((a, b) => b.count - a.count);
 
-                        // Set quantity if available
-                        if (visit.insect_quantities && visit.insect_quantities[insectValue]) {
-                            quantityData[vIndex] = parseInt(visit.insect_quantities[insectValue]);
-                        } else {
-                            quantityData[vIndex] = 1; // Default to 1
-                        }
+                // Take only top 5 insects for readability
+                const topInsects = sortedStats.slice(0, 5);
+
+                // Create a map for insect names
+                const insectNames = {};
+                targetInsects.forEach(insect => {
+                    insectNames[insect.value] = insect.name;
+                });
+
+                // Sort visits by date (oldest first)
+                const sortedVisits = [...visitData].sort((a, b) =>
+                    new Date(a.visit_date) - new Date(b.visit_date)
+                );
+
+                // Extract all unique dates for x-axis
+                let visitDates = sortedVisits.map(visit => {
+                    return new Date(visit.visit_date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                });
+
+                // Create dataset arrays
+                let occurrenceDatasets = [];
+                let quantityDatasets = [];
+
+                // Colors for the datasets
+                let colors = ['#FFCC00', '#3461ff', '#12bf24', '#ff6632', '#8932ff'];
+
+                // Initialize data for top insects
+                if (visitData.length > 0 && topInsects.length > 0 && !useDummy) {
+                    topInsects.forEach((insect, index) => {
+                        const insectValue = insect.value;
+                        const insectName = insect.name;
+                        const color = colors[index % colors.length];
+
+                        // Create occurrence data array (initialize with zeros)
+                        const occurrenceData = Array(visitDates.length).fill(0);
+                        const quantityData = Array(visitDates.length).fill(0);
+
+                        // Fill in actual data from visits
+                        sortedVisits.forEach((visit, vIndex) => {
+                            const foundInsect = visit.target_insects.includes(insectValue);
+                            if (foundInsect) {
+                                occurrenceData[vIndex] = 1; // Mark as present
+
+                                // Set quantity if available
+                                if (visit.insect_quantities && visit.insect_quantities[
+                                        insectValue]) {
+                                    quantityData[vIndex] = parseInt(visit.insect_quantities[
+                                        insectValue]);
+                                } else {
+                                    quantityData[vIndex] = 1; // Default to 1
+                                }
+                            }
+                        });
+
+                        // Create datasets for ApexCharts series
+                        occurrenceDatasets.push({
+                            name: insectName,
+                            data: occurrenceData
+                        });
+
+                        quantityDatasets.push({
+                            name: insectName,
+                            data: quantityData
+                        });
+                    });
+                }
+
+                // Add dummy data if no data is available or dummy mode is on
+                if (occurrenceDatasets.length === 0 || useDummy) {
+                    console.log('Using dummy data for visualization');
+
+                    // Create dummy dates for the last 6 months
+                    const dummyDates = [];
+                    const today = new Date();
+                    for (let i = 5; i >= 0; i--) {
+                        const date = new Date(today);
+                        date.setMonth(today.getMonth() - i);
+                        dummyDates.push(date.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                        }));
                     }
-                });
 
-                // Create Chart.js formatted datasets
-                occurrenceDatasets.push({
-                    label: insectName,
-                    data: occurrenceData,
-                    backgroundColor: color,
-                    borderColor: color,
-                    borderWidth: 1,
-                    barPercentage: 0.7,
-                    categoryPercentage: 0.9
-                });
-
-                quantityDatasets.push({
-                    label: insectName,
-                    data: quantityData,
-                    backgroundColor: color,
-                    borderColor: color,
-                    borderWidth: 1,
-                    barPercentage: 0.7,
-                    categoryPercentage: 0.9
-                });
-            });
-
-            // Render charts if we have visit data
-            if (visitData.length > 0 && topInsects.length > 0) {
-                // Occurrence Chart (line chart with dates)
-                const occurrenceCtx = document.getElementById('insectTrendsChart').getContext('2d');
-                const occurrenceChart = new Chart(occurrenceCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: visitDates,
-                        datasets: occurrenceDatasets
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'Insect Occurrence Over Time',
-                                font: {
-                                    size: 16,
-                                    weight: 'bold'
-                                }
-                            },
-                            tooltip: {
-                                mode: 'index',
-                                intersect: false,
-                                callbacks: {
-                                    label: function(context) {
-                                        const value = context.raw;
-                                        return context.dataset.label + ': ' + (value === 1 ? 'Present' :
-                                            'Absent');
-                                    }
-                                }
-                            },
-                            legend: {
-                                position: 'top',
-                                align: 'center'
-                            }
+                    // Create dummy insects
+                    const dummyInsects = [{
+                            name: 'Cockroach',
+                            value: 'cockroach'
                         },
-                        scales: {
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Visit Date',
-                                    font: {
-                                        weight: 'bold'
-                                    }
-                                },
-                                ticks: {
-                                    maxRotation: 45,
-                                    minRotation: 45
-                                },
-                                grid: {
-                                    display: false
-                                }
-                            },
-                            y: {
-                                stacked: true,
-                                title: {
-                                    display: true,
-                                    text: 'Occurrence',
-                                    font: {
-                                        weight: 'bold'
-                                    }
-                                },
-                                grid: {
-                                    color: '#e0e0e0',
-                                    lineWidth: 1,
-                                    borderDash: [5, 5]
-                                }
-                            }
+                        {
+                            name: 'Ant',
+                            value: 'ant'
                         },
-                        animation: {
-                            duration: 1000,
-                            easing: 'easeInOutQuad'
+                        {
+                            name: 'Spider',
+                            value: 'spider'
                         },
-                        interaction: {
-                            mode: 'index',
-                            intersect: false
+                        {
+                            name: 'Mosquito',
+                            value: 'mosquito'
+                        },
+                        {
+                            name: 'Fly',
+                            value: 'fly'
                         }
-                    }
-                });
+                    ];
 
-                // Quantity Chart (line chart with dates)
-                const quantityCtx = document.getElementById('insectQuantitiesChart').getContext('2d');
-                const quantityChart = new Chart(quantityCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: visitDates,
-                        datasets: quantityDatasets
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'Insect Quantities Over Time',
-                                font: {
-                                    size: 16,
-                                    weight: 'bold'
-                                }
-                            },
-                            tooltip: {
-                                mode: 'index',
-                                intersect: false,
-                                callbacks: {
-                                    label: function(context) {
-                                        return context.dataset.label + ': ' + context.raw + ' insects';
-                                    }
-                                }
-                            },
-                            legend: {
-                                position: 'top',
-                                align: 'center'
+                    // Create dummy occurrence and quantity datasets
+                    const dummyOccurrenceDatasets = [];
+                    const dummyQuantityDatasets = [];
+
+                    dummyInsects.forEach((insect, index) => {
+                        // Generate random occurrence data (0 or 1)
+                        const occurrenceData = Array(6).fill(0).map(() => Math.random() > 0.5 ? 1 : 0);
+
+                        // Generate random quantity data (1-10)
+                        const quantityData = Array(6).fill(0).map(() => {
+                            return Math.floor(Math.random() * 10) + 1;
+                        });
+
+                        dummyOccurrenceDatasets.push({
+                            name: insect.name,
+                            data: occurrenceData
+                        });
+
+                        dummyQuantityDatasets.push({
+                            name: insect.name,
+                            data: quantityData
+                        });
+                    });
+
+                    // Use dummy data
+                    visitDates = dummyDates;
+                    occurrenceDatasets = dummyOccurrenceDatasets;
+                    quantityDatasets = dummyQuantityDatasets;
+                }
+
+                // Create ApexCharts charts if we have data or dummy data
+                if (occurrenceDatasets.length > 0) {
+                    // Occurrence Chart (area chart with ApexCharts)
+                    const occurrenceOptions = {
+                        series: occurrenceDatasets,
+                        chart: {
+                            height: 350,
+                            type: 'area',
+                            toolbar: {
+                                show: true
                             }
                         },
-                        scales: {
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Visit Date',
-                                    font: {
-                                        weight: 'bold'
-                                    }
-                                },
-                                ticks: {
-                                    maxRotation: 45,
-                                    minRotation: 45
-                                },
-                                grid: {
-                                    display: false
+                        dataLabels: {
+                            enabled: false
+                        },
+                        stroke: {
+                            curve: 'smooth',
+                            width: 3
+                        },
+                        colors: colors,
+                        fill: {
+                            type: 'gradient',
+                            gradient: {
+                                shade: 'light',
+                                type: "vertical",
+                                shadeIntensity: 0.4,
+                                inverseColors: false,
+                                opacityFrom: 0.9,
+                                opacityTo: 0.6,
+                                stops: [0, 100]
+                            }
+                        },
+                        xaxis: {
+                            categories: visitDates,
+                            title: {
+                                text: 'Visit Date',
+                                style: {
+                                    fontWeight: 'bold'
                                 }
                             },
+                            labels: {
+                                rotate: -45,
+                                rotateAlways: true
+                            }
+                        },
+                        yaxis: {
+                            title: {
+                                text: 'Occurrence',
+                                style: {
+                                    fontWeight: 'bold'
+                                }
+                            },
+                            min: 0,
+                            max: 1.1,
+                            labels: {
+                                formatter: function(value) {
+                                    return value === 1 ? 'Present' : 'Absent';
+                                }
+                            }
+                        },
+                        tooltip: {
+                            shared: true,
+                            intersect: false,
                             y: {
-                                stacked: true,
+                                formatter: function(value) {
+                                    return value === 1 ? 'Present' : 'Absent';
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'top'
+                        },
+                        grid: {
+                            borderColor: '#e0e0e0',
+                            strokeDashArray: 5
+                        },
+                        title: {
+                            text: 'Insect Occurrence Over Time',
+                            align: 'center',
+                            style: {
+                                fontSize: '16px',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        markers: {
+                            size: 5,
+                            hover: {
+                                size: 7
+                            }
+                        }
+                    };
+
+                    // Quantity Chart with ApexCharts (area chart)
+                    const quantityOptions = {
+                        series: quantityDatasets,
+                        chart: {
+                            height: 350,
+                            type: 'area',
+                            toolbar: {
+                                show: true
+                            }
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        stroke: {
+                            curve: 'smooth',
+                            width: 3
+                        },
+                        colors: colors,
+                        fill: {
+                            type: 'gradient',
+                            gradient: {
+                                shade: 'light',
+                                type: "vertical",
+                                shadeIntensity: 0.4,
+                                inverseColors: false,
+                                opacityFrom: 0.9,
+                                opacityTo: 0.6,
+                                stops: [0, 100]
+                            }
+                        },
+                        xaxis: {
+                            categories: visitDates,
+                            title: {
+                                text: 'Visit Date',
+                                style: {
+                                    fontWeight: 'bold'
+                                }
+                            },
+                            labels: {
+                                rotate: -45,
+                                rotateAlways: true
+                            }
+                        },
+                        yaxis: {
+                            title: {
+                                text: 'Number of Insects',
+                                style: {
+                                    fontWeight: 'bold'
+                                }
+                            },
+                            min: 0
+                        },
+                        tooltip: {
+                            shared: true,
+                            intersect: false,
+                            y: {
+                                formatter: function(value) {
+                                    return value + ' insects';
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'top'
+                        },
+                        grid: {
+                            borderColor: '#e0e0e0',
+                            strokeDashArray: 5
+                        },
+                        title: {
+                            text: 'Insect Quantities Over Time',
+                            align: 'center',
+                            style: {
+                                fontSize: '16px',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        markers: {
+                            size: 5,
+                            hover: {
+                                size: 7
+                            }
+                        }
+                    };
+
+                    // Initialize the tabs and charts
+                    $('#occurrences-tab').on('shown.bs.tab', function(e) {
+                        if (window.occurrenceChart) {
+                            window.occurrenceChart.destroy();
+                        }
+                        // Render occurrence chart
+                        window.occurrenceChart = new ApexCharts(document.querySelector(
+                            "#insectTrendsChart"), occurrenceOptions);
+                        window.occurrenceChart.render();
+                    });
+
+                    $('#quantities-tab').on('shown.bs.tab', function(e) {
+                        if (window.quantityChart) {
+                            window.quantityChart.destroy();
+                        }
+                        // Render quantity chart
+                        window.quantityChart = new ApexCharts(document.querySelector(
+                            "#insectQuantitiesChart"), quantityOptions);
+                        window.quantityChart.render();
+                    });
+
+                    // Initialize the first tab chart (occurrences) by default
+                    window.occurrenceChart = new ApexCharts(document.querySelector("#insectTrendsChart"),
+                        occurrenceOptions);
+                    window.occurrenceChart.render();
+
+                    // Configure density chart with ApexCharts (spline area chart)
+                    if (occurrenceDatasets.length > 0) {
+                        const densityOptions = {
+                            series: quantityDatasets,
+                            chart: {
+                                height: 350,
+                                type: 'area',
+                                toolbar: {
+                                    show: true
+                                }
+                            },
+                            dataLabels: {
+                                enabled: false
+                            },
+                            stroke: {
+                                curve: 'smooth',
+                                width: 3
+                            },
+                            colors: colors,
+                            fill: {
+                                type: 'gradient',
+                                gradient: {
+                                    shade: 'light',
+                                    type: "vertical",
+                                    shadeIntensity: 0.4,
+                                    inverseColors: false,
+                                    opacityFrom: 0.9,
+                                    opacityTo: 0.6,
+                                    stops: [0, 100]
+                                }
+                            },
+                            xaxis: {
+                                categories: visitDates,
                                 title: {
-                                    display: true,
+                                    text: 'Visit Date',
+                                    style: {
+                                        fontWeight: 'bold'
+                                    }
+                                },
+                                labels: {
+                                    rotate: -45,
+                                    rotateAlways: true
+                                }
+                            },
+                            yaxis: {
+                                title: {
                                     text: 'Number of Insects',
-                                    font: {
-                                        weight: 'bold'
+                                    style: {
+                                        fontWeight: 'bold'
                                     }
                                 },
-                                min: 0,
-                                grid: {
-                                    color: '#e0e0e0',
-                                    lineWidth: 1,
-                                    borderDash: [5, 5]
+                                min: 0
+                            },
+                            tooltip: {
+                                shared: true,
+                                intersect: false,
+                                y: {
+                                    formatter: function(value) {
+                                        return value + ' insects';
+                                    }
                                 }
-                            }
-                        },
-                        animation: {
-                            duration: 1000,
-                            easing: 'easeInOutQuad'
-                        },
-                        interaction: {
-                            mode: 'index',
-                            intersect: false
-                        }
-                    }
-                });
-
-                // Density Chart
-                const densityCtx = document.getElementById('insectDensityChart').getContext('2d');
-                const densityChart = new Chart(densityCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: visitDates,
-                        datasets: quantityDatasets
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
+                            },
+                            legend: {
+                                position: 'top'
+                            },
+                            grid: {
+                                borderColor: '#e0e0e0',
+                                strokeDashArray: 5
+                            },
                             title: {
-                                display: true,
                                 text: 'Insect Density Over Time',
-                                font: {
-                                    size: 16,
-                                    weight: 'bold'
+                                align: 'center',
+                                style: {
+                                    fontSize: '16px',
+                                    fontWeight: 'bold'
                                 }
                             },
-                            tooltip: {
-                                mode: 'index',
-                                intersect: false
-                            },
-                            legend: {
-                                position: 'top',
-                                align: 'center'
-                            }
-                        },
-                        scales: {
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Visit Date',
-                                    font: {
-                                        weight: 'bold'
-                                    }
-                                },
-                                ticks: {
-                                    maxRotation: 45,
-                                    minRotation: 45
-                                },
-                                grid: {
-                                    display: false
-                                }
-                            },
-                            y: {
-                                stacked: true,
-                                title: {
-                                    display: true,
-                                    text: 'Number of Insects',
-                                    font: {
-                                        weight: 'bold'
-                                    }
-                                },
-                                min: 0,
-                                grid: {
-                                    color: '#e0e0e0',
-                                    lineWidth: 1,
-                                    borderDash: [5, 5]
+                            markers: {
+                                size: 5,
+                                hover: {
+                                    size: 7
                                 }
                             }
-                        },
-                        animation: {
-                            duration: 1000,
-                            easing: 'easeInOutQuad'
-                        },
-                        interaction: {
-                            mode: 'index',
-                            intersect: false
+                        };
+
+                        // Initialize density chart
+                        if (window.densityChart) {
+                            window.densityChart.destroy();
                         }
+                        window.densityChart = new ApexCharts(document.querySelector("#insectDensityChart"),
+                            densityOptions);
+                        window.densityChart.render();
                     }
-                });
-            } else {
-                // Display message if no data
-                document.querySelector("#insectTrendsChart").innerHTML =
-                    '<div class="alert alert-info">No visit data available for this branch.</div>';
-                document.querySelector("#insectQuantitiesChart").innerHTML =
-                    '<div class="alert alert-info">No visit data available for this branch.</div>';
-                document.querySelector("#insectDensityChart").innerHTML =
-                    '<div class="alert alert-info">No visit data available for this branch.</div>';
+                } else {
+                    // Display message if no data
+                    document.querySelector("#insectTrendsChart").innerHTML =
+                        '<div class="alert alert-info">No visit data available for this branch.</div>';
+                    document.querySelector("#insectQuantitiesChart").innerHTML =
+                        '<div class="alert alert-info">No visit data available for this branch.</div>';
+                    document.querySelector("#insectDensityChart").innerHTML =
+                        '<div class="alert alert-info">No visit data available for this branch.</div>';
+                }
             }
         });
     </script>

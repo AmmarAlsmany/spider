@@ -265,18 +265,44 @@
         const monthlyTrendsData = @json($monthlyTrends);
         const trendsSeries = [];
         const quantitySeries = [];
+        const currentYear = new Date().getFullYear(); // Current year
+        
+        // Filter data for the current year and get month labels
+        let filteredMonthLabels = [];
+        let firstInsectKey = Object.keys(monthlyTrendsData)[0];
+        
+        if (firstInsectKey && monthlyTrendsData[firstInsectKey]?.data) {
+            // Extract year from month strings (format: "Jan 2025")
+            filteredMonthLabels = monthlyTrendsData[firstInsectKey].data
+                .filter(item => {
+                    const year = parseInt(item.month.split(' ')[1]);
+                    return year === currentYear;
+                })
+                .map(item => item.month);
+        }
         
         // Limit to top 5 insects for readability
         let insectCount = 0;
         for (const [key, value] of Object.entries(monthlyTrendsData)) {
             if (insectCount < 5) {
-                const seriesData = value.data.map(item => item.count);
+                // Filter data for current year
+                const currentYearData = value.data.filter(item => {
+                    const year = parseInt(item.month.split(' ')[1]);
+                    return year === currentYear;
+                });
+                
+                const currentYearQuantityData = value.quantity_data.filter(item => {
+                    const year = parseInt(item.month.split(' ')[1]);
+                    return year === currentYear;
+                });
+                
+                const seriesData = currentYearData.map(item => item.count);
                 trendsSeries.push({
                     name: value.name,
                     data: seriesData
                 });
                 
-                const quantityData = value.quantity_data.map(item => item.count);
+                const quantityData = currentYearQuantityData.map(item => item.count);
                 quantitySeries.push({
                     name: value.name,
                     data: quantityData
@@ -286,15 +312,30 @@
             }
         }
         
-        const monthLabels = monthlyTrendsData[Object.keys(monthlyTrendsData)[0]]?.data.map(item => item.month) || [];
+        const monthLabels = filteredMonthLabels;
         
         const trendsOptions = {
             series: trendsSeries,
             chart: {
-                type: 'line',
+                type: 'area',
                 height: 350,
                 toolbar: {
                     show: false
+                },
+                dropShadow: {
+                    enabled: true,
+                    opacity: 0.3,
+                    blur: 5,
+                    left: -7,
+                    top: 22
+                }
+            },
+            title: {
+                text: 'Insect Trends for 2025',
+                align: 'left',
+                style: {
+                    fontSize: '16px',
+                    fontWeight: 'bold'
                 }
             },
             colors: ['#3461ff', '#12bf24', '#ff6632', '#8932ff', '#ffcb32'],
@@ -304,6 +345,15 @@
             stroke: {
                 curve: 'smooth',
                 width: 3
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.7,
+                    opacityTo: 0.2,
+                    stops: [0, 90, 100]
+                }
             },
             grid: {
                 borderColor: '#f1f1f1',
@@ -331,10 +381,25 @@
         const quantitiesOptions = {
             series: quantitySeries,
             chart: {
-                type: 'line',
+                type: 'area',
                 height: 350,
                 toolbar: {
                     show: false
+                },
+                dropShadow: {
+                    enabled: true,
+                    opacity: 0.3,
+                    blur: 5,
+                    left: -7,
+                    top: 22
+                }
+            },
+            title: {
+                text: 'Insect Quantities for 2025',
+                align: 'left',
+                style: {
+                    fontSize: '16px',
+                    fontWeight: 'bold'
                 }
             },
             colors: ['#3461ff', '#12bf24', '#ff6632', '#8932ff', '#ffcb32'],
@@ -344,6 +409,15 @@
             stroke: {
                 curve: 'smooth',
                 width: 3
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.7,
+                    opacityTo: 0.2,
+                    stops: [0, 90, 100]
+                }
             },
             grid: {
                 borderColor: '#f1f1f1',

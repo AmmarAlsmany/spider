@@ -48,14 +48,16 @@
         <div class="col-12">
             <div class="chart-container">
                 <h4>Insect Occurrence Over Time</h4>
-                {{-- The controller will replace this with an actual chart image --}}
                 @if (isset($chartImages['occurrence']) && !empty($chartImages['occurrence']))
-                    <img src="{{ $chartImages['occurrence'] }}" alt="Insect Occurrence Chart" class="chart-img" />
+                    <img src="{{ $chartImages['occurrence'] }}" alt="Insect Occurrence Chart"
+                        style="width:100%; max-width:700px; height: auto; display: block; margin: 10px auto;" />
                 @else
-                    <div class="no-chart" style="height: 150px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; background: #f9f9f9;">
+                    <div class="no-chart"
+                        style="height: 150px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; background: #f9f9f9; margin: 10px 0;">
                         <div style="text-align: center; color: #666;">
                             <p>Chart not available in PDF export</p>
-                            <p style="font-size: 11px; margin-top: 5px;">View the online dashboard for interactive charts</p>
+                            <p style="font-size: 11px; margin-top: 5px;">View the online dashboard for interactive
+                                charts</p>
                         </div>
                     </div>
                 @endif
@@ -67,14 +69,16 @@
         <div class="col-12">
             <div class="chart-container">
                 <h4>Insect Quantities Over Time</h4>
-                {{-- The controller will replace this with an actual chart image --}}
                 @if (isset($chartImages['quantity']) && !empty($chartImages['quantity']))
-                    <img src="{{ $chartImages['quantity'] }}" alt="Insect Quantities Chart" class="chart-img" />
+                    <img src="{{ $chartImages['quantity'] }}" alt="Insect Quantities Chart"
+                        style="width:100%; max-width:700px; height: auto; display: block; margin: 10px auto;" />
                 @else
-                    <div class="no-chart" style="height: 150px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; background: #f9f9f9;">
+                    <div class="no-chart"
+                        style="height: 150px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; background: #f9f9f9; margin: 10px 0;">
                         <div style="text-align: center; color: #666;">
                             <p>Chart not available in PDF export</p>
-                            <p style="font-size: 11px; margin-top: 5px;">View the online dashboard for interactive charts</p>
+                            <p style="font-size: 11px; margin-top: 5px;">View the online dashboard for interactive
+                                charts</p>
                         </div>
                     </div>
                 @endif
@@ -86,14 +90,16 @@
         <div class="col-12">
             <div class="chart-container">
                 <h4>Insect Distribution</h4>
-                {{-- The controller will replace this with an actual chart image --}}
                 @if (isset($chartImages['distribution']) && !empty($chartImages['distribution']))
-                    <img src="{{ $chartImages['distribution'] }}" alt="Insect Distribution Chart" class="chart-img" />
+                    <img src="{{ $chartImages['distribution'] }}" alt="Insect Distribution Chart"
+                        style="width:100%; max-width:700px; height: auto; display: block; margin: 10px auto;" />
                 @else
-                    <div class="no-chart" style="height: 150px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; background: #f9f9f9;">
+                    <div class="no-chart"
+                        style="height: 150px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; background: #f9f9f9; margin: 10px 0;">
                         <div style="text-align: center; color: #666;">
                             <p>Chart not available in PDF export</p>
-                            <p style="font-size: 11px; margin-top: 5px;">View the online dashboard for interactive charts</p>
+                            <p style="font-size: 11px; margin-top: 5px;">View the online dashboard for interactive
+                                charts</p>
                         </div>
                     </div>
                 @endif

@@ -11,6 +11,7 @@
         "laravel/tinker": "^2.9",
         "mpdf/mpdf": "*",
         "simplesoftwareio/simple-qrcode": "^4.2",
+        "spatie/browsershot": "^5.0",
         "spatie/laravel-activitylog": "*"
     },
     "require-dev": {

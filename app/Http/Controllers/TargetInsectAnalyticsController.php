@@ -9,6 +9,7 @@ use App\Models\branchs;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Spatie\Browsershot\Browsershot;
 
 class TargetInsectAnalyticsController extends Controller
 {
@@ -1026,116 +1027,95 @@ class TargetInsectAnalyticsController extends Controller
             return $chartImages;
         }
 
-        // Prepare data for charts
+        // Prepare data for charts (Ensure this part is correct)
         $topInsects = array_slice($insectStats, 0, 5); // Get top 5 insects
-
-        // Sort visits by date (oldest first)
         usort($visitData, function ($a, $b) {
             return strtotime($a['visit_date']) - strtotime($b['visit_date']);
         });
-
-        // Extract dates for x-axis
         $visitDates = array_map(function ($visit) {
             return date('d M Y', strtotime($visit['visit_date']));
         }, $visitData);
-
-        // Prepare datasets for charts
         $occurrenceDatasets = [];
         $quantityDatasets = [];
         $colors = ['#FFCC00', '#3461ff', '#12bf24', '#ff6632', '#8932ff'];
-
         foreach ($topInsects as $index => $insect) {
             $insectValue = $insect['value'];
             $insectName = $insect['name'];
-            $color = $colors[$index % count($colors)];
-
-            // Create occurrence data array
             $occurrenceData = array_fill(0, count($visitDates), 0);
             $quantityData = array_fill(0, count($visitDates), 0);
-
-            // Fill in actual data from visits
             foreach ($visitData as $vIndex => $visit) {
                 $foundInsect = in_array($insectValue, $visit['target_insects']);
                 if ($foundInsect) {
-                    $occurrenceData[$vIndex] = 1; // Mark as present
-
-                    // Set quantity if available
+                    $occurrenceData[$vIndex] = 1;
                     if (isset($visit['insect_quantities'][$insectValue])) {
                         $quantityData[$vIndex] = (int)$visit['insect_quantities'][$insectValue];
                     } else {
-                        $quantityData[$vIndex] = 1; // Default to 1
+                        $quantityData[$vIndex] = 1;
                     }
                 }
             }
-
-            $occurrenceDatasets[] = [
-                'name' => $insectName,
-                'data' => $occurrenceData
-            ];
-
-            $quantityDatasets[] = [
-                'name' => $insectName,
-                'data' => $quantityData
-            ];
+            $occurrenceDatasets[] = ['name' => $insectName, 'data' => $occurrenceData];
+            $quantityDatasets[] = ['name' => $insectName, 'data' => $quantityData];
         }
 
         // Generate base64 encoded chart images using ApexCharts and headless browser
         try {
-            // Install required packages: composer require spatie/browsershot
-            // You'll also need to install Node.js and npm install puppeteer
+            // Ensure spatie/browsershot is installed: composer require spatie/browsershot
+            // Ensure Node.js and puppeteer are installed: npm install puppeteer
 
             // Create a temporary HTML file with ApexCharts
-            $tempHtmlPath = storage_path('app/temp_charts.html');
+            $tempHtmlPath = storage_path('app/temp_pdf_charts.html');
             $html = $this->createChartsHtml($visitDates, $occurrenceDatasets, $quantityDatasets, $insectStats, $colors);
             file_put_contents($tempHtmlPath, $html);
 
             // Use Browsershot to capture screenshots
-            $occurrenceChartPath = storage_path('app/occurrence_chart.png');
-            $quantityChartPath = storage_path('app/quantity_chart.png');
-            $distributionChartPath = storage_path('app/distribution_chart.png');
+            $occurrenceChartPath = storage_path('app/pdf_occurrence_chart.png');
+            $quantityChartPath = storage_path('app/pdf_quantity_chart.png');
+            $distributionChartPath = storage_path('app/pdf_distribution_chart.png');
 
-            // Note: This code requires Spatie/Browsershot and Puppeteer to be installed
-            // If these are not available, comment this section out and use placeholder images
-
-            /*
-            \Spatie\Browsershot\Browsershot::url('file://' . $tempHtmlPath)
+            // Capture Occurrence Chart
+            Browsershot::html($html) // Load HTML directly
                 ->select('#occurrence-chart')
-                ->waitUntilNetworkIdle()
+                ->waitUntilNetworkIdle() // Wait for chart rendering
+                ->deviceScaleFactor(2) // Improve resolution
+                ->windowSize(850, 450) // Ensure consistent size
                 ->save($occurrenceChartPath);
-                
-            \Spatie\Browsershot\Browsershot::url('file://' . $tempHtmlPath)
+
+            // Capture Quantity Chart
+            Browsershot::html($html) // Load HTML directly
                 ->select('#quantity-chart')
                 ->waitUntilNetworkIdle()
+                ->deviceScaleFactor(2)
+                ->windowSize(850, 450)
                 ->save($quantityChartPath);
-                
-            \Spatie\Browsershot\Browsershot::url('file://' . $tempHtmlPath)
+
+            // Capture Distribution Chart
+            Browsershot::html($html) // Load HTML directly
                 ->select('#distribution-chart')
                 ->waitUntilNetworkIdle()
+                ->deviceScaleFactor(2)
+                ->windowSize(850, 450)
                 ->save($distributionChartPath);
-            
+
             // Convert images to base64 for embedding in PDF
-            $chartImages['occurrence'] = 'data:image/png;base64,' . base64_encode(file_get_contents($occurrenceChartPath));
-            $chartImages['quantity'] = 'data:image/png;base64,' . base64_encode(file_get_contents($quantityChartPath));
-            $chartImages['distribution'] = 'data:image/png;base64,' . base64_encode(file_get_contents($distributionChartPath));
-            
-            // Clean up temporary files
-            @unlink($tempHtmlPath);
-            @unlink($occurrenceChartPath);
-            @unlink($quantityChartPath);
-            @unlink($distributionChartPath);
-            */
-
-            // For now, return empty strings - the templates will display placeholders
-            $chartImages['occurrence'] = '';
-            $chartImages['quantity'] = '';
-            $chartImages['distribution'] = '';
-
-            // Clean up any temporary files
-            if (file_exists($tempHtmlPath)) {
-                @unlink($tempHtmlPath);
+            if (file_exists($occurrenceChartPath)) {
+                $chartImages['occurrence'] = 'data:image/png;base64,' . base64_encode(file_get_contents($occurrenceChartPath));
             }
+            if (file_exists($quantityChartPath)) {
+                $chartImages['quantity'] = 'data:image/png;base64,' . base64_encode(file_get_contents($quantityChartPath));
+            }
+            if (file_exists($distributionChartPath)) {
+                $chartImages['distribution'] = 'data:image/png;base64,' . base64_encode(file_get_contents($distributionChartPath));
+            }
+
+            // Clean up temporary files
+            if (file_exists($occurrenceChartPath)) @unlink($occurrenceChartPath);
+            if (file_exists($quantityChartPath)) @unlink($quantityChartPath);
+            if (file_exists($distributionChartPath)) @unlink($distributionChartPath);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error generating chart images: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Error generating PDF chart images using Browsershot: ' . $e->getMessage() . "\nStack Trace:\n" . $e->getTraceAsString());
+            // Return empty array so placeholders are shown
+            $chartImages = [];
         }
 
         return $chartImages;
@@ -1163,11 +1143,13 @@ class TargetInsectAnalyticsController extends Controller
             <title>Analytics Charts</title>
             <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
             <style>
+                body { margin: 0; padding: 0; }
                 .chart-container { 
                     width: 800px; 
                     height: 400px; 
                     margin: 20px;
                     border: 1px solid #eee;
+                    box-sizing: border-box;
                 }
             </style>
         </head>
@@ -1177,150 +1159,159 @@ class TargetInsectAnalyticsController extends Controller
             <div id="distribution-chart" class="chart-container"></div>
             
             <script>
-                // Occurrence Chart
-                var occurrenceOptions = {
-                    series: ' . json_encode($occurrenceDatasets) . ',
-                    chart: {
-                        height: 400,
-                        type: "area",
-                        background: "#fff"
-                    },
-                    dataLabels: {
-                        enabled: false
-                    },
-                    stroke: {
-                        curve: "smooth",
-                        width: 3
-                    },
-                    colors: ' . json_encode($colors) . ',
-                    fill: {
-                        type: "gradient",
-                        gradient: {
-                            shade: "light",
-                            type: "vertical",
-                            shadeIntensity: 0.4,
-                            inverseColors: false,
-                            opacityFrom: 0.9,
-                            opacityTo: 0.6,
-                            stops: [0, 100]
-                        }
-                    },
-                    xaxis: {
-                        categories: ' . json_encode($visitDates) . ',
-                        title: {
-                            text: "Visit Date",
-                            style: {
-                                fontWeight: "bold"
+                // Ensure charts render after page load
+                document.addEventListener("DOMContentLoaded", function() {
+                    // Occurrence Chart
+                    var occurrenceOptions = {
+                        series: ' . json_encode($occurrenceDatasets) . ',
+                        chart: {
+                            height: 400,
+                            width: 800,
+                            type: "area",
+                            background: "#fff",
+                            animations: { enabled: false } // Disable animations for faster capture
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        stroke: {
+                            curve: "smooth",
+                            width: 3
+                        },
+                        colors: ' . json_encode($colors) . ',
+                        fill: {
+                            type: "gradient",
+                            gradient: {
+                                shade: "light",
+                                type: "vertical",
+                                shadeIntensity: 0.4,
+                                inverseColors: false,
+                                opacityFrom: 0.9,
+                                opacityTo: 0.6,
+                                stops: [0, 100]
                             }
-                        }
-                    },
-                    yaxis: {
+                        },
+                        xaxis: {
+                            categories: ' . json_encode($visitDates) . ',
+                            title: {
+                                text: "Visit Date",
+                                style: {
+                                    fontWeight: "bold"
+                                }
+                            }
+                        },
+                        yaxis: {
+                            title: {
+                                text: "Occurrence",
+                                style: {
+                                    fontWeight: "bold"
+                                }
+                            },
+                            min: 0,
+                            max: 1.1
+                        },
                         title: {
-                            text: "Occurrence",
+                            text: "Insect Occurrence Over Time",
+                            align: "center",
                             style: {
+                                fontSize: "16px",
                                 fontWeight: "bold"
                             }
                         },
-                        min: 0,
-                        max: 1.1
-                    },
-                    title: {
-                        text: "Insect Occurrence Over Time",
-                        align: "center",
-                        style: {
-                            fontSize: "16px",
-                            fontWeight: "bold"
+                        markers: {
+                            size: 5
                         }
-                    },
-                    markers: {
-                        size: 5
-                    }
-                };
-                var occurrenceChart = new ApexCharts(document.querySelector("#occurrence-chart"), occurrenceOptions);
-                occurrenceChart.render();
-                
-                // Quantity Chart
-                var quantityOptions = {
-                    series: ' . json_encode($quantityDatasets) . ',
-                    chart: {
-                        height: 400,
-                        type: "area",
-                        background: "#fff"
-                    },
-                    dataLabels: {
-                        enabled: false
-                    },
-                    stroke: {
-                        curve: "smooth",
-                        width: 3
-                    },
-                    colors: ' . json_encode($colors) . ',
-                    fill: {
-                        type: "gradient",
-                        gradient: {
-                            shade: "light",
-                            type: "vertical",
-                            shadeIntensity: 0.4,
-                            inverseColors: false,
-                            opacityFrom: 0.9,
-                            opacityTo: 0.6,
-                            stops: [0, 100]
-                        }
-                    },
-                    xaxis: {
-                        categories: ' . json_encode($visitDates) . ',
-                        title: {
-                            text: "Visit Date",
-                            style: {
-                                fontWeight: "bold"
+                    };
+                    var occurrenceChart = new ApexCharts(document.querySelector("#occurrence-chart"), occurrenceOptions);
+                    occurrenceChart.render();
+                    
+                    // Quantity Chart
+                    var quantityOptions = {
+                        series: ' . json_encode($quantityDatasets) . ',
+                        chart: {
+                            height: 400,
+                            width: 800,
+                            type: "area",
+                            background: "#fff",
+                            animations: { enabled: false }
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        stroke: {
+                            curve: "smooth",
+                            width: 3
+                        },
+                        colors: ' . json_encode($colors) . ',
+                        fill: {
+                            type: "gradient",
+                            gradient: {
+                                shade: "light",
+                                type: "vertical",
+                                shadeIntensity: 0.4,
+                                inverseColors: false,
+                                opacityFrom: 0.9,
+                                opacityTo: 0.6,
+                                stops: [0, 100]
                             }
-                        }
-                    },
-                    yaxis: {
+                        },
+                        xaxis: {
+                            categories: ' . json_encode($visitDates) . ',
+                            title: {
+                                text: "Visit Date",
+                                style: {
+                                    fontWeight: "bold"
+                                }
+                            }
+                        },
+                        yaxis: {
+                            title: {
+                                text: "Number of Insects",
+                                style: {
+                                    fontWeight: "bold"
+                                }
+                            },
+                            min: 0
+                        },
                         title: {
-                            text: "Number of Insects",
+                            text: "Insect Quantities Over Time",
+                            align: "center",
                             style: {
+                                fontSize: "16px",
                                 fontWeight: "bold"
                             }
                         },
-                        min: 0
-                    },
-                    title: {
-                        text: "Insect Quantities Over Time",
-                        align: "center",
-                        style: {
-                            fontSize: "16px",
-                            fontWeight: "bold"
+                        markers: {
+                            size: 5
                         }
-                    },
-                    markers: {
-                        size: 5
-                    }
-                };
-                var quantityChart = new ApexCharts(document.querySelector("#quantity-chart"), quantityOptions);
-                quantityChart.render();
-                
-                // Distribution Chart
-                var distributionOptions = {
-                    series: ' . json_encode($distributionData) . ',
-                    chart: {
-                        type: "pie",
-                        height: 400,
-                        background: "#fff"
-                    },
-                    labels: ' . json_encode($distributionLabels) . ',
-                    colors: ["#3461ff", "#12bf24", "#ff6632", "#8932ff", "#ffcb32", "#ff3e1d", "#299cdb", "#6c757d", "#0dcaf0", "#fd7e14"],
-                    title: {
-                        text: "Insect Distribution",
-                        align: "center",
-                        style: {
-                            fontSize: "16px",
-                            fontWeight: "bold"
+                    };
+                    var quantityChart = new ApexCharts(document.querySelector("#quantity-chart"), quantityOptions);
+                    quantityChart.render();
+                    
+                    // Distribution Chart
+                    var distributionOptions = {
+                        series: ' . json_encode($distributionData) . ',
+                        chart: {
+                            type: "pie",
+                            height: 400,
+                            width: 800,
+                            background: "#fff",
+                            animations: { enabled: false }
+                        },
+                        labels: ' . json_encode($distributionLabels) . ',
+                        colors: ["#3461ff", "#12bf24", "#ff6632", "#8932ff", "#ffcb32", "#ff3e1d", "#299cdb", "#6c757d", "#0dcaf0", "#fd7e14"],
+                        title: {
+                            text: "Insect Distribution",
+                            align: "center",
+                            style: {
+                                fontSize: "16px",
+                                fontWeight: "bold"
+                            }
                         }
-                    }
-                };
-                var distributionChart = new ApexCharts(document.querySelector("#distribution-chart"), distributionOptions);
-                distributionChart.render();
+                    };
+                    var distributionChart = new ApexCharts(document.querySelector("#distribution-chart"), distributionOptions);
+                    distributionChart.render();
+                });
             </script>
         </body>
         </html>';

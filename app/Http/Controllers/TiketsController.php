@@ -72,7 +72,7 @@ class TiketsController extends Controller
         $data = [
             'title' => "New Ticket Created: " . $ticket->tiket_number . "from " . Auth::guard('client')->user()->name,
             'message' => $ticket->tiket_title,
-            'url' => route('technical.client_tickets.show', $ticket->id),
+            'priority' => 'high',
         ];
         
         // Different URLs for different roles
@@ -109,7 +109,7 @@ class TiketsController extends Controller
         $data = [
             'title' => "New Reply: " . $ticket->tiket_number . "from " . Auth::guard('client')->user()->name,
             'message' => $request->reply,
-            'url' => route('technical.client_tickets.show', $ticket->id),
+            'priority' => 'high',
         ];
         
         // Different URLs for different roles
@@ -142,7 +142,7 @@ class TiketsController extends Controller
         $data = [
             'title' => "Ticket Status Updated: " . $ticket->tiket_number . "from " . Auth::guard('client')->user()->name,
             'message' => 'Status changed to ' . $request->status,
-            'url' => route('technical.client_tickets.show', $ticket->id),
+            'priority' => 'high',
         ];
         
         // Different URLs for different roles

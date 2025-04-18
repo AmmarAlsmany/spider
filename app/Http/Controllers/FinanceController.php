@@ -216,7 +216,6 @@ class FinanceController extends Controller
             'title' => 'Payment Recorded',
             'message' => 'Payment of ' . $payment->payment_amount . ' SAR has been recorded as paid',
             'type' => 'success',
-            'url' => route('finance.payments.show', $payment->id),
             'priority' => 'normal',
         ];
         

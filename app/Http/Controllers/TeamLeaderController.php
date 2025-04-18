@@ -140,7 +140,6 @@ class TeamLeaderController extends Controller
         $data = [
             'title' => "Visit In Progress: " . $visit->contract->contract_number,
             'message' => 'Your visit is in progress and awaiting report submission',
-            'url' => route('team-leader.visit.show', $visit->id),
         ];
         
         // Different URLs for different roles
@@ -189,7 +188,6 @@ class TeamLeaderController extends Controller
         $data = [
             'title' => "Visit Report Created: " . $visit->contract->contract_number,
             'message' => 'Your visit has been completed and report is ready to download',
-            'url' => route('team-leader.visit.show', $visit->id),
         ];
         
         // Different URLs for different roles

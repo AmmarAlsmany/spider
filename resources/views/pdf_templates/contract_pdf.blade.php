@@ -381,15 +381,13 @@
                             تلتزم سبايدر ويب باستخدام مواد ذات كفاءة عالية وعديمة الرائحة وآمنة جداً على الإنسان.
                         </li>
                         <li style="margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dotted #ccc;">
-                            العقد لايشمل توفير المصائد بأنواعها وطوارد الطيور.
+                            العقد لايشمل توفير المصائد بأنواعها وطوارد الطيور الا اذا ذكر ذلك في العقد. 
                         </li>
                         <li style="margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dotted #ccc;">
                             يجب أن تكون غرف التفتيش قابلة للفتح لضمان الحصول على أفضل النتائج.
                         </li>
                         <li style="margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dotted #ccc;">
                             تلتزم سبايدر ويب بزيارة مجانية بعد 15 يوم من الزيارة الأولى
-                            في حال وجود مشاكل فنية يرجى التواصل <span
-                                style="font-weight: bold; color: #e74c3c;">920020554</span>
                         </li>
                         <li style="margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dotted #ccc;">
                             يلتزم العميل بجدول الزيارات الزمني المحدد من قبل سبايدر ويب لضمان الحصول على أفضل النتائج
@@ -427,15 +425,14 @@
                             safe for humans.
                         </li>
                         <li style="margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dotted #ccc;">
-                            The contract does not include providing traps of all kinds and bird control materials.
+                            The contract does not include providing traps of all kinds and bird control materials unless
+                            specified in the contract.
                         </li>
                         <li style="margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dotted #ccc;">
                             Inspection rooms must be accessible to ensure the best results.
                         </li>
                         <li style="margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dotted #ccc;">
-                            Spider Web is committed to a free visit 15 days after the first visit in case of technical
-                            problems.
-                            Please contact <span style="font-weight: bold; color: #e74c3c;">920020554</span>.
+                            Spider Web is committed to a free visit 15 days after the first visit.
                         </li>
                         <li style="margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dotted #ccc;">
                             The client is obligated to follow the schedule of visits set by Spider Web to ensure the

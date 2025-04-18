@@ -74,7 +74,6 @@ class PaymentsController extends Controller
             'title' => 'New Payment Created',
             'message' => 'A new payment of ' . $payment->payment_amount . ' SAR has been created with due date ' . $payment->due_date,
             'type' => 'info',
-            'url' => route('payment.show', $payment->id),
             'priority' => 'normal',
         ];
 
@@ -159,7 +158,7 @@ class PaymentsController extends Controller
                 'title' => 'Payment Marked as Paid',
                 'message' => 'Payment of ' . $payment->payment_amount . ' SAR has been paid',
                 'type' => 'info',
-                'priority' => 'normal',
+                'priority' => 'high',
             ];
 
             // Different URLs for different roles

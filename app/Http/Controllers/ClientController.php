@@ -166,7 +166,6 @@ class ClientController extends Controller
         $data = [
             'title' => "Update Request for Contract " . $contract->contract_number,
             'message' =>$contract->customer->name ."Ask for update on contract". $request->request_details,
-            'url' => route('contracts.show', $contract->id),
         ];
         
         // Different URLs for different roles
@@ -175,7 +174,7 @@ class ClientController extends Controller
             'sales_manager' => route('contracts.show', $contract->id)
         ];
 
-        $this->notifyRoles(['sales', 'sales_manager'], $data);
+        $this->notifyRoles(['sales', 'sales_manager'], $data, $client->id, $contract->sales_id, $roleUrls);
 
         return redirect()->back()->with('success', 'Update request submitted successfully');
     }

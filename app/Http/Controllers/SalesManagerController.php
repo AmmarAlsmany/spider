@@ -655,8 +655,7 @@ class SalesManagerController extends Controller
                 'title' => 'Payment Postponement Request Approved',
                 'message' => 'Payment postponement request has been approved.',
                 'type' => 'info',
-                'url' => route('payments.show', $postponementRequest->payment->id),
-                'priority' => 'normal',
+                'priority' => 'high',
             ];
             
             // Different URLs for different roles
@@ -691,8 +690,7 @@ class SalesManagerController extends Controller
                 'title' => 'Payment Postponement Request Rejected',
                 'message' => 'Payment postponement request has been rejected.',
                 'type' => 'info',
-                'url' => route('payments.show', $postponementRequest->payment->id),
-                'priority' => 'normal',
+                'priority' => 'high',
             ];
             
             // Different URLs for different roles

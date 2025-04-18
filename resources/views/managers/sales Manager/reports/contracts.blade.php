@@ -51,7 +51,8 @@ contracts
         </tfoot>
     </table>
 </div>
-
+@endsection
+@push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Prepare data for PDF export
@@ -75,4 +76,4 @@ contracts
         document.getElementById('reportViewData').value = JSON.stringify(contractsData);
     });
 </script>
-@endsection
+@endpush

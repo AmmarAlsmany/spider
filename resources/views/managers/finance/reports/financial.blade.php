@@ -1,50 +1,5 @@
 @extends('shared.dashboard')
 @section('content')
-<script>
-    function printFinancialReport() {
-        // Create an iframe element
-        var printFrame = document.createElement('iframe');
-        
-        // Make it invisible
-        printFrame.style.position = 'fixed';
-        printFrame.style.right = '0';
-        printFrame.style.bottom = '0';
-        printFrame.style.width = '0';
-        printFrame.style.height = '0';
-        printFrame.style.border = '0';
-        
-        document.body.appendChild(printFrame);
-        
-        // Get the iframe document
-        var frameDoc = printFrame.contentWindow || printFrame.contentDocument.document || printFrame.contentDocument;
-        
-        // Write the HTML content to the iframe
-        frameDoc.document.open();
-        frameDoc.document.write('<html><head><title>Financial Report</title>');
-        frameDoc.document.write('<link rel="stylesheet" href="{{ asset("assets/css/bootstrap.min.css") }}" type="text/css" />');
-        frameDoc.document.write('<style>body { padding: 20px; } .actions-column { display: none; }</style>');
-        frameDoc.document.write('</head><body>');
-        frameDoc.document.write('<h3 class="text-center mb-4">Financial Report</h3>');
-        
-        // Add the table HTML
-        var tableHtml = document.querySelector('#printable-area .table-responsive').innerHTML;
-        frameDoc.document.write('<div class="table-responsive">' + tableHtml + '</div>');
-        
-        frameDoc.document.write('</body></html>');
-        frameDoc.document.close();
-        
-        // Use setTimeout to ensure the content is loaded before printing
-        setTimeout(function () {
-            frameDoc.focus();
-            frameDoc.print();
-            
-            // Remove the iframe after printing
-            setTimeout(function() {
-                document.body.removeChild(printFrame);
-            }, 1000);
-        }, 500);
-    }
-</script>
 <div class="page-content">
     @if(session('error'))
     <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
@@ -229,3 +184,50 @@
     </div>
 </div>
 @endsection
+@push('scripts')
+<script>
+    function printFinancialReport() {
+        // Create an iframe element
+        var printFrame = document.createElement('iframe');
+        
+        // Make it invisible
+        printFrame.style.position = 'fixed';
+        printFrame.style.right = '0';
+        printFrame.style.bottom = '0';
+        printFrame.style.width = '0';
+        printFrame.style.height = '0';
+        printFrame.style.border = '0';
+        
+        document.body.appendChild(printFrame);
+        
+        // Get the iframe document
+        var frameDoc = printFrame.contentWindow || printFrame.contentDocument.document || printFrame.contentDocument;
+        
+        // Write the HTML content to the iframe
+        frameDoc.document.open();
+        frameDoc.document.write('<html><head><title>Financial Report</title>');
+        frameDoc.document.write('<link rel="stylesheet" href="{{ asset("assets/css/bootstrap.min.css") }}" type="text/css" />');
+        frameDoc.document.write('<style>body { padding: 20px; } .actions-column { display: none; }</style>');
+        frameDoc.document.write('</head><body>');
+        frameDoc.document.write('<h3 class="mb-4 text-center">Financial Report</h3>');
+        
+        // Add the table HTML
+        var tableHtml = document.querySelector('#printable-area .table-responsive').innerHTML;
+        frameDoc.document.write('<div class="table-responsive">' + tableHtml + '</div>');
+        
+        frameDoc.document.write('</body></html>');
+        frameDoc.document.close();
+        
+        // Use setTimeout to ensure the content is loaded before printing
+        setTimeout(function () {
+            frameDoc.focus();
+            frameDoc.print();
+            
+            // Remove the iframe after printing
+            setTimeout(function() {
+                document.body.removeChild(printFrame);
+            }, 1000);
+        }, 500);
+    }
+</script>
+@endpush

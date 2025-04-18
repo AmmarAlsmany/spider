@@ -179,7 +179,8 @@
                                                             </button>
                                                         @elseif($schedule->status == 'completed')
                                                             <button type="button" class="btn btn-sm btn-outline-success">
-                                                                <a href="{{ route('technical.visit.report.view', $schedule->id) }}">
+                                                                <a
+                                                                    href="{{ route('technical.visit.report.view', $schedule->id) }}">
                                                                     <i class="bx bx-calendar-check"></i> View Report
                                                                 </a>
                                                             </button>
@@ -355,131 +356,130 @@
             </div>
         </div>
     </div>
-
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Initialize tooltips
-                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-                    return new bootstrap.Tooltip(tooltipTriggerEl);
-                });
-
-                // Quick date filter buttons
-                document.getElementById('todayBtn').addEventListener('click', function() {
-                    window.location.href = '{{ route('technical.team.schedules') }}?date=' + new Date()
-                        .toISOString().split('T')[0];
-                });
-
-                document.getElementById('weekBtn').addEventListener('click', function() {
-                    const today = new Date();
-                    // Create a new date object for the start of week to avoid modifying the original date
-                    const startOfWeek = new Date(today);
-                    startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday is 0, Monday is 1, etc.
-                    
-                    // Create a new date object for the end of week
-                    const endOfWeek = new Date(today);
-                    endOfWeek.setDate(today.getDate() + (6 - today.getDay())); // Set to Saturday
-                    
-                    window.location.href =
-                        `{{ route('technical.team.schedules') }}?from_date=${startOfWeek.toISOString().split('T')[0]}&to_date=${endOfWeek.toISOString().split('T')[0]}`;
-                });
-
-                document.getElementById('monthBtn').addEventListener('click', function() {
-                    const today = new Date();
-                    window.location.href = '{{ route('technical.team.schedules') }}?month=' + (today
-                        .getMonth() + 1) + '&year=' + today.getFullYear();
-                });
-                
-                // Clear other filters when using date range
-                const fromDateInput = document.querySelector('input[name="from_date"]');
-                const toDateInput = document.querySelector('input[name="to_date"]');
-                const monthSelect = document.querySelector('select[name="month"]');
-                const yearSelect = document.querySelector('select[name="year"]');
-                
-                // When date range inputs change, clear month/year selections
-                fromDateInput.addEventListener('change', function() {
-                    if (this.value) {
-                        monthSelect.value = '';
-                        // Keep year as it might be relevant for the date range
-                    }
-                });
-                
-                toDateInput.addEventListener('change', function() {
-                    if (this.value) {
-                        monthSelect.value = '';
-                        // Keep year as it might be relevant for the date range
-                    }
-                });
-                
-                // When month/year selections change, clear date range inputs
-                monthSelect.addEventListener('change', function() {
-                    if (this.value) {
-                        fromDateInput.value = '';
-                        toDateInput.value = '';
-                    }
-                });
-                
-                yearSelect.addEventListener('change', function() {
-                    // Only clear date inputs if month is also selected
-                    if (this.value && monthSelect.value) {
-                        fromDateInput.value = '';
-                        toDateInput.value = '';
-                    }
-                });
+@endsection
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
             });
 
-            function rescheduleVisit(visitId) {
-                const modal = new bootstrap.Modal(document.getElementById('rescheduleVisitModal'));
-                const form = document.getElementById('rescheduleForm');
-                form.action = `/technical/visits/${visitId}/reschedule`;
+            // Quick date filter buttons
+            document.getElementById('todayBtn').addEventListener('click', function() {
+                window.location.href = '{{ route('technical.team.schedules') }}?date=' + new Date()
+                    .toISOString().split('T')[0];
+            });
 
-                // Reset form and warnings
-                form.reset();
-                document.getElementById('schedule_warnings').classList.add('d-none');
-                document.getElementById('warning_list').innerHTML = '';
+            document.getElementById('weekBtn').addEventListener('click', function() {
+                const today = new Date();
+                // Create a new date object for the start of week to avoid modifying the original date
+                const startOfWeek = new Date(today);
+                startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday is 0, Monday is 1, etc.
 
-                // Set min date to today
-                document.getElementById('new_date').min = new Date().toISOString().split('T')[0];
+                // Create a new date object for the end of week
+                const endOfWeek = new Date(today);
+                endOfWeek.setDate(today.getDate() + (6 - today.getDay())); // Set to Saturday
 
-                modal.show();
+                window.location.href =
+                    `{{ route('technical.team.schedules') }}?from_date=${startOfWeek.toISOString().split('T')[0]}&to_date=${endOfWeek.toISOString().split('T')[0]}`;
+            });
+
+            document.getElementById('monthBtn').addEventListener('click', function() {
+                const today = new Date();
+                window.location.href = '{{ route('technical.team.schedules') }}?month=' + (today
+                    .getMonth() + 1) + '&year=' + today.getFullYear();
+            });
+
+            // Clear other filters when using date range
+            const fromDateInput = document.querySelector('input[name="from_date"]');
+            const toDateInput = document.querySelector('input[name="to_date"]');
+            const monthSelect = document.querySelector('select[name="month"]');
+            const yearSelect = document.querySelector('select[name="year"]');
+
+            // When date range inputs change, clear month/year selections
+            fromDateInput.addEventListener('change', function() {
+                if (this.value) {
+                    monthSelect.value = '';
+                    // Keep year as it might be relevant for the date range
+                }
+            });
+
+            toDateInput.addEventListener('change', function() {
+                if (this.value) {
+                    monthSelect.value = '';
+                    // Keep year as it might be relevant for the date range
+                }
+            });
+
+            // When month/year selections change, clear date range inputs
+            monthSelect.addEventListener('change', function() {
+                if (this.value) {
+                    fromDateInput.value = '';
+                    toDateInput.value = '';
+                }
+            });
+
+            yearSelect.addEventListener('change', function() {
+                // Only clear date inputs if month is also selected
+                if (this.value && monthSelect.value) {
+                    fromDateInput.value = '';
+                    toDateInput.value = '';
+                }
+            });
+        });
+
+        function rescheduleVisit(visitId) {
+            const modal = new bootstrap.Modal(document.getElementById('rescheduleVisitModal'));
+            const form = document.getElementById('rescheduleForm');
+            form.action = `/technical/visits/${visitId}/reschedule`;
+
+            // Reset form and warnings
+            form.reset();
+            document.getElementById('schedule_warnings').classList.add('d-none');
+            document.getElementById('warning_list').innerHTML = '';
+
+            // Set min date to today
+            document.getElementById('new_date').min = new Date().toISOString().split('T')[0];
+
+            modal.show();
+        }
+
+        function checkScheduleWarnings() {
+            const warnings = [];
+            const timeInput = document.getElementById('new_time');
+            const dateInput = document.getElementById('new_date');
+            const warningsList = document.getElementById('warning_list');
+            const warningsContainer = document.getElementById('schedule_warnings');
+
+            // Check time
+            if (timeInput.value) {
+                const [hours, minutes] = timeInput.value.split(':').map(Number);
+                if (hours < 8 || hours >= 14 || (hours === 14 && minutes > 0)) {
+                    warnings.push('This time is outside regular working hours (8:00 AM to 2:00 PM)');
+                }
             }
 
-            function checkScheduleWarnings() {
-                const warnings = [];
-                const timeInput = document.getElementById('new_time');
-                const dateInput = document.getElementById('new_date');
-                const warningsList = document.getElementById('warning_list');
-                const warningsContainer = document.getElementById('schedule_warnings');
-
-                // Check time
-                if (timeInput.value) {
-                    const [hours, minutes] = timeInput.value.split(':').map(Number);
-                    if (hours < 8 || hours >= 14 || (hours === 14 && minutes > 0)) {
-                        warnings.push('This time is outside regular working hours (8:00 AM to 2:00 PM)');
-                    }
-                }
-
-                // Check date
-                if (dateInput.value) {
-                    const date = new Date(dateInput.value);
-                    if (date.getDay() === 5) {
-                        warnings.push('This appointment is scheduled for a Friday');
-                    }
-                }
-
-                // Update warnings display
-                if (warnings.length > 0) {
-                    warningsList.innerHTML = warnings.map(w => `<li>${w}</li>`).join('');
-                    warningsContainer.classList.remove('d-none');
-                } else {
-                    warningsContainer.classList.add('d-none');
+            // Check date
+            if (dateInput.value) {
+                const date = new Date(dateInput.value);
+                if (date.getDay() === 5) {
+                    warnings.push('This appointment is scheduled for a Friday');
                 }
             }
 
-            // Add event listeners for validation
-            document.getElementById('new_time').addEventListener('change', checkScheduleWarnings);
-            document.getElementById('new_date').addEventListener('change', checkScheduleWarnings);
-        </script>
-    @endpush
-@endsection
+            // Update warnings display
+            if (warnings.length > 0) {
+                warningsList.innerHTML = warnings.map(w => `<li>${w}</li>`).join('');
+                warningsContainer.classList.remove('d-none');
+            } else {
+                warningsContainer.classList.add('d-none');
+            }
+        }
+
+        // Add event listeners for validation
+        document.getElementById('new_time').addEventListener('change', checkScheduleWarnings);
+        document.getElementById('new_date').addEventListener('change', checkScheduleWarnings);
+    </script>
+@endpush

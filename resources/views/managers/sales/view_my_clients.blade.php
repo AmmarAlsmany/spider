@@ -94,7 +94,8 @@
             </div>
         </div>
     </div>
-
+@endsection
+@push('style')
     <style>
         .card {
             border: none;
@@ -161,7 +162,8 @@
             transform: translateY(-2px);
         }
     </style>
-
+@endpush
+@push('scripts')
     <!-- DataTables Scripts -->
     <script src="{{ asset('backend/assets/plugins/datatable/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('backend/assets/plugins/datatable/js/dataTables.bootstrap5.min.js') }}"></script>
@@ -193,4 +195,4 @@
             });
         });
     </script>
-@endsection
+@endpush

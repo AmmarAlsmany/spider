@@ -447,6 +447,8 @@
         </form>
     </div>
 </div>
+@endsection
+@push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
             const paymentsContainer = document.getElementById('payments-container');
@@ -846,4 +848,4 @@
         })()
     });
 </script>
-@endsection
+@endpush

@@ -137,7 +137,7 @@
                 <legend>Contract Information</legend>
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="contract_type">Contract Type <span data-toggle="tooltip"
                                     title="Select the type of contract">(?)</span></label>
                             <select class="form-select @error('contract_type') is-invalid @enderror" id="contract_type"
@@ -155,7 +155,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="Property_type">Property Type <span data-toggle="tooltip"
                                     title="Select the type of property">(?)</span></label>
                             <select class="form-select @error('Property_type') is-invalid @enderror" id="Property_type"
@@ -174,7 +174,7 @@
                     </div>
                 </div>
 
-                <div class="form-group mb-3">
+                <div class="mb-3 form-group">
                     <label for="contract_description">Contract Description <span data-toggle="tooltip"
                             title="Enter a detailed description of the contract">(?)</span></label>
                     <textarea class="form-control @error('contract_description') is-invalid @enderror" id="contract_description"
@@ -186,7 +186,7 @@
 
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="contract_start_date">Start Date <span data-toggle="tooltip"
                                     title="Select the start date of the new contract">(?)</span></label>
                             <input type="date" class="form-control @error('contract_start_date') is-invalid @enderror"
@@ -198,7 +198,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="contract_end_date">End Date <span data-toggle="tooltip"
                                     title="Select the end date of the new contract">(?)</span></label>
                             <input type="date" class="form-control @error('contract_end_date') is-invalid @enderror"
@@ -210,7 +210,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="visit_start_date">Visit Start Date <span data-toggle="tooltip"
                                     title="Select the date when visits should start">(?)</span></label>
                             <input type="date" class="form-control @error('visit_start_date') is-invalid @enderror"
@@ -225,7 +225,7 @@
 
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="warranty">Warranty (Months) <span data-toggle="tooltip"
                                     title="Enter the warranty period in months">(?)</span></label>
                             <input type="number" class="form-control @error('warranty') is-invalid @enderror" id="warranty"
@@ -236,7 +236,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="number_of_visits">Number of Visits <span data-toggle="tooltip"
                                     title="Enter the total number of visits for this contract">(?)</span></label>
                             <input type="number" class="form-control @error('number_of_visits') is-invalid @enderror"
@@ -248,7 +248,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="contract_price">Contract Price (SAR) <span data-toggle="tooltip"
                                     title="Enter the total contract price (VAT will be added automatically)">(?)</span></label>
                             <input type="number" class="form-control @error('contract_price') is-invalid @enderror"
@@ -268,7 +268,7 @@
                 <legend>Equipment Information</legend>
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="equipment_type_id">Equipment Type <span data-toggle="tooltip"
                                     title="Select the type of equipment">(?)</span></label>
                             <select class="form-select @error('equipment_type_id') is-invalid @enderror" id="equipment_type_id"
@@ -286,7 +286,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="equipment_model">Equipment Model <span data-toggle="tooltip"
                                     title="Enter the model of the equipment">(?)</span></label>
                             <input type="text" class="form-control @error('equipment_model') is-invalid @enderror"
@@ -299,7 +299,7 @@
                 </div>
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="equipment_quantity">Quantity <span data-toggle="tooltip"
                                     title="Enter the quantity of equipment">(?)</span></label>
                             <input type="number" class="form-control @error('equipment_quantity') is-invalid @enderror"
@@ -310,7 +310,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="warranty">Warranty Period (Months) <span data-toggle="tooltip"
                                     title="Enter the warranty period in months">(?)</span></label>
                             <input type="number" class="form-control @error('warranty') is-invalid @enderror"
@@ -321,7 +321,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group mb-3">
+                <div class="mb-3 form-group">
                     <label for="equipment_description">Equipment Description <span data-toggle="tooltip"
                             title="Provide a detailed description of the equipment">(?)</span></label>
                     <textarea class="form-control @error('equipment_description') is-invalid @enderror" id="equipment_description"
@@ -336,13 +336,13 @@
                 <legend>Client Information</legend>
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="client_name">Client Name</label>
                             <input type="text" class="form-control" id="client_name" value="{{ $contract->customer->name }}" readonly>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="client_email">Client Email</label>
                             <input type="email" class="form-control" id="client_email" value="{{ $contract->customer->email }}" readonly>
                         </div>
@@ -350,13 +350,13 @@
                 </div>
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="client_phone">Client Phone</label>
                             <input type="text" class="form-control" id="client_phone" value="{{ $contract->customer->phone }}" readonly>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="client_address">Client Address</label>
                             <input type="text" class="form-control" id="client_address" value="{{ $contract->customer->address }}" readonly>
                         </div>
@@ -388,13 +388,13 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <div class="form-group mb-3">
+                                    <div class="mb-3 form-group">
                                         <label>Branch Name</label>
                                         <input type="text" class="form-control" value="{{ $branch->branch_name }}" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group mb-3">
+                                    <div class="mb-3 form-group">
                                         <label>Branch Manager</label>
                                         <input type="text" class="form-control" value="{{ $branch->branch_manager_name }}" readonly>
                                     </div>
@@ -402,19 +402,19 @@
                             </div>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <div class="form-group mb-3">
+                                    <div class="mb-3 form-group">
                                         <label>Phone</label>
                                         <input type="text" class="form-control" value="{{ $branch->branch_manager_phone }}" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group mb-3">
+                                    <div class="mb-3 form-group">
                                         <label>City</label>
                                         <input type="text" class="form-control" value="{{ $branch->branch_city }}" readonly>
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group mb-3">
+                            <div class="mb-3 form-group">
                                 <label>Address</label>
                                 <input type="text" class="form-control" value="{{ $branch->branch_address }}" readonly>
                             </div>
@@ -424,13 +424,13 @@
                                 <h6 class="mb-3">Edit Branch Information</h6>
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <div class="form-group mb-3">
+                                        <div class="mb-3 form-group">
                                             <label for="branch_name_{{ $branch->id }}">Branch Name</label>
                                             <input type="text" class="form-control" id="branch_name_{{ $branch->id }}" name="branch_data[{{ $branch->id }}][branch_name]" value="{{ $branch->branch_name }}">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-group mb-3">
+                                        <div class="mb-3 form-group">
                                             <label for="branch_manager_{{ $branch->id }}">Branch Manager</label>
                                             <input type="text" class="form-control" id="branch_manager_{{ $branch->id }}" name="branch_data[{{ $branch->id }}][branch_manager_name]" value="{{ $branch->branch_manager_name }}">
                                         </div>
@@ -438,13 +438,13 @@
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <div class="form-group mb-3">
+                                        <div class="mb-3 form-group">
                                             <label for="branch_phone_{{ $branch->id }}">Phone</label>
                                             <input type="text" class="form-control" id="branch_phone_{{ $branch->id }}" name="branch_data[{{ $branch->id }}][branch_manager_phone]" value="{{ $branch->branch_manager_phone }}">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-group mb-3">
+                                        <div class="mb-3 form-group">
                                             <label for="branch_city_{{ $branch->id }}">City</label>
                                             <select class="form-select" id="branch_city_{{ $branch->id }}" name="branch_data[{{ $branch->id }}][branch_city]">
                                                 @foreach($saudiCities as $city)
@@ -454,7 +454,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group mb-3">
+                                <div class="mb-3 form-group">
                                     <label for="branch_address_{{ $branch->id }}">Address</label>
                                     <input type="text" class="form-control" id="branch_address_{{ $branch->id }}" name="branch_data[{{ $branch->id }}][branch_address]" value="{{ $branch->branch_address }}">
                                 </div>
@@ -482,7 +482,7 @@
                 <legend>Payment Information</legend>
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="payment_type">Payment Type <span data-toggle="tooltip"
                                     title="Select how the client will pay">(?)</span></label>
                             <select class="form-select @error('payment_type') is-invalid @enderror" id="payment_type"
@@ -496,7 +496,7 @@
                         </div>
                     </div>
                     <div class="col-md-6 payment-details" id="postpaid-details" style="{{ $contract->payment_type == 'postpaid' ? '' : 'display: none;' }}">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="number_of_payments">Number of Payments <span data-toggle="tooltip"
                                     title="Enter the number of installments">(?)</span></label>
                             <input type="number" class="form-control @error('number_of_payments') is-invalid @enderror"
@@ -510,7 +510,7 @@
                 </div>
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="first_payment_date">First Payment Date <span data-toggle="tooltip"
                                     title="Select the date for the first payment">(?)</span></label>
                             <input type="date" class="form-control @error('first_payment_date') is-invalid @enderror"
@@ -535,7 +535,9 @@
         </form>
     </div>
 </div>
+@endsection
 
+@push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Contract type toggle for Buy equipment
@@ -711,13 +713,13 @@
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <div class="form-group mb-3">
+                                <div class="mb-3 form-group">
                                     <label for="branch_name_${newBranchId}">Branch Name</label>
                                     <input type="text" class="form-control" id="branch_name_${newBranchId}" name="new_branch_data[${newBranchId}][branch_name]" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group mb-3">
+                                <div class="mb-3 form-group">
                                     <label for="branch_manager_${newBranchId}">Branch Manager</label>
                                     <input type="text" class="form-control" id="branch_manager_${newBranchId}" name="new_branch_data[${newBranchId}][branch_manager_name]" required>
                                 </div>
@@ -725,13 +727,13 @@
                         </div>
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <div class="form-group mb-3">
+                                <div class="mb-3 form-group">
                                     <label for="branch_phone_${newBranchId}">Phone</label>
                                     <input type="text" class="form-control" id="branch_phone_${newBranchId}" name="new_branch_data[${newBranchId}][branch_manager_phone]" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group mb-3">
+                                <div class="mb-3 form-group">
                                     <label for="branch_city_${newBranchId}">City</label>
                                     <select class="form-select" id="branch_city_${newBranchId}" name="new_branch_data[${newBranchId}][branch_city]" required>
                                         <option value="">Select City</option>
@@ -740,7 +742,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group mb-3">
+                        <div class="mb-3 form-group">
                             <label for="branch_address_${newBranchId}">Address</label>
                             <input type="text" class="form-control" id="branch_address_${newBranchId}" name="new_branch_data[${newBranchId}][branch_address]" required>
                         </div>
@@ -804,4 +806,4 @@
         }
     });
 </script>
-@endsection
+@endpush

@@ -776,6 +776,8 @@ $property_types = ['Residential', 'Commercial', 'Industrial', 'Agricultural', 'O
     </div>
 </div>
 </div>
+@endsection
+@push('scripts')
 <script>
     var stepper;
         var currentStep = 0;
@@ -1702,4 +1704,4 @@ $property_types = ['Residential', 'Commercial', 'Industrial', 'Agricultural', 'O
             validationCache = {};
         }
 </script>
-@endsection
+@endpush

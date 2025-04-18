@@ -106,7 +106,7 @@
         </div>
     </div>
 </div>
-
+@endsection
 @push('scripts')
 <script>
     document.getElementById('change_password').addEventListener('change', function() {
@@ -114,4 +114,3 @@
     });
 </script>
 @endpush
-@endsection

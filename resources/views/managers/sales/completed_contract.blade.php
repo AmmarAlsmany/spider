@@ -1,4 +1,22 @@
 @extends('shared.dashboard')
+@push('style')
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .table th {
+        font-weight: 600;
+        background-color: #f8f9fa;
+    }
+
+    .btn-sm {
+        padding: 5px 10px;
+    }
+</style>
+@endpush
 @section('content')
     <div class="page-content">
         @if (session('error'))
@@ -123,51 +141,33 @@
             </div>
         </div>
     </div>
-
-    <style>
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .table th {
-            font-weight: 600;
-            background-color: #f8f9fa;
-        }
-
-        .btn-sm {
-            padding: 5px 10px;
-        }
-    </style>
-
-    @push('scripts')
-        <script>
-            $(document).ready(function() {
-                $('#example2').DataTable({
-                    lengthChange: false,
-                    paging: false,
-                    info: false,
-                    dom: '<"row"<"col-md-6"B><"col-md-6"f>>rt',
-                    buttons: [{
-                            extend: 'copy',
-                            className: 'btn btn-secondary btn-sm'
-                        },
-                        {
-                            extend: 'excel',
-                            className: 'btn btn-secondary btn-sm'
-                        },
-                        {
-                            extend: 'pdf',
-                            className: 'btn btn-secondary btn-sm'
-                        },
-                        {
-                            extend: 'print',
-                            className: 'btn btn-secondary btn-sm'
-                        }
-                    ]
-                });
-            });
-        </script>
-    @endpush
 @endsection
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#example2').DataTable({
+                lengthChange: false,
+                paging: false,
+                info: false,
+                dom: '<"row"<"col-md-6"B><"col-md-6"f>>rt',
+                buttons: [{
+                        extend: 'copy',
+                        className: 'btn btn-secondary btn-sm'
+                    },
+                    {
+                        extend: 'excel',
+                        className: 'btn btn-secondary btn-sm'
+                    },
+                    {
+                        extend: 'pdf',
+                        className: 'btn btn-secondary btn-sm'
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-secondary btn-sm'
+                    }
+                ]
+            });
+        });
+    </script>
+@endpush

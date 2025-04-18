@@ -137,7 +137,7 @@
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
     <script>
         $(document).ready(function() {
             // Search functionality
@@ -167,4 +167,4 @@
             }
         });
     </script>
-@endsection
+@endpush

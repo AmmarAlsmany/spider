@@ -154,7 +154,8 @@
         </div>
     </div>
 </div>
-
+@endsection
+@push('scripts')
 <script>
     $(document).ready(function() {
         // Image preview
@@ -230,4 +231,4 @@
         });
     });
 </script>
-@endsection
+@endpush

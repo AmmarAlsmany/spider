@@ -180,23 +180,22 @@
             </div>
         </div>
     </div>
-
-    @push('scripts')
-        <script>
-            function openRescheduleModal(visitId) {
-                const form = document.getElementById('rescheduleForm');
-                form.action = `/technical/visits/${visitId}/reschedule`;
-                $('#rescheduleModal').modal('show');
-            }
-
-            // Prevent scheduling on Fridays
-            document.getElementById('new_visit_date').addEventListener('change', function(e) {
-                const date = new Date(this.value);
-                if (date.getDay() === 5) { // 5 is Friday
-                    alert('Visits cannot be scheduled on Fridays. Please select another day.');
-                    this.value = '';
-                }
-            });
-        </script>
-    @endpush
 @endsection
+@push('scripts')
+    <script>
+        function openRescheduleModal(visitId) {
+            const form = document.getElementById('rescheduleForm');
+            form.action = `/technical/visits/${visitId}/reschedule`;
+            $('#rescheduleModal').modal('show');
+        }
+
+        // Prevent scheduling on Fridays
+        document.getElementById('new_visit_date').addEventListener('change', function(e) {
+            const date = new Date(this.value);
+            if (date.getDay() === 5) { // 5 is Friday
+                alert('Visits cannot be scheduled on Fridays. Please select another day.');
+                this.value = '';
+            }
+        });
+    </script>
+@endpush

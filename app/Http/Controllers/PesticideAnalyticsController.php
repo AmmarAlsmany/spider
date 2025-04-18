@@ -307,20 +307,53 @@ class PesticideAnalyticsController extends Controller
         // Get all visit reports that used this pesticide
         $reports = VisitReport::with(['visit.team', 'createdBy'])
             ->whereHas('visit', function ($q) use ($startDate, $endDate) {
-                $q->whereDate('created_at', '>=', $startDate)
-                    ->whereDate('created_at', '<=', $endDate);
+                // Ensure the visit_date is within the range
+                $q->whereDate('visit_date', '>=', $startDate)
+                    ->whereDate('visit_date', '<=', $endDate);
             })
-            ->whereRaw("JSON_CONTAINS(pesticides_used, '\"$pesticideSlug\"')")
+            ->whereRaw("JSON_CONTAINS(pesticides_used, '\"$pesticideSlug\"')") // Reverted to original for now
             ->orderBy('created_at', 'desc')
             ->get();
-        // dd($reports);
+
+        // Calculate timeline data
+        $timelineDataAggregated = [];
+        foreach ($reports as $report) {
+            if (!$report->visit) continue; // Skip if visit is missing
+
+            $date = Carbon::parse($report->visit->visit_date)->format('Y-m-d');
+            $pesticideQuantities = json_decode($report->pesticide_quantities, true) ?? [];
+
+            // Check if the current pesticide exists in the quantities data
+            if (isset($pesticideQuantities[$pesticideSlug])) {
+                $quantity = $pesticideQuantities[$pesticideSlug]['quantity'] ?? 0;
+
+                // Aggregate quantity by date
+                if (!isset($timelineDataAggregated[$date])) {
+                    $timelineDataAggregated[$date] = 0;
+                }
+                $timelineDataAggregated[$date] += $quantity;
+            }
+        }
+
+        // Format timeline data for the chart
+        $timelineData = [];
+        foreach ($timelineDataAggregated as $date => $total) {
+            $timelineData[] = ['date' => $date, 'total' => $total];
+        }
+        // Sort the data by date
+        usort($timelineData, function ($a, $b) {
+            return strtotime($a['date']) <=> strtotime($b['date']);
+        });
+
+        // dd($reports); // Keep this commented out
         return view('managers.technical.pesticides.pesticide-report', compact(
             'pesticide',
             'startDate',
             'endDate',
             'teamUsage',
             'totalUsage',
-            'reports'
+            'reports',
+            'timelineData' // Add the new variable here
         ));
     }
 }

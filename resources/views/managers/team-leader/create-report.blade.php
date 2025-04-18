@@ -348,36 +348,36 @@
                             <div class="card-body">
                                 <div class="mb-3">
                                     <label class="form-label">How satisfied was the customer with our service?</label>
-                                    <div class="emoji-rating-container row row-cols-1 row-cols-sm-3 row-cols-md-5 g-3 mt-2">
-                                        <div class="col text-center">
+                                    <div class="mt-2 emoji-rating-container row row-cols-1 row-cols-sm-3 row-cols-md-5 g-3">
+                                        <div class="text-center col">
                                             <input type="radio" class="btn-check" name="customer_satisfaction" id="rating-1" value="1" required>
                                             <label class="btn btn-outline-light emoji-btn w-100" for="rating-1">
                                                 <span style="font-size: 2rem;">😡</span>
                                                 <div class="mt-1">Very Dissatisfied</div>
                                             </label>
                                         </div>
-                                        <div class="col text-center">
+                                        <div class="text-center col">
                                             <input type="radio" class="btn-check" name="customer_satisfaction" id="rating-2" value="2">
                                             <label class="btn btn-outline-light emoji-btn w-100" for="rating-2">
                                                 <span style="font-size: 2rem;">😕</span>
                                                 <div class="mt-1">Dissatisfied</div>
                                             </label>
                                         </div>
-                                        <div class="col text-center">
+                                        <div class="text-center col">
                                             <input type="radio" class="btn-check" name="customer_satisfaction" id="rating-3" value="3">
                                             <label class="btn btn-outline-light emoji-btn w-100" for="rating-3">
                                                 <span style="font-size: 2rem;">😐</span>
                                                 <div class="mt-1">Neutral</div>
                                             </label>
                                         </div>
-                                        <div class="col text-center">
+                                        <div class="text-center col">
                                             <input type="radio" class="btn-check" name="customer_satisfaction" id="rating-4" value="4">
                                             <label class="btn btn-outline-light emoji-btn w-100" for="rating-4">
                                                 <span style="font-size: 2rem;">🙂</span>
                                                 <div class="mt-1">Satisfied</div>
                                             </label>
                                         </div>
-                                        <div class="col text-center">
+                                        <div class="text-center col">
                                             <input type="radio" class="btn-check" name="customer_satisfaction" id="rating-5" value="5">
                                             <label class="btn btn-outline-light emoji-btn w-100" for="rating-5">
                                                 <span style="font-size: 2rem;">😄</span>
@@ -433,6 +433,7 @@
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
@@ -559,5 +560,3 @@
     });
 </script>
 @endpush
-
-@endsection

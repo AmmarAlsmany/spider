@@ -2,7 +2,7 @@
 
 @section('title', 'Compare Team Performance')
 
-@section('styles')
+@push('styles')
 <style>
     .comparison-card {
         transition: all 0.3s ease;
@@ -19,7 +19,7 @@
         border-radius: 50%;
     }
 </style>
-@endsection
+@endpush
 
 @section('content')
 <div class="page-content">
@@ -272,7 +272,7 @@
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 @if(count($selectedTeams) > 0)
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
@@ -470,4 +470,4 @@
     });
 </script>
 @endif
-@endsection
+@endpush

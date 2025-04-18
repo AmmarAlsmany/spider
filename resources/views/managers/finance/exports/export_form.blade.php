@@ -133,7 +133,7 @@
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
     $(document).ready(function() {
         // Initialize select2 for better dropdown experience
@@ -143,4 +143,4 @@
         });
     });
 </script>
-@endsection
+@endpush

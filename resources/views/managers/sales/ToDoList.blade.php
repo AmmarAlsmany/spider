@@ -253,7 +253,8 @@
             </div>
         </div>
     </div>
-
+@endsection
+@push('style')
     <style>
         .card {
             border: none;
@@ -305,7 +306,8 @@
             background-color: #f8f9fa !important;
         }
     </style>
-
+@endpush
+@push('scripts')
     <script>
         function getCsrfToken() {
             return document.querySelector('meta[name="csrf-token"]').content;
@@ -400,4 +402,4 @@
             }
         }
     </script>
-@endsection
+@endpush

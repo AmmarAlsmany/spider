@@ -1,4 +1,5 @@
 @extends('shared.dashboard')
+
 @section('content')
 <div class="page-content">
     @if(session('error'))
@@ -151,7 +152,6 @@
         </div>
     </div>
 </div>
-
 <!-- Create Worker Modal -->
 <div class="modal fade" id="createWorkerModal" tabindex="-1">
     <div class="modal-dialog">
@@ -192,8 +192,8 @@
         </div>
     </div>
 </div>
-
 @endsection
+
 @push('scripts')
 <script>
     $(document).ready(function() {

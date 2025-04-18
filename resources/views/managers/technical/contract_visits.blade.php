@@ -474,253 +474,253 @@
                 </div>
             </div>
         </div>
-
-        @push('styles')
-            <style>
-                /* Visits Card Grid Styles */
-                .visits-card-grid {
-                    margin-top: 1rem;
-                }
-
-                .visit-card {
-                    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-                    background-color: #fff;
-                }
-
-                .visit-card:hover {
-                    transform: translateY(-3px);
-                    box-shadow: 0 8px 24px rgba(149, 157, 165, 0.15) !important;
-                }
-
-                .visit-card .btn {
-                    transition: all 0.2s ease-in-out;
-                }
-
-                /* Status badges in cards */
-                .visit-card .rounded-pill {
-                    font-size: 0.75rem;
-                    white-space: nowrap;
-                    padding: 0.25rem 0.75rem;
-                }
-
-                .visits-card-grid .empty-state {
-                    padding: 2rem;
-                    background-color: #f8f9fa;
-                    border-radius: 8px;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                /* Pagination Styles */
-                .pagination {
-                    display: flex;
-                    gap: 4px;
-                    align-items: center;
-                    margin: 0;
-                    padding: 0;
-                }
-
-                .page-item {
-                    margin: 0;
-                    list-style: none;
-                }
-
-                .page-link {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    min-width: 32px;
-                    height: 32px;
-                    padding: 0.25rem;
-                    font-size: 0.875rem;
-                    font-weight: 500;
-                    line-height: 1.5;
-                    color: var(--bs-primary);
-                    background-color: #fff;
-                    border: 1px solid #e2e8f0;
-                    border-radius: 6px;
-                    transition: all 0.2s ease-in-out;
-                }
-
-                .page-link:hover {
-                    color: var(--bs-primary);
-                    background-color: #f8fafc;
-                    border-color: #e2e8f0;
-                    z-index: 2;
-                }
-
-                .page-item.active .page-link {
-                    color: #fff;
-                    background-color: var(--bs-primary);
-                    border-color: var(--bs-primary);
-                    box-shadow: 0 2px 4px rgba(var(--bs-primary-rgb), 0.15);
-                }
-
-                .page-item.disabled .page-link {
-                    color: #94a3b8;
-                    background-color: #f8fafc;
-                    border-color: #e2e8f0;
-                    cursor: not-allowed;
-                }
-
-                /* Responsive adjustments */
-                @media (max-width: 767.98px) {
-                    .visits-card-grid .row {
-                        margin-left: -0.5rem;
-                        margin-right: -0.5rem;
-                    }
-
-                    .visits-card-grid .col-md-6 {
-                        padding-left: 0.5rem;
-                        padding-right: 0.5rem;
-                    }
-
-                    .visit-card {
-                        margin-bottom: 1rem;
-                    }
-
-                    .pagination {
-                        flex-wrap: wrap;
-                        justify-content: center;
-                    }
-
-                    .page-link {
-                        min-width: 28px;
-                        height: 28px;
-                        font-size: 0.8125rem;
-                    }
-                }
-            </style>
-        @endpush
-
-        @push('scripts')
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Initialize tooltips
-                    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-                        return new bootstrap.Tooltip(tooltipTriggerEl)
-                    });
-
-                    // Branch filter change handler (redirect to branch-specific URL)
-                    $('#branch_filter').on('change', function() {
-                        var branchId = $(this).val();
-                        var baseUrl = "{{ route('technical.contract.visits', $contract->id) }}";
-
-                        if (branchId) {
-                            if (branchId === 'main') {
-                                window.location.href =
-                                    "{{ route('technical.contract.branch.visits', [$contract->id, 'main']) }}";
-                            } else {
-                                window.location.href =
-                                    "{{ route('technical.contract.branch.visits', [$contract->id, ':branchId']) }}"
-                                    .replace(':branchId', branchId);
-                            }
-                        } else {
-                            window.location.href = baseUrl;
-                        }
-                    });
-
-                    // Edit modal data loading
-                    $('#editModal').on('show.bs.modal', function(event) {
-                        var button = $(event.relatedTarget);
-                        var visitId = button.data('visit-id');
-                        var visitDate = button.data('visit-date');
-                        var visitTime = button.data('visit-time');
-                        var teamId = button.data('team-id');
-
-                        var modal = $(this);
-
-                        // Set data in the modal
-                        modal.find('#edit_visit_date').val(visitDate);
-                        modal.find('#edit_visit_time').val(visitTime);
-                        modal.find('#edit_team_id').val(teamId);
-
-                        // Update the form action
-                        var formAction = "{{ route('technical.appointment.edit', ':id') }}";
-                        formAction = formAction.replace(':id', visitId);
-
-                        modal.find('#editForm').attr('action', formAction);
-                    });
-
-                    // Cancel Visit confirmation
-                    $('.cancelVisit').on('click', function() {
-                        var visitId = $(this).data('visit-id');
-
-                        if (confirm('Are you sure you want to cancel this visit?')) {
-                            var cancelUrl = "{{ route('technical.appointment.cancel', ':id') }}";
-                            cancelUrl = cancelUrl.replace(':id', visitId);
-
-                            // Create a form and submit it
-                            var form = $('<form>', {
-                                'method': 'POST',
-                                'action': cancelUrl
-                            });
-
-                            form.append($('<input>', {
-                                'type': 'hidden',
-                                'name': '_token',
-                                'value': '{{ csrf_token() }}'
-                            }));
-
-                            form.append($('<input>', {
-                                'type': 'hidden',
-                                'name': '_method',
-                                'value': 'PUT'
-                            }));
-
-                            form.append($('<input>', {
-                                'type': 'hidden',
-                                'name': 'status',
-                                'value': 'cancelled'
-                            }));
-
-                            $('body').append(form);
-                            form.submit();
-                        }
-                    });
-
-                    // Visit time and date change handlers for warnings
-                    document.querySelector('#createVisitModal input[name="visit_time"]').addEventListener('change',
-                        checkScheduleWarnings);
-                    document.querySelector('#createVisitModal input[name="visit_date"]').addEventListener('change',
-                        checkScheduleWarnings);
-                });
-
-                // Schedule warnings check
-                function checkScheduleWarnings() {
-                    const visitDate = document.querySelector('#createVisitModal input[name="visit_date"]').value;
-                    const visitTime = document.querySelector('#createVisitModal input[name="visit_time"]').value;
-                    const warningsDiv = document.getElementById('schedule_warnings');
-                    const warningsList = document.getElementById('warning_list');
-                    const warnings = [];
-
-                    if (visitDate && visitTime) {
-                        const date = new Date(visitDate);
-                        const time = new Date(`2000-01-01T${visitTime}`);
-                        const hours = time.getHours();
-
-                        // Check if it's Friday
-                        if (date.getDay() === 5) {
-                            warnings.push('This visit is scheduled for a Friday. Please confirm if this is intentional.');
-                        }
-
-                        // Check if it's outside regular hours (8 AM - 2 PM)
-                        if (hours < 8 || hours >= 14) {
-                            warnings.push('This visit is scheduled outside regular working hours (8:00 AM - 2:00 PM).');
-                        }
-                    }
-
-                    if (warnings.length > 0) {
-                        warningsList.innerHTML = warnings.map(warning => `<li>${warning}</li>`).join('');
-                        warningsDiv.classList.remove('d-none');
-                    } else {
-                        warningsDiv.classList.add('d-none');
-                    }
-                }
-            </script>
-        @endpush
     </div>
 @endsection
+
+@push('styles')
+    <style>
+        /* Visits Card Grid Styles */
+        .visits-card-grid {
+            margin-top: 1rem;
+        }
+
+        .visit-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            background-color: #fff;
+        }
+
+        .visit-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(149, 157, 165, 0.15) !important;
+        }
+
+        .visit-card .btn {
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Status badges in cards */
+        .visit-card .rounded-pill {
+            font-size: 0.75rem;
+            white-space: nowrap;
+            padding: 0.25rem 0.75rem;
+        }
+
+        .visits-card-grid .empty-state {
+            padding: 2rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-item {
+            margin: 0;
+            list-style: none;
+        }
+
+        .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: var(--bs-primary);
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .page-link:hover {
+            color: var(--bs-primary);
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
+            z-index: 2;
+        }
+
+        .page-item.active .page-link {
+            color: #fff;
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+            box-shadow: 0 2px 4px rgba(var(--bs-primary-rgb), 0.15);
+        }
+
+        .page-item.disabled .page-link {
+            color: #94a3b8;
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
+            cursor: not-allowed;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767.98px) {
+            .visits-card-grid .row {
+                margin-left: -0.5rem;
+                margin-right: -0.5rem;
+            }
+
+            .visits-card-grid .col-md-6 {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+
+            .visit-card {
+                margin-bottom: 1rem;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .page-link {
+                min-width: 28px;
+                height: 28px;
+                font-size: 0.8125rem;
+            }
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+
+            // Branch filter change handler (redirect to branch-specific URL)
+            $('#branch_filter').on('change', function() {
+                var branchId = $(this).val();
+                var baseUrl = "{{ route('technical.contract.visits', $contract->id) }}";
+
+                if (branchId) {
+                    if (branchId === 'main') {
+                        window.location.href =
+                            "{{ route('technical.contract.branch.visits', [$contract->id, 'main']) }}";
+                    } else {
+                        window.location.href =
+                            "{{ route('technical.contract.branch.visits', [$contract->id, ':branchId']) }}"
+                            .replace(':branchId', branchId);
+                    }
+                } else {
+                    window.location.href = baseUrl;
+                }
+            });
+
+            // Edit modal data loading
+            $('#editModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                var visitId = button.data('visit-id');
+                var visitDate = button.data('visit-date');
+                var visitTime = button.data('visit-time');
+                var teamId = button.data('team-id');
+
+                var modal = $(this);
+
+                // Set data in the modal
+                modal.find('#edit_visit_date').val(visitDate);
+                modal.find('#edit_visit_time').val(visitTime);
+                modal.find('#edit_team_id').val(teamId);
+
+                // Update the form action
+                var formAction = "{{ route('technical.appointment.edit', ':id') }}";
+                formAction = formAction.replace(':id', visitId);
+
+                modal.find('#editForm').attr('action', formAction);
+            });
+
+            // Cancel Visit confirmation
+            $('.cancelVisit').on('click', function() {
+                var visitId = $(this).data('visit-id');
+
+                if (confirm('Are you sure you want to cancel this visit?')) {
+                    var cancelUrl = "{{ route('technical.appointment.cancel', ':id') }}";
+                    cancelUrl = cancelUrl.replace(':id', visitId);
+
+                    // Create a form and submit it
+                    var form = $('<form>', {
+                        'method': 'POST',
+                        'action': cancelUrl
+                    });
+
+                    form.append($('<input>', {
+                        'type': 'hidden',
+                        'name': '_token',
+                        'value': '{{ csrf_token() }}'
+                    }));
+
+                    form.append($('<input>', {
+                        'type': 'hidden',
+                        'name': '_method',
+                        'value': 'PUT'
+                    }));
+
+                    form.append($('<input>', {
+                        'type': 'hidden',
+                        'name': 'status',
+                        'value': 'cancelled'
+                    }));
+
+                    $('body').append(form);
+                    form.submit();
+                }
+            });
+
+            // Visit time and date change handlers for warnings
+            document.querySelector('#createVisitModal input[name="visit_time"]').addEventListener('change',
+                checkScheduleWarnings);
+            document.querySelector('#createVisitModal input[name="visit_date"]').addEventListener('change',
+                checkScheduleWarnings);
+        });
+
+        // Schedule warnings check
+        function checkScheduleWarnings() {
+            const visitDate = document.querySelector('#createVisitModal input[name="visit_date"]').value;
+            const visitTime = document.querySelector('#createVisitModal input[name="visit_time"]').value;
+            const warningsDiv = document.getElementById('schedule_warnings');
+            const warningsList = document.getElementById('warning_list');
+            const warnings = [];
+
+            if (visitDate && visitTime) {
+                const date = new Date(visitDate);
+                const time = new Date(`2000-01-01T${visitTime}`);
+                const hours = time.getHours();
+
+                // Check if it's Friday
+                if (date.getDay() === 5) {
+                    warnings.push('This visit is scheduled for a Friday. Please confirm if this is intentional.');
+                }
+
+                // Check if it's outside regular hours (8 AM - 2 PM)
+                if (hours < 8 || hours >= 14) {
+                    warnings.push('This visit is scheduled outside regular working hours (8:00 AM - 2:00 PM).');
+                }
+            }
+
+            if (warnings.length > 0) {
+                warningsList.innerHTML = warnings.map(warning => `<li>${warning}</li>`).join('');
+                warningsDiv.classList.remove('d-none');
+            } else {
+                warningsDiv.classList.add('d-none');
+            }
+        }
+    </script>
+@endpush

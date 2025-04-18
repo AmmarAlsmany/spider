@@ -1,4 +1,75 @@
 @extends('shared.dashboard')
+@push('style')
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control,
+    .input-group-text {
+        padding: 0.6rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+        border-color: #80bdff;
+    }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+    }
+
+    .table {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #eee;
+    }
+
+    .table thead {
+        background-color: #f8f9fa;
+    }
+
+    .table thead th {
+        border-bottom: none;
+        font-weight: 600;
+        color: #444;
+    }
+
+    .table td {
+        vertical-align: middle;
+        padding: 1rem 0.75rem;
+    }
+
+    .badge {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>
+@endpush
 @section('content')
 <div class="page-content">
     @if(session('error'))
@@ -216,74 +287,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    .card {
-        border: none;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .form-control,
-    .input-group-text {
-        padding: 0.6rem 1rem;
-        font-size: 0.875rem;
-    }
-
-    .form-control:focus {
-        box-shadow: none;
-        border-color: #80bdff;
-    }
-
-    .input-group-text {
-        background-color: #f8f9fa;
-        border: 1px solid #ced4da;
-    }
-
-    .table {
-        border-radius: 10px;
-        overflow: hidden;
-        border: 1px solid #eee;
-    }
-
-    .table thead {
-        background-color: #f8f9fa;
-    }
-
-    .table thead th {
-        border-bottom: none;
-        font-weight: 600;
-        color: #444;
-    }
-
-    .table td {
-        vertical-align: middle;
-        padding: 1rem 0.75rem;
-    }
-
-    .badge {
-        font-weight: 500;
-        letter-spacing: 0.5px;
-    }
-
-    .btn {
-        padding: 0.5rem 1rem;
-        font-weight: 500;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-    }
-
-    .btn:hover {
-        transform: translateY(-2px);
-    }
-
-    .bg-light {
-        background-color: #f8f9fa !important;
-    }
-</style>
 @endsection

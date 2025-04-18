@@ -1,4 +1,80 @@
 @extends('shared.dashboard')
+@push('style')
+    <style>
+        .card {
+            border: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        .table thead {
+            background-color: #f8f9fa;
+        }
+
+        .table thead th {
+            border-bottom: none;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .table td {
+            vertical-align: middle;
+            padding: 1rem 0.75rem;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .badge {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .text-decoration-none:hover {
+            color: #0056b3 !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate-button {
+            border-radius: 8px;
+            margin: 0 2px;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            border-radius: 8px;
+            border: 1px solid #eee;
+            padding: 5px 10px;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            border-radius: 8px;
+            border: 1px solid #eee;
+            padding: 5px 10px;
+        }
+
+        .dt-buttons .btn {
+            border-radius: 8px;
+            margin-right: 5px;
+            padding: 5px 15px;
+            font-size: 0.875rem;
+        }
+    </style>
+@endpush
 @section('content')
     <div class="page-content">
         @if (session('error'))
@@ -125,82 +201,8 @@
             </div>
         </div>
     </div>
-
-    <style>
-        .card {
-            border: none;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .table {
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid #eee;
-        }
-
-        .table thead {
-            background-color: #f8f9fa;
-        }
-
-        .table thead th {
-            border-bottom: none;
-            font-weight: 600;
-            color: #444;
-        }
-
-        .table td {
-            vertical-align: middle;
-            padding: 1rem 0.75rem;
-        }
-
-        .table tbody tr {
-            transition: all 0.2s ease;
-        }
-
-        .table tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .badge {
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        .text-decoration-none:hover {
-            color: #0056b3 !important;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate-button {
-            border-radius: 8px;
-            margin: 0 2px;
-        }
-
-        .dataTables_wrapper .dataTables_filter input {
-            border-radius: 8px;
-            border: 1px solid #eee;
-            padding: 5px 10px;
-        }
-
-        .dataTables_wrapper .dataTables_length select {
-            border-radius: 8px;
-            border: 1px solid #eee;
-            padding: 5px 10px;
-        }
-
-        .dt-buttons .btn {
-            border-radius: 8px;
-            margin-right: 5px;
-            padding: 5px 15px;
-            font-size: 0.875rem;
-        }
-    </style>
-
+@endsection
+@push('scripts')
     <!-- DataTables Scripts -->
     <script src="{{ asset('backend/assets/plugins/datatable/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('backend/assets/plugins/datatable/js/dataTables.bootstrap5.min.js') }}"></script>
@@ -234,4 +236,4 @@
                 .appendTo('#example2_wrapper .col-md-6:eq(0)');
         });
     </script>
-@endsection
+@endpush

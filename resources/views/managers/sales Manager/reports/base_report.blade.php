@@ -1,6 +1,6 @@
 @extends('shared.dashboard')
 
-@section('page_styles')
+@push('styles')
 <style>
     @media print {
         /* Hide non-essential elements */
@@ -79,7 +79,7 @@
         margin-bottom: 20px;
     }
 </style>
-@endsection
+@endpush
 
 @section('content')
 <div class="page-content">
@@ -93,10 +93,10 @@
                     @endif
                 </div>
                 <div class="ms-md-auto w-100 w-md-auto">
-                    <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch align-items-md-center">
+                    <div class="gap-2 d-flex flex-column flex-md-row align-items-stretch align-items-md-center">
                         <!-- Date Filter Form -->
-                        <form method="GET" class="d-flex flex-column flex-md-row gap-2 no-print w-100">
-                            <div class="d-flex gap-2 flex-grow-1">
+                        <form method="GET" class="gap-2 d-flex flex-column flex-md-row no-print w-100">
+                            <div class="gap-2 d-flex flex-grow-1">
                                 <input type="date" name="start_date" class="form-control form-control-sm" placeholder="Start Date" value="{{ request('start_date') }}" />
                                 <input type="date" name="end_date" class="form-control form-control-sm" placeholder="End Date" value="{{ request('end_date') }}" />
                             </div>
@@ -201,7 +201,7 @@
 </div>
 @endsection
 
-@section('page_scripts')
+@push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.print/1.6.2/jQuery.print.min.js"></script>
 <script>
@@ -209,4 +209,4 @@
         // Removed print button functionality
     });
 </script>
-@endsection
+@endpush

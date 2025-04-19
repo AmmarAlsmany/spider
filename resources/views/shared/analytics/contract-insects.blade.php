@@ -107,9 +107,6 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Insect Analytics for Contract #{{ $contract->id }}</h5>
                         <div>
-                            <button id="toggleDummyData" class="btn btn-sm btn-outline-secondary me-2">
-                                <i class="bx bx-data me-1"></i> Toggle Demo Data
-                            </button>
                             @if ($contract->is_multi_branch && $contract->branchs->count() > 0)
                                 <a href="{{ route('analytics.contract.branches', ['contractId' => $contract->id]) }}"
                                     class="btn btn-sm btn-outline-primary me-2">
@@ -421,51 +418,11 @@
     <script src="{{ asset('backend/assets/plugins/apexcharts-bundle/js/apexcharts.min.js') }}"></script>
     <script>
         $(document).ready(function() {
-            // Add a flag to track dummy data state
-            let useDummyData = false;
-
-            // Toggle dummy data button click handler
-            $('#toggleDummyData').on('click', function() {
-                useDummyData = !useDummyData;
-                $(this).toggleClass('btn-outline-secondary btn-secondary');
-
-                if (useDummyData) {
-                    $(this).html('<i class="bx bx-data me-1"></i> Using Demo Data');
-                } else {
-                    $(this).html('<i class="bx bx-data me-1"></i> Toggle Demo Data');
-                }
-
-                // Cleanup existing charts
-                if (window.occurrenceChart) {
-                    window.occurrenceChart.destroy();
-                    window.occurrenceChart = null;
-                }
-                if (window.quantityChart) {
-                    window.quantityChart.destroy();
-                    window.quantityChart = null;
-                }
-                if (window.distributionChart) {
-                    window.distributionChart.destroy();
-                    window.distributionChart = null;
-                }
-                if (window.quantityPieChart) {
-                    window.quantityPieChart.destroy();
-                    window.quantityPieChart = null;
-                }
-                if (window.densityChart) {
-                    window.densityChart.destroy();
-                    window.densityChart = null;
-                }
-
-                // Re-initialize charts with or without dummy data
-                initializeCharts(useDummyData);
-            });
-
             // Initialize charts on page load
-            initializeCharts(useDummyData);
+            initializeCharts();
 
-            // Function to initialize charts with or without dummy data
-            function initializeCharts(useDummy) {
+            // Function to initialize charts
+            function initializeCharts() {
                 // Clear existing charts
                 document.querySelector("#insectTrendsChart").innerHTML = '';
                 document.querySelector("#insectQuantitiesChart").innerHTML = '';
@@ -514,7 +471,7 @@
                 let colors = ['#FFCC00', '#3461ff', '#12bf24', '#ff6632', '#8932ff'];
 
                 // Initialize data for top insects
-                if (visitData.length > 0 && topInsects.length > 0 && !useDummy) {
+                if (visitData.length > 0 && topInsects.length > 0) {
                     topInsects.forEach((insect, index) => {
                         const insectValue = insect.value;
                         const insectName = insect.name;
@@ -554,77 +511,7 @@
                     });
                 }
 
-                // Add dummy data if no data is available or dummy mode is on
-                if (occurrenceDatasets.length === 0 || useDummy) {
-                    console.log('Using dummy data for visualization');
-
-                    // Create dummy dates for the last 6 months
-                    const dummyDates = [];
-                    const today = new Date();
-                    for (let i = 5; i >= 0; i--) {
-                        const date = new Date(today);
-                        date.setMonth(today.getMonth() - i);
-                        dummyDates.push(date.toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                        }));
-                    }
-
-                    // Create dummy insects
-                    const dummyInsects = [{
-                            name: 'Cockroach',
-                            value: 'cockroach'
-                        },
-                        {
-                            name: 'Ant',
-                            value: 'ant'
-                        },
-                        {
-                            name: 'Spider',
-                            value: 'spider'
-                        },
-                        {
-                            name: 'Mosquito',
-                            value: 'mosquito'
-                        },
-                        {
-                            name: 'Fly',
-                            value: 'fly'
-                        }
-                    ];
-
-                    // Create dummy occurrence and quantity datasets
-                    const dummyOccurrenceDatasets = [];
-                    const dummyQuantityDatasets = [];
-
-                    dummyInsects.forEach((insect, index) => {
-                        // Generate random occurrence data (0 or 1)
-                        const occurrenceData = Array(6).fill(0).map(() => Math.random() > 0.5 ? 1 : 0);
-
-                        // Generate random quantity data (1-10)
-                        const quantityData = Array(6).fill(0).map(() => {
-                            return Math.floor(Math.random() * 10) + 1;
-                        });
-
-                        dummyOccurrenceDatasets.push({
-                            name: insect.name,
-                            data: occurrenceData
-                        });
-
-                        dummyQuantityDatasets.push({
-                            name: insect.name,
-                            data: quantityData
-                        });
-                    });
-
-                    // Use dummy data
-                    visitDates = dummyDates;
-                    occurrenceDatasets = dummyOccurrenceDatasets;
-                    quantityDatasets = dummyQuantityDatasets;
-                }
-
-                // Create ApexCharts charts if we have data or dummy data
+                // Create ApexCharts charts if we have data
                 if (occurrenceDatasets.length > 0) {
                     // Occurrence Chart (area chart with ApexCharts)
                     const occurrenceOptions = {
@@ -824,8 +711,6 @@
                     window.occurrenceChart = new ApexCharts(document.querySelector("#insectTrendsChart"),
                         occurrenceOptions);
                     window.occurrenceChart.render();
-
-                    // Don't automatically render the quantities chart until its tab is selected
                 } else {
                     document.querySelector("#insectTrendsChart").innerHTML =
                         '<div class="py-5 text-center">No trend data available</div>';

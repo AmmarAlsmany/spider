@@ -51,7 +51,7 @@ class LoginController extends Controller
                     }
                 }
 
-                if (Auth::guard('web')->attempt($credentials)) {
+                if (Auth::guard('web')->attempt($credentials, $request->has('remember'))) {
                     return $this->handleSuccessfulLogin($request, $user, 'web');
                 }
             }
@@ -61,7 +61,7 @@ class LoginController extends Controller
                     throw new \Exception('Your client account is not active. Please contact your sales representative.');
                 }
 
-                if (Auth::guard('client')->attempt($credentials)) {
+                if (Auth::guard('client')->attempt($credentials, $request->has('remember'))) {
                     return $this->handleSuccessfulLogin($request, $client, 'client');
                 }
             }

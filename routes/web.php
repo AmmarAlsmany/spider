@@ -42,6 +42,16 @@ Route::controller(LoginController::class)->group(function () {
     Route::post('/logout', 'logout')->name('logout');
 })->middleware('throttle:5,1', 'auth:web,client', 'prevent-back-history');
 
+// Password Reset Routes
+Route::get('/forgot-password', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])
+    ->name('password.request');
+Route::post('/forgot-password', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])
+    ->name('password.email');
+Route::get('/reset-password/{token}', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])
+    ->name('password.reset');
+Route::post('/reset-password', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])
+    ->name('password.update');
+
 Route::middleware(['auth:web,client', 'prevent-back-history'])->group(function () {
     Route::get('/change-user-profile', [shared::class, 'changeUserProfile'])->name('change.user.profile');
     Route::post('/update-user-profile', [shared::class, 'updateUserProfile'])->name('update.user.profile');

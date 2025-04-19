@@ -1,9 +1,9 @@
-<!-- resources/views/auth/login.blade.php -->
+<!-- resources/views/auth/passwords/email.blade.php -->
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 
 <head>
-    <title>Login - Spider Web</title>
+    <title>Reset Password - Spider Web</title>
     <link rel="icon" type="image/png" href="{{ asset('images/spider.webp') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -18,7 +18,7 @@
             min-height: 100vh;
         }
 
-        .login-container {
+        .reset-container {
             background-color: rgba(0, 0, 0, 0.85);
             padding: 2.5rem;
             border-radius: 1rem;
@@ -29,22 +29,21 @@
         }
 
         @media (min-width: 1024px) {
-            .login-container {
+            .reset-container {
                 margin-right: 8%;
                 margin-left: auto;
             }
         }
 
         @media (max-width: 768px) {
-            .login-container {
+            .reset-container {
                 margin: 1rem auto;
                 padding: 2rem;
                 width: 90%;
                 max-width: none;
             }
 
-            input[type="email"],
-            input[type="password"] {
+            input[type="email"] {
                 font-size: 16px; /* Prevents zoom on mobile */
                 height: 50px;
             }
@@ -83,8 +82,7 @@
             object-fit: contain;
         }
 
-        input[type="email"],
-        input[type="password"] {
+        input[type="email"] {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
@@ -94,8 +92,7 @@
             margin-top: 0.5rem;
         }
 
-        input[type="email"]:focus,
-        input[type="password"]:focus {
+        input[type="email"]:focus {
             outline: none;
             border-color: #b71c1c;
             box-shadow: 0 0 0 2px rgba(183, 28, 28, 0.2);
@@ -106,6 +103,18 @@
             display: block;
             color: rgba(255, 255, 255, 0.9);
             font-size: 1rem;
+        }
+
+        .alert {
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .alert-success {
+            background-color: rgba(0, 128, 0, 0.2);
+            border: 1px solid rgba(0, 128, 0, 0.3);
+            color: #90ee90;
         }
 
         @media (max-width: 640px) {
@@ -119,67 +128,50 @@
                 margin-top: 1rem;
             }
 
-            .login-container {
+            .reset-container {
                 padding: 1.5rem;
                 margin: 1rem;
                 width: auto;
-            }
-
-            .remember-forgot {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                margin: 1rem 0;
-            }
-
-            input[type="checkbox"] {
-                width: 20px;
-                height: 20px;
             }
         }
     </style>
 </head>
 
 <body class="flex justify-center items-center p-4 min-h-screen">
-    <div class="login-container">
+    <div class="reset-container">
         <div class="mb-8 text-center">
             <img src="/images/spider.webp" alt="Spider Web Logo" class="mx-auto spider-logo">
-            <h1 class="mt-4 text-3xl font-bold sm:text-4xl text-highlight">Spider Web</h1>
-            <p class="mt-2 text-lg">Pest Control Services</p>
+            <h1 class="mt-4 text-3xl font-bold sm:text-4xl text-highlight">Reset Password</h1>
+            <p class="mt-2 text-lg">Enter your email to receive a password reset link</p>
         </div>
 
-        <form method="POST" action="{{ route('login') }}" class="space-y-6">
+        @if (session('status'))
+            <div class="alert alert-success mb-4" role="alert">
+                {{ session('status') }}
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('password.email') }}" class="space-y-6">
             @csrf
 
             <div>
                 <label for="email" class="block font-medium">Email Address</label>
                 <input id="email" name="email" type="email" required
-                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-            </div>
-
-            <div>
-                <label for="password" class="block font-medium">Password</label>
-                <input id="password" name="password" type="password" required
-                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-            </div>
-
-            @if ($errors->any())
-            <div class="text-sm text-red-500">
-                {{ $errors->first() }}
-            </div>
-            @endif
-
-            <div class="flex items-center remember-forgot">
-                <div class="flex items-center">
-                    <input type="checkbox" name="remember" id="remember" class="mr-2">
-                    <label for="remember" class="text-sm">Remember Me</label>
-                </div>
-                <a href="{{ route('password.request') }}" class="ml-auto text-sm text-red-500 hover:underline">Forgot Password?</a>
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
+                    value="{{ old('email') }}" autocomplete="email" autofocus>
+                
+                @error('email')
+                    <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                @enderror
             </div>
 
             <button type="submit" class="flex justify-center items-center btn-primary">
-                Login
+                Send Password Reset Link
             </button>
+
+            <div class="text-center mt-4">
+                <a href="{{ route('login') }}" class="text-sm text-red-500 hover:underline">Back to Login</a>
+            </div>
         </form>
     </div>
 </body>

@@ -54,11 +54,7 @@ class shared extends Controller
             $profile_data['avatar'] = $filename;
         }
         $profile_data->save();
-        $notification = array(
-            'message' => 'Profile updated successfully',
-            'alert-type' => 'success'
-        );
-        return redirect()->back()->with($notification);
+        return redirect()->back()->with('success', 'Profile updated successfully');
     }
 
     public function updateUserpassword(Request $request)
@@ -89,10 +85,7 @@ class shared extends Controller
             if (!$user) {
                 return redirect()->back()
                     ->withInput()
-                    ->with([
-                        'message' => 'User not found',
-                        'alert-type' => 'error'
-                    ]);
+                    ->with('error', 'User not found');
             }
 
             // Define notifications
@@ -116,13 +109,13 @@ class shared extends Controller
                 if (!Auth::guard('client')->attempt(['email' => $user->email, 'password' => $request->old_password])) {
                     return redirect()->back()
                         ->withInput()
-                        ->with($notifications['password_mismatch']);
+                        ->with('error', $notifications['password_mismatch']['message']);
                 }
             } else {
                 if (!Hash::check($request->old_password, $user->password)) {
                     return redirect()->back()
                         ->withInput()
-                        ->with($notifications['password_mismatch']);
+                        ->with('error', $notifications['password_mismatch']['message']);
                 }
             }
 
@@ -130,7 +123,7 @@ class shared extends Controller
             if (Hash::check($request->new_password, $user->password)) {
                 return redirect()->back()
                     ->withInput()
-                    ->with($notifications['same_password']);
+                    ->with('error', $notifications['same_password']['message']);
             }
 
             // Update password
@@ -145,7 +138,7 @@ class shared extends Controller
             Auth::guard($isClient ? 'client' : 'web')->logout();
 
             return redirect()->route('login')
-                ->with($notifications['success']);
+                ->with('success', $notifications['success']['message']);
 
         } catch (\Exception $e) {
             Log::error('Password change failed', [
@@ -155,10 +148,7 @@ class shared extends Controller
 
             return redirect()->back()
                 ->withInput()
-                ->with([
-                    'message' => 'An error occurred while changing your password. Please try again.',
-                    'alert-type' => 'error'
-                ]);
+                ->with('error', 'An error occurred while changing your password. Please try again.');
         }
     }
 }

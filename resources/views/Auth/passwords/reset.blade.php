@@ -1,9 +1,9 @@
-<!-- resources/views/auth/login.blade.php -->
+<!-- resources/views/auth/passwords/reset.blade.php -->
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 
 <head>
-    <title>Login - Spider Web</title>
+    <title>Reset Password - Spider Web</title>
     <link rel="icon" type="image/png" href="{{ asset('images/spider.webp') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -18,7 +18,7 @@
             min-height: 100vh;
         }
 
-        .login-container {
+        .reset-container {
             background-color: rgba(0, 0, 0, 0.85);
             padding: 2.5rem;
             border-radius: 1rem;
@@ -29,14 +29,14 @@
         }
 
         @media (min-width: 1024px) {
-            .login-container {
+            .reset-container {
                 margin-right: 8%;
                 margin-left: auto;
             }
         }
 
         @media (max-width: 768px) {
-            .login-container {
+            .reset-container {
                 margin: 1rem auto;
                 padding: 2rem;
                 width: 90%;
@@ -119,67 +119,62 @@
                 margin-top: 1rem;
             }
 
-            .login-container {
+            .reset-container {
                 padding: 1.5rem;
                 margin: 1rem;
                 width: auto;
-            }
-
-            .remember-forgot {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                margin: 1rem 0;
-            }
-
-            input[type="checkbox"] {
-                width: 20px;
-                height: 20px;
             }
         }
     </style>
 </head>
 
 <body class="flex justify-center items-center p-4 min-h-screen">
-    <div class="login-container">
+    <div class="reset-container">
         <div class="mb-8 text-center">
             <img src="/images/spider.webp" alt="Spider Web Logo" class="mx-auto spider-logo">
-            <h1 class="mt-4 text-3xl font-bold sm:text-4xl text-highlight">Spider Web</h1>
-            <p class="mt-2 text-lg">Pest Control Services</p>
+            <h1 class="mt-4 text-3xl font-bold sm:text-4xl text-highlight">Reset Password</h1>
+            <p class="mt-2 text-lg">Create a new password for your account</p>
         </div>
 
-        <form method="POST" action="{{ route('login') }}" class="space-y-6">
+        <form method="POST" action="{{ route('password.update') }}" class="space-y-6">
             @csrf
+
+            <input type="hidden" name="token" value="{{ $token }}">
 
             <div>
                 <label for="email" class="block font-medium">Email Address</label>
                 <input id="email" name="email" type="email" required
-                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
+                    value="{{ $email ?? old('email') }}" readonly>
+                
+                @error('email')
+                    <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                @enderror
             </div>
 
             <div>
-                <label for="password" class="block font-medium">Password</label>
+                <label for="password" class="block font-medium">New Password</label>
                 <input id="password" name="password" type="password" required
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                
+                @error('password')
+                    <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div>
+                <label for="password-confirm" class="block font-medium">Confirm Password</label>
+                <input id="password-confirm" name="password_confirmation" type="password" required
                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
             </div>
 
-            @if ($errors->any())
-            <div class="text-sm text-red-500">
-                {{ $errors->first() }}
-            </div>
-            @endif
-
-            <div class="flex items-center remember-forgot">
-                <div class="flex items-center">
-                    <input type="checkbox" name="remember" id="remember" class="mr-2">
-                    <label for="remember" class="text-sm">Remember Me</label>
-                </div>
-                <a href="{{ route('password.request') }}" class="ml-auto text-sm text-red-500 hover:underline">Forgot Password?</a>
-            </div>
-
             <button type="submit" class="flex justify-center items-center btn-primary">
-                Login
+                Reset Password
             </button>
+
+            <div class="text-center mt-4">
+                <a href="{{ route('login') }}" class="text-sm text-red-500 hover:underline">Back to Login</a>
+            </div>
         </form>
     </div>
 </body>

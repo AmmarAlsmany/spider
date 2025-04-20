@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('Property_type',["Residential","Commercial","Industrial","Government","Equipment","Agricultural","Other"])->nullable();
             $table->foreignId('contract_type')->constrained('contracts_types')->onDelete('cascade')->onUpdate('cascade');
             $table->string('contract_price');
-            $table->enum('contract_status',["approved","pending","Not approved","completed","stopped","canceled"])->default("pending");
+            $table->enum('contract_status',["approved","pending","Not approved","completed","stopped","canceled","under_processing"])->default("pending");
             $table->string('rejection_reason')->nullable();
             $table->string('contract_description');
             $table->enum('Payment_type',["postpaid","prepaid"])->default("postpaid");

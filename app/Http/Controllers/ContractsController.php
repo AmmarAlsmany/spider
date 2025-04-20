@@ -559,7 +559,7 @@ class ContractsController extends Controller
     public function show(contracts $contracts)
     {
         $query = contracts::where('sales_id', Auth::user()->id)
-            ->whereNotIn('contract_status', ['completed', 'Not approved', 'Stopped'])
+            ->whereNotIn('contract_status', ['completed', 'Not approved', 'stopped'])
             ->whereNull('deleted_at')
             ->with('customer'); // Eager load customer relationship
 
@@ -842,8 +842,7 @@ class ContractsController extends Controller
         // Get contracts where contract end date has passed
         $contracts = contracts::with('customer', 'visitSchedules', 'type')
             ->where('sales_id', auth()->id())
-            ->where('contract_status', 'approved')
-            ->where('is_finish', 1)
+            ->where('contract_status', 'completed')
             ->orderBy('contract_end_date', $sortDirection)
             ->paginate(10);
 
@@ -878,7 +877,7 @@ class ContractsController extends Controller
         $contracts = contracts::with('customer', 'visitSchedules', 'type')
             ->where('sales_id', auth()->id())
             ->where(function ($query) {
-                $query->where('contract_status', 'cancelled')
+                $query->where('contract_status', 'canceled')
                     ->orWhere('contract_status', 'Not approved');
             })
             ->orderBy('updated_at', $sortDirection)
@@ -989,7 +988,6 @@ class ContractsController extends Controller
                 'branches.*.branch_address' => 'required|string',
                 'branches.*.branch_city' => 'required|string'
             ]);
-
             // Generate annex number
             $annex_number = $contract->contract_number . '-A' . ($contract->annexes()->count() + 1);
 
@@ -1009,7 +1007,6 @@ class ContractsController extends Controller
                 'created_by' => Auth::id()
             ]);
             $annex->save();
-
             // Create branches and link them to the annex
             foreach ($request->branches as $branchData) {
                 $branch = new branchs([
@@ -1019,7 +1016,8 @@ class ContractsController extends Controller
                     'branch_address' => $branchData['branch_address'],
                     'branch_city' => $branchData['branch_city'],
                     'contracts_id' => $contract->id,
-                    'annex_id' => $annex->id // Link branch to annex
+                    'annex_id' => $annex->id,
+                    'number_of_visits' => $branchData['number_of_visits'],
                 ]);
                 $branch->save();
             }
@@ -1125,14 +1123,12 @@ class ContractsController extends Controller
             $newBranches = branchs::where('annex_id', $annex->id)->get();
 
             // Create a temporary contract object for scheduling only the new branches
+            // we add number_of_visits to the temporary contract
             $tempContract = clone $contract;
             $tempContract->setRelation('branchs', $newBranches);
+            $tempContract->number_of_visits = $newBranches->sum('number_of_visits');
 
             // Ensure the temporary contract has all required properties
-            if (!isset($tempContract->number_of_visits) || empty($tempContract->number_of_visits)) {
-                $tempContract->number_of_visits = $contract->number_of_visits;
-            }
-
             if (!isset($tempContract->visit_start_date) || empty($tempContract->visit_start_date)) {
                 // Use current date as the visit start date for annex branches
                 $tempContract->visit_start_date = now()->format('Y-m-d');
@@ -1578,10 +1574,10 @@ class ContractsController extends Controller
                 'new_branch_data.*.branch_address' => 'sometimes|required|string',
                 'new_branch_data.*.branch_city' => 'sometimes|required|string',
                 // Equipment contract fields
-                'equipment_type_id' => 'required_if:contract_type,Buy equipment|exists:equipment_types,id',
-                'equipment_model' => 'required_if:contract_type,Buy equipment|string',
-                'equipment_quantity' => 'required_if:contract_type,Buy equipment|integer|min:1',
-                'equipment_description' => 'required_if:contract_type,Buy equipment|string',
+                'equipment_type_id' => 'nullable|required_if:contract_type,6|exists:equipment_types,id',
+                'equipment_model' => 'nullable|required_if:contract_type,6|string',
+                'equipment_quantity' => 'nullable|required_if:contract_type,6|integer|min:1',
+                'equipment_description' => 'nullable|required_if:contract_type,6|string',
             ]);
 
             // Generate a new contract number

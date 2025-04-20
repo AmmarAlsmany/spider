@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Http\Controllers\AlertController;
 use App\Services\ContractService;
+use App\Services\PaymentService;
 
 class TestAutomaticFunctions extends Command
 {
@@ -27,11 +28,6 @@ class TestAutomaticFunctions extends Command
         $this->info('Testing all automatic functions...');
         $this->info('----------------------------------------');
 
-        // Test expired contracts check
-        $this->info('1. Testing expired contracts check...');
-        app(AlertController::class)->checkExpiredContracts();
-        $this->info('✓ Expired contracts check completed');
-
         // Test due payments check
         $this->info('2. Testing due payments check...');
         app(AlertController::class)->checkDuePayments();
@@ -39,7 +35,7 @@ class TestAutomaticFunctions extends Command
 
         // Test renewal needed check
         $this->info('3. Testing renewal needed check...');
-        app(AlertController::class)->checkRenewalNeeded();
+        app(AlertController::class)->reminderRenewal();
         $this->info('✓ Renewal needed check completed');
 
         // Test monthly report generation
@@ -47,8 +43,13 @@ class TestAutomaticFunctions extends Command
         app(AlertController::class)->generateMonthlyReport();
         $this->info('✓ Monthly report generation completed');
 
+        // Test overdue payments check
+        $this->info('5. Testing overdue payments check...');
+        app(PaymentService::class)->updateOverduePayments();
+        $this->info('✓ Overdue payments check completed');
+
         // Test completed contracts check
-        $this->info('5. Testing completed contracts check...');
+        $this->info('6. Testing completed contracts check...');
         app(ContractService::class)->checkAndUpdateCompletedContracts();
         $this->info('✓ Completed contracts check completed');
 
@@ -62,17 +63,17 @@ class TestAutomaticFunctions extends Command
         $this->info('----------------------------------------');
 
         switch ($function) {
-            case 'expired-contracts':
-                app(AlertController::class)->checkExpiredContracts();
-                break;
             case 'due-payments':
                 app(AlertController::class)->checkDuePayments();
                 break;
             case 'renewal-needed':
-                app(AlertController::class)->checkRenewalNeeded();
+                app(AlertController::class)->reminderRenewal();
                 break;
             case 'monthly-report':
                 app(AlertController::class)->generateMonthlyReport();
+                break;
+            case 'overdue-payments':
+                app(PaymentService::class)->updateOverduePayments();
                 break;
             case 'completed-contracts':
                 app(ContractService::class)->checkAndUpdateCompletedContracts();

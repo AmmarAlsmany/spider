@@ -125,6 +125,8 @@ return [
     'annexes_confirm_delete_annex' => 'تأكيد عملية حذف الملحق مع الدفعات المرتبطة به؟', 
     'annexes_cancel' => 'الغاء',
     'annexes_no_annexes' => 'لا توجد ملحقات',
+    'annexes_number_of_visits' => 'عدد الزيارات',
+    'annexes_description' => 'وصف الملحق',
 
     // Status
     'status_pending' => 'قيد الانتظار',

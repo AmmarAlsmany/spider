@@ -134,6 +134,19 @@
                                                                 <small class="text-muted">Enter 9 digits without the country
                                                                     code</small>
                                                             </div>
+                                                            
+                                                            <div class="mb-3 col-md-6">
+                                                                <label class="form-label">Number of Visits <span
+                                                                        class="text-danger">*</span></label>
+                                                                <input type="number"
+                                                                    class="form-control @error('branches.0.number_of_visits') is-invalid @enderror"
+                                                                    name="branches[0][number_of_visits]"
+                                                                    placeholder="Enter Number of Visits" required min="1"
+                                                                    value="{{ old('branches.0.number_of_visits') }}">
+                                                                @error('branches.0.number_of_visits')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                @enderror
+                                                            </div>
 
                                                             <div class="mb-3 col-12">
                                                                 <label class="form-label">Branch Address <span

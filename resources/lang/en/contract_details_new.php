@@ -125,6 +125,8 @@ return [
     'annexes_confirm_delete_annex' => 'Are you sure you want to delete this annex and its associated payments?',
     'annexes_cancel' => 'Cancel',
     'annexes_delete' => 'Delete',
+    'annexes_description' => 'Description',
+    'annexes_number_of_visits' => 'Number of Visits',
 
     // Status
     'status_pending' => 'Pending',

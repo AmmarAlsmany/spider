@@ -19,10 +19,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Load custom helpers
         require_once app_path('helpers.php');
         
         // Set default pagination view to our custom template
-        \Illuminate\Pagination\Paginator::defaultView('pagination.custom');
-        \Illuminate\Pagination\Paginator::defaultSimpleView('pagination.custom');
+        \Illuminate\Pagination\Paginator::defaultView('vendor.pagination.custom');
+        \Illuminate\Pagination\Paginator::defaultSimpleView('vendor.pagination.custom');
     }
 }

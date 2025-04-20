@@ -16,9 +16,29 @@ use App\Models\contracts;
 use App\Models\VisitReport;
 use App\Models\client;
 use App\Models\branchs;
+use App\Services\VisitScheduleService;
+use App\Traits\NotificationDispatcher;
 
 class TechnicalController extends Controller
 {
+    use NotificationDispatcher;
+    
+    /**
+     * Constructor to share data with all technical views
+     */
+    public function __construct()
+    {
+        // Share pending team assignments count with all technical views
+        view()->composer('managers.technical.*', function ($view) {
+            // Only compute this for authenticated technical users
+            if (Auth::check() && Auth::user()->role === 'technical') {
+                // Get count of contracts waiting for team assignment
+                $pendingTeamAssignments = contracts::where('contract_status', 'under_processing')->count();
+                $view->with('pendingTeamAssignments', $pendingTeamAssignments);
+            }
+        });
+    }
+    
     public function dashboard()
     {
         // Get all teams with their leaders and members
@@ -40,6 +60,9 @@ class TechnicalController extends Controller
 
         // Get count of open tickets
         $openTickets = Tiket::where('status', 'open')->count();
+        
+        // Get count of contracts waiting for team assignment
+        $pendingTeamAssignments = contracts::where('contract_status', 'under_processing')->count();
 
         // Get active contracts with upcoming visits
         $activeContracts = contracts::with(['customer', 'visitSchedules' => function ($query) {
@@ -76,6 +99,7 @@ class TechnicalController extends Controller
             'todayAppointments',
             'pendingTasks',
             'openTickets',
+            'pendingTeamAssignments',
             'activeContracts',
             'contractStats',
             'visitReports',
@@ -87,6 +111,88 @@ class TechnicalController extends Controller
     {
         $teams = Team::with(['leader', 'members'])->get();
         return view('managers.technical.teams.index', compact('teams'));
+    }
+    
+    /**
+     * Display contracts waiting for team assignment
+     */
+    public function pendingTeamAssignments()
+    {
+        $contracts = contracts::with(['customer', 'branchs'])
+            ->where('contract_status', 'under_processing')
+            ->latest()
+            ->paginate(10);
+            
+        $teams = Team::where('status', 'active')->get();
+        
+        return view('managers.technical.pending_team_assignments', compact('contracts', 'teams'));
+    }
+    
+    /**
+     * Process a contract that is waiting for team assignment
+     */
+    public function processContract(Request $request, $id)
+    {
+        try {
+            DB::beginTransaction();
+            
+            // Find the contract
+            $contract = contracts::findOrFail($id);
+            
+            // Verify contract is in under_processing status
+            if ($contract->contract_status !== 'under_processing') {
+                return back()->with('error', 'This contract is not in under_processing status');
+            }
+            
+            // Check if there are active teams available
+            $activeTeams = Team::where('status', 'active')->count();
+            if ($activeTeams == 0) {
+                return back()->with('error', 'No active teams available for scheduling visits');
+            }
+            
+            // Check if the contract has a valid visit_start_date
+            // If not, set it to today's date for proper scheduling
+            if (!isset($contract->visit_start_date) || empty($contract->visit_start_date)) {
+                $contract->visit_start_date = now()->format('Y-m-d');
+                \Illuminate\Support\Facades\Log::info("Setting visit_start_date for contract {$contract->id} to today: {$contract->visit_start_date}");
+            } else {
+                \Illuminate\Support\Facades\Log::info("Using existing visit_start_date for contract {$contract->id}: {$contract->visit_start_date}");
+            }
+            
+            // Update contract status to approved
+            $contract->contract_status = 'approved';
+            $contract->save();
+            
+            // Create visit schedule
+            $visitScheduleService = app(VisitScheduleService::class);
+            $visitScheduleService->createVisitSchedule($contract);
+            
+            // Notify relevant parties
+            $notificationData = [
+                'title' => 'Contract Fully Approved: ' . $contract->contract_number,
+                'message' => 'Contract has been processed and visits scheduled',
+                'type' => 'success',
+                'priority' => 'normal'
+            ];
+            
+            // Different URLs for different roles
+            $roleUrls = [
+                'sales' => route('contract.show.details', $contract->id),
+                'sales_manager' => route('sales_manager.contract.view', $contract->id),
+                'client' => route('client.contract.details', $contract->id)
+            ];
+
+            // Notify client, sales manager and sales rep
+            $this->notifyRoles(['client', 'sales', 'sales_manager'], $notificationData, 
+                $contract->customer_id, $contract->sales_id, $roleUrls);
+            
+            DB::commit();
+            return back()->with('success', 'Contract has been approved and visits scheduled successfully');
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Failed to process contract: ' . $e->getMessage());
+        }
     }
 
     public function create(Request $request)

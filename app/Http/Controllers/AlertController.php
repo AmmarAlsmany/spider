@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Alert;
 use App\Models\contracts;
 use App\Models\payments;
-use App\Models\User;
-use App\Models\client;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
@@ -76,33 +74,6 @@ class AlertController extends Controller
         return null;
     }
 
-    public function checkExpiredContracts()
-    {
-        $today = Carbon::now();
-
-        // Get contracts that have expired
-        $expiredContracts = contracts::where('contract_status', 'approved')
-            ->get();
-
-        foreach ($expiredContracts as $contract) {
-            // Check if all visits are completed
-            $allVisitsCompleted = $contract->visitSchedules->every(function ($visit) {
-                return $visit->status === 'completed';
-            });
-
-            if ($allVisitsCompleted) {
-                // Create alert for expired contract
-                Alert::create([
-                    'type' => 'expired',
-                    'contract_id' => $contract->id,
-                    'message' => "Contract #{$contract->id} has expired on " . Carbon::now()->format('Y-m-d') . "!"
-                ]);
-            }
-        }
-
-        return count($expiredContracts);
-    }
-
     public function checkDuePayments()
     {
         $today = Carbon::now();
@@ -118,30 +89,30 @@ class AlertController extends Controller
             // Create alert for due payment
             Alert::create([
                 'type' => 'payment_due',
-                'contract_id' => $payment->contract_id,
-                'message' => "Payment of {$payment->payment_amount} is due on {$payment->due_date} for Contract #{$payment->contract_id}"
+                'message' => "Payment of {$payment->payment_amount} is should be paid by {$payment->due_date} for Contract #{$payment->contract_number}"
             ]);
         }
 
         return count($duePayments);
     }
 
-    public function checkRenewalNeeded()
+    public function reminderRenewal()
     {
-        $threeMonthsFromNow = Carbon::now()->addMonths(3);
+        $oneMonthFromNow = Carbon::now()->addMonths(1);
         $twoMonthsFromNow = Carbon::now()->addMonths(2);
 
-        // Get contracts that need renewal (ending in 2-3 months)
-        $renewalContracts = contracts::whereBetween('contract_end_date', [$twoMonthsFromNow, $threeMonthsFromNow])
-            ->where('contract_status', 'approved')
+        // Get contracts that need renewal (ending between 1 and 2 months from now)
+        $renewalContracts = contracts::where('contract_status', 'approved')
+            ->whereBetween('contract_end_date', [$oneMonthFromNow, $twoMonthsFromNow])
             ->get();
 
         foreach ($renewalContracts as $contract) {
             // Create alert for contract renewal
             Alert::create([
-                'type' => 'renewal_needed',
-                'contract_id' => $contract->id,
-                'message' => "Contract #{$contract->id} needs renewal. Expires on {$contract->contract_end_date}!"
+                'title' => 'Reminder',
+                'message' => "Contract #{$contract->contract_number} will expire in {$contract->contract_end_date} Dont miss renewal!",
+                'type' => 'Contract Renewal',
+                'priority' => 'medium'
             ]);
         }
 
@@ -150,13 +121,11 @@ class AlertController extends Controller
 
     public function generateMonthlyReport()
     {
-        $expiredCount = $this->checkExpiredContracts();
         $duePaymentsCount = $this->checkDuePayments();
-        $renewalCount = $this->checkRenewalNeeded();
+        $renewalCount = $this->reminderRenewal();
 
         $report = [
             'generated_at' => Carbon::now()->format('Y-m-d H:i:s'),
-            'expired_contracts' => $expiredCount,
             'due_payments' => $duePaymentsCount,
             'contracts_needing_renewal' => $renewalCount
         ];
@@ -164,7 +133,7 @@ class AlertController extends Controller
         // Create alert for monthly report
         Alert::create([
             'type' => 'monthly_report',
-            'message' => "Monthly Report Generated: {$expiredCount} expired contracts, {$duePaymentsCount} due payments, {$renewalCount} contracts needing renewal"
+            'message' => "Monthly Report Generated: {$duePaymentsCount} due payments, {$renewalCount} contracts needing renewal"
         ]);
 
         return $report;
@@ -179,12 +148,15 @@ class AlertController extends Controller
             if ($user) {
                 $notification = $user->notifications()->where('id', $id)->first();
                 if ($notification) {
-                    $notification->markAsRead();
+                    // Delete the notification instead of marking it as read
+                    $notification->delete();
+                    return redirect()->back()->with('success', 'Notification removed successfully');
                 }
             }
         } else {
             // This is an alert
             $alert = Alert::findOrFail($id);
+            // Only mark as read for the current user, don't delete the alert
             $alert->readByUsers()->syncWithoutDetaching([Auth::id()]);
         }
         
@@ -193,19 +165,26 @@ class AlertController extends Controller
 
     public function markAllAsRead()
     {
-        // Mark all alerts as read
+        // Mark all alerts as read for the current user only
         $alerts = Alert::all();
         foreach ($alerts as $alert) {
+            // Only mark as read for the current user, don't delete the alert
             $alert->readByUsers()->syncWithoutDetaching([Auth::id()]);
         }
         
-        // Mark all notifications as read
+        // Delete all notifications instead of marking them as read
         $user = $this->getAuthenticatedUser();
         if ($user) {
-            $user->unreadNotifications->markAsRead();
+            // Get count of notifications for the success message
+            $notificationCount = $user->notifications->count();
+            
+            // Delete all notifications
+            $user->notifications()->delete();
+            
+            return redirect()->back()->with('success', "All alerts marked as read and notifications removed");
         }
         
-        return redirect()->back()->with('success', 'All alerts and notifications marked as read');
+        return redirect()->back()->with('success', 'All alerts marked as read');
     }
 
     public function getUnreadCount()
@@ -232,5 +211,28 @@ class AlertController extends Controller
         
         return redirect()->route('alerts.index')
             ->with('success', 'Alert deleted successfully');
+    }
+    
+    /**
+     * Delete a notification
+     *
+     * @param string $id Notification ID
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function deleteNotification($id)
+    {
+        // Check if the notification exists
+        $user = $this->getAuthenticatedUser();
+        if ($user) {
+            $notification = $user->notifications()->where('id', $id)->first();
+            if ($notification) {
+                $notification->delete();
+                return redirect()->route('alerts.index')
+                    ->with('success', 'Notification deleted successfully');
+            }
+        }
+        
+        return redirect()->route('alerts.index')
+            ->with('error', 'Notification not found');
     }
 }

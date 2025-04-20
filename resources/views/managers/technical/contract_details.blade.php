@@ -71,6 +71,8 @@
                                             <span class="badge bg-info">Completed</span>
                                         @elseif($contract->contract_status == 'stopped')
                                             <span class="badge bg-warning">Stopped</span>
+                                        @elseif($contract->contract_status == 'under_processing')
+                                            <span class="badge bg-warning">Under Processing</span>
                                         @else
                                             <span class="badge bg-danger">Cancelled</span>
                                         @endif

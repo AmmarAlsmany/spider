@@ -31,6 +31,9 @@
                 <div class="parent-icon"><i class='bx bx-folder-plus'></i>
                 </div>
                 <div class="menu-title">{{ __('clients.sidebar.pending_annexes') }}</div>
+                @if(isset($pendingAnnexes) && $pendingAnnexes > 0)
+                    <span class="badge rounded-pill bg-danger">{{ $pendingAnnexes }}</span>
+                @endif
             </a>
         </li>
 

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('branch_manager_phone');
             $table->string('branch_address');
             $table->string('branch_city');
+            $table->integer('number_of_visits')->nullable();
             $table->foreignId('contracts_id')->constrained('contracts')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('annex_id')->nullable()->constrained('contract_annexes')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();

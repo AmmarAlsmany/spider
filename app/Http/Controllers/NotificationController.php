@@ -54,15 +54,15 @@ class NotificationController extends Controller
             // Store the URL before marking as read
             $redirectUrl = $notification->data['url'] ?? '';
             
-            // Mark as read instead of deleting
-            $notification->markAsRead();
+            // Delete notification instead of marking as read
+            $notification->delete();
 
             return response()->json([
-                'message' => 'Notification marked as read',
+                'message' => 'Notification removed successfully',
                 'redirect_url' => $redirectUrl
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error marking notification as read: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error removing notification: ' . $e->getMessage()], 500);
         }
     }
 
@@ -74,15 +74,19 @@ class NotificationController extends Controller
         }
 
         try {
-            // Mark all notifications as read instead of deleting them
+            // Count notifications before deleting for the message
+            $count = DatabaseNotification::where('notifiable_id', $user->id)
+                ->where('notifiable_type', get_class($user))
+                ->count();
+                
+            // Delete all notifications instead of marking them as read
             DatabaseNotification::where('notifiable_id', $user->id)
                 ->where('notifiable_type', get_class($user))
-                ->whereNull('read_at')
-                ->update(['read_at' => now()]);
+                ->delete();
 
-            return response()->json(['message' => 'All notifications marked as read']);
+            return response()->json(['message' => "{$count} notifications removed successfully"]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error marking notifications as read: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error removing notifications: ' . $e->getMessage()], 500);
         }
     }
 

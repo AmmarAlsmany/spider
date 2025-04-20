@@ -288,6 +288,10 @@ Route::middleware(['auth', 'role:finance', 'prevent-back-history'])->group(funct
 // Technical Routes
 Route::middleware(['auth', 'role:technical'])->group(function () {
     Route::get('/technical/dashboard', [TechnicalController::class, 'dashboard'])->name('technical.dashboard');
+    // Pending team assignment routes
+    Route::get('/technical/pending-team-assignments', [TechnicalController::class, 'pendingTeamAssignments'])->name('technical.pending-team-assignments');
+    Route::post('/technical/process-contract/{id}', [TechnicalController::class, 'processContract'])->name('technical.process.contract');
+    
     // Team management Routes
     Route::get('/teams', [TechnicalController::class, 'index'])->name('teams.index');
     Route::post('/teams', [TechnicalController::class, 'create'])->name('teams.create');
@@ -463,6 +467,7 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::get('/alerts/mark-all-as-read', [AlertController::class, 'markAllAsRead'])->name('alerts.mark-all-as-read');
     Route::get('/alerts/{id}/mark-as-read', [AlertController::class, 'markAsRead'])->name('alerts.mark-as-read');
     Route::delete('/alerts/{alert}', [AlertController::class, 'destroy'])->name('alerts.destroy');
+    Route::delete('/notifications/{id}', [AlertController::class, 'deleteNotification'])->name('notifications.delete');
 });
 
 Route::get('/check-duplicate', [ValidationController::class, 'checkDuplicate'])->name('check.duplicate');

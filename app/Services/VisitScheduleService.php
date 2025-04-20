@@ -536,14 +536,19 @@ class VisitScheduleService
             $branchVisitDates = [];
             $schedules = [];
             
-            // Each branch gets the full number of visits
-            // (not dividing visits among branches)
+            // Each branch gets visits based on its own number_of_visits if available
+            // otherwise default to the contract's number_of_visits
             $branchCount = count($branches);
-            Log::info("Total branches: $branchCount, visits per branch: $numberOfVisits");
+            Log::info("Total branches: $branchCount, contract visits: $numberOfVisits");
 
             // First, generate all visit dates for each branch
             foreach ($branches as $branch) {
-                Log::info("Generating visit dates for branch ID: {$branch->id}");
+                // Check if this branch has its own number_of_visits
+                $branchVisits = (isset($branch->number_of_visits) && !empty($branch->number_of_visits)) 
+                    ? $branch->number_of_visits 
+                    : $numberOfVisits;
+                
+                Log::info("Generating visit dates for branch ID: {$branch->id}, branch visits: $branchVisits");
                 
                 $existingVisits = VisitSchedule::where('branch_id', $branch->id)
                     ->where('status', '!=', 'cancelled')
@@ -559,7 +564,7 @@ class VisitScheduleService
                 $branchVisitDates[$branch->id] = $this->generateVisitDates(
                     $startDate,
                     $endDate,
-                    $numberOfVisits, // Each branch gets the full number of visits
+                    $branchVisits, // Use branch-specific visit number if available
                     $existingVisits
                 );
                 

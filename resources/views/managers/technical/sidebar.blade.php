@@ -27,6 +27,18 @@
             </a>
         </li>
         <li>
+            <a href="{{ route('technical.pending-team-assignments') }}">
+                <div class="parent-icon"><i class='bx bx-clipboard text-danger'></i>
+                </div>
+                <div class="menu-title">
+                    Pending Team Assignments
+                    @if(isset($pendingTeamAssignments) && $pendingTeamAssignments > 0)
+                        <span class="badge rounded-pill bg-danger">{{ $pendingTeamAssignments }}</span>
+                    @endif
+                </div>
+            </a>
+        </li>
+        <li>
             <a href="{{ route('technical.team.schedules') }}">
                 <div class="parent-icon"><i class='bx bx-calendar-check'></i>
                 </div>

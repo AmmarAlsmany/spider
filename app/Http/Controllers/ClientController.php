@@ -3,17 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\client;
-use App\Http\Controllers\Controller;
-use App\Models\ContractAnnex;
 use App\Models\contracts;
+use App\Models\ContractAnnex;
+use App\Models\payments;
+use App\Models\Team;
+use App\Models\VisitSchedule;
 use App\Models\tikets;
 use App\Models\ContractUpdateRequest; 
-use App\Models\payments;
 use App\Models\VisitChangeRequest;
-use App\Models\VisitSchedule;
 use App\Services\VisitScheduleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Traits\NotificationDispatcher;
 
@@ -89,6 +91,13 @@ class ClientController extends Controller
         // Fetch client's contracts
         $contracts = contracts::where('customer_id', $client->id)->get();
 
+        // Get pending annexes
+        $pendingAnnexes = ContractAnnex::where('status', 'pending')
+            ->whereHas('contract', function ($query) use ($client) {
+                $query->where('customer_id', $client->id);
+            })
+            ->count();
+
         return view('clients.dashboard', compact(
             'totalContracts',
             'activeContracts',
@@ -100,7 +109,8 @@ class ClientController extends Controller
             'recentContracts',
             'openTickets',
             'scheduledVisits',
-            'contracts' // Add contracts to the view
+            'contracts',
+            'pendingAnnexes' // Add contracts to the view
         ));
     }
 
@@ -216,6 +226,8 @@ class ClientController extends Controller
     public function approveContract($id)
     {
         try {
+            DB::beginTransaction();
+            
             $contract = contracts::findOrFail($id);
             $client = Auth::guard('client')->user();
 
@@ -224,17 +236,41 @@ class ClientController extends Controller
                 return redirect()->back()->with('error', 'Unauthorized action.');
             }
 
-            $contract->contract_status = 'approved';
-            $contract->save();
-
-            // Create visit schedule
-            $visitScheduleService = new VisitScheduleService();
-            $visitScheduleService->createVisitSchedule($contract);
+            // Check if there are active teams available
+            $activeTeams = Team::where('status', 'active')->count();
+            
+            if ($activeTeams > 0) {
+                // Teams are available, set to approved and schedule visits
+                $contract->contract_status = 'approved';
+                $contract->save();
+                
+                // Create visit schedule
+                try {
+                    $visitScheduleService = new VisitScheduleService();
+                    $visitScheduleService->createVisitSchedule($contract);
+                } catch (\Exception $e) {
+                    DB::rollback();
+                    Log::error('Failed to schedule visits for contract: ' . $e->getMessage());
+                    return redirect()->back()->with('error', 'Failed to schedule visits for the contract: ' . $e->getMessage());
+                }
+            } else {
+                // No active teams available, set status to under_processing
+                $contract->contract_status = 'under_processing';
+                $contract->save();
+                
+                // Log this situation for admin follow-up
+                Log::info('Contract '.$contract->id.' set to under_processing due to no active teams being available');
+            }
 
             // Notify sales manager,sales representative about contract approval
+            $statusText = $contract->contract_status === 'approved' ? 'Approved' : 'Under Processing';
+            $messageText = $contract->contract_status === 'approved' 
+                ? 'Your contract has been approved and visits have been scheduled.' 
+                : 'Your contract has been approved by the client but is currently under processing due to team availability. Visits will be scheduled once teams become available.';
+            
             $data = [
-                'title' => "Contract Approved: " . $contract->contract_number,
-                'message' => 'Your contract has been approved',
+                'title' => "Contract {$statusText}: " . $contract->contract_number,
+                'message' => $messageText,
             ];
             
             // Different URLs for different roles
@@ -243,11 +279,35 @@ class ClientController extends Controller
                 'sales_manager' => route('sales_manager.contract.view', $contract->id)
             ];
 
+            // Notify sales and managers
             $this->notifyRoles(['sales', 'sales_manager'], $data, null, null, $roleUrls);
+            
+            // Also notify technical team if contract is under processing so they can assign teams
+            if ($contract->contract_status === 'under_processing') {
+                $technicalData = [
+                    'title' => "Action Required: Contract Needs Team Assignment - " . $contract->contract_number,
+                    'message' => 'A contract has been approved by the client but is waiting for team assignment. Please assign an active team.',
+                    'type' => 'warning',
+                    'priority' => 'high'
+                ];
+                
+                $this->notifyRoles(['technical'], $technicalData, null, null, [
+                    'technical' => route('technical.contract.show', $contract->id)
+                ]);
+            }
 
-            return redirect()->back()->with('success', 'Contract has been approved successfully.');
+            DB::commit();
+            
+            // Return the appropriate success message based on contract status
+            $successMessage = $contract->contract_status === 'approved'
+                ? 'Contract has been approved successfully and visits have been scheduled.'
+                : 'Contract has been approved and marked as under processing. Visits will be scheduled once teams become available.';
+                
+            return redirect()->back()->with('success', $successMessage);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to approve contract. ' . $e->getMessage());
+            DB::rollback();
+            Log::error('Contract approval error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to approve contract: ' . $e->getMessage());
         }
     }
 

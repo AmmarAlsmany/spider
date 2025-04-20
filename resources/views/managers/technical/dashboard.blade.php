@@ -93,6 +93,26 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <div class="col-xl-3 col-md-6">
+                                <a href="{{ route('technical.pending-team-assignments') }}" class="text-decoration-none">
+                                    <div class="overflow-hidden border-0 transition-all card rounded-4 hover:transform hover:scale-102"
+                                        style="box-shadow: 0 4px 24px 0 rgb(34 41 47 / 10%);">
+                                        <div class="p-4 card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0 p-3 rounded-circle"
+                                                    style="background: linear-gradient(45deg, #fa5c7c, #fd8da2);">
+                                                    <i class="text-white fas fa-clipboard-list fs-3"></i>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <p class="mb-1 text-sm font-medium text-muted">Pending Team Assignments</p>
+                                                    <h3 class="mb-0 fw-bold text-dark">{{ $pendingTeamAssignments ?? 0 }}</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
                         </div>
 
                         <!-- Contract Statistics -->

@@ -17,6 +17,7 @@ class branchs extends Model
         'branch_city',
         'contracts_id',
         'annex_id',
+        'number_of_visits',
     ];
 
     // Relationships

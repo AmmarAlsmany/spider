@@ -11,6 +11,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Log;
 use App\Services\ContractService;
+use App\Services\PaymentService;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -23,13 +24,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(SetLocale::class);
     })
     ->withSchedule(function (Schedule $schedule) {
-        $schedule->call([app(AlertController::class), 'checkExpiredContracts'])
-            ->sundays()
-            ->name('check-expired-contracts')
-            ->onFailure(function () {
-                Log::error('Failed to check expired contracts');
-            });
-
         $schedule->call([app(AlertController::class), 'checkDuePayments'])
             ->dailyAt('08:00')
             ->name('check-due-payments')
@@ -37,9 +31,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 Log::error('Failed to check due payments');
             });
 
-        $schedule->call([app(AlertController::class), 'checkRenewalNeeded'])
+        $schedule->call([app(AlertController::class), 'reminderRenewal'])
             ->sundays()
-            ->name('check-renewal-needed')
+            ->name('reminder-renewal')
             ->onFailure(function () {
                 Log::error('Failed to check contracts needing renewal');
             });
@@ -51,7 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 Log::error('Failed to generate monthly report');
             });
 
-        $schedule->command('payments:update-overdue')
+        $schedule->call([app(PaymentService::class), 'updateOverduePayments'])
             ->dailyAt('00:00')
             ->name('update-overdue-payments')
             ->onFailure(function () {

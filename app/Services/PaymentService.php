@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\payments;
 use Carbon\Carbon;
 use App\Traits\NotificationDispatcher;
-use App\Traits\NotificationHelpers;
 
 class PaymentService
 {
@@ -41,7 +40,6 @@ class PaymentService
                     'title' => 'Overdue Payment',
                     'message' => 'Your payment of ' . $payment->payment_amount . ' SAR is overdue. Please make the payment as soon as possible.',
                     'type' => 'info',
-                    'url' => "#",
                     'priority' => 'normal',
                 ], $customer->id, $payment->sales_id);
                 

@@ -64,15 +64,12 @@ class ContractService
         // Get customer name
         $customerName = $contract->customer ? $contract->customer->name : 'Unknown Customer';
         
-        // Create renewal URL
-        $renewalUrl = route('contract.renewal.form', ['id' => $contract->id]);
-        
         // Prepare notification data
         $notificationData = [
-            'title' => 'Contract Renewal Required',
-            'message' => "Contract #{$contract->contract_number} with {$customerName} ends today. Do you want to renew it?",
-            'url' => $renewalUrl,
-            'type' => 'warning',
+            'title' => 'info',
+            'message' => "Contract #{$contract->contract_number} with {$customerName} ends in {$contract->contract_end_date}. and we Changed To completed contract",
+            'type' => 'info',
+            'url' => '/sales/Show contracts Details/'. $contract->id,
             'priority' => 'high'
         ];
         

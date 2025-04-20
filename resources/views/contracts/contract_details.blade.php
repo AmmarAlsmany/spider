@@ -590,6 +590,9 @@
                                                     {{ __('contract_details_new.annexes_amount') }}
                                                 </th>
                                                 <th>
+                                                    {{ __('contract_details_new.annexes_description') }}
+                                                </th>
+                                                <th>
                                                     {{ __('contract_details_new.annexes_status') }}
                                                 </th>
                                                 <th>
@@ -604,6 +607,9 @@
                                                     <td>{{ $annex->annex_date->format('M d, Y') }}</td>
                                                     <td>
                                                         {{ number_format($annex->additional_amount * 1.15, 2) }} SAR
+                                                    </td>
+                                                    <td>
+                                                        {{ $annex->description }}
                                                     </td>
                                                     <td>
                                                         <span
@@ -651,6 +657,8 @@
             </div>
         </div>
     </div>
+@endsection
+@push('scripts')
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
@@ -976,7 +984,7 @@
             window.location.href = `/Payment/view Payment Details/${paymentId}`;
         }
     </script>
-@endsection
+@endpush
 
 <!-- Mark as Paid Modal -->
 <div class="modal fade" id="markAsPaidModal" tabindex="-1" aria-hidden="true">

@@ -170,10 +170,12 @@
     <script>
         $(document).ready(function() {
             $('#clientsTable').DataTable({
-                lengthChange: false,
-                paging: false,
+                lengthChange: true,
+                paging: true,
                 searching: true,
-                info: false,
+                info: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                 dom: '<"row"<"col-md-6"B><"col-md-6"f>>rt',
                 buttons: [{
                         extend: 'copy',

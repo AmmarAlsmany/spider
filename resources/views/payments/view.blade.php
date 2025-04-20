@@ -267,7 +267,7 @@
                 </div>
 
                 <div class="invoice-header">
-                    فاتورة ضريبية
+                    مطالبة مالية
                 </div>
 
                 <table class="info-table">
@@ -319,7 +319,7 @@
                 </table>
 
                 <div class="invoice-details-header">
-                    بيان الفاتورة
+                    بيان المطالبة
                 </div>
 
                 <table class="details-table">

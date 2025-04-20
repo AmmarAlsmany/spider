@@ -3,20 +3,20 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">{{ __('contracts.reject_contract') }}</h5>
+                <h5 class="modal-title">{{ __('clients.contract_modals.reject_contract') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('client.contract.reject', $contract->id) }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="reject_reason" class="form-label">{{ __('contracts.reason_for_rejection') }}</label>
+                        <label for="reject_reason" class="form-label">{{ __('clients.contract_modals.reason_for_rejection') }}</label>
                         <textarea class="form-control" id="reject_reason" name="reject_reason" rows="3" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('contracts.cancel') }}</button>
-                    <button type="submit" class="btn btn-danger">{{ __('contracts.reject') }}</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('clients.contract_modals.cancel') }}</button>
+                    <button type="submit" class="btn btn-danger">{{ __('clients.contract_modals.reject') }}</button>
                 </div>
             </form>
         </div>
@@ -28,20 +28,20 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">{{ __('contracts.request_update') }}</h5>
+                <h5 class="modal-title">{{ __('clients.contract_modals.request_update') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('client.contract.update-request', $contract->id) }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="request_details" class="form-label">{{ __('contracts.update_request_details') }}</label>
+                        <label for="request_details" class="form-label">{{ __('clients.contract_modals.update_request_details') }}</label>
                         <textarea class="form-control" id="request_details" name="request_details" rows="3" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('contracts.cancel') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ __('contracts.submit_request') }}</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('clients.contract_modals.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('clients.contract_modals.submit_request') }}</button>
                 </div>
             </form>
         </div>

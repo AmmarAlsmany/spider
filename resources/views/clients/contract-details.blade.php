@@ -17,13 +17,13 @@
     </div>
     @endif
     <div class="mb-3 page-breadcrumb d-none d-sm-flex align-items-center">
-        <div class="breadcrumb-title pe-3">{{ __('contract_details.title') }}</div>
+        <div class="breadcrumb-title pe-3">{{ __('clients.contract_details.contract_details') }}</div>
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="p-0 mb-0 breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('client.dashboard') }}"><i class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('client.show') }}">{{ __('contract_details.contracts') }}</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ __('contract_details.details') }}</li>
+                    <li class="breadcrumb-item"><a href="{{ route('client.show') }}">{{ __('clients.contracts.my_contracts') }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('clients.contract_details.contract_details') }}</li>
                 </ol>
             </nav>
         </div>
@@ -42,9 +42,9 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-secondary">{{ __('contract_details.contract_status') }}</p>
-                            <h4 class="my-1">{{ __('contract_details.status.' . strtolower($contract->contract_status)) }}</h4>
-                            <p class="mb-0 font-13">{{ __('contract_details.contract_number', ['number' => $contract->contract_number]) }}</p>
+                            <p class="mb-0 text-secondary">{{ __('clients.contract_details.status') }}</p>
+                            <h4 class="my-1">{{ __('clients.status.' . strtolower($contract->contract_status)) }}</h4>
+                            <p class="mb-0 font-13">{{ __('clients.contract_details.contract_number') }} {{ $contract->contract_number }}</p>
                         </div>
                         <div class="widgets-icons-2 bg-gradient-{{ 
                             $contract->contract_status == 'pending' ? 'warning' : 
@@ -63,14 +63,14 @@
         <div class="col-12 col-lg-8">
             <div class="card">
                 <div class="bg-transparent card-header">
-                    <h5 class="mb-0">{{ __('contract_details.contract_information') }}</h5>
+                    <h5 class="mb-0">{{ __('clients.contract_details.contract_details') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3 d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">{{ __('messages.contract_details') }}</h5>
                         <div>
                             <a href="{{ route('contract.insect-analytics', $contract->id) }}" class="btn btn-primary">
-                                <i class="bx bx-line-chart"></i> Insect Analytics
+                                <i class="bx bx-line-chart"></i> {{ __('clients.contract_details.insect_analytics') }}
                             </a>
                         </div>
                     </div>

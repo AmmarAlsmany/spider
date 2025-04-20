@@ -23,18 +23,18 @@
                     <div class="card-body">
                         <div class="mb-4 d-flex align-items-center">
                             <div>
-                                <h5 class="mb-0">Visit Details</h5>
-                                <p class="mb-0 text-muted">Visit #{{ $visit->id }}</p>
+                                <h5 class="mb-0">{{ __('clients.reports.visit_details') }}</h5>
+                                <p class="mb-0 text-muted">{{ __('clients.reports.visit_number') }} {{ $visit->id }}</p>
                             </div>
                             <div class="ms-auto">
                                 @if ($visit->status == 'completed' && $visit->report)
                                     <button id="printReportBtn" class="btn btn-primary btn-sm me-2">
-                                        <i class="bx bx-printer me-1"></i>Print Report
+                                        <i class="bx bx-printer me-1"></i>{{ __('clients.reports.print_report') }}
                                     </button>
                                 @endif
                                 <a href="{{ route('client.contract.visit.details', $visit->contract->id) }}"
                                     class="btn btn-secondary btn-sm">
-                                    <i class="bx bx-arrow-back me-1"></i>Back to Visits
+                                    <i class="bx bx-arrow-back me-1"></i>{{ __('clients.reports.back_to_visits') }}
                                 </a>
                             </div>
                         </div>
@@ -44,7 +44,7 @@
                             <div class="col-md-6">
                                 <div class="border card">
                                     <div class="card-header bg-light">
-                                        <h6 class="mb-0">Visit Information</h6>
+                                        <h6 class="mb-0">{{ __('clients.reports.visit_information') }}</h6>
                                     </div>
                                     <div class="card-body">
                                         <table class="table table-borderless">
@@ -86,7 +86,7 @@
                             <div class="col-md-6">
                                 <div class="border card">
                                     <div class="card-header bg-light">
-                                        <h6 class="mb-0">Customer Information</h6>
+                                        <h6 class="mb-0">{{ __('clients.reports.customer_information') }}</h6>
                                     </div>
                                     <div class="card-body">
                                         <table class="table table-borderless">
@@ -133,12 +133,12 @@
                                 <div class="col-12">
                                     <div class="border card">
                                         <div class="card-header bg-light">
-                                            <h6 class="mb-0">Visit Report</h6>
+                                            <h6 class="mb-0">{{ __('clients.reports.visit_report') }}</h6>
                                         </div>
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col-md-6">
-                                                    <h6>Target Insects</h6>
+                                                    <h6>{{ __('clients.reports.target_insects') }}</h6>
                                                     @php
                                                         $insects = is_array($visit->report->target_insects)
                                                             ? $visit->report->target_insects
@@ -194,7 +194,7 @@
                                             </div>
                                             <div class="mt-4 row">
                                                 <div class="col-md-6">
-                                                    <h6>Recommendations & Observations</h6>
+                                                    <h6>{{ __('clients.reports.recommendations') }}</h6>
                                                     <p>{{ $visit->report->recommendations }}</p>
                                                 </div>
                                                 <div class="col-md-6">
@@ -206,7 +206,7 @@
                                             @if (isset($visit->report->customer_satisfaction))
                                                 <div class="mt-4 row">
                                                     <div class="col-12">
-                                                        <h6>Customer Satisfaction</h6>
+                                                        <h6>{{ __('clients.reports.customer_satisfaction') }}</h6>
                                                         <div class="d-flex align-items-center">
                                                             <div class="me-3">
                                                                 @php
@@ -256,7 +256,7 @@
                                             @if ($visit->report->customer_signature)
                                                 <div class="mt-4 row">
                                                     <div class="col-md-6">
-                                                        <h6>Customer Signature</h6>
+                                                        <h6>{{ __('clients.reports.customer_signature') }}</h6>
                                                         <img src="{{ $visit->report->customer_signature }}"
                                                             alt="Customer Signature" class="img-fluid"
                                                             style="max-height: 100px;">

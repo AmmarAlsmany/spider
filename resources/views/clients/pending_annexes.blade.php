@@ -19,12 +19,12 @@
     <div class="page-content">
         <!-- Breadcrumb -->
         <div class="mb-4 page-breadcrumb d-sm-flex align-items-center">
-            <div class="breadcrumb-title pe-3 fw-bold text-primary">Pending Annexes</div>
+            <div class="breadcrumb-title pe-3 fw-bold text-primary">{{ __('clients.annexes.pending_annexes') }}</div>
             <div class="ps-3">
                 <nav aria-label="breadcrumb">
                     <ol class="p-0 mb-0 breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('client.dashboard') }}"><i class="bx bx-home-alt"></i></a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Pending Annexes</li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ __('clients.annexes.pending_annexes') }}</li>
                     </ol>
                 </nav>
             </div>
@@ -54,13 +54,13 @@
                                 <table class="table table-hover table-striped table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>Contract Number</th>
-                                            <th>Annex Number</th>
-                                            <th>Amount</th>
-                                            <th>Due Date</th>
-                                            <th>Created By</th>
-                                            <th>Created At</th>
-                                            <th>Actions</th>
+                                            <th>{{ __('clients.annexes.contract_number') }}</th>
+                                            <th>{{ __('clients.annexes.annex_number') }}</th>
+                                            <th>{{ __('clients.annexes.amount') }}</th>
+                                            <th>{{ __('clients.annexes.due_date') }}</th>
+                                            <th>{{ __('clients.annexes.created_by') }}</th>
+                                            <th>{{ __('clients.annexes.created_at') }}</th>
+                                            <th>{{ __('clients.annexes.actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -88,18 +88,18 @@
                                                               method="POST" class="d-inline">
                                                             @csrf
                                                             <button type="submit" class="btn btn-sm btn-success" 
-                                                                    onclick="return confirm('Are you sure you want to approve this annex?')"
+                                                                    onclick="return confirm('{{ __('clients.annexes.approve_confirm') }}')"
                                                                     title="Approve Annex">
-                                                                <i class="bx bx-check"></i> Approve
+                                                                <i class="bx bx-check"></i> {{ __('clients.annexes.approve') }}
                                                             </button>
                                                         </form>
                                                         <form action="{{ route('contracts.annex.reject', $annex->id) }}" 
                                                               method="POST" class="d-inline">
                                                             @csrf
                                                             <button type="submit" class="btn btn-sm btn-danger"
-                                                                    onclick="return confirm('Are you sure you want to reject this annex?')"
+                                                                    onclick="return confirm('{{ __('clients.annexes.reject_confirm') }}')"
                                                                     title="Reject Annex">
-                                                                <i class="bx bx-x"></i> Reject
+                                                                <i class="bx bx-x"></i> {{ __('clients.annexes.reject') }}
                                                             </button>
                                                         </form>
                                                     </div>
@@ -116,8 +116,8 @@
                                 <div class="py-4 text-center">
                                     <img src="{{ asset('assets/images/no-data.svg') }}" alt="No Data" 
                                          style="max-width: 200px; opacity: 0.6;">
-                                    <h4 class="mt-3 text-muted">No Pending Annexes</h4>
-                                    <p class="text-muted">There are no annexes waiting for your approval at this time.</p>
+                                    <h4 class="mt-3 text-muted">{{ __('clients.annexes.no_pending_annexes') }}</h4>
+                                    <p class="text-muted">{{ __('clients.annexes.no_annexes_message') }}</p>
                                 </div>
                             @endif
                         </div>

@@ -17,19 +17,15 @@
     </div>
     @endif
     <div class="mb-3 page-breadcrumb d-none d-sm-flex align-items-center">
-        <div class="breadcrumb-title pe-3">{{ __('payment_details.title') }}</div>
+        <div class="breadcrumb-title pe-3">{{ __('clients.payment_details.payment_details') }}</div>
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="p-0 mb-0 breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('client.dashboard') }}"><i
                                 class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('client.show') }}">{{
-                            __('payment_details.breadcrumb.contracts') }}</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('client.contract.details', $contract->id) }}">{{
-                            __('payment_details.breadcrumb.contract_number', ['number' => $contract->contract_number])
-                            }}</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ __('payment_details.breadcrumb.payments')
-                        }}</li>
+                    <li class="breadcrumb-item"><a href="{{ route('client.show') }}">{{ __('clients.contracts.my_contracts') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('client.contract.details', $contract->id) }}">{{ __('clients.contract_details.contract_number') }} {{ $contract->contract_number }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('clients.payment_details.payment_details') }}</li>
                 </ol>
             </nav>
         </div>
@@ -38,21 +34,19 @@
     <!-- Payment Summary Card -->
     <div class="row">
         <div class="col-12">
-            <div class="border-0 border-4 card border-start border-primary">
+            <div class="card border-4 border-start border-primary">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-secondary">{{ __('payment_details.summary.total_value') }}</p>
-                            <h4 class="my-1">{{ number_format($contract->contract_price, 2) }} {{
-                                __('payment_details.summary.currency') }}</h4>
-                            <p class="mb-0 font-13">{{ __('payment_details.summary.contract_number', ['number' =>
-                                $contract->contract_number]) }}</p>
+                            <p class="mb-0 text-secondary">{{ __('clients.payment_details.contract_value') }}</p>
+                            <h4 class="my-1">{{ number_format($contract->contract_price, 2) }} SAR</h4>
+                            <p class="mb-0 font-13">{{ __('clients.contract_details.contract_number') }} {{ $contract->contract_number }}</p>
                         </div>
                         <div class="ms-auto">
                             <div class="row g-3">
                                 <div class="col-auto">
                                     <div class="text-end">
-                                        <p class="mb-0 text-success">{{ __('payment_details.summary.paid_amount') }}</p>
+                                        <p class="mb-0 text-success">{{ __('clients.payment_details.paid_amount') }}</p>
                                         <h5 class="my-1 text-success">{{
                                             number_format($contract->payments->where('payment_status',
                                             'paid')->sum('payment_amount'), 2) }} {{

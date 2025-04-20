@@ -1,5 +1,5 @@
 @extends('shared.dashboard')
-@section('title', __('tickets.my_tickets'))
+@section('title', __('clients.tickets.support_tickets'))
 @section('content')
 
 <div class="page-content">
@@ -22,9 +22,9 @@
         <div class="col-12">
             <div class="mb-4 card">
                 <div class="pb-0 card-header d-flex justify-content-between align-items-center">
-                    <h6>{{ __('tickets.my_tickets') }}</h6>
+                    <h6>{{ __('clients.tickets.support_tickets') }}</h6>
                     <a href="{{ route('client.tickets.create') }}" class="btn btn-primary btn-sm">
-                        <i class="bx bx-plus"></i> {{ __('tickets.new_ticket') }}
+                        <i class="bx bx-plus"></i> {{ __('clients.tickets.create_ticket') }}
                     </a>
                 </div>
                 <div class="px-0 pt-0 pb-2 card-body">
@@ -33,15 +33,15 @@
                             <thead>
                                 <tr>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        {{ __('tickets.subject') }}</th>
+                                        {{ __('clients.tickets.subject') }}</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        {{ __('tickets.status') }}</th>
+                                        {{ __('clients.tickets.status') }}</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        {{ __('tickets.priority') }}</th>
+                                        {{ __('clients.tickets.priority') }}</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        {{ __('tickets.created') }}</th>
+                                        {{ __('clients.tickets.created_date') }}</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        {{ __('tickets.actions') }}</th>
+                                        {{ __('clients.tickets.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

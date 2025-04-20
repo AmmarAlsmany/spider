@@ -22,9 +22,9 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-secondary">Total Contracts</p>
+                            <p class="mb-0 text-secondary">{{ __('clients.dashboard.total_contracts') }}</p>
                             <h4 class="my-1 text-info">{{ $totalContracts }}</h4>
-                            <p class="mb-0 font-13">{{ $activeContracts }} Active Contracts</p>
+                            <p class="mb-0 font-13">{{ $activeContracts }} {{ __('clients.dashboard.active_contracts') }}</p>
                         </div>
                         <div class="text-white widgets-icons-2 rounded-circle bg-gradient-blues ms-auto">
                             <i class='bx bxs-folder'></i>
@@ -38,11 +38,11 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-secondary">Total Payments</p>
+                            <p class="mb-0 text-secondary">{{ __('clients.dashboard.total_payments') }}</p>
                             <h4 class="my-1 text-danger">${{ number_format($totalRevenue, 2) }}</h4>
                             <p class="mb-0 font-13">
-                                <span class="text-warning">{{ $pendingPayments }} Pending</span> /
-                                <span class="text-danger">{{ $overduePayments }} Overdue</span>
+                                <span class="text-warning">{{ $pendingPayments }} {{ __('clients.dashboard.pending') }}</span> /
+                                <span class="text-danger">{{ $overduePayments }} {{ __('clients.dashboard.overdue') }}</span>
                             </p>
                         </div>
                         <div class="text-white widgets-icons-2 rounded-circle bg-gradient-burning ms-auto">
@@ -57,7 +57,7 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-secondary">Active Contracts</p>
+                            <p class="mb-0 text-secondary">{{ __('clients.dashboard.active_contracts') }}</p>
                             <h4 class="my-1 text-success">{{ $activeContracts }}</h4>
                             <p class="mb-0 font-13">{{ round(($activeContracts / ($totalContracts ?: 1)) * 100) }}% of Total</p>
                         </div>
@@ -73,9 +73,9 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-secondary">Open Tickets</p>
+                            <p class="mb-0 text-secondary">{{ __('clients.dashboard.open_tickets') }}</p>
                             <h4 class="my-1 text-warning">{{ $openTickets }}</h4>
-                            <p class="mb-0 font-13">Pending Support Requests</p>
+                            <p class="mb-0 font-13">{{ __('clients.dashboard.pending_support') }}</p>
                         </div>
                         <div class="text-white widgets-icons-2 rounded-circle bg-gradient-orange ms-auto">
                             <i class='bx bxs-group'></i>
@@ -91,7 +91,7 @@
             <div class="card-header">
                 <div class="d-flex align-items-center">
                     <div>
-                        <h6 class="mb-0">Your Contracts</h6>
+                        <h6 class="mb-0">{{ __('clients.dashboard.your_contracts') }}</h6>
                     </div>
                 </div>
             </div>
@@ -106,7 +106,7 @@
                                         <i class='bx bx-file'></i>
                                     </div>
                                     <div class="ms-3">
-                                        <h6 class="mb-0">Contract #{{ $contract->contract_number }}</h6>
+                                        <h6 class="mb-0">{{ __('clients.dashboard.contract_number') }}{{ $contract->contract_number }}</h6>
                                         <p class="mb-0 text-secondary">
                                             <span class="badge {{ 
                                                 $contract->contract_status == 'approved' ? 'bg-success' : 
@@ -136,10 +136,10 @@
                                             </span>
                                         </p>
                                         <p class="mb-0 text-secondary">
-                                            <strong>Property Type:</strong> {{ $contract->Property_type }}
+                                            <strong>{{ __('clients.dashboard.property_type') }}:</strong> {{ $contract->Property_type }}
                                         </p>
                                         <p class="mb-0 text-secondary">
-                                            <strong>Start Date:</strong> {{ \Carbon\Carbon::parse($contract->contract_start_date)->format('M d, Y') }}
+                                            <strong>{{ __('clients.dashboard.start_date') }}:</strong> {{ \Carbon\Carbon::parse($contract->contract_start_date)->format('M d, Y') }}
                                         </p>
                                         <div class="mt-2">
                                             <a href="{{ route('client.contract.details', $contract->id) }}" class="btn btn-sm btn-primary">
@@ -161,23 +161,23 @@
         <div class="card-header">
             <div class="d-flex align-items-center">
                 <div>
-                    <h6 class="mb-0">Recent Payments</h6>
+                    <h6 class="mb-0">{{ __('clients.dashboard.recent_payments') }}</h6>
                 </div>
             </div>
         </div>
         <div class="card-body">
             @if($recentPayments->isEmpty())
             <div class="p-4 text-center">
-                <p class="text-muted">No recent payments.</p>
+                <p class="text-muted">{{ __('clients.dashboard.no_recent_payments') }}</p>
             </div>
             @else
             <div class="table-responsive">
                 <table class="table mb-0 align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>Amount</th>
-                            <th>Date</th>
-                            <th>Status</th>
+                            <th>{{ __('clients.dashboard.amount') }}</th>
+                            <th>{{ __('clients.dashboard.date') }}</th>
+                            <th>{{ __('clients.dashboard.status') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -215,7 +215,7 @@
             <div class="card-header">
                 <div class="d-flex align-items-center">
                     <div>
-                        <h6 class="mb-0"><i class="bx bx-calendar-check me-2"></i>Service Visits</h6>
+                        <h6 class="mb-0"><i class="bx bx-calendar-check me-2"></i>{{ __('clients.dashboard.service_visits') }}</h6>
                     </div>
                 </div>
             </div>
@@ -242,8 +242,8 @@
                                     <table class="table mb-0">
                                         <thead class="table-light">
                                             <tr>
-                                                <th>Date</th>
-                                                <th>Time</th>
+                                                <th>{{ __('clients.dashboard.date') }}</th>
+                                                <th>{{ __('clients.dashboard.time') }}</th>
                                                 <th>Status</th>
                                                 <th>Actions</th>
                                             </tr>
@@ -284,7 +284,7 @@
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title">Visit Details</h5>
+                                                            <h5 class="modal-title">{{ __('clients.dashboard.visit_details') }}</h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
@@ -333,7 +333,7 @@
                     <div class="col-12">
                         <div class="p-4 text-center">
                             <i class="bx bx-calendar-x text-muted" style="font-size: 3rem;"></i>
-                            <p class="mt-2">No scheduled visits for this branch.</p>
+                            <p class="text-muted">{{ __('clients.dashboard.no_scheduled_visits') }}</p>
                         </div>
                     </div>
                     @endforelse

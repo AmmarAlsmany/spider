@@ -1,16 +1,16 @@
 @extends('shared.dashboard')
-@section('title', 'Alerts & Notifications')
+@section('title', __('alerts.title'))
 @section('content')
     <div class="page-content">
         <div class="card radius-10">
             <div class="card-body">
                 <div class="mb-3 d-flex align-items-center justify-content-between">
                     <div>
-                        <h5 class="mb-0">Alerts & Notifications</h5>
+                        <h5 class="mb-0">{{ __('alerts.title') }}</h5>
                     </div>
                     <div>
                         <a href="{{ route('alerts.mark-all-as-read') }}" class="btn btn-primary btn-sm">
-                            <i class="bx bx-check-double me-1"></i> Mark All as Read
+                            <i class="bx bx-check-double me-1"></i> {{ __('alerts.mark_all_as_read') }}
                         </a>
                     </div>
                 </div>
@@ -20,7 +20,7 @@
                         <a class="nav-link active" data-bs-toggle="tab" href="#all" role="tab" aria-selected="true">
                             <div class="d-flex align-items-center">
                                 <div class="tab-icon"><i class='bx bx-list-ul font-18 me-1'></i></div>
-                                <div class="tab-title">All</div>
+                                <div class="tab-title">{{ __('alerts.all') }}</div>
                             </div>
                         </a>
                     </li>
@@ -28,7 +28,7 @@
                         <a class="nav-link" data-bs-toggle="tab" href="#alerts" role="tab" aria-selected="false">
                             <div class="d-flex align-items-center">
                                 <div class="tab-icon"><i class='bx bx-bell-plus font-18 me-1'></i></div>
-                                <div class="tab-title">System Alerts</div>
+                                <div class="tab-title">{{ __('alerts.system_alerts') }}</div>
                             </div>
                         </a>
                     </li>
@@ -36,7 +36,7 @@
                         <a class="nav-link" data-bs-toggle="tab" href="#notifications" role="tab" aria-selected="false">
                             <div class="d-flex align-items-center">
                                 <div class="tab-icon"><i class='bx bx-bell font-18 me-1'></i></div>
-                                <div class="tab-title">Notifications</div>
+                                <div class="tab-title">{{ __('alerts.notifications') }}</div>
                             </div>
                         </a>
                     </li>
@@ -100,9 +100,9 @@
                                             <td>{{ $alert->message }}</td>
                                             <td>
                                                 @if (!$alert->is_read)
-                                                    <span class="badge bg-danger">Unread</span>
+                                                    <span class="badge bg-danger">{{ __('alerts.unread') }}</span>
                                                 @else
-                                                    <span class="badge bg-success">Read</span>
+                                                    <span class="badge bg-success">{{ __('alerts.read') }}</span>
                                                 @endif
                                             </td>
                                             <td>{{ $alert->created_at->format('Y-m-d H:i') }}</td>
@@ -158,9 +158,9 @@
                                             <td>{{ $notification['message'] }}</td>
                                             <td>
                                                 @if (!$notification['is_read'])
-                                                    <span class="badge bg-danger">Unread</span>
+                                                    <span class="badge bg-danger">{{ __('alerts.unread') }}</span>
                                                 @else
-                                                    <span class="badge bg-success">Read</span>
+                                                    <span class="badge bg-success">{{ __('alerts.read') }}</span>
                                                 @endif
                                             </td>
                                             <td>{{ $notification['created_at']->format('Y-m-d H:i') }}</td>
@@ -227,9 +227,9 @@
                                             <td>{{ $alert->message }}</td>
                                             <td>
                                                 @if (!$alert->is_read)
-                                                    <span class="badge bg-danger">Unread</span>
+                                                    <span class="badge bg-danger">{{ __('alerts.unread') }}</span>
                                                 @else
-                                                    <span class="badge bg-success">Read</span>
+                                                    <span class="badge bg-success">{{ __('alerts.read') }}</span>
                                                 @endif
                                             </td>
                                             <td>{{ $alert->created_at->format('Y-m-d H:i') }}</td>
@@ -317,9 +317,9 @@
                                             </td>
                                             <td>
                                                 @if (!$notification['is_read'])
-                                                    <span class="badge bg-danger">Unread</span>
+                                                    <span class="badge bg-danger">{{ __('alerts.unread') }}</span>
                                                 @else
-                                                    <span class="badge bg-success">Read</span>
+                                                    <span class="badge bg-success">{{ __('alerts.read') }}</span>
                                                 @endif
                                             </td>
                                             <td>

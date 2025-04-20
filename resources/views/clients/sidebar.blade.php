@@ -14,15 +14,15 @@
         <li>
             <a href="{{ url('client/dashboard') }}">
                 <div class="parent-icon"><i class='bx bx-home-alt'></i></div>
-                <div class="menu-title">{{ __('messages.dashboard') }}</div>
+                <div class="menu-title">{{ __('clients.sidebar.dashboard') }}</div>
             </a>
         </li>
 
-        <li class="menu-label">{{ __('messages.contracts') }}</li>
+        <li class="menu-label">{{ __('clients.sidebar.contracts') }}</li>
         <li>
             <a href="{{ route('client.show') }}">
                 <div class="parent-icon"><i class='bx bx-file'></i></div>
-                <div class="menu-title">{{ __('messages.all_contracts') }}</div>
+                <div class="menu-title">{{ __('clients.sidebar.all_contracts') }}</div>
             </a>
         </li>
 
@@ -30,23 +30,23 @@
             <a href="{{ route('client.contract.pending_annexes') }}">
                 <div class="parent-icon"><i class='bx bx-folder-plus'></i>
                 </div>
-                <div class="menu-title">{{ __('messages.pending_annexes') }}</div>
+                <div class="menu-title">{{ __('clients.sidebar.pending_annexes') }}</div>
             </a>
         </li>
 
-        <li class="menu-label">{{ __('messages.support') }}</li>
+        <li class="menu-label">{{ __('clients.sidebar.support') }}</li>
         <li>
             <a href="{{ route('client.tikets') }}">
                 <div class="parent-icon"><i class='bx bx-message-square-detail'></i></div>
-                <div class="menu-title">{{ __('messages.my_tickets') }}</div>
+                <div class="menu-title">{{ __('clients.sidebar.my_tickets') }}</div>
             </a>
         </li>
 
-        <li class="menu-label">{{ __('messages.account') }}</li>
+        <li class="menu-label">{{ __('clients.sidebar.account') }}</li>
         <li>
             <a href="{{ route('change.user.profile') }}">
                 <div class="parent-icon"><i class='bx bx-user'></i></div>
-                <div class="menu-title">{{ __('messages.my_profile') }}</div>
+                <div class="menu-title">{{ __('clients.sidebar.my_profile') }}</div>
             </a>
         </li>
 
@@ -54,7 +54,7 @@
             <a href="{{ route('logout') }}"
                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <div class="parent-icon"><i class='bx bx-log-out'></i></div>
-                <div class="menu-title">{{ __('messages.logout') }}</div>
+                <div class="menu-title">{{ __('clients.sidebar.logout') }}</div>
             </a>
         </li>
     </ul>

@@ -17,16 +17,15 @@
     </div>
     @endif
     <div class="mb-3 page-breadcrumb d-none d-sm-flex align-items-center">
-        <div class="breadcrumb-title pe-3">{{ __('visits.contract_visits') }}</div>
+        <div class="breadcrumb-title pe-3">{{ __('clients.contract_visits.scheduled_visits') }}</div>
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="p-0 mb-0 breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('client.dashboard') }}"><i
                                 class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('client.show') }}">{{ __('visits.contracts') }}</a>
+                    <li class="breadcrumb-item"><a href="{{ route('client.show') }}">{{ __('clients.contracts.my_contracts') }}</a>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ __('visits.contract_number', ['number' =>
-                        $contract->contract_number]) }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('clients.contract_details.contract_number') }} {{ $contract->contract_number }}</li>
                 </ol>
             </nav>
         </div>
@@ -36,7 +35,7 @@
         <div class="card-header">
             <div class="d-flex align-items-center">
                 <div>
-                    <h5 class="mb-0"><i class="bx bx-calendar-check me-2"></i>{{ __('visits.contract_details') }}</h5>
+                    <h5 class="mb-0"><i class="bx bx-calendar-check me-2"></i>{{ __('clients.contract_details.contract_details') }}</h5>
                 </div>
             </div>
         </div>
@@ -45,10 +44,10 @@
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="mb-3 card-title">{{ __('visits.details.contract_info') }}</h5>
+                            <h5 class="mb-3 card-title">{{ __('clients.contract_details.contract_details') }}</h5>
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>{{ __('visits.details.number') }}</span>
+                                    <span>{{ __('clients.contract_details.contract_number') }}</span>
                                     <strong>{{ $contract->contract_number }}</strong>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -107,7 +106,7 @@
         <div class="card-header">
             <div class="d-flex align-items-center">
                 <div>
-                    <h5 class="mb-0"><i class="bx bx-list-check me-2"></i>{{ __('visits.visit_schedule') }}</h5>
+                    <h5 class="mb-0"><i class="bx bx-list-check me-2"></i>{{ __('clients.contract_visits.scheduled_visits') }}</h5>
                 </div>
             </div>
         </div>

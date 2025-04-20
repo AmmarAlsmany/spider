@@ -1,5 +1,5 @@
 @extends('shared.dashboard')
-@section('title', __('tickets.create_ticket'))
+@section('title', __('clients.tickets.create_ticket'))
 @section('content')
 
 <div class="page-content">
@@ -19,13 +19,13 @@
     </div>
     @endif
     <div class="mb-3 page-breadcrumb d-none d-sm-flex align-items-center">
-        <div class="breadcrumb-title pe-3">{{ __('tickets.support') }}</div>
+        <div class="breadcrumb-title pe-3">{{ __('clients.tickets.support_tickets') }}</div>
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="p-0 mb-0 breadcrumb">
                     <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('client.tikets') }}">{{ __('tickets.my_tickets') }}</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ __('tickets.create_ticket') }}</li>
+                    <li class="breadcrumb-item"><a href="{{ route('client.tikets') }}">{{ __('clients.tickets.support_tickets') }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('clients.tickets.create_ticket') }}</li>
                 </ol>
             </nav>
         </div>
@@ -37,9 +37,9 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
                         <a href="{{ route('client.tikets') }}" class="btn btn-secondary me-3">
-                            <i class="bx bx-arrow-back"></i> {{ __('tickets.back') }}
+                            <i class="bx bx-arrow-back"></i> {{ __('clients.actions.cancel') }}
                         </a>
-                        <h4 class="mb-0">{{ __('tickets.create_new_ticket') }}</h4>
+                        <h4 class="mb-0">{{ __('clients.tickets.new_ticket') }}</h4>
                     </div>
                 </div>
                 <div class="card-body">
@@ -48,7 +48,7 @@
                         <input type="hidden" name="customer_id" value="{{ Auth::guard('client')->user()->id }}">
                         
                         <div class="mb-3">
-                            <label for="tiket_title" class="form-label">{{ __('tickets.title') }}</label>
+                            <label for="tiket_title" class="form-label">{{ __('clients.tickets.ticket_subject') }}</label>
                             <input type="text" class="form-control @error('tiket_title') is-invalid @enderror" 
                                 id="tiket_title" name="tiket_title" value="{{ old('tiket_title') }}" required>
                             @error('tiket_title')

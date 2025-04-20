@@ -19,6 +19,7 @@ class VisitScheduleService
         14,  // 2:00 PM - 4:00 PM
         16, // 4:00 PM - 6:00 PM
         18, // 6:00 PM - 8:00 PM
+        20, // 8:00 PM - 10:00 PM
     ];
 
     /**
@@ -420,7 +421,7 @@ class VisitScheduleService
         }
 
         // If we get here, no standard slot was available - try a fallback time slot
-        $fallbackSlots = [15, 16]; // 3:00 PM and 4:00 PM as fallback options
+        $fallbackSlots = [15, 16, 17, 18, 19, 20]; // 3:00 PM and 4:00 PM as fallback options
         
         foreach ($fallbackSlots as $fallbackSlot) {
             $timeString = sprintf('%02d:00:00', $fallbackSlot);

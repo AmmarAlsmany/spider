@@ -69,7 +69,7 @@
                                                     </a>
                                                     
                                                     @if($teams->count() > 0)
-                                                        <form action="{{ route('technical.process.contract', $contract->id) }}" method="POST">
+                                                        <form action="{{ route('technical.process.contract', $contract->id) }}" method="POST" class="process-contract-form">
                                                             @csrf
                                                             <button type="submit" class="btn btn-sm btn-success">
                                                                 <i class="fas fa-check-circle"></i> Process & Schedule
@@ -150,17 +150,29 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
-        // Add confirmation for processing contracts using native browser confirm
-        $('form').on('submit', function(e) {
+        // Add confirmation for processing contracts using SweetAlert2
+        $('.process-contract-form').on('submit', function(e) {
             e.preventDefault();
             
             const form = $(this);
             
-            if (confirm('Process this contract? This will schedule all visits and notify the client. Continue?')) {
-                form.off('submit').submit();
-            }
+            Swal.fire({
+                title: 'Confirm Action',
+                text: 'Process this contract? This will schedule all visits and notify the client.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, process it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.off('submit').submit();
+                }
+            });
         });
     });
 </script>

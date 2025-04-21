@@ -814,23 +814,38 @@ class TechnicalController extends Controller
 
             $visit = VisitSchedule::findOrFail($id);
             $visitDateTime = Carbon::parse($request->visit_date . ' ' . $request->visit_time);
+            $visitEndTime = $visitDateTime->copy()->addHours(2);
 
-            // Check if the team is already assigned to another visit at the same time
-            $existingVisit = VisitSchedule::where('team_id', $visit->team_id)
+            // Validation checks:
+            // 1. Check if the team is already assigned to another visit that overlaps with this time slot
+            $existingTeamVisit = VisitSchedule::where('team_id', $request->team_id)
                 ->where('visit_date', $visitDateTime->format('Y-m-d'))
                 ->where('id', '!=', $id)
                 ->where('status', 'scheduled')
-                ->where(function ($query) use ($visitDateTime) {
-                    $query->whereBetween('visit_time', [
-                        $visitDateTime->format('H:i:s'),
-                        $visitDateTime->copy()->addHours(2)->format('H:i:s')
-                    ]);
+                ->where(function ($query) use ($visitDateTime, $visitEndTime) {
+                    // Check overlapping time slots
+                    $query->where(function ($q) use ($visitDateTime, $visitEndTime) {
+                        // New visit starts during an existing visit
+                        $q->where(function ($innerQ) use ($visitDateTime) {
+                            $innerQ->whereTime('visit_time', '<=', $visitDateTime->format('H:i:s'))
+                                ->whereRaw("ADDTIME(visit_time, '02:00:00') > ?", [$visitDateTime->format('H:i:s')]);
+                        });
+                        // OR Existing visit starts during our new visit
+                        $q->orWhere(function ($innerQ) use ($visitDateTime, $visitEndTime) {
+                            $innerQ->whereTime('visit_time', '>=', $visitDateTime->format('H:i:s'))
+                                ->whereTime('visit_time', '<', $visitEndTime->format('H:i:s'));
+                        });
+                    });
                 })
                 ->exists();
 
-            if ($existingVisit) {
-                return redirect()->back()->with('error', 'Selected team is already booked during this time slot.');
+            if ($existingTeamVisit) {
+                return redirect()->back()->with('error', 'Selected team is already booked during this time slot or there is a scheduling conflict within the 2-hour visit window.');
             }
+            
+            // We don't need to check for all visits overlapping - we only need to ensure
+            // the selected team isn't double-booked, which is handled by the first validation check.
+            // First validation is sufficient - we don't need a second global time check.
 
             // Update the visit schedule
             $visit->update([
@@ -850,31 +865,45 @@ class TechnicalController extends Controller
     {
         try {
             $appointment = VisitSchedule::findOrFail($id);
-
             // Parse the date and time
             $visitDateTime = Carbon::parse($request->visit_date . ' ' . $request->visit_time);
+            $visitEndTime = $visitDateTime->copy()->addHours(2);
 
-            // Check if the team is already assigned to another visit at the same time
-            $existingVisit = VisitSchedule::where('team_id', $request->team_id)
+            // Validation checks:
+            // 1. Check if the team is already assigned to another visit that overlaps with this time slot
+            $existingTeamVisit = VisitSchedule::where('team_id', $request->team_id)
                 ->where('visit_date', $visitDateTime->format('Y-m-d'))
                 ->where('id', '!=', $id)
                 ->where('status', 'scheduled')
-                ->where(function ($query) use ($visitDateTime) {
-                    $query->whereBetween('visit_time', [
-                        $visitDateTime->format('H:i:s'),
-                        $visitDateTime->copy()->addHours(2)->format('H:i:s')
-                    ]);
+                ->where(function ($query) use ($visitDateTime, $visitEndTime) {
+                    // Check overlapping time slots
+                    $query->where(function ($q) use ($visitDateTime, $visitEndTime) {
+                        // New visit starts during an existing visit
+                        $q->where(function ($innerQ) use ($visitDateTime) {
+                            $innerQ->whereTime('visit_time', '<=', $visitDateTime->format('H:i:s'))
+                                ->whereRaw("ADDTIME(visit_time, '02:00:00') > ?", [$visitDateTime->format('H:i:s')]);
+                        });
+                        // OR Existing visit starts during our new visit
+                        $q->orWhere(function ($innerQ) use ($visitDateTime, $visitEndTime) {
+                            $innerQ->whereTime('visit_time', '>=', $visitDateTime->format('H:i:s'))
+                                ->whereTime('visit_time', '<', $visitEndTime->format('H:i:s'));
+                        });
+                    });
                 })
                 ->exists();
 
-            if ($existingVisit) {
-                return redirect()->back()->with('error', 'Selected team is already booked during this time slot.');
+            if ($existingTeamVisit) {
+                return redirect()->back()->with('error', 'Selected team is already booked during this time slot or there is a scheduling conflict within the 2-hour visit window.');
             }
+
+            // We don't need to check for all visits overlapping - we only need to ensure
+            // the selected team isn't double-booked, which is handled by the first validation check.
+            // First validation is sufficient - we don't need a second global time check.
 
             // Update the appointment
             $appointment->update([
-                'visit_date' => $request->visit_date,
-                'visit_time' => $request->visit_time,
+                'visit_date' => $visitDateTime->format('Y-m-d'),
+                'visit_time' => $visitDateTime->format('H:i:s'),
                 'team_id' => $request->team_id
             ]);
 

@@ -172,7 +172,7 @@ class ContractsController extends Controller
                 'payment_type.required' => 'The payment type field is required.',
                 'contractamount.required' => 'The contract amount field is required.',
                 'contractamount.numeric' => 'The contract amount must be a number.',
-                'contractamount.min' => 'The contract amount must be greater than 0.',
+                'contractamount.min' => 'The contract amount must be 0 or greater.',
                 'warranty.required' => 'The warranty period field is required.',
                 'warranty.numeric' => 'The warranty period must be a number.',
                 'warranty.min' => 'The warranty period must be 0 or greater.',

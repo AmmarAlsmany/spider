@@ -47,7 +47,7 @@ class LoginController extends Controller
                 if ($user->role === 'client') {
                     $clientProfile = client::where('user_id', $user->id)->first();
                     if (!$clientProfile || $clientProfile->status !== 'active') {
-                        throw new \Exception('Your client account is not active. Please contact your sales representative.');
+                        throw new \Exception('Your client account is not active. Please contact your Manager.');
                     }
                 }
 
@@ -82,6 +82,15 @@ class LoginController extends Controller
         $user->last_login_at = Carbon::now();
         $user->last_login_ip = $request->ip();
         $user->save();
+
+        // Set different session lifetimes based on authentication guard
+        if ($guard === 'client') {
+            // Very short session time (1 minute) for client users only
+            $request->session()->put('_lifetime', 15);
+        } else {
+            // 2-hour session time (120 minutes) for all other users (web guard)
+            $request->session()->put('_lifetime', 120);
+        }
 
         // Set a session flag to indicate a new login for notification popup
         $request->session()->put('new_login', true);
@@ -122,7 +131,7 @@ class LoginController extends Controller
 
         // Clear and invalidate cookies
         $cookie = cookie()->forget('laravel_session');
-        
+
         $response = redirect()->route('login')
             ->withCookie($cookie);
 

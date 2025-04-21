@@ -40,7 +40,7 @@ Route::controller(LoginController::class)->group(function () {
     Route::get('/login', 'showLoginForm')->name('login');
     Route::post('/login', 'login')->name('login.submit');
     Route::post('/logout', 'logout')->name('logout');
-})->middleware('throttle:5,1', 'auth:web,client', 'prevent-back-history');
+})->middleware('throttle:5,1', 'auth:web,client', 'prevent-back-history', 'custom-session-timeout');
 
 // Password Reset Routes
 Route::get('/forgot-password', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])
@@ -52,7 +52,7 @@ Route::get('/reset-password/{token}', [\App\Http\Controllers\Auth\ResetPasswordC
 Route::post('/reset-password', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])
     ->name('password.update');
 
-Route::middleware(['auth:web,client', 'prevent-back-history'])->group(function () {
+Route::middleware(['auth:web,client', 'prevent-back-history', 'custom-session-timeout'])->group(function () {
     Route::get('/change-user-profile', [shared::class, 'changeUserProfile'])->name('change.user.profile');
     Route::post('/update-user-profile', [shared::class, 'updateUserProfile'])->name('update.user.profile');
     Route::get('/change-user-password', [shared::class, 'changeUserpassword'])->name('change.user.password');
@@ -60,7 +60,7 @@ Route::middleware(['auth:web,client', 'prevent-back-history'])->group(function (
 });
 
 // Notification Routes
-Route::middleware(['prevent-back-history', 'auth:web,client'])->group(function () {
+Route::middleware(['prevent-back-history', 'auth:web,client', 'custom-session-timeout'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'getNotifications'])->name('notifications.get');
     Route::post('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
@@ -116,7 +116,7 @@ Route::middleware(['prevent-back-history', 'auth:web,client'])->group(function (
 });
 
 // Admin Routes
-Route::middleware(['auth', 'role:admin', 'prevent-back-history'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin', 'prevent-back-history', 'custom-session-timeout'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard Routes
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -154,7 +154,7 @@ Route::middleware(['auth', 'role:admin', 'prevent-back-history'])->prefix('admin
 });
 
 // Sales Routes
-Route::middleware(['auth', 'role:sales', 'prevent-back-history'])->group(function () {
+Route::middleware(['auth', 'role:sales', 'prevent-back-history', 'custom-session-timeout'])->group(function () {
     Route::get('/sales/dashboard', [sales::class, 'index'])->name('sales.dashboard');
     Route::get('/sales/generate-report', [sales::class, 'generateReport'])->name('sales.generate-report');
     Route::get('/sales/Create-New-Contract', [sales::class, 'contractTypeCards'])->name('sales.contract.type.cards');
@@ -211,7 +211,7 @@ Route::middleware(['auth', 'role:sales', 'prevent-back-history'])->group(functio
 });
 
 // Sales Manager Routes
-Route::middleware(['auth', 'role:sales_manager', 'prevent-back-history'])->group(function () {
+Route::middleware(['auth', 'role:sales_manager', 'prevent-back-history', 'custom-session-timeout'])->group(function () {
     Route::get('/sales-manager/dashboard', [SalesManagerController::class, 'index'])->name('sales_manager.dashboard');
     Route::get('/sales-manager/agents', [SalesManagerController::class, 'manageAgents'])->name('sales_manager.manage_agents');
     Route::post('/sales-manager/agents', [SalesManagerController::class, 'storeAgent'])->name('sales_manager.store_agent');
@@ -264,7 +264,7 @@ Route::middleware(['auth', 'role:sales_manager', 'prevent-back-history'])->group
 });
 
 // Finance Routes
-Route::middleware(['auth', 'role:finance', 'prevent-back-history'])->group(function () {
+Route::middleware(['auth', 'role:finance', 'prevent-back-history', 'custom-session-timeout'])->group(function () {
     Route::get('/finance/dashboard', [FinanceController::class, 'dashboard'])->name('finance.dashboard');
     Route::get('/finance/payments', [FinanceController::class, 'payments'])->name('finance.payments');
     Route::get('/finance/payments/pending', [FinanceController::class, 'pendingPayments'])->name('finance.payments.pending');
@@ -286,12 +286,12 @@ Route::middleware(['auth', 'role:finance', 'prevent-back-history'])->group(funct
 });
 
 // Technical Routes
-Route::middleware(['auth', 'role:technical'])->group(function () {
+Route::middleware(['auth', 'role:technical', 'prevent-back-history', 'custom-session-timeout'])->group(function () {
     Route::get('/technical/dashboard', [TechnicalController::class, 'dashboard'])->name('technical.dashboard');
     // Pending team assignment routes
     Route::get('/technical/pending-team-assignments', [TechnicalController::class, 'pendingTeamAssignments'])->name('technical.pending-team-assignments');
     Route::post('/technical/process-contract/{id}', [TechnicalController::class, 'processContract'])->name('technical.process.contract');
-    
+
     // Team management Routes
     Route::get('/teams', [TechnicalController::class, 'index'])->name('teams.index');
     Route::post('/teams', [TechnicalController::class, 'create'])->name('teams.create');
@@ -393,7 +393,7 @@ Route::middleware(['auth', 'role:technical'])->group(function () {
 });
 
 // Team Leader Routes
-Route::middleware(['auth', 'role:team_leader', 'prevent-back-history'])->group(function () {
+Route::middleware(['auth', 'role:team_leader', 'prevent-back-history', 'custom-session-timeout'])->group(function () {
     // Dashboard
     Route::get('/team-leader/dashboard', [TeamLeaderController::class, 'dashboard'])
         ->name('team-leader.dashboard');
@@ -418,7 +418,7 @@ Route::middleware(['auth', 'role:team_leader', 'prevent-back-history'])->group(f
 });
 
 // Client Routes
-Route::middleware(['role:client', 'prevent-back-history'])->group(function () {
+Route::middleware(['role:client', 'prevent-back-history', 'custom-session-timeout'])->group(function () {
     // Dashboard & Contract Routes
     Route::get('/client/dashboard', [ClientController::class, 'index'])->name('client.dashboard');
     Route::get('/client/Show Contracts', [ClientController::class, 'show'])->name('client.show');
@@ -462,7 +462,7 @@ Route::middleware(['role:client', 'prevent-back-history'])->group(function () {
 });
 
 // Alert Routes
-Route::middleware(['auth', 'prevent-back-history'])->group(function () {
+Route::middleware(['auth', 'prevent-back-history', 'custom-session-timeout'])->group(function () {
     Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');
     Route::get('/alerts/mark-all-as-read', [AlertController::class, 'markAllAsRead'])->name('alerts.mark-all-as-read');
     Route::get('/alerts/{id}/mark-as-read', [AlertController::class, 'markAsRead'])->name('alerts.mark-as-read');

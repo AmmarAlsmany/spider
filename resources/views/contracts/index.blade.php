@@ -562,7 +562,7 @@
                                             <label for="Contractamount" class="form-label">Contract Amount (without VAT)
                                                 <span class="text-danger">*</span></label>
                                             <input type="number" class="form-control" name="contractamount"
-                                                id="Contractamount" x-model="contractAmount" required min="1"
+                                                id="Contractamount" x-model="contractAmount" required min="0"
                                                 step="0.01">
                                             <div class="invalid-feedback">Please enter a valid contract amount</div>
                                         </div>
@@ -1294,10 +1294,10 @@
 
             // Validate contract amount
             const contractAmount = form.querySelector('#Contractamount');
-            if (!contractAmount || !contractAmount.value || parseFloat(contractAmount.value) <= 0) {
+            if (!contractAmount || contractAmount.value === '' || parseFloat(contractAmount.value) < 0) {
                 if (contractAmount) contractAmount.classList.add('is-invalid');
                 isValid = false;
-                errorMessage = 'Please enter a valid contract amount greater than 0';
+                errorMessage = 'Please enter a valid contract amount (0 or greater)';
                 return false;
             }
             if (contractAmount) contractAmount.classList.remove('is-invalid');

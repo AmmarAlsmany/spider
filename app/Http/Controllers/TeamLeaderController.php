@@ -145,7 +145,7 @@ class TeamLeaderController extends Controller
         // Different URLs for different roles
         $roleUrls = [
             'sales' => route('view.contract.visit', $visit->contract->id),
-            'sales_manager' => route('view.contract.visit', $visit->contract->id),
+            'sales_manager' => route('sales_manager.contract.view', $visit->contract->id),
             'technical' => route('technical.visit.report.view', $visit->id)
         ];
 
@@ -192,8 +192,8 @@ class TeamLeaderController extends Controller
         
         // Different URLs for different roles
         $roleUrls = [
-            'sales' => route('contract.visit.report', $visit->id),
-            'sales_manager' => route('contract.visit.report', $visit->id),
+            'sales' => route('view.contract.visit', $visit->contract->id),
+            'sales_manager' => route('sales_manager.contract.view', $visit->contract->id),
             'technical' => route('technical.visit.report.view', $visit->id)
         ];
 

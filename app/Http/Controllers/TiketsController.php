@@ -147,10 +147,9 @@ class TiketsController extends Controller
         $roleUrls = [
             'technical' => route('technical.client_tickets'),
             'sales' => route('sales.show.ticket'),
-            'sales_manager' => route('sales.show.ticket')
         ];
 
-        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data, $ticket->customer_id, $ticket->created_by, $roleUrls);
+        $this->notifyRoles(['technical', 'sales'], $data, $ticket->customer_id, $ticket->created_by, $roleUrls);
 
         return redirect()->back()->with('success', 'Ticket status updated successfully');
     }

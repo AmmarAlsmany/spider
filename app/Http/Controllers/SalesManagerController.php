@@ -366,10 +366,10 @@ class SalesManagerController extends Controller
             DB::beginTransaction();
             
             $contract = contracts::findOrFail($id);
-
             // Check if contract has any payments paid
-            if ($contract->payments->where('payment_status', 'paid')->count()) {
-                return redirect()->back()->with('error', 'Cannot delete contract with existing payments');
+            if ($contract->payments->where('payment_status', 'paid')->count() > 0) {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Cannot cancel contract with existing payments.');
             }
             
             // Update the contract status to 'canceled' (with one 'l')
@@ -428,7 +428,7 @@ class SalesManagerController extends Controller
 
             return redirect()->back()->with('success', 'Contract transferred successfully');
         } catch (\Exception $e) {
-            DB::rollback();
+            DB::rollBack();
             return redirect()->back()->with('error', 'Error transferring contract: ' . $e->getMessage());
         }
     }

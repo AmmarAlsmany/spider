@@ -46,7 +46,7 @@
 </head>
 <body>
     <div class="header">
-        <img src="{{ asset('backend/assets/images/logo-icon.png') }}" alt="Spider Web Logo" class="logo">
+        <img src="{{ asset('backend/assets/images/logo-img.png') }}" alt="Spider Web Logo" class="logo">
         <h1>Reset Your Password</h1>
     </div>
     

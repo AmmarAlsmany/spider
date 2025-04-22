@@ -180,8 +180,8 @@ class ClientController extends Controller
         
         // Different URLs for different roles
         $roleUrls = [
-            'sales' => route('contracts.show', $contract->id),
-            'sales_manager' => route('contracts.show', $contract->id)
+            'sales' => route('contract.show.details', $contract->id),
+            'sales_manager' => route('sales_manager.contract.view', $contract->id)
         ];
 
         $this->notifyRoles(['sales', 'sales_manager'], $data, $client->id, $contract->sales_id, $roleUrls);
@@ -550,7 +550,12 @@ class ClientController extends Controller
             'message' => "Visit on " . Carbon::parse($visit->visit_date)->format('M d, Y') . " at " . $visit->visit_time . " the client has requested a change.",
         ];
 
-        $this->notifyRoles(['technical'], $data);
+        $client = Auth::guard('client')->user();
+        $roleUrls = [
+            'technical' => route('technical.visit.requests', $visit->id),
+        ];
+
+        $this->notifyRoles(['technical'], $data, $client->id, null, $roleUrls);
 
         return redirect()->back()->with('success', 'Visit change request sent successfully. Awaiting technical manager approval.');
     }
@@ -598,7 +603,13 @@ class ClientController extends Controller
             'message' => $message,
         ];
 
-        $this->notifyRoles(['client', 'team_leader', 'sales'], $data, $visit->contract->customer_id, $salesId);
+        $urls = [
+            'client' => route('client.visit.details', $visit->id),
+            'team_leader' => route('team-leader.contract.show', $visit->contract->id),
+            'sales' => route('view.contract.visit', $visit->contract->id),
+        ];
+
+        $this->notifyRoles(['client', 'team_leader', 'sales'], $data, $visit->contract->customer_id, $salesId, $urls);
 
         $statusMessage = $request->status === 'approved'
             ? 'Visit rescheduled and client notified successfully.'

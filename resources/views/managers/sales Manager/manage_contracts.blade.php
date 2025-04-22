@@ -25,16 +25,6 @@
             </div>
         </div>
         <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
-            @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
             <div class="mb-3 row">
                 <div class="col-12">
                     <form action="{{ route('sales_manager.manage_contracts') }}" method="GET" class="row g-3">

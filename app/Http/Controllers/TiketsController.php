@@ -77,7 +77,7 @@ class TiketsController extends Controller
         
         // Different URLs for different roles
         $roleUrls = [
-            'technical' => route('managers.technical.client_tickets', $ticket->id),
+            'technical' => route('technical.client_tickets.show', $ticket->id),
             'sales' => route('sales.show.ticket'),
         ];
 

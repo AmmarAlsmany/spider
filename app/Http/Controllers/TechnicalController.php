@@ -1015,7 +1015,7 @@ class TechnicalController extends Controller
         $ticket = Tiket::with(['customer', 'solver', 'replies'])
             ->findOrFail($id);
 
-        return view('managers.technical.client_tikets', compact('ticket'));
+        return view('managers.technical.client_tickets', compact('ticket'));
     }
 
     /**

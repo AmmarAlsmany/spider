@@ -50,7 +50,7 @@
                             <div class="col-12 col-md-6">
                                 <label
                                     class="form-label text-secondary">{{ __('admin.payments.details.payment_method') }}</label>
-                                <h6>{{ ucfirst($payment->payment_method) }}</h6>
+                                <h6>{{ ucfirst($payment->payment_method ?? 'N/A') }}</h6>
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label text-secondary">{{ __('admin.payments.details.paid_at') }}</label>
@@ -65,7 +65,7 @@
                             </div>
                         </div>
 
-                        @if ($payment->payment_status !== 'paid')
+                        {{-- @if ($payment->payment_status !== 'paid')
                             <div class="mt-4">
                                 <form action="{{ route('admin.payments.status.update', $payment->id) }}" method="POST">
                                     @csrf
@@ -108,7 +108,7 @@
                                     </div>
                                 </form>
                             </div>
-                        @endif
+                        @endif --}}
                     </div>
                 </div>
             </div>

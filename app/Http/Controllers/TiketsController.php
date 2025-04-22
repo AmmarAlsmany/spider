@@ -77,7 +77,7 @@ class TiketsController extends Controller
         
         // Different URLs for different roles
         $roleUrls = [
-            'technical' => route('technical.client_tickets.show', $ticket->id),
+            'technical' => route('technical.client_tickets'),
             'sales' => route('sales.show.ticket'),
         ];
 
@@ -113,7 +113,7 @@ class TiketsController extends Controller
         
         // Different URLs for different roles
         $roleUrls = [
-            'technical' => route('technical.client_tickets.show', $ticket->id),
+            'technical' => route('technical.client_tickets'),
             'sales' => route('sales.show.ticket'),
         ];
 
@@ -145,7 +145,7 @@ class TiketsController extends Controller
         
         // Different URLs for different roles
         $roleUrls = [
-            'technical' => route('technical.client_tickets.show', $ticket->id),
+            'technical' => route('technical.client_tickets'),
             'sales' => route('sales.show.ticket'),
             'sales_manager' => route('sales.show.ticket')
         ];

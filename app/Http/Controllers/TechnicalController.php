@@ -1012,10 +1012,10 @@ class TechnicalController extends Controller
      */
     public function showClientTicket($id)
     {
-        $ticket = Tiket::with(['customer', 'solver', 'replies'])
+        $tickets = Tiket::with(['customer', 'solver', 'replies'])
             ->findOrFail($id);
 
-        return view('managers.technical.client_tickets', compact('ticket'));
+        return view('managers.technical.client_tickets', compact('tickets'));
     }
 
     /**

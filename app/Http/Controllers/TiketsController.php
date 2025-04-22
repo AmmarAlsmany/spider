@@ -77,12 +77,11 @@ class TiketsController extends Controller
         
         // Different URLs for different roles
         $roleUrls = [
-            'technical' => route('technical.client_tickets.show', $ticket->id),
+            'technical' => route('managers.technical.client_tickets', $ticket->id),
             'sales' => route('sales.show.ticket'),
-            'sales_manager' => route('sales.show.ticket')
         ];
 
-        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data, $ticket->customer_id, $ticket->created_by, $roleUrls);
+        $this->notifyRoles(['technical', 'sales'], $data, $ticket->customer_id, $ticket->created_by, $roleUrls);
 
         return redirect()->route('client.tikets')->with('success', 'Ticket created successfully');
     }
@@ -116,10 +115,9 @@ class TiketsController extends Controller
         $roleUrls = [
             'technical' => route('technical.client_tickets.show', $ticket->id),
             'sales' => route('sales.show.ticket'),
-            'sales_manager' => route('sales.show.ticket')
         ];
 
-        $this->notifyRoles(['technical', 'sales', 'sales_manager'], $data, $ticket->customer_id, $ticket->created_by, $roleUrls);
+        $this->notifyRoles(['technical', 'sales'], $data, $ticket->customer_id, $ticket->created_by, $roleUrls);
 
         return redirect()->back()->with('success', 'Reply added successfully');
     }

@@ -117,7 +117,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($client->contracts as $contract)
+                                @forelse($contracts as $contract)
                                 <tr>
                                     <td>{{ $contract->contract_number }}</td>
                                     <td>{{ $contract->created_at->format('M d, Y') }}</td>
@@ -144,6 +144,7 @@
                                 @endforelse
                             </tbody>
                         </table>
+                        {{ $contracts->links("vendor.pagination.custom") }}
                     </div>
                 </div>
             </div>

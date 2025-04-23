@@ -159,6 +159,7 @@
                                 @endforelse
                             </tbody>
                         </table>
+                        {{ $payments->links("vendor.pagination.custom") }}
                     </div>
                 </div>
             </div>
@@ -198,6 +199,7 @@
                                 @endforelse
                             </tbody>
                         </table>
+                        {{ $visitSchedules->links("vendor.pagination.custom") }}
                     </div>
                     @if($visitSchedules->hasPages())
                     <div class="mt-4 d-flex justify-content-end">

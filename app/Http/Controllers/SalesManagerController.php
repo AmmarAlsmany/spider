@@ -42,8 +42,7 @@ class SalesManagerController extends Controller
         // Get recent contracts
         $recentContracts = contracts::with(['customer', 'salesRepresentative'])
             ->orderBy('created_at', 'desc')
-            ->take(10)
-            ->get();
+            ->paginate(10);
 
         $sales_agents = User::where('role', 'sales')->get();
 
@@ -123,7 +122,7 @@ class SalesManagerController extends Controller
             });
         }
 
-        $sales_agents = $query->get();
+        $sales_agents = $query->paginate(10);
         return view('managers.sales manager.manage_agents', compact('sales_agents'));
     }
 
@@ -239,17 +238,20 @@ class SalesManagerController extends Controller
             $query->whereBetween('created_at', [$startDate, $endDateAdjusted]);
         }
         
+        // Calculate stats before pagination
+        $total = $query->count();
+        $approved = (clone $query)->where('contract_status', 'approved')->count();
+        $pending = (clone $query)->where('contract_status', 'pending')->count();
+        $rejected = (clone $query)->where('contract_status', 'rejected')->count();
+        $totalContractPrice = (clone $query)->sum('contract_price');
+        
+        // Now get paginated results for display
         $contracts = $query->with(['customer', 'salesRepresentative', 'type'])
-            ->get();
-
-        $total = $contracts->count();
-        $approved = $contracts->where('contract_status', 'approved')->count();
-        $pending = $contracts->where('contract_status', 'pending')->count();
-        $rejected = $contracts->where('contract_status', 'rejected')->count();
+            ->paginate(10);
 
         return view(
             'managers.sales manager.reports.contracts',
-            compact('contracts', 'total', 'approved', 'pending', 'rejected')
+            compact('contracts', 'total', 'approved', 'pending', 'rejected', 'totalContractPrice')
         );
     }
 
@@ -265,11 +267,13 @@ class SalesManagerController extends Controller
             $query->whereBetween('paid_at', [$startDate, $endDateAdjusted]);
         }
         
+        // Get total sum before pagination
+        $total = $query->whereNotNull('paid_at')->sum('payment_amount');
+        
+        // Now paginate for display
         $collections = $query->whereNotNull('paid_at')
             ->with(['contract.customer', 'contract.salesRepresentative'])
-            ->get();
-
-        $total = $collections->sum('payment_amount');
+            ->paginate(10);
 
         return view(
             'managers.sales manager.reports.collections',
@@ -290,10 +294,12 @@ class SalesManagerController extends Controller
             $query->whereBetween('due_date', [$startDate, $endDateAdjusted]);
         }
         
+        // Get total sum before pagination
+        $total = $query->whereNull('paid_at')->sum('payment_amount');
+        
+        // Now paginate for display
         $remainingPayments = $query->with(['contract.customer', 'contract.salesRepresentative'])
-            ->get();
-
-        $total = $remainingPayments->sum('payment_amount');
+            ->paginate(10);
 
         return view(
             'managers.sales manager.reports.payments',
@@ -314,12 +320,14 @@ class SalesManagerController extends Controller
             $query->whereBetween('due_date', [$startDate, $endDateAdjusted]);
         }
         
-        $invoices = $query->with(['contract.customer', 'contract.salesRepresentative'])
-            ->get();
-
-        $total = $invoices->sum('payment_amount');
-        $collected = $invoices->whereNotNull('paid_at')->sum('payment_amount');
+        // Calculate totals before pagination
+        $total = $query->sum('payment_amount');
+        $collected = $query->whereNotNull('paid_at')->sum('payment_amount');
         $remaining = $total - $collected;
+        
+        // Now paginate for display
+        $invoices = $query->with(['contract.customer', 'contract.salesRepresentative'])
+            ->paginate(10);
 
         return view(
             'managers.sales manager.reports.invoices',
@@ -354,7 +362,7 @@ class SalesManagerController extends Controller
             $query->whereDate('created_at', request('date'));
         }
 
-        $contracts = $query->orderBy('created_at', 'desc')->get();
+        $contracts = $query->orderBy('created_at', 'desc')->paginate(10);
         $salesAgents = User::where('role', 'sales')->get();
 
         return view('managers.sales manager.manage_contracts', compact('contracts', 'salesAgents'));
@@ -473,42 +481,75 @@ class SalesManagerController extends Controller
             });
         }
 
-        $contracts = $query->orderBy('created_at', 'desc')->get();
+        $contracts = $query->orderBy('created_at', 'desc')->paginate(10);
         return view('managers.sales manager.agent_contracts', compact('agent', 'contracts'));
     }
 
     public function viewContract($id)
     {
         $contract = contracts::with(['customer'])->findOrFail($id);
-        return view('managers.sales manager.view_contract', compact('contract'));
+        
+        // Paginate the payments
+        $payments = payments::where('contract_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+            
+        // Paginate the visit schedules
+        $visitSchedules = DB::table('visit_schedules')
+            ->where('contract_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+            
+        return view('managers.sales manager.view_contract', compact('contract', 'payments', 'visitSchedules'));
     }
 
     private function getAgentStats($agentId, $month, $year, $status = null)
     {
         $agent = User::findOrFail($agentId);
 
-        // Get new contracts for selected month
+        // Get total counts for stats before pagination
+        $totalNewContracts = contracts::where('sales_id', $agentId)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->when($status, function ($query) use ($status) {
+                $query->where('contract_status', $status);
+            })
+            ->count();
+            
+        $totalContractValue = contracts::where('sales_id', $agentId)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->when($status, function ($query) use ($status) {
+                $query->where('contract_status', $status);
+            })
+            ->sum('contract_price');
+            
+        // Now get paginated new contracts for selected month
         $newContracts = contracts::where('sales_id', $agentId)
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->when($status, function ($query) use ($status) {
                 $query->where('contract_status', $status);
             })
-            ->get();
+            ->paginate(10);
 
-        // Get collections for selected month
+        // Get total collected amount before pagination
+        $totalCollections = payments::whereHas('contract', function ($query) use ($agentId) {
+            $query->where('sales_id', $agentId);
+        })
+            ->whereYear('paid_at', $year)
+            ->whereMonth('paid_at', $month)
+            ->whereNotNull('paid_at')
+            ->sum('payment_amount');
+            
+        // Now get paginated collections for selected month
         $collections = payments::whereHas('contract', function ($query) use ($agentId) {
             $query->where('sales_id', $agentId);
         })
             ->whereYear('paid_at', $year)
             ->whereMonth('paid_at', $month)
             ->whereNotNull('paid_at')
-            ->get();
-
-        // Calculate totals
-        $totalNewContracts = $newContracts->count();
-        $totalContractValue = $newContracts->sum('contract_price');
-        $totalCollections = $collections->sum('payment_amount');
+            ->paginate(10);
 
         // Get all time stats
         $allTimeContracts = contracts::where('sales_id', $agentId)
@@ -625,7 +666,7 @@ class SalesManagerController extends Controller
             $query->whereBetween('requested_date', [request('start_date'), request('end_date')]);
         }
 
-        $requests = $query->orderBy('created_at', 'desc')->get();
+        $requests = $query->orderBy('created_at', 'desc')->paginate(10);
         return view('managers.sales manager.postponement_requests', compact('requests'));
     }
 
@@ -742,12 +783,17 @@ class SalesManagerController extends Controller
 
     public function clientDetails($id)
     {
-        $client = client::with(['sales', 'contracts'])
+        $client = client::with(['sales'])
             ->withCount('contracts')
             ->withSum('contracts', 'contract_price')
             ->findOrFail($id);
-
-        return view('managers.sales manager.client_details', compact('client'));
+            
+        // Paginate the contracts instead of using the relationship directly
+        $contracts = contracts::where('customer_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+            
+        return view('managers.sales manager.client_details', compact('client', 'contracts'));
     }
 
     public function editClient($id)

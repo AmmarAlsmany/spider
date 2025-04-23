@@ -97,6 +97,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                {{ $requests->links("vendor.pagination.custom") }}
             </div>
         </div>
     </div>

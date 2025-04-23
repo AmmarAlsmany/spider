@@ -40,5 +40,6 @@ Payments Report {{ request('start_date') && request('end_date') ? '(' . request(
             </tr>
         </tfoot>
     </table>
+    {{ $remainingPayments->links("vendor.pagination.custom") }}
 </div>
 @endsection

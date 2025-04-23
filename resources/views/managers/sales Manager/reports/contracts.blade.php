@@ -46,10 +46,11 @@ contracts
         <tfoot>
             <tr>
                 <td colspan="3" class="text-end fw-bold">Total Value:</td>
-                <td colspan="4" class="fw-bold">{{ number_format($contracts->sum('contract_price'), 2) }}</td>
+                <td colspan="4" class="fw-bold">{{ number_format($totalContractPrice, 2) }}</td>
             </tr>
         </tfoot>
     </table>
+    {{ $contracts->links("vendor.pagination.custom") }}
 </div>
 @endsection
 @push('scripts')
@@ -70,7 +71,7 @@ contracts
                 }{{ $loop->last ? '' : ',' }}
                 @endforeach
             ],
-            total_value: {{ $contracts->sum('contract_price') }}
+            total_value: {{ $totalContractPrice }}
         };
         
         document.getElementById('reportViewData').value = JSON.stringify(contractsData);

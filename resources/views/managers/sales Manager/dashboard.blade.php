@@ -124,6 +124,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        {{ $recentContracts->links("vendor.pagination.custom") }}
                     </div>
                 </div>
             </div>

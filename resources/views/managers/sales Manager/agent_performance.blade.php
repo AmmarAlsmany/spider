@@ -130,6 +130,7 @@
                                 @endforelse
                             </tbody>
                         </table>
+                        {{ $data['current_month']['new_contracts']->links("vendor.pagination.custom") }}
                     </div>
                 </div>
             </div>
@@ -167,6 +168,7 @@
                                 @endforelse
                             </tbody>
                         </table>
+                        {{ $data['current_month']['collections']->links("vendor.pagination.custom") }}
                     </div>
                 </div>
             </div>

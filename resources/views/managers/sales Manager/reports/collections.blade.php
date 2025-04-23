@@ -40,5 +40,6 @@ Collections Report {{ request('start_date') && request('end_date') ? '(' . reque
             </tr>
         </tfoot>
     </table>
+    {{ $collections->links("vendor.pagination.custom") }}
 </div>
 @endsection

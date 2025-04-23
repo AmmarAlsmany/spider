@@ -176,6 +176,7 @@
                         </div>
                         @endforeach
                     </tbody>
+                    {{ $sales_agents->links("vendor.pagination.custom") }}
                 </table>
             </div>
         </div>

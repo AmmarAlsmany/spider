@@ -82,5 +82,6 @@ Invoices Report {{ request('start_date') && request('end_date') ? '(' . request(
             @endforelse
         </tbody>
     </table>
+    {{ $invoices->links("vendor.pagination.custom") }}
 </div>
 @endsection

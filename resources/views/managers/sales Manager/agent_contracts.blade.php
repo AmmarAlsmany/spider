@@ -87,6 +87,7 @@
                         @endforelse
                     </tbody>
                 </table>
+                {{ $contracts->links("vendor.pagination.custom") }}
             </div>
         </div>
     </div>

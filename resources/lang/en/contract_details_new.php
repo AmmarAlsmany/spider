@@ -28,7 +28,7 @@ return [
     'button_submit' => 'Submit',
     'button_save' => 'Save Changes',
     'button_view_payment_details' => 'View Payment Details',
-    'button_view_invoice' => 'View Invoice',
+    'button_view_invoice' => 'View Claim',
     'button_view_visit' => 'View Visit Schedule',
 
     // Contract Information
@@ -73,7 +73,7 @@ return [
 
     // Payment Information
     'payment_info_title' => 'Payment Information',
-    'payment_info_invoice' => 'Invoice Number',
+    'payment_info_invoice' => 'Claim Number',
     'payment_info_amount' => 'Amount',
     'payment_info_due_date' => 'Due Date',
     'payment_info_status' => 'Status',

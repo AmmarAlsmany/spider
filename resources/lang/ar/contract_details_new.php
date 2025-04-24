@@ -28,7 +28,7 @@ return [
     'button_submit' => 'إرسال',
     'button_save' => 'حفظ التغييرات',
     'button_view_payment_details' => 'تفاصيل الدفعة',
-    'button_view_invoice' => 'عرض الفاتورة',
+    'button_view_invoice' => 'عرض المطالبة',
     'button_view_visit' => 'عرض جدول الزيارات',
 
     // Contract Information
@@ -73,7 +73,7 @@ return [
 
     // Payment Information
     'payment_info_title' => 'معلومات الدفع',
-    'payment_info_invoice' => 'رقم الفاتورة',
+    'payment_info_invoice' => 'رقم المطالبة',
     'payment_info_amount' => 'المبلغ',
     'payment_info_due_date' => 'تاريخ الاستحقاق',
     'payment_info_status' => 'الحالة',

@@ -22,7 +22,6 @@
                 <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
                     <i class="bx bx-arrow-back"></i> Back
                 </a>
-                <h4 class="mb-0 text-primary"><i class="bx bx-store-alt"></i> Sales Profile</h4>
             </div>
             <div class="ps-3">
                 <nav aria-label="breadcrumb">
@@ -36,6 +35,9 @@
         </div>
 
         <div class="shadow-sm card">
+            <div class="card-header">
+                <h4 class="mb-0 text-primary"><i class="bx bx-store-alt"></i> Sales Profile</h4>
+            </div>
             <div class="card-body">
                 <div class="mb-4 row g-3">
                     <div class="col-md-4">

@@ -45,7 +45,8 @@ return [
     ],
     'actions' => [
         'postpone' => 'Postpone Payment',
-        'view_receipt' => 'View Receipt'
+        'view_receipt' => 'View Receipt',
+        'view_invoice' => 'View Invoice'
     ],
     'postpone_modal' => [
         'title' => 'Postpone Payment',
@@ -58,6 +59,20 @@ return [
     ],
     'payment_details_modal' => [
         'title' => 'Payment Details',
-        'close' => 'Close'
-    ]
+        'close' => 'Close',
+        'loading' => 'Loading...',
+        'error' => 'An error occurred while loading payment details. Please try again.'
+    ],
+    // Adding standardized keys that might be used from clients.payment_details
+    'payment_details' => 'Payment Details',
+    'contract' => 'Contract',
+    'payment_amount' => 'Payment Amount',
+    'due_date' => 'Due Date',
+    'payment_status' => 'Payment Status',
+    'payment_method' => 'Payment Method',
+    'transaction_id' => 'Transaction ID',
+    'payment_date' => 'Payment Date',
+    'make_payment' => 'Make Payment',
+    'paid_amount' => 'Paid Amount',
+    'contract_value' => 'Contract Value'
 ];

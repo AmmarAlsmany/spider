@@ -20,12 +20,14 @@
     @endif
     <div class="row">
         <div class="col-12">
+            <div class="d-flex align-items-center">
+                <a href="{{ route('client.tickets.create') }}" class="btn btn-primary btn-sm">
+                    <i class="bx bx-plus"></i> {{ __('clients.tickets.create_ticket') }}
+                </a>
+            </div>
             <div class="mb-4 card">
                 <div class="pb-0 card-header d-flex justify-content-between align-items-center">
-                    <h6>{{ __('clients.tickets.support_tickets') }}</h6>
-                    <a href="{{ route('client.tickets.create') }}" class="btn btn-primary btn-sm">
-                        <i class="bx bx-plus"></i> {{ __('clients.tickets.create_ticket') }}
-                    </a>
+                    <div class="breadcrumb-title pe-3 fw-bold text-primary">{{ __('clients.tickets.support_tickets') }}</div>
                 </div>
                 <div class="px-0 pt-0 pb-2 card-body">
                     <div class="p-0 table-responsive">

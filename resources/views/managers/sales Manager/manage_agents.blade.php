@@ -19,9 +19,6 @@
     <div class="card radius-10">
         <div class="card-header">
             <div class="d-flex align-items-center">
-                <div>
-                    <h6 class="mb-0">Manage Sales Agents</h6>
-                </div>
                 <div class="ms-auto">
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAgentModal">
                         Add New Agent
@@ -30,16 +27,6 @@
             </div>
         </div>
         <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
-            @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
             <div class="mb-3 row">
                 <div class="col-md-6">
                     <form action="{{ route('sales_manager.manage_agents') }}" method="GET" class="d-flex">

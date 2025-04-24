@@ -93,7 +93,6 @@
             <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
                 <i class="bx bx-arrow-back"></i> Back
             </a>
-            <h4 class="mb-0 text-primary"><i class="bx bx-user-circle"></i> Client Profile</h4>
         </div>
         <div class="ps-3">
             <nav aria-label="breadcrumb">
@@ -111,6 +110,8 @@
             <div class="row">
                 <div class="mb-4 col-lg-4">
                     <div class="shadow-sm card">
+                        <div class="card-header">
+                              <h4 class="mb-0 text-primary"><i class="bx bx-user-circle"></i> Client Profile</h4>
                         <div class="text-center card-body">
                             <div class="p-4 mb-3 rounded-circle bg-light d-inline-block">
                                 <i class="bx bx-user-circle text-primary" style="font-size: 4rem;"></i>

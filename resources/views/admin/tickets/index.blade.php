@@ -15,9 +15,11 @@
     </div>
 
     <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">{{ __('admin.tickets.title') }}</h5>
+        </div>
         <div class="card-body">
             <div class="d-flex align-items-center">
-                <h5 class="mb-0">{{ __('admin.tickets.title') }}</h5>
                 <form class="ms-auto position-relative">
                     <div class="px-3 position-absolute top-50 translate-middle-y search-icon"><i class="bx bx-search"></i></div>
                     <input class="form-control ps-5" type="text" placeholder="{{ __('admin.tickets.search_placeholder') }}">

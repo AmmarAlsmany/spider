@@ -14,7 +14,8 @@ return [
         'warranty_months' => ':months Months',
         'status' => 'Status',
         'total_visits' => 'Total Visits',
-        'completed_visits' => 'Completed Visits'
+        'completed_visits' => 'Completed Visits',
+        'visit_summary' => 'Visit Summary'
     ],
     'visit_schedule' => 'Visit Schedule',
     'table' => [

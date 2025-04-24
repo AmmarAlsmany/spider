@@ -26,7 +26,7 @@ return [
         'visit_details' => 'Visit Details',
         'edit_visit' => 'Edit Visit',
     ],
-    
+
     // Contract PDF
     'contract_pdf' => [
         'contract_number' => 'Contract #',
@@ -42,7 +42,7 @@ return [
         'date' => 'Date',
         'generated_on' => 'Generated on',
     ],
-    
+
     // Contract Modals
     'contract_modals' => [
         'reject_contract' => 'Reject Contract',
@@ -56,7 +56,7 @@ return [
         'update_history' => 'Update History',
         'close' => 'Close',
     ],
-    
+
     // Contract Details
     'contract_details' => [
         'contract_details' => 'Contract Details',
@@ -73,7 +73,7 @@ return [
         'payment_details' => 'Payment Details',
         'insect_analytics' => 'Insect Analytics',
     ],
-    
+
     // Contract Visits
     'contract_visits' => [
         'scheduled_visits' => 'Scheduled Visits',
@@ -88,7 +88,7 @@ return [
         'notes' => 'Notes',
         'close' => 'Close',
     ],
-    
+
     // Contracts
     'contracts' => [
         'my_contracts' => 'My Contracts',
@@ -101,7 +101,7 @@ return [
         'no_contracts' => 'No contracts found.',
         'view_details' => 'View Details',
     ],
-    
+
     // Payment Details
     'payment_details' => [
         'payment_details' => 'Payment Details',
@@ -116,7 +116,7 @@ return [
         'paid_amount' => 'Paid Amount',
         'contract_value' => 'Contract Value',
     ],
-    
+
     // Tickets
     'tickets' => [
         'support_tickets' => 'Support Tickets',
@@ -133,8 +133,14 @@ return [
         'ticket_subject' => 'Ticket Subject',
         'ticket_description' => 'Ticket Description',
         'submit_ticket' => 'Submit Ticket',
+        'select_priority' => 'Select Priority',
+        'priority_levels' => [
+            'low' => 'Low',
+            'medium' => 'Medium',
+            'high' => 'High'
+        ],
     ],
-    
+
     // Status translations
     'status' => [
         'pending' => 'Pending',
@@ -148,7 +154,7 @@ return [
         'completed' => 'Completed',
         'cancelled' => 'Cancelled',
     ],
-    
+
     // Reports
     'reports' => [
         'visit_details' => 'Visit Details',
@@ -163,7 +169,7 @@ return [
         'customer_satisfaction' => 'Customer Satisfaction',
         'customer_signature' => 'Customer Signature',
     ],
-    
+
     // Annexes
     'annexes' => [
         'pending_annexes' => 'Pending Annexes',
@@ -181,7 +187,7 @@ return [
         'no_pending_annexes' => 'No Pending Annexes',
         'no_annexes_message' => 'There are no annexes waiting for your approval at this time.',
     ],
-    
+
     // Sidebar
     'sidebar' => [
         'dashboard' => 'Dashboard',
@@ -194,7 +200,7 @@ return [
         'my_profile' => 'My Profile',
         'logout' => 'Logout',
     ],
-    
+
     // Common buttons and actions
     'actions' => [
         'view' => 'View',

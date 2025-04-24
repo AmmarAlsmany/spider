@@ -28,13 +28,15 @@
                     <ol class="p-0 mb-0 breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}" class="text-decoration-none"><i
                                     class="bx bx-home-alt"></i></a></li>
-                        <li class="breadcrumb-item active text-muted" aria-current="page">Clients List</li>
                     </ol>
                 </nav>
             </div>
         </div>
 
         <div class="shadow-sm card">
+            <div class="card-header">
+                <h4 class="mb-0 text-primary"><i class="bx bx-group"></i> My Clients</h4>
+            </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table id="clientsTable" class="table table-hover">

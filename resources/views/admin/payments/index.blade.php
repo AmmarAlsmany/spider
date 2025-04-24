@@ -15,9 +15,11 @@
     </div>
 
     <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">{{ __('admin.payments.title') }}</h5>
+        </div>
         <div class="card-body">
             <div class="d-flex align-items-center">
-                <h5 class="mb-0">{{ __('admin.payments.title') }}</h5>
                 <div class="ms-auto">
                     <div class="btn-group">
                         <a href="{{ route('admin.payments.index') }}" class="btn {{ !request('status') ? 'btn-primary' : 'btn-outline-primary' }}">

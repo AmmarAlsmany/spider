@@ -14,7 +14,8 @@ return [
         'warranty_months' => ':months شهر',
         'status' => 'الحالة',
         'total_visits' => 'إجمالي الزيارات',
-        'completed_visits' => 'الزيارات المكتملة'
+        'completed_visits' => 'الزيارات المكتملة',
+        'visit_summary' => 'ملخص الزيارات'
     ],
     'visit_schedule' => 'جدول الزيارات',
     'table' => [

@@ -76,4 +76,5 @@ return [
     'request_update' => 'Request Contract Update',
     'update_request_details' => 'Update Request Details',
     'submit_request' => 'Submit Request',
+    'active_contract' => 'Active Contract'
 ];

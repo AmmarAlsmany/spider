@@ -52,7 +52,7 @@
                     <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
                         <i class="bx bx-arrow-back"></i> Back
                     </a>
-                    <h2 class="mb-0">Sales Report</h2>
+                    <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> Sales Report</h4>
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="mb-4 alert alert-info flex-grow-1 me-3">
@@ -78,7 +78,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Contract Statistics</h4>
+                        <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> Contract Statistics</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -133,7 +133,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Financial Summary</h4>
+                        <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> Financial Summary</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -184,7 +184,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Contracts List</h4>
+                        <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> Contracts List</h4>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -246,7 +246,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Payments List</h4>
+                        <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> Payments List</h4>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">

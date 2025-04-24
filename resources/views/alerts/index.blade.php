@@ -3,11 +3,11 @@
 @section('content')
     <div class="page-content">
         <div class="card radius-10">
+            <div class="card-header">
+                <h5 class="mb-0">{{ __('alerts.title') }}</h5>
+            </div>
             <div class="card-body">
                 <div class="mb-3 d-flex align-items-center justify-content-between">
-                    <div>
-                        <h5 class="mb-0">{{ __('alerts.title') }}</h5>
-                    </div>
                     <div>
                         <a href="{{ route('alerts.mark-all-as-read') }}" class="btn btn-primary btn-sm">
                             <i class="bx bx-check-double me-1"></i> {{ __('alerts.mark_all_as_read') }}
@@ -56,12 +56,12 @@
                             <table class="table mb-0 align-middle" id="all-table">
                                 <thead class="table-light">
                                     <tr>
-                                        <th width="5%">Type</th>
-                                        <th width="20%">Title/Source</th>
-                                        <th width="40%">Message</th>
-                                        <th width="10%">Status</th>
-                                        <th width="15%">Date</th>
-                                        <th width="10%">Actions</th>
+                                        <th width="5%">{{ __('alerts.table.type') }}</th>
+                                        <th width="20%">{{ __('alerts.table.title_source') }}</th>
+                                        <th width="40%">{{ __('alerts.table.message') }}</th>
+                                        <th width="10%">{{ __('alerts.table.status') }}</th>
+                                        <th width="15%">{{ __('alerts.table.date') }}</th>
+                                        <th width="10%">{{ __('alerts.table.actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -70,19 +70,20 @@
                                             <td>
                                                 @switch($alert->type)
                                                     @case('expired')
-                                                        <span class="badge bg-danger">Expired</span>
+                                                        <span class="badge bg-danger">{{ __('alerts.types.expired') }}</span>
                                                     @break
 
                                                     @case('payment_due')
-                                                        <span class="badge bg-warning">Payment Due</span>
+                                                        <span class="badge bg-warning">{{ __('alerts.types.payment_due') }}</span>
                                                     @break
 
                                                     @case('renewal_needed')
-                                                        <span class="badge bg-info">Renewal Needed</span>
+                                                        <span class="badge bg-info">{{ __('alerts.types.renewal_needed') }}</span>
                                                     @break
 
                                                     @case('monthly_report')
-                                                        <span class="badge bg-primary">Monthly Report</span>
+                                                        <span
+                                                            class="badge bg-primary">{{ __('alerts.types.monthly_report') }}</span>
                                                     @break
 
                                                     @default
@@ -90,10 +91,10 @@
                                                 @endswitch
                                             </td>
                                             <td>
-                                                <strong>System Alert</strong>
+                                                <strong>{{ __('alerts.labels.system_alert') }}</strong>
                                                 @if ($alert->contract)
                                                     <div class="small text-muted">
-                                                        Contract #{{ $alert->contract->id }}
+                                                        {{ __('alerts.labels.contract') }} #{{ $alert->contract->id }}
                                                     </div>
                                                 @endif
                                             </td>
@@ -130,29 +131,30 @@
                                             <td>
                                                 @switch($notification['type'])
                                                     @case('success')
-                                                        <span class="badge bg-success">Success</span>
+                                                        <span class="badge bg-success">{{ __('alerts.types.success') }}</span>
                                                     @break
 
                                                     @case('warning')
-                                                        <span class="badge bg-warning">Warning</span>
+                                                        <span class="badge bg-warning">{{ __('alerts.types.warning') }}</span>
                                                     @break
 
                                                     @case('error')
-                                                        <span class="badge bg-danger">Error</span>
+                                                        <span class="badge bg-danger">{{ __('alerts.types.error') }}</span>
                                                     @break
 
                                                     @case('info')
-                                                        <span class="badge bg-info">Info</span>
+                                                        <span class="badge bg-info">{{ __('alerts.types.info') }}</span>
                                                     @break
 
                                                     @default
-                                                        <span class="badge bg-secondary">{{ ucfirst($notification['type']) }}</span>
+                                                        <span
+                                                            class="badge bg-secondary">{{ ucfirst($notification['type']) }}</span>
                                                 @endswitch
                                             </td>
                                             <td>
                                                 <strong>{{ $notification['title'] }}</strong>
                                                 <div class="small text-muted">
-                                                    User Notification
+                                                    {{ __('alerts.labels.user_notification') }}
                                                 </div>
                                             </td>
                                             <td>{{ $notification['message'] }}</td>
@@ -192,11 +194,11 @@
                             <table class="table mb-0 align-middle" id="alerts-table">
                                 <thead class="table-light">
                                     <tr>
-                                        <th width="10%">Type</th>
-                                        <th width="45%">Message</th>
-                                        <th width="15%">Status</th>
-                                        <th width="15%">Date</th>
-                                        <th width="15%">Actions</th>
+                                        <th width="10%">{{ __('alerts.table.type') }}</th>
+                                        <th width="45%">{{ __('alerts.table.message') }}</th>
+                                        <th width="15%">{{ __('alerts.table.status') }}</th>
+                                        <th width="15%">{{ __('alerts.table.date') }}</th>
+                                        <th width="15%">{{ __('alerts.table.actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -205,19 +207,20 @@
                                             <td>
                                                 @switch($alert->type)
                                                     @case('expired')
-                                                        <span class="badge bg-danger">Expired</span>
+                                                        <span class="badge bg-danger">{{ __('alerts.types.expired') }}</span>
                                                     @break
 
                                                     @case('payment_due')
-                                                        <span class="badge bg-warning">Payment Due</span>
+                                                        <span class="badge bg-warning">{{ __('alerts.types.payment_due') }}</span>
                                                     @break
 
                                                     @case('renewal_needed')
-                                                        <span class="badge bg-info">Renewal Needed</span>
+                                                        <span class="badge bg-info">{{ __('alerts.types.renewal_needed') }}</span>
                                                     @break
 
                                                     @case('monthly_report')
-                                                        <span class="badge bg-primary">Monthly Report</span>
+                                                        <span
+                                                            class="badge bg-primary">{{ __('alerts.types.monthly_report') }}</span>
                                                     @break
 
                                                     @default
@@ -238,13 +241,15 @@
                                                     @if (!$alert->is_read)
                                                         <a href="{{ route('alerts.mark-as-read', $alert->id) }}"
                                                             class="btn btn-sm btn-primary">
-                                                            <i class="bx bx-check"></i> Mark as Read
+                                                            <i class="bx bx-check"></i>
+                                                            {{ __('alerts.buttons.mark_as_read') }}
                                                         </a>
                                                     @endif
                                                     @if ($alert->contract)
                                                         <a href="{{ route('contract.show', $alert->contract->id) }}"
                                                             class="btn btn-sm btn-info">
-                                                            <i class="bx bx-link-external"></i> View
+                                                            <i class="bx bx-link-external"></i>
+                                                            {{ __('alerts.buttons.view') }}
                                                         </a>
                                                     @endif
                                                 </div>
@@ -265,12 +270,12 @@
                             <table class="table mb-0 align-middle" id="notifications-table">
                                 <thead class="table-light">
                                     <tr>
-                                        <th width="10%">Type</th>
-                                        <th width="20%">Title</th>
-                                        <th width="35%">Message</th>
-                                        <th width="10%">Priority</th>
-                                        <th width="10%">Status</th>
-                                        <th width="15%">Actions</th>
+                                        <th width="10%">{{ __('alerts.table.type') }}</th>
+                                        <th width="20%">{{ __('alerts.table.title') }}</th>
+                                        <th width="35%">{{ __('alerts.table.message') }}</th>
+                                        <th width="10%">{{ __('alerts.table.priority') }}</th>
+                                        <th width="10%">{{ __('alerts.table.status') }}</th>
+                                        <th width="15%">{{ __('alerts.table.actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -279,19 +284,19 @@
                                             <td>
                                                 @switch($notification['type'])
                                                     @case('success')
-                                                        <span class="badge bg-success">Success</span>
+                                                        <span class="badge bg-success">{{ __('alerts.types.success') }}</span>
                                                     @break
 
                                                     @case('warning')
-                                                        <span class="badge bg-warning">Warning</span>
+                                                        <span class="badge bg-warning">{{ __('alerts.types.warning') }}</span>
                                                     @break
 
                                                     @case('error')
-                                                        <span class="badge bg-danger">Error</span>
+                                                        <span class="badge bg-danger">{{ __('alerts.types.error') }}</span>
                                                     @break
 
                                                     @case('info')
-                                                        <span class="badge bg-info">Info</span>
+                                                        <span class="badge bg-info">{{ __('alerts.types.info') }}</span>
                                                     @break
 
                                                     @default
@@ -304,15 +309,15 @@
                                             <td>
                                                 @switch($notification['priority'])
                                                     @case('high')
-                                                        <span class="badge bg-danger">High</span>
+                                                        <span class="badge bg-danger">{{ __('alerts.priority.high') }}</span>
                                                     @break
 
                                                     @case('medium')
-                                                        <span class="badge bg-warning">Medium</span>
+                                                        <span class="badge bg-warning">{{ __('alerts.priority.medium') }}</span>
                                                     @break
 
                                                     @default
-                                                        <span class="badge bg-info">Normal</span>
+                                                        <span class="badge bg-info">{{ __('alerts.priority.normal') }}</span>
                                                 @endswitch
                                             </td>
                                             <td>
@@ -327,12 +332,14 @@
                                                     @if (!$notification['is_read'])
                                                         <a href="{{ route('alerts.mark-as-read', $notification['id']) }}"
                                                             class="btn btn-sm btn-primary">
-                                                            <i class="bx bx-check"></i> Mark as Read
+                                                            <i class="bx bx-check"></i>
+                                                            {{ __('alerts.buttons.mark_as_read') }}
                                                         </a>
                                                     @endif
                                                     @if ($notification['url'] && $notification['url'] !== '#')
                                                         <a href="{{ $notification['url'] }}" class="btn btn-sm btn-info">
-                                                            <i class="bx bx-link-external"></i> View
+                                                            <i class="bx bx-link-external"></i>
+                                                            {{ __('alerts.buttons.view') }}
                                                         </a>
                                                     @endif
                                                 </div>

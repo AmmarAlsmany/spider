@@ -6,7 +6,6 @@
             <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
                 <i class="bx bx-arrow-back"></i> {{ __('contract_views.back') }}
             </a>
-            <h4 class="mb-0 text-success"><i class="bx bx-check-circle"></i> {{ __('contracts.active_contracts') }}</h4>
         </div>
         <div class="ps-3">
             <nav aria-label="breadcrumb">
@@ -22,6 +21,9 @@
     </div>
 
     <div class="border-0 shadow-sm card">
+        <div class="card-header">
+            <h4 class="mb-0 text-success"><i class="bx bx-check-circle"></i> {{ __('contracts.active_contract') }}</h4>
+        </div>
         <div class="p-4 card-body">
             <!-- Search Form -->
             <div class="mb-4">

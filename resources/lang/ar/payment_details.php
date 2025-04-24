@@ -45,7 +45,8 @@ return [
     ],
     'actions' => [
         'postpone' => 'تأجيل الدفع',
-        'view_receipt' => 'عرض الإيصال'
+        'view_receipt' => 'عرض الإيصال',
+        'view_invoice' => 'عرض الفاتورة'
     ],
     'postpone_modal' => [
         'title' => 'تأجيل الدفع',
@@ -58,6 +59,20 @@ return [
     ],
     'payment_details_modal' => [
         'title' => 'تفاصيل الدفعة',
-        'close' => 'إغلاق'
-    ]
+        'close' => 'إغلاق',
+        'loading' => 'تحميل...',
+        'error' => 'حدث خطأ أثناء تحميل تفاصيل الدفع. يرجى المحاولة مرة أخرى.'
+    ],
+    // Adding standardized keys that might be used from clients.payment_details
+    'payment_details' => 'تفاصيل الدفع',
+    'contract' => 'العقد',
+    'payment_amount' => 'مبلغ الدفع',
+    'due_date' => 'تاريخ الاستحقاق',
+    'payment_status' => 'حالة الدفع',
+    'payment_method' => 'طريقة الدفع',
+    'transaction_id' => 'رقم المعاملة',
+    'payment_date' => 'تاريخ الدفع',
+    'make_payment' => 'إجراء الدفع',
+    'paid_amount' => 'المبلغ المدفوع',
+    'contract_value' => 'قيمة العقد'
 ];

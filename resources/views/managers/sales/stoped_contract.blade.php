@@ -21,7 +21,6 @@
             <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
                 <i class="bx bx-arrow-back"></i> Back
             </a>
-            <h4 class="mb-0 text-danger"><i class="bx bx-x-circle"></i> Stopped Contracts</h4>
         </div>
         <div class="ps-3">
             <nav aria-label="breadcrumb">
@@ -35,6 +34,9 @@
     </div>
 
     <div class="shadow-sm card">
+        <div class="card-header">
+            <h4 class="mb-0 text-danger"><i class="bx bx-x-circle"></i> Stopped Contracts</h4>
+        </div>
         <div class="card-body">
             @include('shared.contract_search')
             <div class="table-responsive">

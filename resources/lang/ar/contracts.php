@@ -77,5 +77,6 @@ return [
     'reject' => 'رفض العقد',
     'request_update' => 'طلب تحديث العقد',
     'update_request_details' => 'تفاصيل طلب التحديث',
-    'submit_request' => 'إرسال الطلب'
+    'submit_request' => 'إرسال الطلب',
+    'active_contract' => 'العقود النشطة'
 ];

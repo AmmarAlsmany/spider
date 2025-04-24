@@ -26,7 +26,7 @@ return [
         'visit_details' => 'تفاصيل الزيارة',
         'edit_visit' => 'تعديل الزيارة',
     ],
-    
+
     // Contract PDF
     'contract_pdf' => [
         'contract_number' => 'عقد رقم',
@@ -42,7 +42,7 @@ return [
         'date' => 'التاريخ',
         'generated_on' => 'تم إنشاؤه في',
     ],
-    
+
     // Contract Modals
     'contract_modals' => [
         'reject_contract' => 'رفض العقد',
@@ -56,7 +56,7 @@ return [
         'update_history' => 'تاريخ التحديثات',
         'close' => 'إغلاق',
     ],
-    
+
     // Contract Details
     'contract_details' => [
         'contract_details' => 'تفاصيل العقد',
@@ -73,7 +73,7 @@ return [
         'payment_details' => 'تفاصيل الدفع',
         'insect_analytics' => 'تحليلات الحشرات',
     ],
-    
+
     // Contract Visits
     'contract_visits' => [
         'scheduled_visits' => 'الزيارات المجدولة',
@@ -88,7 +88,7 @@ return [
         'notes' => 'ملاحظات',
         'close' => 'إغلاق',
     ],
-    
+
     // Contracts
     'contracts' => [
         'my_contracts' => 'عقودي',
@@ -101,7 +101,7 @@ return [
         'no_contracts' => 'لم يتم العثور على عقود.',
         'view_details' => 'عرض التفاصيل',
     ],
-    
+
     // Payment Details
     'payment_details' => [
         'payment_details' => 'تفاصيل الدفع',
@@ -116,7 +116,7 @@ return [
         'paid_amount' => 'المبلغ المدفوع',
         'contract_value' => 'قيمة العقد',
     ],
-    
+
     // Tickets
     'tickets' => [
         'support_tickets' => 'تذاكر الدعم',
@@ -133,8 +133,14 @@ return [
         'ticket_subject' => 'موضوع التذكرة',
         'ticket_description' => 'وصف التذكرة',
         'submit_ticket' => 'إرسال التذكرة',
+        'select_priority' => 'اختر الأولوية',
+        'priority_levels' => [
+            'low' => 'منخفضة',
+            'medium' => 'متوسطة',
+            'high' => 'عالية'
+        ],
     ],
-    
+
     // Status translations
     'status' => [
         'pending' => 'قيد الانتظار',
@@ -148,7 +154,7 @@ return [
         'completed' => 'مكتمل',
         'cancelled' => 'ملغي',
     ],
-    
+
     // Reports
     'reports' => [
         'visit_details' => 'تفاصيل الزيارة',
@@ -163,7 +169,7 @@ return [
         'customer_satisfaction' => 'رضا العميل',
         'customer_signature' => 'توقيع العميل',
     ],
-    
+
     // Annexes
     'annexes' => [
         'pending_annexes' => 'الملاحق المعلقة',
@@ -181,7 +187,7 @@ return [
         'no_pending_annexes' => 'لا توجد ملاحق معلقة',
         'no_annexes_message' => 'لا توجد ملاحق في انتظار موافقتك في هذا الوقت.',
     ],
-    
+
     // Sidebar
     'sidebar' => [
         'dashboard' => 'لوحة التحكم',
@@ -194,7 +200,7 @@ return [
         'my_profile' => 'ملفي الشخصي',
         'logout' => 'تسجيل الخروج',
     ],
-    
+
     // Common buttons and actions
     'actions' => [
         'view' => 'عرض',

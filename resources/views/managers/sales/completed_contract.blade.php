@@ -15,6 +15,28 @@
     .btn-sm {
         padding: 5px 10px;
     }
+    
+    /* Mobile table optimization */
+    .table-responsive {
+        margin-bottom: 1rem;
+        border: 0;
+    }
+    
+    /* Ensure the table container doesn't affect page layout */
+    .table-wrapper {
+        overflow: visible;
+    }
+    
+    /* Only the table scrolls horizontally on mobile */
+    @media (max-width: 767.98px) {
+        .page-content {
+            overflow-x: hidden;
+        }
+        
+        .card-body {
+            padding: 1rem 0.75rem;
+        }
+    }
 </style>
 @endpush
 @section('content')
@@ -39,24 +61,26 @@
             <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
                 <i class="bx bx-arrow-back"></i> Back
             </a>
-            <h4 class="mb-0 text-success"><i class="bx bx-check-circle"></i> Completed Contracts</h4>
         </div>
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="p-0 mb-0 breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}" class="text-decoration-none"><i
                                 class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item active text-muted" aria-current="page">Completed Contract</li>
                 </ol>
             </nav>
         </div>
     </div>
 
     <div class="shadow-sm card">
+        <div class="card-header">
+            <h4 class="mb-0 text-success"><i class="bx bx-check-circle"></i> Completed Contracts</h4>
+        </div>
         <div class="card-body">
             @include('shared.contract_search')
-            <div class="table-responsive">
-                <table id="example2" class="table table-hover">
+            <div class="table-wrapper">
+                <div class="table-responsive">
+                    <table id="example2" class="table table-hover">
                     <thead class="bg-light">
                         <tr>
                             <th>Id</th>
@@ -133,6 +157,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
                 <div class="mt-4 d-flex justify-content-center">
                     {{ $contracts->links('vendor.pagination.custom') }}
                 </div>

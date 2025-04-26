@@ -129,7 +129,7 @@
                             <td>
                                 <i class="bi bi-calendar-event me-2 text-muted"></i>
                                 {{ $contract->contract_start_date ? date('M d, Y',
-                                strtotime($contract->contract_start_date)) : '{{ __('sales_views.not_set') }}' }}
+                                strtotime($contract->contract_start_date)) : __('sales_views.not_set') }}
                             </td>
                             <td>
                                 @if ($contract->contract_status == 'pending')

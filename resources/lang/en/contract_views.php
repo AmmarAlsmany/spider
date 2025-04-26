@@ -98,7 +98,7 @@ return [
     'customer' => 'Customer',
     'customer_information' => 'Customer Information',
     'select_customer' => 'Select Customer',
-    'contract-insects' => 'Contract Analysis',
+    'insect_analytics' => 'Contract Analysis',
 
     // Branch Information
     'branch_name' => 'Branch Name',

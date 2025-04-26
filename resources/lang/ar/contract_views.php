@@ -172,6 +172,7 @@ return [
     'number_of_branches' => 'عدد الفروع',
     'contract_amount' => 'قيمة العقد',
     'contract_description' => 'وصف العقد',
+    'contract-insects' => 'العقد تحليل',
 
     // Branch Information
     'branch_name' => 'اسم الفرع',

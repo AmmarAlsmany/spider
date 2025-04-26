@@ -19,13 +19,13 @@
         <!-- Statistics Cards -->
         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
             <div class="col">
-                <div class="border-0 border-4 card radius-10 border-start border-info">
+                <div class="border-4 card radius-10 border-start border-info">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div>
-                                <p class="mb-0 text-secondary">Current Contracts</p>
+                                <p class="mb-0 text-secondary">{{ __('sales_views.current_contracts') }}</p>
                                 <h4 class="my-1 text-info">{{ $totalContracts }}</h4>
-                                <p class="mb-0 font-13">{{ $approvedContracts }} Approved</p>
+                                <p class="mb-0 font-13">{{ $approvedContracts }} {{ __('sales_views.approved') }}</p>
                             </div>
                             <div class="text-white widgets-icons-2 rounded-circle bg-gradient-blues ms-auto">
                                 <i class='bx bxs-report'></i>
@@ -35,13 +35,13 @@
                 </div>
             </div>
             <div class="col">
-                <div class="border-0 border-4 card radius-10 border-start border-danger">
+                <div class="border-4 card radius-10 border-start border-danger">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div>
-                                <p class="mb-0 text-secondary">Total Revenue</p>
-                                <h4 class="my-1 text-danger">{{ number_format($totalRevenue, 2) }} SAR</h4>
-                                <p class="mb-0 font-13">From Approved Contracts</p>
+                                <p class="mb-0 text-secondary">{{ __('sales_views.total_revenue') }}</p>
+                                <h4 class="my-1 text-danger">{{ number_format($totalRevenue, 2) }} {{ __('sales_views.sar') }}</h4>
+                                <p class="mb-0 font-13">{{ __('sales_views.from_approved_contracts') }}</p>
                             </div>
                             <div class="text-white widgets-icons-2 rounded-circle bg-gradient-burning ms-auto">
                                 <i class='bx bxs-wallet'></i>
@@ -51,13 +51,13 @@
                 </div>
             </div>
             <div class="col">
-                <div class="border-0 border-4 card radius-10 border-start border-success">
+                <div class="border-4 card radius-10 border-start border-success">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div>
-                                <p class="mb-0 text-secondary">My Clients</p>
+                                <p class="mb-0 text-secondary">{{ __('sales_views.my_clients') }}</p>
                                 <h4 class="my-1 text-success">{{ $totalClients }}</h4>
-                                <p class="mb-0 font-13">Active Clients</p>
+                                <p class="mb-0 font-13">{{ __('sales_views.active_clients') }}</p>
                             </div>
                             <div class="text-white widgets-icons-2 rounded-circle bg-gradient-ohhappiness ms-auto">
                                 <i class='bx bx-user'></i>
@@ -67,17 +67,17 @@
                 </div>
             </div>
             <div class="col">
-                <div class="border-0 border-4 card radius-10 border-start border-warning">
+                <div class="border-4 card radius-10 border-start border-warning">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div>
-                                <p class="mb-0 text-secondary">Customer Support</p>
+                                <p class="mb-0 text-secondary">{{ __('sales_views.customer_support') }}</p>
                                 <h4 class="my-1 text-warning">{{ $openTickets }}</h4>
                                 <p class="mb-0 font-13">
                                     @if ($urgentTickets > 0)
-                                        <span class="text-danger">{{ $urgentTickets }} Urgent</span>
+                                        <span class="text-danger">{{ $urgentTickets }} {{ __('sales_views.urgent') }}</span>
                                     @else
-                                        No urgent tickets
+                                        {{ __('sales_views.no_urgent_tickets') }}
                                     @endif
                                 </p>
                             </div>
@@ -97,11 +97,10 @@
                     <div class="card-header">
                         <div class="d-flex align-items-center">
                             <div>
-                                <h6 class="mb-0">Current Contracts</h6>
+                                <h6 class="mb-0">{{ __('sales_views.current_contracts') }}</h6>
                             </div>
                             <div class="ms-auto">
-                                <a href="{{ route('sales.contract.type.cards') }}" class="btn btn-primary btn-sm">Create New
-                                    Contract</a>
+                                <a href="{{ route('sales.contract.type.cards') }}" class="btn btn-primary btn-sm">{{ __('sales_views.create_new_contract') }}</a>
                             </div>
                         </div>
                     </div>
@@ -110,12 +109,12 @@
                             <table class="table mb-0 align-middle">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Contract #</th>
-                                        <th>Client</th>
-                                        <th>Type</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
-                                        <th>Actions</th>
+                                        <th>{{ __('sales_views.contract_number') }}</th>
+                                        <th>{{ __('sales_views.client') }}</th>
+                                        <th>{{ __('sales_views.type') }}</th>
+                                        <th>{{ __('sales_views.status') }}</th>
+                                        <th>{{ __('sales_views.created') }}</th>
+                                        <th>{{ __('sales_views.actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -135,29 +134,29 @@
                                                 @if ($contract->contract_status == 'approved' || $contract->contract_status == 'pending')
                                                     <a href="{{ route('contract.show.details', $contract->id) }}"
                                                         class="btn btn-primary btn-sm">
-                                                        <i class="bx bx-show"></i> View
+                                                        <i class="bx bx-show"></i> {{ __('sales_views.view') }}
                                                     </a>
                                                 @elseif($contract->contract_status == 'completed')
                                                     <a href="{{ route('completed.show.all') }}"
                                                         class="btn btn-primary btn-sm">
-                                                        <i class="bx bx-show"></i> View
+                                                        <i class="bx bx-show"></i> {{ __('sales_views.view') }}
                                                     </a>
                                                 @elseif($contract->contract_status == 'stopped')
                                                     <a href="{{ route('stopped.show.all') }}"
                                                         class="btn btn-primary btn-sm">
-                                                        <i class="bx bx-show"></i> View
+                                                        <i class="bx bx-show"></i> {{ __('sales_views.view') }}
                                                     </a>
                                                 @elseif($contract->contract_status == 'canceled' || $contract->contract_status == 'Not approved')
                                                     <a href="{{ route('canceled.show.all') }}"
                                                         class="btn btn-primary btn-sm">
-                                                        <i class="bx bx-show"></i> View
+                                                        <i class="bx bx-show"></i> {{ __('sales_views.view') }}
                                                     </a>
                                                 @endif
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center">No contracts found</td>
+                                            <td colspan="6" class="text-center">{{ __('sales_views.no_contracts_found') }}</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -176,10 +175,10 @@
                     <div class="card-header">
                         <div class="d-flex align-items-center">
                             <div>
-                                <h6 class="mb-0">Customer Suggestions</h6>
+                                <h6 class="mb-0">{{ __('sales_views.customer_suggestions') }}</h6>
                             </div>
                             <div class="ms-auto">
-                                <a href="{{ route('sales.tikets') }}" class="btn btn-primary btn-sm">View All</a>
+                                <a href="{{ route('sales.tikets') }}" class="btn btn-primary btn-sm">{{ __('sales_views.view_all') }}</a>
                             </div>
                         </div>
                     </div>

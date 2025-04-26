@@ -20,9 +20,9 @@
     <div class="mb-4 page-breadcrumb d-flex align-items-center">
         <div class="pe-3 breadcrumb-title d-flex align-items-center">
             <a href="{{ route('equipment-types.index') }}" class="btn btn-secondary me-3">
-                <i class="bx bx-arrow-back"></i> Back
+                <i class="bx bx-arrow-back"></i> {{ __('equipment_views.back') }}
             </a>
-            <h4 class="mb-0 text-primary"><i class="bx bx-edit"></i> Edit Equipment Type</h4>
+            <h4 class="mb-0 text-primary"><i class="bx bx-edit"></i> {{ __('equipment_views.edit_equipment_type') }}</h4>
         </div>
     </div>
     <!--end breadcrumb-->
@@ -34,7 +34,7 @@
                 @method('PUT')
                 <div class="row g-3">
                     <div class="col-12">
-                        <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                        <label for="name" class="form-label">{{ __('equipment_views.name') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('name') is-invalid @enderror" 
                                id="name" name="name" value="{{ old('name', $equipmentType->name) }}" required>
                         @error('name')
@@ -43,7 +43,7 @@
                     </div>
 
                     <div class="col-12">
-                        <label for="description" class="form-label">Description</label>
+                        <label for="description" class="form-label">{{ __('equipment_views.description') }}</label>
                         <textarea class="form-control @error('description') is-invalid @enderror" 
                                   id="description" name="description" rows="3">{{ old('description', $equipmentType->description) }}</textarea>
                         @error('description')
@@ -56,13 +56,13 @@
                             <input type="checkbox" class="form-check-input" 
                                    id="is_active" name="is_active" 
                                    {{ old('is_active', $equipmentType->is_active) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_active">Active</label>
+                            <label class="form-check-label" for="is_active">{{ __('equipment_views.active') }}</label>
                         </div>
                     </div>
 
                     <div class="col-12">
                         <button type="submit" class="px-4 btn btn-primary">
-                            <i class="bx bx-save"></i> Update Equipment Type
+                            <i class="bx bx-save"></i> {{ __('equipment_views.update_equipment_type') }}
                         </button>
                     </div>
                 </div>

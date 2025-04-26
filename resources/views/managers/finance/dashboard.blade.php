@@ -22,9 +22,9 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-secondary">Total Contracts</p>
+                            <p class="mb-0 text-secondary">{{ __('finance_views.total_contracts') }}</p>
                             <h4 class="my-1 text-info">{{ $totalContracts }}</h4>
-                            <p class="mb-0 font-13">{{ $activeContracts }} Active Contracts</p>
+                            <p class="mb-0 font-13">{{ $activeContracts }} {{ __('finance_views.active_contracts') }}</p>
                         </div>
                         <div class="text-white widgets-icons-2 rounded-circle bg-gradient-blues ms-auto">
                             <i class='bx bxs-folder'></i>
@@ -38,11 +38,11 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-secondary">Total Payments</p>
-                            <h4 class="my-1 text-danger">${{ number_format($totalRevenue, 2) }}</h4>
+                            <p class="mb-0 text-secondary">{{ __('finance_views.total_payments') }}</p>
+                            <h4 class="my-1 text-danger">{{ number_format($totalRevenue, 2) }} {{ __('finance_views.currency_sar') }}</h4>
                             <p class="mb-0 font-13">
-                                <span class="text-warning">{{ $pendingPayments }} Pending</span> / 
-                                <span class="text-danger">{{ $overduePayments }} Overdue</span>
+                                <span class="text-warning">{{ $pendingPayments }} {{ __('finance_views.pending') }}</span> / 
+                                <span class="text-danger">{{ $overduePayments }} {{ __('finance_views.overdue') }}</span>
                             </p>
                         </div>
                         <div class="text-white widgets-icons-2 rounded-circle bg-gradient-burning ms-auto">
@@ -57,9 +57,9 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-secondary">Active Contracts</p>
+                            <p class="mb-0 text-secondary">{{ __('finance_views.active_contracts') }}</p>
                             <h4 class="my-1 text-success">{{ $activeContracts }}</h4>
-                            <p class="mb-0 font-13">{{ round(($activeContracts / ($totalContracts ?: 1)) * 100) }}% of Total</p>
+                            <p class="mb-0 font-13">{{ round(($activeContracts / ($totalContracts ?: 1)) * 100) }}% {{ __('finance_views.of_total') }}</p>
                         </div>
                         <div class="text-white widgets-icons-2 rounded-circle bg-gradient-ohhappiness ms-auto">
                             <i class='bx bxs-bar-chart-alt-2'></i>
@@ -73,9 +73,9 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div>
-                            <p class="mb-0 text-secondary">Open Tickets</p>
+                            <p class="mb-0 text-secondary">{{ __('finance_views.open_tickets') }}</p>
                             <h4 class="my-1 text-warning">{{ $openTickets }}</h4>
-                            <p class="mb-0 font-13">Pending Support Requests</p>
+                            <p class="mb-0 font-13">{{ __('finance_views.pending_support_requests') }}</p>
                         </div>
                         <div class="text-white widgets-icons-2 rounded-circle bg-gradient-orange ms-auto">
                             <i class='bx bxs-group'></i>
@@ -90,7 +90,7 @@
         <div class="card-header">
             <div class="d-flex align-items-center">
                 <div>
-                    <h6 class="mb-0">Recent Payments</h6>
+                    <h6 class="mb-0">{{ __('finance_views.recent_payments') }}</h6>
                 </div>
             </div>
         </div>
@@ -99,12 +99,12 @@
                 <table class="table mb-0 align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>Contract Number</th>
-                            <th>Payment Number</th>
-                            <th>Payment Amount</th>
-                            <th>Payment Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th>{{ __('finance_views.contract_number') }}</th>
+                            <th>{{ __('finance_views.payment_number') }}</th>
+                            <th>{{ __('finance_views.payment_amount') }}</th>
+                            <th>{{ __('finance_views.payment_date') }}</th>
+                            <th>{{ __('finance_views.status') }}</th>
+                            <th>{{ __('finance_views.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -112,37 +112,37 @@
                         <tr>
                             <td>{{ $payment->contract->contract_number }}</td>
                             <td>{{ $payment->invoice_number }}</td>
-                            <td>${{ number_format($payment->payment_amount, 2) }}</td>
+                            <td>{{ number_format($payment->payment_amount, 2) }} {{ __('finance_views.currency_sar') }}</td>
                             <td>
                                 @if($payment->postponementRequests->where('status', 'pending')->first())
                                     {{ \Carbon\Carbon::parse($payment->postponementRequests->where('status', 'pending')->first()->requested_date)->format('Y-m-d') }}
-                                    <span class="badge bg-info">Postponement Requested</span>
+                                    <span class="badge bg-info">{{ __('finance_views.postponement_requested') }}</span>
                                 @else
                                     {{ \Carbon\Carbon::parse($payment->payment_date)->format('Y-m-d') }}
                                 @endif
                             </td>
                             <td>
                                 @if($payment->payment_status == 'paid')
-                                    <span class="badge bg-success">Completed</span>
+                                    <span class="badge bg-success">{{ __('finance_views.completed') }}</span>
                                 @elseif($payment->postponementRequests->where('status', 'pending')->first())
-                                    <span class="badge bg-info">Postponement Pending</span>
+                                    <span class="badge bg-info">{{ __('finance_views.postponement_pending') }}</span>
                                 @elseif($payment->payment_date < now() && $payment->payment_status == 'overdue')
-                                    <span class="badge bg-danger">Overdue</span>
+                                    <span class="badge bg-danger">{{ __('finance_views.overdue') }}</span>
                                 @elseif($payment->payment_date < now() && $payment->payment_status == 'unpaid')
-                                    <span class="badge bg-danger">Unpaid</span>
+                                    <span class="badge bg-danger">{{ __('finance_views.unpaid') }}</span>
                                 @else
-                                    <span class="badge bg-warning">Pending</span>
+                                    <span class="badge bg-warning">{{ __('finance_views.pending') }}</span>
                                 @endif
                             </td>
                             <td>
                                 <a href="{{ route('finance.payments.show', $payment->id) }}" class="btn btn-primary btn-sm">
-                                    <i class="bx bx-show"></i> View
+                                    <i class="bx bx-show"></i> {{ __('finance_views.view') }}
                                 </a>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center">No payments found</td>
+                            <td colspan="6" class="text-center">{{ __('finance_views.no_payments_found') }}</td>
                         </tr>
                         @endforelse
                     </tbody>

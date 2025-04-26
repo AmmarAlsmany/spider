@@ -19,9 +19,9 @@
         <div class="mb-4 page-breadcrumb d-flex align-items-center">
             <div class="pe-3 breadcrumb-title d-flex align-items-center">
                 <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
-                    <i class="bx bx-arrow-back"></i> Back
+                    <i class="bx bx-arrow-back"></i> {{ __('sales_views.back') }}
                 </a>
-                <h4 class="mb-0 text-primary"><i class="bx bx-group"></i> My Clients</h4>
+                <h4 class="mb-0 text-primary"><i class="bx bx-group"></i> {{ __('sales_views.my_clients') }}</h4>
             </div>
             <div class="ps-3">
                 <nav aria-label="breadcrumb">
@@ -35,7 +35,7 @@
 
         <div class="shadow-sm card">
             <div class="card-header">
-                <h4 class="mb-0 text-primary"><i class="bx bx-group"></i> My Clients</h4>
+                <h4 class="mb-0 text-primary"><i class="bx bx-group"></i> {{ __('sales_views.my_clients') }}</h4>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -43,11 +43,11 @@
                         <thead class="bg-light">
                             <tr>
                                 <th scope="col" width="70">#</th>
-                                <th scope="col">Full Name</th>
-                                <th scope="col">Phone</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">Address</th>
-                                <th scope="col" width="100">Actions</th>
+                                <th scope="col">{{ __('sales_views.full_name') }}</th>
+                                <th scope="col">{{ __('sales_views.phone') }}</th>
+                                <th scope="col">{{ __('sales_views.email') }}</th>
+                                <th scope="col">{{ __('sales_views.address') }}</th>
+                                <th scope="col" width="100">{{ __('sales_views.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -82,7 +82,7 @@
                                     <td class="align-middle">
                                         <a href="{{ route('view.my.clients.details', ['id' => $item->id]) }}"
                                             class="btn btn-sm btn-primary">
-                                            <i class="bi bi-eye me-1"></i>View
+                                            <i class="bi bi-eye me-1"></i>{{ __('sales_views.view') }}
                                         </a>
                                     </td>
                                 </tr>

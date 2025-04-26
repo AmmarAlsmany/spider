@@ -95,7 +95,7 @@
     <div class="mb-4 page-breadcrumb d-flex align-items-center">
         <div class="pe-3 breadcrumb-title d-flex align-items-center">
             <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
-                <i class="bx bx-arrow-back"></i> Back
+                <i class="bx bx-arrow-back"></i> {{ __('sales_views.back') }}
             </a>
         </div>
         <div class="ps-3">
@@ -103,7 +103,7 @@
                 <ol class="p-0 mb-0 breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}"><i
                                 class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Canceled Contract</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('sales_views.canceled_contract') }}</li>
                 </ol>
             </nav>
         </div>
@@ -111,7 +111,7 @@
 
     <div class="shadow-sm card">
         <div class="card-header">
-            <h4 class="mb-0 text-danger"><i class="bx bx-x-circle"></i> Canceled Contracts</h4>
+            <h4 class="mb-0 text-danger"><i class="bx bx-x-circle"></i> {{ __('sales_views.canceled_contracts') }}</h4>
         </div>
         <div class="card-body">
             @include('shared.contract_search')
@@ -119,17 +119,17 @@
                 <table id="example2" class="table table-hover">
                     <thead class="bg-light">
                         <tr>
-                            <th>Client Name</th>
-                            <th>Client Email</th>
-                            <th>Client Phone</th>
-                            <th>Contract Number</th>
-                            <th>Contract Type</th>
-                            <th>Contract amount</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Contract Status</th>
-                            <th>Rejection Reason</th>
-                            <th>Action</th>
+                            <th>{{ __('sales_views.client_name') }}</th>
+                            <th>{{ __('sales_views.client_email') }}</th>
+                            <th>{{ __('sales_views.client_phone') }}</th>
+                            <th>{{ __('sales_views.contract_number') }}</th>
+                            <th>{{ __('sales_views.contract_type') }}</th>
+                            <th>{{ __('sales_views.contract_amount') }}</th>
+                            <th>{{ __('sales_views.start_date') }}</th>
+                            <th>{{ __('sales_views.end_date') }}</th>
+                            <th>{{ __('sales_views.contract_status') }}</th>
+                            <th>{{ __('sales_views.rejection_reason') }}</th>
+                            <th>{{ __('sales_views.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -160,7 +160,7 @@
                             <td>{{ $contract->type->name }} {{ $contract->type->type }}</td>
                             <td>
                                 <i class="bi bi-currency-dollar me-2 text-muted"></i>{{ $contract->contract_price }}
-                                SAR
+                                {{ __('sales_views.sar') }}
                             </td>
                             <td>
                                 <i class="bi bi-calendar-event me-2 text-muted"></i>
@@ -180,8 +180,7 @@
                             </td>
                             <td>
                                 <i class="bi bi-exclamation-triangle me-2 text-muted"></i>
-                                {{ $contract->rejection_reason ? $contract->rejection_reason : 'Stopped from the Sales
-                                Manager' }}
+                                {{ $contract->rejection_reason ? $contract->rejection_reason : __('sales_views.stopped_from_sales_manager') }}
                             </td>
                             <td>
                                 <form action="{{ route('contract.return', ['id' => $contract->id]) }}" method="POST">
@@ -189,7 +188,7 @@
                                     @method('PATCH')
                                     <input type="hidden" name="status" value="pending">
                                     <button type="submit" class="btn btn-sm btn-warning">
-                                        <i class="bi bi-arrow-return-left"></i> Return
+                                        <i class="bi bi-arrow-return-left"></i> {{ __('sales_views.return') }}
                                     </button>
                                 </form>
                             </td>

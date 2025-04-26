@@ -119,30 +119,30 @@
 
     <div class="container mt-4">
         <div class="mb-4 d-flex justify-content-between align-items-center">
-            <h2>Renew Contract #{{ $contract->contract_number }}</h2>
+            <h2>{{ __('contract_views.renew_contract') }} #{{ $contract->contract_number }}</h2>
             <a href="{{ route('completed.show.all') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Back to Completed Contracts
+                <i class="fas fa-arrow-left me-1"></i> {{ __('contract_views.back_to_completed_contracts') }}
             </a>
         </div>
 
         <div class="mb-4 alert alert-info">
             <i class="fas fa-info-circle me-2"></i>
-            You are renewing contract #{{ $contract->contract_number }} for {{ $contract->customer->name }}.
-            The new contract will have a new contract number and will require approval.
+            {{ __('contract_views.renewing_contract_info', ['number' => $contract->contract_number, 'name' => $contract->customer->name]) }}.
+            {{ __('contract_views.new_contract_info') }}
         </div>
 
         <form action="{{ route('contract.renewal.process', $contract->id) }}" method="POST" id="contract-form">
             @csrf
             <fieldset class="mb-4">
-                <legend>Contract Information</legend>
+                <legend>{{ __('contract_views.contract_information') }}</legend>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="mb-3 form-group">
-                            <label for="contract_type">Contract Type <span data-toggle="tooltip"
-                                    title="Select the type of contract">(?)</span></label>
+                            <label for="contract_type">{{ __('contract_views.contract_type') }} <span data-toggle="tooltip"
+                                    title="{{ __('contract_views.select_contract_type_tooltip') }}">(?)</span></label>
                             <select class="form-select @error('contract_type') is-invalid @enderror" id="contract_type"
                                 name="contract_type" required>
-                                <option value="">Select Contract Type</option>
+                                <option value="">{{ __('contract_views.select_contract_type') }}</option>
                                 @foreach($contract_types as $type)
                                 <option value="{{ $type->id }}" {{ $contract->contract_type == $type->id ? 'selected' :
                                     '' }}>
@@ -157,11 +157,11 @@
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3 form-group">
-                            <label for="Property_type">Property Type <span data-toggle="tooltip"
-                                    title="Select the type of property">(?)</span></label>
+                            <label for="Property_type">{{ __('contract_views.property_type') }} <span data-toggle="tooltip"
+                                    title="{{ __('contract_views.select_property_type_tooltip') }}">(?)</span></label>
                             <select class="form-select @error('Property_type') is-invalid @enderror" id="Property_type"
                                 name="Property_type" required>
-                                <option value="">Select Property Type</option>
+                                <option value="">{{ __('contract_views.select_property_type') }}</option>
                                 @foreach($property_types as $type)
                                 <option value="{{ $type }}" {{ $contract->Property_type == $type ? 'selected' : '' }}>
                                     {{ $type }}
@@ -176,8 +176,8 @@
                 </div>
 
                 <div class="mb-3 form-group">
-                    <label for="contract_description">Contract Description <span data-toggle="tooltip"
-                            title="Enter a detailed description of the contract">(?)</span></label>
+                    <label for="contract_description">{{ __('contract_views.contract_description') }} <span data-toggle="tooltip"
+                            title="{{ __('contract_views.contract_description_tooltip') }}">(?)</span></label>
                     <textarea class="form-control @error('contract_description') is-invalid @enderror"
                         id="contract_description" name="contract_description" rows="4"
                         required>{{ $contract->contract_description }}</textarea>
@@ -189,8 +189,8 @@
                 <div class="row g-3">
                     <div class="col-md-4">
                         <div class="mb-3 form-group">
-                            <label for="contract_start_date">Start Date <span data-toggle="tooltip"
-                                    title="Select the start date of the new contract">(?)</span></label>
+                            <label for="contract_start_date">{{ __('contract_views.start_date') }} <span data-toggle="tooltip"
+                                    title="{{ __('contract_views.start_date_tooltip') }}">(?)</span></label>
                             <input type="date" class="form-control @error('contract_start_date') is-invalid @enderror"
                                 id="contract_start_date" name="contract_start_date" value="{{ date('Y-m-d') }}"
                                 required>
@@ -201,8 +201,8 @@
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3 form-group">
-                            <label for="contract_end_date">End Date <span data-toggle="tooltip"
-                                    title="Select the end date of the new contract">(?)</span></label>
+                            <label for="contract_end_date">{{ __('contract_views.end_date') }} <span data-toggle="tooltip"
+                                    title="{{ __('contract_views.end_date_tooltip') }}">(?)</span></label>
                             <input type="date" class="form-control @error('contract_end_date') is-invalid @enderror"
                                 id="contract_end_date" name="contract_end_date"
                                 value="{{ date('Y-m-d', strtotime('+1 year')) }}" required>
@@ -213,8 +213,8 @@
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3 form-group">
-                            <label for="visit_start_date">Visit Start Date <span data-toggle="tooltip"
-                                    title="Select the date when visits should start">(?)</span></label>
+                            <label for="visit_start_date">{{ __('contract_views.visit_start_date') }} <span data-toggle="tooltip"
+                                    title="{{ __('contract_views.visit_start_date_tooltip') }}">(?)</span></label>
                             <input type="date" class="form-control @error('visit_start_date') is-invalid @enderror"
                                 id="visit_start_date" name="visit_start_date"
                                 value="{{ date('Y-m-d', strtotime('+7 days')) }}" required>
@@ -228,8 +228,8 @@
                 <div class="row g-3">
                     <div class="col-md-4">
                         <div class="mb-3 form-group">
-                            <label for="warranty">Warranty (Months) <span data-toggle="tooltip"
-                                    title="Enter the warranty period in months">(?)</span></label>
+                            <label for="warranty">{{ __('contract_views.warranty_period_months') }} <span data-toggle="tooltip"
+                                    title="{{ __('contract_views.warranty_period_tooltip') }}">(?)</span></label>
                             <input type="number" class="form-control @error('warranty') is-invalid @enderror"
                                 id="warranty" name="warranty" value="{{ $contract->warranty }}" min="0" required>
                             @error('warranty')
@@ -239,8 +239,8 @@
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3 form-group">
-                            <label for="number_of_visits">Number of Visits <span data-toggle="tooltip"
-                                    title="Enter the total number of visits for this contract">(?)</span></label>
+                            <label for="number_of_visits">{{ __('contract_views.number_of_visits') }} <span data-toggle="tooltip"
+                                    title="{{ __('contract_views.number_of_visits_tooltip') }}">(?)</span></label>
                             <input type="number" class="form-control @error('number_of_visits') is-invalid @enderror"
                                 id="number_of_visits" name="number_of_visits" value="{{ $contract->number_of_visits }}"
                                 min="1" required>
@@ -251,15 +251,15 @@
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3 form-group">
-                            <label for="contract_price">Contract Price (SAR) <span data-toggle="tooltip"
-                                    title="Enter the total contract price (VAT will be added automatically)">(?)</span></label>
+                            <label for="contract_price">{{ __('contract_views.contract_price') }} <span data-toggle="tooltip"
+                                    title="{{ __('contract_views.contract_price_tooltip') }}">(?)</span></label>
                             <input type="number" class="form-control @error('contract_price') is-invalid @enderror"
                                 id="contract_price" name="contract_price" value="{{ $contract->contract_price / 1.15 }}"
                                 min="0" step="0.01" required>
-                            <small class="text-muted">VAT (15%): <span id="vatAmount">{{
-                                    number_format($contract->contract_price * 0.15 / 1.15, 2) }}</span> SAR</small>
-                            <small class="d-block text-muted">Total with VAT: <span id="totalWithVat">{{
-                                    number_format($contract->contract_price, 2) }}</span> SAR</small>
+                            <small class="text-muted">{{ __('contract_details_new.vat_amount') }}: <span id="vatAmount">{{
+                                    number_format($contract->contract_price * 0.15 / 1.15, 2) }}</span> {{ __('contract_views.currency') }}</small>
+                            <small class="d-block text-muted">{{ __('contract_views.total_with_vat') }}: <span id="totalWithVat">{{
+                                    number_format($contract->contract_price, 2) }}</span> {{ __('contract_views.currency') }}</small>
                             @error('contract_price')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -269,16 +269,16 @@
             </fieldset>
 
             <fieldset class="mb-4" id="buy-equipment-fields" style="display: none;">
-                <legend>Equipment Information</legend>
+                <legend>{{ __('contract_views.equipment_information') }}</legend>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="mb-3 form-group">
-                            <label for="equipment_type_id">Equipment Type <span data-toggle="tooltip"
-                                    title="Select the type of equipment">(?)</span></label>
+                            <label for="equipment_type_id">{{ __('contract_views.equipment_type') }} <span data-toggle="tooltip"
+                                    title="{{ __('contract_views.equipment_type_tooltip') }}">(?)</span></label>
                             <select class="form-select @error('equipment_type_id') is-invalid @enderror"
                                 id="equipment_type_id" name="equipment_type_id"
                                 value="{{ $contract->equipment_type_id ?? '' }}">
-                                <option value="">Select Equipment Type</option>
+                                <option value="">{{ __('contract_views.select_equipment_type') }}</option>
                                 @foreach($equipment_types ?? [] as $type)
                                 <option value="{{ $type->id }}" {{ isset($contract->equipment_type_id) &&
                                     $contract->equipment_type_id == $type->id ? 'selected' : '' }}>
@@ -293,8 +293,8 @@
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3 form-group">
-                            <label for="equipment_model">Equipment Model <span data-toggle="tooltip"
-                                    title="Enter the model of the equipment">(?)</span></label>
+                            <label for="equipment_model">{{ __('contract_views.equipment_model') }} <span data-toggle="tooltip"
+                                    title="{{ __('contract_views.equipment_model_tooltip') }}">(?)</span></label>
                             <input type="text" class="form-control @error('equipment_model') is-invalid @enderror"
                                 id="equipment_model" name="equipment_model"
                                 value="{{ $contract->equipment_model ?? '' }}">
@@ -307,8 +307,8 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="mb-3 form-group">
-                            <label for="equipment_quantity">Quantity <span data-toggle="tooltip"
-                                    title="Enter the quantity of equipment">(?)</span></label>
+                            <label for="equipment_quantity">{{ __('contract_views.equipment_quantity') }} <span data-toggle="tooltip"
+                                    title="{{ __('contract_views.equipment_quantity_tooltip') }}">(?)</span></label>
                             <input type="number" class="form-control @error('equipment_quantity') is-invalid @enderror"
                                 id="equipment_quantity" name="equipment_quantity"
                                 value="{{ $contract->equipment_quantity ?? 1 }}" min="1">
@@ -342,18 +342,18 @@
             </fieldset>
 
             <fieldset class="mb-4">
-                <legend>Client Information</legend>
+                <legend>{{ __('contract_views.client_information') }}</legend>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="mb-3 form-group">
-                            <label for="client_name">Client Name</label>
+                            <label for="client_name">{{ __('contract_views.client_name') }}</label>
                             <input type="text" class="form-control" id="client_name"
                                 value="{{ $contract->customer->name }}" readonly>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3 form-group">
-                            <label for="client_email">Client Email</label>
+                            <label for="client_email">{{ __('contract_views.email') }}</label>
                             <input type="email" class="form-control" id="client_email"
                                 value="{{ $contract->customer->email }}" readonly>
                         </div>
@@ -362,14 +362,14 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="mb-3 form-group">
-                            <label for="client_phone">Client Phone</label>
+                            <label for="client_phone">{{ __('contract_views.phone') }}</label>
                             <input type="text" class="form-control" id="client_phone"
                                 value="{{ $contract->customer->phone }}" readonly>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3 form-group">
-                            <label for="client_address">Client Address</label>
+                            <label for="client_address">{{ __('contract_views.address') }}</label>
                             <input type="text" class="form-control" id="client_address"
                                 value="{{ $contract->customer->address }}" readonly>
                         </div>
@@ -379,11 +379,10 @@
 
             @if($contract->branchs && $contract->branchs->count() > 0)
             <fieldset class="mb-4">
-                <legend>Branch Information</legend>
+                <legend>{{ __('contract_views.branch_information') }}</legend>
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>
-                    This contract has {{ $contract->branchs->count() }} {{ $contract->branchs->count() == 1 ? 'branch' :
-                    'branches' }}. All branch information will be copied to the new contract.
+                    {{ __('contract_views.contract_has_branches', ['count' => $contract->branchs->count()]) }} {{ $contract->branchs->count() == 1 ? __('contract_views.branch') : __('contract_views.branches') }}. {{ __('contract_views.branch_copy_info') }}
                 </div>
 
                 <div id="branches-container">
@@ -392,28 +391,27 @@
                         <div class="card-header bg-light d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">
                                 <i class="fas fa-building me-2"></i>
-                                Branch #{{ $index + 1 }}: {{ $branch->branch_name }}
+                                {{ __('contract_views.branch') }} #{{ $index + 1 }}: {{ $branch->branch_name }}
                             </h5>
                             <div class="form-check form-switch">
                                 <input class="form-check-input branch-include" type="checkbox"
                                     id="include_branch_{{ $branch->id }}" name="include_branches[]"
                                     value="{{ $branch->id }}" checked>
-                                <label class="form-check-label" for="include_branch_{{ $branch->id }}">Include in
-                                    renewal</label>
+                                <label class="form-check-label" for="include_branch_{{ $branch->id }}">{{ __('contract_views.include_in_renewal') }}</label>
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3 form-group">
-                                        <label>Branch Name</label>
+                                        <label>{{ __('contract_views.branch_name') }}</label>
                                         <input type="text" class="form-control" value="{{ $branch->branch_name }}"
                                             readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3 form-group">
-                                        <label>Branch Manager</label>
+                                        <label>{{ __('contract_views.branch_manager') }}</label>
                                         <input type="text" class="form-control"
                                             value="{{ $branch->branch_manager_name }}" readonly>
                                     </div>
@@ -422,31 +420,31 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3 form-group">
-                                        <label>Phone</label>
+                                        <label>{{ __('contract_views.phone') }}</label>
                                         <input type="text" class="form-control"
                                             value="{{ $branch->branch_manager_phone }}" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3 form-group">
-                                        <label>City</label>
+                                        <label>{{ __('contract_views.city') }}</label>
                                         <input type="text" class="form-control" value="{{ $branch->branch_city }}"
                                             readonly>
                                     </div>
                                 </div>
                             </div>
                             <div class="mb-3 form-group">
-                                <label>Address</label>
+                                <label>{{ __('contract_views.address') }}</label>
                                 <input type="text" class="form-control" value="{{ $branch->branch_address }}" readonly>
                             </div>
 
                             <div class="branch-edit-container" style="display: none;">
                                 <hr>
-                                <h6 class="mb-3">Edit Branch Information</h6>
+                                <h6 class="mb-3">{{ __('contract_views.edit_branch_information') }}</h6>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <div class="mb-3 form-group">
-                                            <label for="branch_name_{{ $branch->id }}">Branch Name</label>
+                                            <label for="branch_name_{{ $branch->id }}">{{ __('contract_views.branch_name') }}</label>
                                             <input type="text" class="form-control" id="branch_name_{{ $branch->id }}"
                                                 name="branch_data[{{ $branch->id }}][branch_name]"
                                                 value="{{ $branch->branch_name }}">
@@ -454,7 +452,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3 form-group">
-                                            <label for="branch_manager_{{ $branch->id }}">Branch Manager</label>
+                                            <label for="branch_manager_{{ $branch->id }}">{{ __('contract_views.branch_manager') }}</label>
                                             <input type="text" class="form-control"
                                                 id="branch_manager_{{ $branch->id }}"
                                                 name="branch_data[{{ $branch->id }}][branch_manager_name]"
@@ -465,7 +463,7 @@
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <div class="mb-3 form-group">
-                                            <label for="branch_phone_{{ $branch->id }}">Phone</label>
+                                            <label for="branch_phone_{{ $branch->id }}">{{ __('contract_views.phone') }}</label>
                                             <input type="text" class="form-control" id="branch_phone_{{ $branch->id }}"
                                                 name="branch_data[{{ $branch->id }}][branch_manager_phone]"
                                                 value="{{ $branch->branch_manager_phone }}">
@@ -473,7 +471,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3 form-group">
-                                            <label for="branch_city_{{ $branch->id }}">City</label>
+                                            <label for="branch_city_{{ $branch->id }}">{{ __('contract_views.city') }}</label>
                                             <select class="form-select" id="branch_city_{{ $branch->id }}"
                                                 name="branch_data[{{ $branch->id }}][branch_city]">
                                                 @foreach($saudiCities as $city)
@@ -485,7 +483,7 @@
                                     </div>
                                 </div>
                                 <div class="mb-3 form-group">
-                                    <label for="branch_address_{{ $branch->id }}">Address</label>
+                                    <label for="branch_address_{{ $branch->id }}">{{ __('contract_views.address') }}</label>
                                     <input type="text" class="form-control" id="branch_address_{{ $branch->id }}"
                                         name="branch_data[{{ $branch->id }}][branch_address]"
                                         value="{{ $branch->branch_address }}">
@@ -495,7 +493,7 @@
                             <div class="mt-3 text-end">
                                 <button type="button" class="btn btn-outline-primary btn-sm toggle-edit-branch"
                                     data-branch-id="{{ $branch->id }}">
-                                    <i class="fas fa-edit me-1"></i> Edit Branch
+                                    <i class="fas fa-edit me-1"></i> {{ __('contract_views.edit_branch') }}
                                 </button>
                             </div>
                         </div>
@@ -505,25 +503,25 @@
 
                 <div class="mt-3">
                     <button type="button" id="add-new-branch" class="btn btn-outline-success">
-                        <i class="fas fa-plus-circle me-1"></i> Add New Branch
+                        <i class="fas fa-plus-circle me-1"></i> {{ __('contract_views.add_new_branch') }}
                     </button>
                 </div>
             </fieldset>
             @endif
 
             <fieldset class="mb-4">
-                <legend>Payment Information</legend>
+                <legend>{{ __('contract_views.payment_information') }}</legend>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="mb-3 form-group">
-                            <label for="payment_type">Payment Type <span data-toggle="tooltip"
-                                    title="Select how the client will pay">(?)</span></label>
+                            <label for="payment_type">{{ __('contract_views.payment_type') }} <span data-toggle="tooltip"
+                                    title="{{ __('contract_views.payment_type_tooltip') }}">(?)</span></label>
                             <select class="form-select @error('payment_type') is-invalid @enderror" id="payment_type"
                                 name="payment_type" required>
                                 <option value="prepaid" {{ $contract->payment_type == 'prepaid' ? 'selected' : ''
-                                    }}>Prepaid (Full payment upfront)</option>
+                                    }}>{{ __('contract_views.prepaid_full') }}</option>
                                 <option value="postpaid" {{ $contract->payment_type == 'postpaid' ? 'selected' : ''
-                                    }}>Postpaid (Installments)</option>
+                                    }}>{{ __('contract_views.postpaid_installments') }}</option>
                             </select>
                             @error('payment_type')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -533,8 +531,8 @@
                     <div class="col-md-6 payment-details" id="postpaid-details"
                         style="{{ $contract->payment_type == 'postpaid' ? '' : 'display: none;' }}">
                         <div class="mb-3 form-group">
-                            <label for="number_of_payments">Number of Payments <span data-toggle="tooltip"
-                                    title="Enter the number of installments">(?)</span></label>
+                            <label for="number_of_payments">{{ __('contract_views.number_of_payments') }} <span data-toggle="tooltip"
+                                    title="{{ __('contract_views.number_of_payments_tooltip') }}">(?)</span></label>
                             <input type="number" class="form-control @error('number_of_payments') is-invalid @enderror"
                                 id="number_of_payments" name="number_of_payments"
                                 value="{{ $contract->number_Payments ?? 3 }}" min="1" max="12">
@@ -547,8 +545,8 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="mb-3 form-group">
-                            <label for="first_payment_date">First Payment Date <span data-toggle="tooltip"
-                                    title="Select the date for the first payment">(?)</span></label>
+                            <label for="first_payment_date">{{ __('contract_views.first_payment_date') }} <span data-toggle="tooltip"
+                                    title="{{ __('contract_views.first_payment_date_tooltip') }}">(?)</span></label>
                             <input type="date" class="form-control @error('first_payment_date') is-invalid @enderror"
                                 id="first_payment_date" name="first_payment_date" value="{{ date('Y-m-d') }}" required>
                             @error('first_payment_date')
@@ -561,10 +559,10 @@
 
             <div class="mt-4 d-flex justify-content-between">
                 <a href="{{ route('completed.show.all') }}" class="btn btn-secondary">
-                    <i class="fas fa-times me-1"></i> Cancel
+                    <i class="fas fa-times me-1"></i> {{ __('contract_views.cancel') }}
                 </a>
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-sync-alt me-1"></i> Renew Contract
+                    <i class="fas fa-sync-alt me-1"></i> {{ __('contract_views.renew_contract') }}
                 </button>
             </div>
         </form>
@@ -692,11 +690,11 @@
                     
                     if (editContainer.style.display === 'none') {
                         editContainer.style.display = 'block';
-                        this.innerHTML = '<i class="fas fa-times me-1"></i> Cancel Edit';
+                        this.innerHTML = '<i class="fas fa-times me-1"></i> {{ __('contract_views.cancel_edit') }}';
                         this.classList.replace('btn-outline-primary', 'btn-outline-danger');
                     } else {
                         editContainer.style.display = 'none';
-                        this.innerHTML = '<i class="fas fa-edit me-1"></i> Edit Branch';
+                        this.innerHTML = '<i class="fas fa-edit me-1"></i> {{ __('contract_views.edit_branch') }}';
                         this.classList.replace('btn-outline-danger', 'btn-outline-primary');
                     }
                 });
@@ -738,24 +736,24 @@
                     <div class="card-header bg-light d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
                             <i class="fas fa-building me-2"></i>
-                            New Branch
+                            {{ __('contract_views.new_branch') }}
                         </h5>
                         <div class="form-check form-switch">
                             <input class="form-check-input branch-include" type="checkbox" id="include_branch_${newBranchId}" name="include_branches[]" value="${newBranchId}" checked>
-                            <label class="form-check-label" for="include_branch_${newBranchId}">Include in renewal</label>
+                            <label class="form-check-label" for="include_branch_${newBranchId}">{{ __('contract_views.include_in_renewal') }}</label>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="mb-3 form-group">
-                                    <label for="branch_name_${newBranchId}">Branch Name</label>
+                                    <label for="branch_name_${newBranchId}">{{ __('contract_views.branch_name') }}</label>
                                     <input type="text" class="form-control" id="branch_name_${newBranchId}" name="new_branch_data[${newBranchId}][branch_name]" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3 form-group">
-                                    <label for="branch_manager_${newBranchId}">Branch Manager</label>
+                                    <label for="branch_manager_${newBranchId}">{{ __('contract_views.branch_manager') }}</label>
                                     <input type="text" class="form-control" id="branch_manager_${newBranchId}" name="new_branch_data[${newBranchId}][branch_manager_name]" required>
                                 </div>
                             </div>
@@ -763,28 +761,28 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="mb-3 form-group">
-                                    <label for="branch_phone_${newBranchId}">Phone</label>
+                                    <label for="branch_phone_${newBranchId}">{{ __('contract_views.phone') }}</label>
                                     <input type="text" class="form-control" id="branch_phone_${newBranchId}" name="new_branch_data[${newBranchId}][branch_manager_phone]" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3 form-group">
-                                    <label for="branch_city_${newBranchId}">City</label>
+                                    <label for="branch_city_${newBranchId}">{{ __('contract_views.city') }}</label>
                                     <select class="form-select" id="branch_city_${newBranchId}" name="new_branch_data[${newBranchId}][branch_city]" required>
-                                        <option value="">Select City</option>
+                                        <option value="">{{ __('contract_views.select_city') }}</option>
                                         ${getSaudiCitiesOptions()}
                                     </select>
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3 form-group">
-                            <label for="branch_address_${newBranchId}">Address</label>
+                            <label for="branch_address_${newBranchId}">{{ __('contract_views.address') }}</label>
                             <input type="text" class="form-control" id="branch_address_${newBranchId}" name="new_branch_data[${newBranchId}][branch_address]" required>
                         </div>
                         
                         <div class="mt-3 text-end">
                             <button type="button" class="btn btn-outline-danger btn-sm remove-branch" data-branch-id="${newBranchId}">
-                                <i class="fas fa-trash me-1"></i> Remove Branch
+                                <i class="fas fa-trash me-1"></i> {{ __('contract_views.remove_branch') }}
                             </button>
                         </div>
                     </div>

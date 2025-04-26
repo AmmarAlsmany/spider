@@ -20,10 +20,10 @@
         <div class="card-header">
             <div class="d-flex align-items-center">
                 <div>
-                    <h6 class="mb-0">Payments List</h6>
+                    <h6 class="mb-0">{{ __('finance_views.payments_list') }}</h6>
                 </div>
                 <div class="ms-auto">
-                    <a href="{{ route('finance.payments.pending') }}" class="btn btn-warning">View Pending Payments</a>
+                    <a href="{{ route('finance.payments.pending') }}" class="btn btn-warning">{{ __('finance_views.view_pending_payments') }}</a>
                 </div>
             </div>
         </div>
@@ -32,14 +32,14 @@
                 <table class="table mb-0 align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>Payment ID</th>
-                            <th>Invoice #</th>
-                            <th>Sales Agent</th>
-                            <th>Contract</th>
-                            <th>Amount</th>
-                            <th>Created Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th>{{ __('finance_views.payment_id') }}</th>
+                            <th>{{ __('finance_views.invoice_number') }}</th>
+                            <th>{{ __('finance_views.sales_agent') }}</th>
+                            <th>{{ __('finance_views.contract') }}</th>
+                            <th>{{ __('finance_views.amount') }}</th>
+                            <th>{{ __('finance_views.created_date') }}</th>
+                            <th>{{ __('finance_views.status') }}</th>
+                            <th>{{ __('finance_views.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -52,15 +52,15 @@
                             <td>{{ $payment->invoice_number }}</td>
                             <td>{{ $payment->contract->salesRepresentative->name }} <small>({{ $payment->contract->salesRepresentative->email }})</small></td>
                             <td>{{ $payment->contract->contract_number }}</td>
-                            <td>{{ number_format($payment->payment_amount, 2) }} ASR</td>
+                            <td>{{ number_format($payment->payment_amount, 2) }} {{ __('finance_views.currency_sar') }}</td>
                             <td>{{ $payment->created_at->format('Y-m-d') }}</td>
                             <td>
                                 <span class="badge bg-{{ $payment->payment_status == 'paid' ? 'success' : 'warning' }}">
-                                    {{ ucfirst($payment->payment_status) }}
+                                    {{ __('finance_views.' . $payment->payment_status) }}
                                 </span>
                             </td>
                             <td>
-                                <a href="{{ route('payment.show', $payment->id) }}" class="btn btn-primary btn-sm">View</a>
+                                <a href="{{ route('payment.show', $payment->id) }}" class="btn btn-primary btn-sm">{{ __('finance_views.view') }}</a>
                             </td>
                         </tr>
                         @endforeach

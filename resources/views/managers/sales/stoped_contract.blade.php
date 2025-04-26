@@ -19,7 +19,7 @@
     <div class="mb-4 page-breadcrumb d-flex align-items-center">
         <div class="pe-3 breadcrumb-title d-flex align-items-center">
             <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
-                <i class="bx bx-arrow-back"></i> Back
+                <i class="bx bx-arrow-back"></i> {{ __('sales_views.back') }}
             </a>
         </div>
         <div class="ps-3">
@@ -27,7 +27,7 @@
                 <ol class="p-0 mb-0 breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}" class="text-decoration-none"><i
                                 class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item active text-muted" aria-current="page">Stopped Contract</li>
+                    <li class="breadcrumb-item active text-muted" aria-current="page">{{ __('sales_views.stopped_contract') }}</li>
                 </ol>
             </nav>
         </div>
@@ -35,7 +35,7 @@
 
     <div class="shadow-sm card">
         <div class="card-header">
-            <h4 class="mb-0 text-danger"><i class="bx bx-x-circle"></i> Stopped Contracts</h4>
+            <h4 class="mb-0 text-danger"><i class="bx bx-x-circle"></i> {{ __('sales_views.stopped_contracts') }}</h4>
         </div>
         <div class="card-body">
             @include('shared.contract_search')
@@ -43,16 +43,16 @@
                 <table id="example2" class="table table-hover">
                     <thead class="bg-light">
                         <tr>
-                            <th>Client Name</th>
-                            <th>Client Email</th>
-                            <th>Client Phone</th>
-                            <th>Contract Number</th>
-                            <th>Contract Type</th>
-                            <th>Contract amount</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Contract Status</th>
-                            <th>Actions</th>
+                            <th>{{ __('sales_views.client_name') }}</th>
+                            <th>{{ __('sales_views.client_email') }}</th>
+                            <th>{{ __('sales_views.client_phone') }}</th>
+                            <th>{{ __('sales_views.contract_number') }}</th>
+                            <th>{{ __('sales_views.contract_type') }}</th>
+                            <th>{{ __('sales_views.contract_amount') }}</th>
+                            <th>{{ __('sales_views.start_date') }}</th>
+                            <th>{{ __('sales_views.end_date') }}</th>
+                            <th>{{ __('sales_views.contract_status') }}</th>
+                            <th>{{ __('sales_views.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -99,17 +99,17 @@
                             </td>
                             <td class="align-middle">
                                 <i class="bi bi-currency-dollar me-2 text-muted"></i>
-                                {{ $contract->contract_price }} SAR
+                                {{ $contract->contract_price }} {{ __('sales_views.sar') }}
                             </td>
                             <td class="align-middle">
                                 <i class="bi bi-calendar-event me-2 text-muted"></i>
                                 {{ $contract->contract_start_date ? date('M d, Y',
-                                strtotime($contract->contract_start_date)) : 'Not set' }}
+                                strtotime($contract->contract_start_date)) : __('sales_views.not_set') }}
                             </td>
                             <td class="align-middle">
                                 <i class="bi bi-calendar-event me-2 text-muted"></i>
                                 {{ $contract->contract_end_date ? date('M d, Y',
-                                strtotime($contract->contract_end_date)) : 'Not set' }}
+                                strtotime($contract->contract_end_date)) : __('sales_views.not_set') }}
                             </td>
                             <td class="align-middle">
                                 <span class="px-3 py-1 badge rounded-pill bg-danger-subtle text-danger">
@@ -120,12 +120,12 @@
                             <td class="align-middle">
                                 <a href="{{ route('contract.show.details', ['id' => $contract->id]) }}"
                                     class="btn btn-sm btn-primary me-2">
-                                    <i class="bi bi-eye"></i> View
+                                    <i class="bi bi-eye"></i> {{ __('sales_views.view') }}
                                 </a>
                                 <button type="button" class="btn btn-sm btn-success"
                                     onclick="setReturnContractId('{{ $contract->id }}')" data-bs-toggle="modal"
                                     data-bs-target="#returnContractModal">
-                                    <i class="bi bi-arrow-clockwise"></i> Return Contract
+                                    <i class="bi bi-arrow-clockwise"></i> {{ __('sales_views.return_contract') }}
                                 </button>
                             </td>
                         </tr>
@@ -145,25 +145,25 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Return Contract</h5>
+                <h5 class="modal-title">{{ __('sales_views.return_contract') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>How would you like to return this contract?</p>
+                <p>{{ __('sales_views.how_return_contract') }}</p>
                 <form id="returnContractForm" action="{{ route('contract.return', ['id' => ':id']) }}" method="POST">
                     @csrf
                     @method('PATCH')
                     <div class="mb-3">
                         <select name="status" class="form-select" required>
-                            <option value="">Select Status</option>
-                            <option value="approved">Return as Approved</option>
+                            <option value="">{{ __('sales_views.select_status') }}</option>
+                            <option value="approved">{{ __('sales_views.return_as_approved') }}</option>
                         </select>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" form="returnContractForm" class="btn btn-primary">Return Contract</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('sales_views.cancel') }}</button>
+                <button type="submit" form="returnContractForm" class="btn btn-primary">{{ __('sales_views.return_contract') }}</button>
             </div>
         </div>
     </div>

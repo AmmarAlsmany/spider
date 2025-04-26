@@ -20,10 +20,10 @@
         <div class="card-header">
             <div class="d-flex align-items-center">
                 <div>
-                    <h6 class="mb-0">Pending Payments</h6>
+                    <h6 class="mb-0">{{ __('finance_views.pending_payments') }}</h6>
                 </div>
                 <div class="ms-auto">
-                    <a href="{{ route('finance.payments') }}" class="btn btn-secondary">Back to All Payments</a>
+                    <a href="{{ route('finance.payments') }}" class="btn btn-secondary">{{ __('finance_views.back_to_payments') }}</a>
                 </div>
             </div>
         </div>
@@ -32,14 +32,14 @@
                 <table class="table mb-0 align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>Invoice #</th>
-                            <th>Client</th>
-                            <th>Sales Agent</th>
-                            <th>Contract</th>
-                            <th>Amount</th>
-                            <th>Due Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th>{{ __('finance_views.invoice_number') }}</th>
+                            <th>{{ __('finance_views.client') }}</th>
+                            <th>{{ __('finance_views.sales_agent') }}</th>
+                            <th>{{ __('finance_views.contract') }}</th>
+                            <th>{{ __('finance_views.amount') }}</th>
+                            <th>{{ __('finance_views.due_date') }}</th>
+                            <th>{{ __('finance_views.status') }}</th>
+                            <th>{{ __('finance_views.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -50,7 +50,7 @@
                             <td>{{ $payment->customer->name }}</td>
                             <td>{{ $payment->contract->salesRepresentative->name }} <small>({{ $payment->contract->salesRepresentative->email }})</small></td>
                             <td>{{ $payment->contract->contract_number }}</td>
-                            <td>{{ number_format($payment->payment_amount, 2) }} ASR</td>
+                            <td>{{ number_format($payment->payment_amount, 2) }} {{ __('finance_views.currency_sar') }}</td>
                             <td>
                                 <span class="{{ strtotime($payment->due_date) < time() ? 'text-danger' : '' }}">
                                     {{ $payment->due_date }}
@@ -58,17 +58,17 @@
                             </td>
                             <td>
                                 <span class="badge bg-{{ $payment->payment_status == 'overdue' ? 'danger' : 'warning' }}">
-                                    {{ ucfirst($payment->payment_status) }}
+                                    {{ __('finance_views.' . $payment->payment_status) }}
                                 </span>
                             </td>
                             <td>
                                 <div class="gap-2 d-flex">
-                                    <a href="{{ route('payment.show', $payment->id) }}" class="btn btn-primary btn-sm">View Invoice</a>
+                                    <a href="{{ route('payment.show', $payment->id) }}" class="btn btn-primary btn-sm">{{ __('finance_views.view_invoice') }}</a>
                                     {{-- <form action="{{ route('finance.payments.update-status', $payment->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="status" value="paid">
-                                        <button type="submit" class="btn btn-success btn-sm">Mark as Paid</button>
+                                        <button type="submit" class="btn btn-success btn-sm">{{ __('finance_views.mark_as_paid') }}</button>
                                     </form> --}}
                                 </div>
                             </td>
@@ -76,7 +76,7 @@
                         @endforeach
                         @else
                         <tr>
-                            <td colspan="7" class="text-center">No pending payments found</td>
+                            <td colspan="7" class="text-center">{{ __('finance_views.no_pending_payments') }}</td>
                         </tr>
                         @endif
                     </tbody>

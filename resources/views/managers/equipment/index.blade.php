@@ -20,9 +20,9 @@
     <div class="mb-4 page-breadcrumb d-flex align-items-center">
         <div class="pe-3 breadcrumb-title d-flex align-items-center">
             <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
-                <i class="bx bx-arrow-back"></i> Back
+                <i class="bx bx-arrow-back"></i> {{ __('equipment_views.back') }}
             </a>
-            <h4 class="mb-0 text-primary"><i class="bx bx-list-ul"></i> Equipment Types</h4>
+            <h4 class="mb-0 text-primary"><i class="bx bx-list-ul"></i> {{ __('equipment_views.equipment_types') }}</h4>
         </div>
     </div>
     <!--end breadcrumb-->
@@ -30,9 +30,9 @@
     <div class="card">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Equipment Types List</h5>
+                <h5 class="mb-0">{{ __('equipment_views.equipment_types_list') }}</h5>
                 <a href="{{ route('equipment-types.create') }}" class="btn btn-primary">
-                    <i class="bx bx-plus"></i> Add New Equipment Type
+                    <i class="bx bx-plus"></i> {{ __('equipment_views.add_new_equipment_type') }}
                 </a>
             </div>
         </div>
@@ -41,10 +41,10 @@
                 <table class="table table-striped table-bordered">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th>{{ __('equipment_views.name') }}</th>
+                            <th>{{ __('equipment_views.description') }}</th>
+                            <th>{{ __('equipment_views.status') }}</th>
+                            <th>{{ __('equipment_views.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -54,10 +54,10 @@
                                 <td>{{ $type->description }}</td>
                                 <td>
                                     @if($type->trashed())
-                                        <span class="badge bg-danger">Deleted</span>
+                                        <span class="badge bg-danger">{{ __('equipment_views.deleted') }}</span>
                                     @else
                                         <span class="badge bg-{{ $type->is_active ? 'success' : 'warning' }}">
-                                            {{ $type->is_active ? 'Active' : 'Inactive' }}
+                                            {{ $type->is_active ? __('equipment_views.active') : __('equipment_views.inactive') }}
                                         </span>
                                     @endif
                                 </td>
@@ -66,18 +66,18 @@
                                         <form action="{{ route('equipment-types.restore', $type->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-success">
-                                                <i class="bx bx-refresh"></i> Restore
+                                                <i class="bx bx-refresh"></i> {{ __('equipment_views.restore') }}
                                             </button>
                                         </form>
                                     @else
                                         <a href="{{ route('equipment-types.edit', $type->id) }}" class="btn btn-sm btn-primary">
-                                            <i class="bx bx-edit"></i> Edit
+                                            <i class="bx bx-edit"></i> {{ __('equipment_views.edit') }}
                                         </a>
                                         <form action="{{ route('equipment-types.destroy', $type->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this equipment type?')">
-                                                <i class="bx bx-trash"></i> Delete
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('{{ __('equipment_views.confirm_delete') }}')">
+                                                <i class="bx bx-trash"></i> {{ __('equipment_views.delete') }}
                                             </button>
                                         </form>
                                     @endif

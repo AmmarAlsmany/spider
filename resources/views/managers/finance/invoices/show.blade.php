@@ -20,27 +20,27 @@
         <div class="card-header">
             <div class="d-flex align-items-center">
                 <div>
-                    <h6 class="mb-0">Invoice Details</h6>
+                    <h6 class="mb-0">{{ __('finance_views.invoice_details') }}</h6>
                 </div>
                 <div class="ms-auto">
-                    <a href="{{ route('finance.invoices') }}" class="btn btn-secondary">Back to Invoices</a>
+                    <a href="{{ route('finance.invoices') }}" class="btn btn-secondary">{{ __('finance_views.back_to_invoices') }}</a>
                 </div>
             </div>
         </div>
         <div class="card-body">
             <div class="mb-4 row">
                 <div class="col-sm-6">
-                    <h6 class="mb-3">From:</h6>
+                    <h6 class="mb-3">{{ __('finance_views.from') }}</h6>
                     <div>
-                        <strong>Your Company Name</strong>
+                        <strong>{{ __('finance_views.company_name') }}</strong>
                     </div>
-                    <div>Company Address</div>
-                    <div>Email: company@email.com</div>
-                    <div>Phone: (123) 456-7890</div>
+                    <div>{{ __('finance_views.company_address') }}</div>
+                    <div>{{ __('finance_views.company_email') }}</div>
+                    <div>{{ __('finance_views.company_phone') }}</div>
                 </div>
 
                 <div class="col-sm-6">
-                    <h6 class="mb-3">To:</h6>
+                    <h6 class="mb-3">{{ __('finance_views.to') }}</h6>
                     <div>
                         <strong>{{ $invoice->customer->name }}</strong>
                     </div>
@@ -52,13 +52,13 @@
 
             <div class="mb-4 row">
                 <div class="col-sm-6">
-                    <h6 class="mb-3">Invoice Details:</h6>
-                    <div>Invoice #: <strong>{{ $invoice->invoice_number }}</strong></div>
-                    <div>Date: {{ $invoice->created_at->format('Y-m-d') }}</div>
-                    <div>Due Date: {{ $invoice->due_date }}</div>
-                    <div>Status: 
+                    <h6 class="mb-3">{{ __('finance_views.invoice_details_section') }}</h6>
+                    <div>{{ __('finance_views.invoice_number') }}: <strong>{{ $invoice->invoice_number }}</strong></div>
+                    <div>{{ __('finance_views.date') }}: {{ $invoice->created_at->format('Y-m-d') }}</div>
+                    <div>{{ __('finance_views.due_date') }}: {{ $invoice->due_date }}</div>
+                    <div>{{ __('finance_views.status') }}: 
                         <span class="badge bg-{{ $invoice->payment_status == 'paid' ? 'success' : ($invoice->payment_status == 'pending' ? 'warning' : 'danger') }}">
-                            {{ ucfirst($invoice->payment_status) }}
+                            {{ __('finance_views.' . $invoice->payment_status) }}
                         </span>
                     </div>
                 </div>
@@ -68,45 +68,45 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Description</th>
-                            <th class="text-end">Amount</th>
+                            <th>{{ __('finance_views.description') }}</th>
+                            <th class="text-end">{{ __('finance_views.amount') }}</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Contract Service: {{ $invoice->contract->contract_number }}</td>
-                            <td class="text-end">{{ number_format($invoice->payment_amount, 2) }} ASR</td>
+                            <td>{{ __('finance_views.contract_service') }}: {{ $invoice->contract->contract_number }}</td>
+                            <td class="text-end">{{ number_format($invoice->payment_amount, 2) }} {{ __('finance_views.currency_sar') }}</td>
                         </tr>
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td class="text-end"><strong>Total:</strong></td>
-                            <td class="text-end"><strong>{{ number_format($invoice->payment_amount, 2) }} ASR</strong></td>
+                            <td class="text-end"><strong>{{ __('finance_views.total') }}:</strong></td>
+                            <td class="text-end"><strong>{{ number_format($invoice->payment_amount, 2) }} {{ __('finance_views.currency_sar') }}</strong></td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
 
             <div class="mt-4">
-                <h6>Payment Details</h6>
+                <h6>{{ __('finance_views.payment_details') }}</h6>
                 <div class="table-responsive">
                     <table class="table mb-0 align-middle">
                         <thead class="table-light">
                             <tr>
-                                <td>Created Date</td>
-                                <td>Amount</td>
-                                <td>Payment Method</td>
-                                <td>Status</td>
+                                <td>{{ __('finance_views.created_date') }}</td>
+                                <td>{{ __('finance_views.amount') }}</td>
+                                <td>{{ __('finance_views.payment_method') }}</td>
+                                <td>{{ __('finance_views.status') }}</td>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>{{ $invoice->created_at->format('Y-m-d') }}</td>
-                                <td>{{ number_format($invoice->payment_amount, 2) }} ASR</td>
-                                <td>{{ $invoice->payment_method ?? 'N/A' }}</td>
+                                <td>{{ number_format($invoice->payment_amount, 2) }} {{ __('finance_views.currency_sar') }}</td>
+                                <td>{{ $invoice->payment_method ?? __('finance_views.na') }}</td>
                                 <td>
                                     <span class="badge bg-{{ $invoice->payment_status == 'paid' ? 'success' : 'warning' }}">
-                                        {{ ucfirst($invoice->payment_status) }}
+                                        {{ __('finance_views.' . $invoice->payment_status) }}
                                     </span>
                                 </td>
                             </tr>

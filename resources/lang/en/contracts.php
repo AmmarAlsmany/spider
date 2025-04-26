@@ -58,7 +58,14 @@ return [
     'modals' => [
         'contract_history' => 'Contract History #:number',
         'update_history' => 'Update Request History',
-        'contract_details' => 'Contract Details #:number'
+        'contract_details' => 'Contract Details #:number',
+        'contract_created' => 'Contract Created',
+        'contract_number' => 'Contract Number: #:number',
+        'contract_type' => 'Contract Type: :type',
+        'update_request_status' => 'Status: :status',
+        'update_request_details' => 'Request Details',
+        'update_request_response' => 'Response from Administrator',
+        'contract_status' => 'Contract Status'
     ],
     
     // Status labels

@@ -20,7 +20,7 @@
         <div class="card-header">
             <div class="d-flex align-items-center">
                 <div>
-                    <h6 class="mb-0">Financial Report</h6>
+                    <h6 class="mb-0">{{ __('finance_views.financial_report') }}</h6>
                 </div>
             </div>
         </div>
@@ -29,21 +29,21 @@
             <div class="mb-4">
                 <form action="{{ route('finance.reports.financial') }}" method="GET" class="row g-3">
                     <div class="col-md-3">
-                        <label class="form-label">Start Date</label>
+                        <label class="form-label">{{ __('finance_views.start_date') }}</label>
                         <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">End Date</label>
+                        <label class="form-label">{{ __('finance_views.end_date') }}</label>
                         <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">Contract Number</label>
-                        <input type="text" name="contract_number" class="form-control" value="{{ request('contract_number') }}" placeholder="Enter contract number">
+                        <label class="form-label">{{ __('finance_views.contract_number') }}</label>
+                        <input type="text" name="contract_number" class="form-control" value="{{ request('contract_number') }}" placeholder="{{ __('finance_views.contract_number') }}">
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">&nbsp;</label>
                         <div class="gap-2 d-flex">
-                            <button type="submit" class="btn btn-primary flex-grow-1">Generate Report</button>
+                            <button type="submit" class="btn btn-primary flex-grow-1">{{ __('finance_views.generate_report') }}</button>
                             @if(request('contract_number') || request('start_date') || request('end_date'))
                                 <a href="{{ route('finance.reports.financial') }}" class="btn btn-outline-secondary">
                                     <i class='bx bx-reset'></i>
@@ -61,9 +61,9 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div>
-                                    <p class="mb-0 text-secondary">Total Revenue</p>
-                                    <h4 class="my-1 text-success">{{ number_format($report['total_revenue'], 2) }} ASR</h4>
-                                    <p class="mb-0 font-13">For selected period</p>
+                                    <p class="mb-0 text-secondary">{{ __('finance_views.total_revenue') }}</p>
+                                    <h4 class="my-1 text-success">{{ number_format($report['total_revenue'], 2) }} {{ __('finance_views.currency_sar') }}</h4>
+                                    <p class="mb-0 font-13">{{ __('finance_views.for_selected_period') }}</p>
                                 </div>
                                 <div class="text-success ms-auto font-35">
                                     <i class='bx bx-dollar'></i>
@@ -77,9 +77,9 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div>
-                                    <p class="mb-0 text-secondary">Pending Payments</p>
-                                    <h4 class="my-1 text-warning">{{ number_format($report['pending_payments'], 2) }} ASR</h4>
-                                    <p class="mb-0 font-13">Awaiting payment</p>
+                                    <p class="mb-0 text-secondary">{{ __('finance_views.pending_payments') }}</p>
+                                    <h4 class="my-1 text-warning">{{ number_format($report['pending_payments'], 2) }} {{ __('finance_views.currency_sar') }}</h4>
+                                    <p class="mb-0 font-13">{{ __('finance_views.awaiting_payment') }}</p>
                                 </div>
                                 <div class="text-warning ms-auto font-35">
                                     <i class='bx bx-time'></i>
@@ -93,9 +93,9 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div>
-                                    <p class="mb-0 text-secondary">Overdue Amount</p>
-                                    <h4 class="my-1 text-danger">{{ number_format($report['overdue_amount'], 2) }} ASR</h4>
-                                    <p class="mb-0 font-13">Past due date</p>
+                                    <p class="mb-0 text-secondary">{{ __('finance_views.overdue_amount') }}</p>
+                                    <h4 class="my-1 text-danger">{{ number_format($report['overdue_amount'], 2) }} {{ __('finance_views.currency_sar') }}</h4>
+                                    <p class="mb-0 font-13">{{ __('finance_views.past_due_date') }}</p>
                                 </div>
                                 <div class="text-danger ms-auto font-35">
                                     <i class='bx bx-error'></i>
@@ -109,9 +109,9 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div>
-                                    <p class="mb-0 text-secondary">Monthly Revenue</p>
-                                    <h4 class="my-1 text-info">{{ number_format($report['monthly_revenue'], 2) }} ASR</h4>
-                                    <p class="mb-0 font-13">Current month</p>
+                                    <p class="mb-0 text-secondary">{{ __('finance_views.monthly_revenue') }}</p>
+                                    <h4 class="my-1 text-info">{{ number_format($report['monthly_revenue'], 2) }} {{ __('finance_views.currency_sar') }}</h4>
+                                    <p class="mb-0 font-13">{{ __('finance_views.current_month') }}</p>
                                 </div>
                                 <div class="text-info ms-auto font-35">
                                     <i class='bx bx-calendar'></i>
@@ -127,11 +127,11 @@
                 <div class="card-header">
                     <div class="d-flex align-items-center">
                         <div>
-                            <h6 class="mb-0">Payment History</h6>
+                            <h6 class="mb-0">{{ __('finance_views.payment_history') }}</h6>
                         </div>
                         <div class="ms-auto">
                             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="printFinancialReport()">
-                                <i class='bx bx-printer'></i> Print Report
+                                <i class='bx bx-printer'></i> {{ __('finance_views.print_report') }}
                             </button>
                         </div>
                     </div>
@@ -142,13 +142,13 @@
                             <table class="table table-striped table-hover">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Created Date</th>
-                                        <th>Invoice #</th>
-                                        <th>Contract</th>
-                                        <th>Amount</th>
-                                        <th>Due Date</th>
-                                        <th>Status</th>
-                                        <th class="actions-column">Actions</th>
+                                        <th>{{ __('finance_views.created_date') }}</th>
+                                        <th>{{ __('finance_views.invoice_number') }}</th>
+                                        <th>{{ __('finance_views.contract') }}</th>
+                                        <th>{{ __('finance_views.amount') }}</th>
+                                        <th>{{ __('finance_views.due_date') }}</th>
+                                        <th>{{ __('finance_views.status') }}</th>
+                                        <th class="actions-column">{{ __('finance_views.actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -156,12 +156,12 @@
                                     <tr>
                                         <td>{{ $payment->created_at->format('Y-m-d') }}</td>
                                         <td>{{ $payment->invoice_number }}</td>
-                                        <td>{{ $payment->contract->contract_number ?? 'N/A' }}</td>
-                                        <td>{{ number_format($payment->payment_amount, 2) }} ASR</td>
+                                        <td>{{ $payment->contract->contract_number ?? __('finance_views.na') }}</td>
+                                        <td>{{ number_format($payment->payment_amount, 2) }} {{ __('finance_views.currency_sar') }}</td>
                                         <td>{{ $payment->due_date }}</td>
                                         <td>
                                             <span class="badge bg-{{ $payment->payment_status == 'paid' ? 'success' : ($payment->payment_status == 'overdue' ? 'danger' : 'warning') }}">
-                                                {{ ucfirst($payment->payment_status) }}
+                                                {{ __('finance_views.' . $payment->payment_status) }}
                                             </span>
                                         </td>
                                         <td class="actions-column">
@@ -205,11 +205,11 @@
         
         // Write the HTML content to the iframe
         frameDoc.document.open();
-        frameDoc.document.write('<html><head><title>Financial Report</title>');
+        frameDoc.document.write('<html><head><title>{{ __('finance_views.financial_report') }}</title>');
         frameDoc.document.write('<link rel="stylesheet" href="{{ asset("assets/css/bootstrap.min.css") }}" type="text/css" />');
         frameDoc.document.write('<style>body { padding: 20px; } .actions-column { display: none; }</style>');
         frameDoc.document.write('</head><body>');
-        frameDoc.document.write('<h3 class="mb-4 text-center">Financial Report</h3>');
+        frameDoc.document.write('<h3 class="mb-4 text-center">{{ __('finance_views.financial_report') }}</h3>');
         
         // Add the table HTML
         var tableHtml = document.querySelector('#printable-area .table-responsive').innerHTML;

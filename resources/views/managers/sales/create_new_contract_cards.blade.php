@@ -89,16 +89,16 @@
         <div class="mb-4 page-breadcrumb d-flex align-items-center">
             <div class="pe-3 breadcrumb-title d-flex align-items-center">
                 <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
-                    <i class="bx bx-arrow-back"></i> Back
+                    <i class="bx bx-arrow-back"></i> {{ __('sales_views.back') }}
                 </a>
-                <h4 class="mb-0 text-primary"><i class="bx bx-file-plus"></i> Create New Contract</h4>
+                <h4 class="mb-0 text-primary"><i class="bx bx-file-plus"></i> {{ __('sales_views.create_new_contract') }}</h4>
             </div>
             <div class="ps-3">
                 <nav aria-label="breadcrumb">
                     <ol class="p-0 mb-0 breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}"><i
                                     class="bx bx-home-alt"></i></a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Create new Contract</li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ __('sales_views.create_new_contract') }}</li>
                     </ol>
                 </nav>
             </div>
@@ -109,7 +109,7 @@
                 <div class="col-12">
                     <div class="alert alert-danger d-flex align-items-center" role="alert">
                         <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        <div>No contract types found</div>
+                        <div>{{ __('sales_views.no_contract_types_found') }}</div>
                     </div>
                 </div>
             @endempty
@@ -127,25 +127,25 @@
                         <div class="card-body">
                             <h5 class="mb-3 card-title fw-bold">{{ $type->name }}</h5>
                             <p class="mb-4 text-muted">
-                                {{ $type->description ?? 'Create a new contract with ' . $type->name }}
+                                {{ $type->description ?? __('sales_views.create_a_new_contract_with') . ' ' . $type->name }}
                             </p>
                             <div class="gap-2 d-flex justify-content-center">
                                 @if ($type->name == 'Buy equipment')
                                     <a href="{{ route('equipment.contract.create') }}" class="btn btn-primary flex-grow-1">
-                                        <i class="bi bi-person-plus me-2"></i>New Client
+                                        <i class="bi bi-person-plus me-2"></i>{{ __('sales_views.new_client') }}
                                     </a>
                                     <a href="{{ route('equipment.contract.create') }}?existing=true"
                                         class="btn btn-outline-primary flex-grow-1">
-                                        <i class="bi bi-person-check me-2"></i>Existing Client
+                                        <i class="bi bi-person-check me-2"></i>{{ __('sales_views.existing_client') }}
                                     </a>
                                 @else
                                     <button class="btn btn-primary flex-grow-1" data-bs-toggle="modal"
                                         data-bs-target="#newClientModal{{ $type->id }}">
-                                        <i class="bi bi-person-plus me-2"></i>New Client
+                                        <i class="bi bi-person-plus me-2"></i>{{ __('sales_views.new_client') }}
                                     </button>
                                     <button class="btn btn-outline-primary flex-grow-1" data-bs-toggle="modal"
                                         data-bs-target="#existingClientModal{{ $type->id }}">
-                                        <i class="bi bi-person-check me-2"></i>Existing Client
+                                        <i class="bi bi-person-check me-2"></i>{{ __('sales_views.existing_client') }}
                                     </button>
                                 @endif
                             </div>
@@ -161,7 +161,7 @@
                                 <div class="text-white modal-header bg-primary">
                                     <h5 class="modal-title">
                                         <i class="bi bi-person-plus me-2"></i>
-                                        New Client - {{ $type->name }}
+                                        {{ __('sales_views.new_client') }} - {{ $type->name }}
                                     </h5>
                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
@@ -172,19 +172,19 @@
                                     <div class="modal-body">
                                         <div class="mb-3">
                                             <label for="branches" class="form-label">
-                                                <i class="bi bi-building me-2"></i>Number of Branches
+                                                <i class="bi bi-building me-2"></i>{{ __('sales_views.number_of_branches') }}
                                             </label>
                                             <input type="number" class="form-control form-control-lg" id="branches"
                                                 name="branches" required min="1"
-                                                placeholder="Enter number of branches">
+                                                placeholder="{{ __('sales_views.enter_number_of_branches') }}">
                                         </div>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                                            <i class="bi bi-x-circle me-2"></i>Close
+                                            <i class="bi bi-x-circle me-2"></i>{{ __('sales_views.close') }}
                                         </button>
                                         <button type="submit" class="btn btn-primary">
-                                            <i class="bi bi-arrow-right-circle me-2"></i>Continue
+                                            <i class="bi bi-arrow-right-circle me-2"></i>{{ __('sales_views.continue') }}
                                         </button>
                                     </div>
                                 </form>
@@ -200,7 +200,7 @@
                                 <div class="text-white modal-header bg-primary">
                                     <h5 class="modal-title">
                                         <i class="bi bi-person-check me-2"></i>
-                                        Select Existing Client - {{ $type->name }}
+                                        {{ __('sales_views.select_existing_client') }} - {{ $type->name }}
                                     </h5>
                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
@@ -211,11 +211,11 @@
                                     <div class="modal-body">
                                         <div class="mb-3">
                                             <label for="client" class="form-label">
-                                                <i class="bi bi-search me-2"></i>Select Client
+                                                <i class="bi bi-search me-2"></i>{{ __('sales_views.select_client') }}
                                             </label>
                                             <select class="form-select form-select-lg" id="client" name="client_id"
                                                 required>
-                                                <option value="">Choose a client...</option>
+                                                <option value="">{{ __('sales_views.choose_a_client') }}</option>
                                                 @foreach ($clients as $client)
                                                     <option value="{{ $client->id }}">{{ $client->name }}
                                                         <small class="text-muted">({{ $client->email }})</small>
@@ -225,19 +225,19 @@
                                         </div>
                                         <div class="mb-3">
                                             <label for="existing_branches" class="form-label">
-                                                <i class="bi bi-building me-2"></i>Number of Branches
+                                                <i class="bi bi-building me-2"></i>{{ __('sales_views.number_of_branches') }}
                                             </label>
                                             <input type="number" class="form-control form-control-lg"
                                                 id="existing_branches" name="branches" required min="1"
-                                                placeholder="Enter number of branches">
+                                                placeholder="{{ __('sales_views.enter_number_of_branches') }}">
                                         </div>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                                            <i class="bi bi-x-circle me-2"></i>Close
+                                            <i class="bi bi-x-circle me-2"></i>{{ __('sales_views.close') }}
                                         </button>
                                         <button type="submit" class="btn btn-primary">
-                                            <i class="bi bi-arrow-right-circle me-2"></i>Continue
+                                            <i class="bi bi-arrow-right-circle me-2"></i>{{ __('sales_views.continue') }}
                                         </button>
                                     </div>
                                 </form>

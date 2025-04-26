@@ -147,7 +147,7 @@
                                     <div class="">
                                         <h5 class="mb-0 steper-title">{{ __('contract_views.personal_information') }}</h5>
                                         <p class="mb-0 steper-sub-title">
-                                            {{ __('contract_views.enter_customer_information') }}</p>
+                                            {{ __('contract_views.steper_sub_title') }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -157,7 +157,7 @@
                                     <div class="bs-stepper-circle">2</div>
                                     <div class="">
                                         <h5 class="mb-0 steper-title">{{ __('contract_views.contract_details') }}</h5>
-                                        <p class="mb-0 steper-sub-title">{{ __('contract_views.setup_contract_details') }}
+                                        <p class="mb-0 steper-sub-title">{{ __('contract_views.steper_sub_title') }}
                                         </p>
                                     </div>
                                 </div>
@@ -169,7 +169,7 @@
                                         <div class="bs-stepper-circle">3</div>
                                         <div class="">
                                             <h5 class="mb-0 steper-title">{{ __('contract_views.branch_information') }}</h5>
-                                            <p class="mb-0 steper-sub-title">{{ __('contract_views.branch_information') }}
+                                            <p class="mb-0 steper-sub-title">{{ __('contract_views.steper_sub_title') }}
                                             </p>
                                         </div>
                                     </div>
@@ -181,7 +181,7 @@
                                     <div class="bs-stepper-circle">4</div>
                                     <div class="">
                                         <h5 class="mb-0 steper-title">{{ __('contract_views.payment_information') }}</h5>
-                                        <p class="mb-0 steper-sub-title">{{ __('contract_views.payment_details') }}</p>
+                                        <p class="mb-0 steper-sub-title">{{ __('contract_views.steper_sub_title') }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -191,7 +191,7 @@
                                     <div class="bs-stepper-circle">5</div>
                                     <div class="">
                                         <h5 class="mb-0 steper-title">{{ __('contract_views.summary') }}</h5>
-                                        <p class="mb-0 steper-sub-title">{{ __('contract_views.review_information') }}</p>
+                                        <p class="mb-0 steper-sub-title">{{ __('contract_views.steper_sub_title') }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -217,67 +217,67 @@
                                 <input type="hidden" name="Property_type" value="{{ $contract_type_id->name }}">
                                 <div id="test-l-1" role="tabpanel" class="bs-stepper-pane"
                                     aria-labelledby="stepper1trigger1">
-                                    <h5 class="mb-1">Client Personal Information</h5>
-                                    <p class="mb-4">Enter the Client personal information to get closer Your Deal</p>
+                                    <h5 class="mb-1">{{ __('contract_views.personal_information') }}</h5>
+                                    <p class="mb-4">{{ __('contract_views.enter_customer_information') }}</p>
                                     <div class="row g-3">
                                         <div class="col-12 col-lg-6">
-                                            <label for="FullName" class="form-label">Full Name <span
+                                            <label for="FullName" class="form-label">{{ __('contract_views.name') }} <span
                                                     class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="clientName" id="FullName"
-                                                placeholder="Full Name" required
+                                                placeholder="{{ __('contract_views.name_placeholder') }}" required
                                                 @isset($client_info)
                                             value="{{ $client_info->name }}" @endisset>
-                                            <div class="invalid-feedback">Please enter client's full name</div>
+                                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_client_name') }}</div>
                                         </div>
                                         <div class="col-12 col-lg-6">
-                                            <label for="Phone" class="form-label">Phone Number <span
+                                            <label for="Phone" class="form-label">{{ __('contract_views.phone_number') }} <span
                                                     class="text-danger">*</span></label>
                                             <input type="tel" class="form-control" name="clientPhone" id="Phone"
-                                                placeholder="05xxxxxxxx" pattern="^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$"
+                                                placeholder="{{ __('contract_views.phone_placeholder') }}" pattern="^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$"
                                                 required
                                                 @isset($client_info) value="{{ $client_info->phone }}" @endisset>
-                                            <div class="invalid-feedback">Please enter a valid Saudi phone number</div>
+                                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_phone_number') }}</div>
                                         </div>
                                         <div class="col-12 col-lg-6">
-                                            <label for="Mobile" class="form-label">Mobile Number <span
+                                            <label for="Mobile" class="form-label">{{ __('contract_views.mobile') }} <span
                                                     class="text-danger">*</span></label>
                                             <input type="tel" class="form-control" name="clientMobile"
-                                                id="Mobile" placeholder="05xxxxxxxx"
+                                                id="Mobile" placeholder="{{ __('contract_views.phone_placeholder') }}"
                                                 pattern="^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$" required
                                                 @isset($client_info) value="{{ $client_info->mobile }}" @endisset>
-                                            <div class="invalid-feedback">Please enter a valid Saudi mobile number</div>
+                                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_mobile_number') }}</div>
                                         </div>
                                         <div class="col-12 col-lg-6">
-                                            <label for="Email" class="form-label">Email <span
+                                            <label for="Email" class="form-label">{{ __('contract_views.email') }} <span
                                                     class="text-danger">*</span></label>
                                             <input type="email" class="form-control" name="clientEmail" id="Email"
-                                                placeholder="example@domain.com" required
+                                                placeholder="{{ __('contract_views.email_placeholder') }}" required
                                                 @isset($client_info)
                                             value="{{ $client_info->email }}" @endisset>
-                                            <div class="invalid-feedback">Please enter a valid email address</div>
+                                            <div class="invalid-feedback">{{ __('contract_views.invalid_email') }}</div>
                                         </div>
                                         <div class="col-12 col-lg-6">
-                                            <label for="taxNumber" class="form-label">Tax Number <span
+                                            <label for="taxNumber" class="form-label">{{ __('contract_views.tax_number') }} <span
                                                     class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="client_tax_number"
-                                                id="taxNumber" placeholder="Enter Tax Number" pattern="^[0-9]{15}$"
+                                                id="taxNumber" placeholder="{{ __('contract_views.tax_number_placeholder') }}" pattern="^[0-9]{15}$"
                                                 required
                                                 @isset($client_info) value="{{ $client_info->tax_number }}" @endisset>
-                                            <div class="invalid-feedback">Please enter a valid 15-digit tax number</div>
+                                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_tax_number') }}</div>
                                         </div>
                                         <div class="col-12 col-lg-6">
-                                            <label for="zipCode" class="form-label">Zip Code</label>
+                                            <label for="zipCode" class="form-label">{{ __('contract_views.zip_code') }}</label>
                                             <input type="text" class="form-control" name="client_zipcode"
-                                                id="zipCode" placeholder="Enter Zip Code" pattern="^[0-9]{5}$"
+                                                id="zipCode" placeholder="{{ __('contract_views.zip_code_placeholder') }}" pattern="^[0-9]{5}$"
                                                 @isset($client_info)
                                             value="{{ $client_info->zip_code }}" @endisset>
-                                            <div class="invalid-feedback">Please enter a valid 5-digit zip code</div>
+                                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_zipcode') }}</div>
                                         </div>
                                         <div class="col-12 col-lg-6">
-                                            <label for="City" class="form-label">City <span
+                                            <label for="City" class="form-label">{{ __('contract_views.city') }} <span
                                                     class="text-danger">*</span></label>
                                             <select class="form-select" name="clientCity" id="City" required>
-                                                <option value="">Select City</option>
+                                                <option value="">{{ __('contract_views.select_city') }}</option>
                                                 @foreach ($saudiCities as $city)
                                                     <option value="{{ $city }}"
                                                         @isset($client_info) @if ($client_info->city == $city) selected @endif @endisset>
@@ -285,22 +285,22 @@
                                                     </option>
                                                 @endforeach
                                             </select>
-                                            <div class="invalid-feedback">Please select a city</div>
+                                            <div class="invalid-feedback">{{ __('contract_views.select_valid_city') }}</div>
                                         </div>
                                         <div class="col-12">
-                                            <label for="Address" class="form-label">Address <span
+                                            <label for="Address" class="form-label">{{ __('contract_views.address') }} <span
                                                     class="text-danger">*</span></label>
-                                            <textarea class="form-control" name="clientAddress" id="Address" rows="3" placeholder="Enter full address"
+                                            <textarea class="form-control" name="clientAddress" id="Address" rows="3" placeholder="{{ __('contract_views.address_placeholder') }}"
                                                 required>
 @isset($client_info)
 {{ $client_info->address }}
 @endisset
 </textarea>
-                                            <div class="invalid-feedback">Please enter the client's address</div>
+                                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_address') }}</div>
                                         </div>
                                         <div class="mb-3 col-12">
                                             <button type="button" class="px-4 btn btn-primary"
-                                                onclick="handleNextStep();">Next<i
+                                                onclick="handleNextStep()">{{ __('contract_views.next') }}<i
                                                     class='bx bx-right-arrow-alt ms-2'></i></button>
                                         </div>
                                     </div>
@@ -310,8 +310,8 @@
                                 <div id="test-l-2" role="tabpanel" class="bs-stepper-pane"
                                     aria-labelledby="stepper1trigger2">
 
-                                    <h5 class="mb-1">Contracts Details</h5>
-                                    <p class="mb-4">Enter Your Contract Details.</p>
+                                    <h5 class="mb-1">{{ __('contract_views.contract_details') }}</h5>
+                                    <p class="mb-4">{{ __('contract_views.setup_contract_details') }}</p>
 
                                     <div class="row g-3" x-data="{
                                         branchCount: {{ $branches }},
@@ -319,39 +319,37 @@
 
                                         <div class="row g-3">
                                             <div class="col-12 col-lg-6">
-                                                <label for="contractNumber" class="form-label">Contract Number <span
+                                                <label for="contractNumber" class="form-label">{{ __('contract_views.contract_number') }} <span
                                                         class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" name="contractnumber"
-                                                    id="contractNumber" placeholder="123.."
+                                                    id="contractNumber" placeholder="{{ __('contract_views.contract_number_placeholder') }}"
                                                     value="{{ $contract_number }}" readonly>
                                             </div>
                                             <div class="col-12 col-lg-6">
-                                                <label for="contractstartdate" class="form-label">Start Date <span
+                                                <label for="start_date" class="form-label">{{ __('contract_views.start_date') }} <span
                                                         class="text-danger">*</span></label>
                                                 <input type="date" class="form-control" name="contractstartdate"
                                                     id="contractstartdate" required>
-                                                <div class="invalid-feedback">Please select a start date</div>
+                                                <div class="invalid-feedback">{{ __('contract_views.select_valid_start_date') }}</div>
                                             </div>
                                             <div class="col-12 col-lg-6">
-                                                <label for="contractenddate" class="form-label">End Date <span
+                                                <label for="contractenddate" class="form-label">{{ __('contract_views.end_date') }} <span
                                                         class="text-danger">*</span></label>
                                                 <input type="date" class="form-control" name="contractenddate"
                                                     id="contractenddate" required>
-                                                <div class="invalid-feedback">Please select an end date that's after the
-                                                    start date</div>
+                                                <div class="invalid-feedback">{{ __('contract_views.select_valid_end_date') }}</div>
                                             </div>
 
                                             <div class="col-12 col-lg-6">
-                                                <label for="visit_start_date" class="form-label">Visit Start Date <span
+                                                <label for="visit_start_date" class="form-label">{{ __('contract_views.visit_start_date') }} <span
                                                         class="text-danger">*</span></label>
                                                 <input type="date" class="form-control" name="visit_start_date"
                                                     id="visit_start_date" required>
-                                                <div class="invalid-feedback">Please select a visit start date between
-                                                    contract start and end dates</div>
+                                                <div class="invalid-feedback">{{ __('contract_views.select_valid_visit_start_date') }}</div>
                                             </div>
 
                                             <div class="col-12 col-lg-6">
-                                                <label for="contract_type_id" class="form-label">Contract Type <span
+                                                <label for="contract_type" class="form-label">{{ __('contract_views.contract_type') }} <span
                                                         class="text-danger">*</span></label>
                                                 <select class="form-select" name="contract_type_id" id="contract_type_id"
                                                     required>
@@ -359,11 +357,11 @@
                                                         <option value="{{ $type->id }}">{{ $type->name }}</option>
                                                     @endforeach
                                                 </select>
-                                                <div class="invalid-feedback">Please select a contract type</div>
+                                                <div class="invalid-feedback">{{ __('contract_views.select_contract_type_error') }}</div>
                                             </div>
 
                                             <div class="col-12 col-lg-6">
-                                                <label for="Property_type" class="form-label">Property Type <span
+                                                <label for="Property_type" class="form-label">{{ __('contract_views.property_type') }} <span
                                                         class="text-danger">*</span></label>
                                                 <select class="form-select" name="Property_type" id="Property_type"
                                                     required>
@@ -371,45 +369,43 @@
                                                         <option value="{{ $type }}">{{ $type }}</option>
                                                     @endforeach
                                                 </select>
-                                                <div class="invalid-feedback">Please select a property type</div>
+                                                <div class="invalid-feedback">{{ __('contract_views.select_property_type_error') }}</div>
                                             </div>
 
                                             <div class="col-12">
-                                                <label for="contractDescription" class="form-label">Contract Description
+                                                <label for="contractDescription" class="form-label">{{ __('contract_views.contract_description') }}
                                                     <span class="text-danger">*</span></label>
                                                 <div class="form-group">
                                                     <textarea class="form-control" id="contractDescription" name="contract_description"
-                                                        placeholder="Enter contract description..." rows="3" required minlength="10"></textarea>
-                                                    <div class="invalid-feedback">
-                                                        Please enter a description (minimum 10 characters)
-                                                    </div>
+                                                        placeholder="{{ __('contract_views.enter_contract_description_placeholder') }}" rows="3" required minlength="10"></textarea>
+                                                    <div class="invalid-feedback">{{ __('contract_views.provide_valid_description') }}</div>
                                                 </div>
                                             </div>
 
                                             <div class="col-12 col-lg-6">
-                                                <label for="number_of_visits" class="form-label">Number of Visits <span
+                                                <label for="number_of_visits" class="form-label">{{ __('contract_views.number_of_visits') }} <span
                                                         class="text-danger">*</span></label>
                                                 <input type="number" class="form-control" name="number_of_visits"
                                                     id="number_of_visits" min="1" required value="1">
-                                                <div class="invalid-feedback">Please enter at least 1 visit</div>
-                                                <div class="form-text">Minimum 1 visit required</div>
+                                                <div class="invalid-feedback">{{ __('contract_views.provide_valid_number_of_visits') }}</div>
+                                                <div class="form-text">{{ __('contract_views.minimum_visits_required') }}</div>
                                             </div>
 
                                             <div class="col-12 col-lg-6">
-                                                <label for="warranty" class="form-label">Warranty Period (Months) <span
+                                                <label for="warranty" class="form-label">{{ __('contract_views.warranty_period_months') }} <span
                                                         class="text-danger">*</span></label>
                                                 <input type="number" class="form-control" name="warranty"
                                                     id="warranty" min="0" required value="0">
-                                                <div class="invalid-feedback">Please enter a valid warranty period</div>
+                                                <div class="invalid-feedback">{{ __('contract_views.provide_valid_warranty_period') }}</div>
                                             </div>
 
                                             <div class="col-12">
                                                 <div class="gap-3 d-flex align-items-center">
                                                     <button type="button" class="px-4 btn btn-outline-secondary"
                                                         onclick="handlePreviousStep()"><i
-                                                            class='bx bx-left-arrow-alt me-2'></i>Previous</button>
+                                                            class='bx bx-left-arrow-alt me-2'></i>{{ __('contract_views.previous') }}</button>
                                                     <button type="button" class="px-4 btn btn-primary"
-                                                        onclick="handleNextStep();">Next<i
+                                                        onclick="handleNextStep();">{{ __('contract_views.next') }}<i
                                                             class='bx bx-right-arrow-alt ms-2'></i></button>
                                                 </div>
                                             </div>
@@ -421,74 +417,69 @@
                                 @if ($branches >= 1)
                                     <div id="test-l-3" role="tabpanel" class="bs-stepper-pane"
                                         aria-labelledby="stepper1trigger3">
-                                        <h5 class="mb-1">Branchs Information</h5>
+                                        <h5 class="mb-1">{{ __('contract_views.branch_information') }}</h5>
                                         @for ($i = 0; $i < $branches; $i++)
                                             <div class="mb-3 card">
                                                 <div class="card-header">
-                                                    <h5 class="mb-1">Branch {{ $i + 1 }}</h5>
+                                                    <h5 class="mb-1">{{ __('contract_views.branch') }} {{ $i + 1 }}</h5>
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="row g-3">
                                                         <div class="col-12 col-lg-6">
                                                             <label for="branchName{{ $i }}"
-                                                                class="form-label">Branch Name <span
+                                                                class="form-label">{{ __('contract_views.branch_name') }} <span
                                                                     class="text-danger">*</span></label>
                                                             <input type="text" class="form-control"
                                                                 name="branchName{{ $i }}"
                                                                 id="branchName{{ $i }}"
-                                                                placeholder="Branch Name" required>
-                                                            <div class="invalid-feedback">Please enter the branch name
-                                                            </div>
+                                                                placeholder="{{ __('contract_views.branch_name') }}" required>
+                                                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_branch_name') }}</div>
                                                         </div>
                                                         <div class="col-12 col-lg-6">
                                                             <label for="branchmanager{{ $i }}"
-                                                                class="form-label">Branch Manager
-                                                                Name <span class="text-danger">*</span></label>
+                                                                class="form-label">{{ __('contract_views.branch_manager') }}
+                                                                <span class="text-danger">*</span></label>
                                                             <input type="text" class="form-control"
                                                                 name="branchmanager{{ $i }}"
                                                                 id="branchmanager{{ $i }}"
-                                                                placeholder="Branch Manager Name" required>
-                                                            <div class="invalid-feedback">Please enter the branch manager
-                                                                name</div>
+                                                                placeholder="{{ __('contract_views.branch_manager') }}" required>
+                                                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_branch_manager') }}</div>
                                                         </div>
                                                         <div class="col-12 col-lg-6">
                                                             <label for="branchphone{{ $i }}"
-                                                                class="form-label">Branch Manager Phone
+                                                                class="form-label">{{ __('contract_views.branch_phone') }}
                                                                 <span class="text-danger">*</span></label>
                                                             <input type="text" class="form-control"
                                                                 name="branchphone{{ $i }}"
                                                                 id="branchphone{{ $i }}"
-                                                                placeholder="05xxxxxxxx" required
+                                                                placeholder="{{ __('contract_views.phone_placeholder') }}" required
                                                                 pattern="^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$">
-                                                            <div class="invalid-feedback">Please enter a valid Saudi phone
-                                                                number
-                                                                (e.g., 05xxxxxxxx)</div>
+                                                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_branch_phone') }}</div>
                                                         </div>
                                                         <div class="col-12 col-lg-6">
                                                             <label for="branchAddress{{ $i }}"
-                                                                class="form-label">Branch Address
+                                                                class="form-label">{{ __('contract_views.branch_address') }}
                                                                 <span class="text-danger">*</span></label>
                                                             <input type="text" class="form-control"
                                                                 name="branchAddress{{ $i }}"
                                                                 id="branchAddress{{ $i }}"
-                                                                placeholder="Branch Address" required>
-                                                            <div class="invalid-feedback">Please enter the branch address
-                                                            </div>
+                                                                placeholder="{{ __('contract_views.branch_address') }}" required>
+                                                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_branch_address') }}</div>
                                                         </div>
                                                         <div class="col-12 col-lg-6">
                                                             <label for="branchcity{{ $i }}"
-                                                                class="form-label">City <span
+                                                                class="form-label">{{ __('contract_views.city') }} <span
                                                                     class="text-danger">*</span></label>
                                                             <select class="form-select"
                                                                 name="branchcity{{ $i }}"
                                                                 id="branchcity{{ $i }}" required>
-                                                                <option value="">Select City</option>
+                                                                <option value="">{{ __('contract_views.select_city') }}</option>
                                                                 @foreach ($saudiCities as $city)
                                                                     <option value="{{ $city }}">
                                                                         {{ $city }}</option>
                                                                 @endforeach
                                                             </select>
-                                                            <div class="invalid-feedback">Please select a city</div>
+                                                            <div class="invalid-feedback">{{ __('contract_views.select_city_error') }}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -499,9 +490,9 @@
                                                 <div class="gap-3 d-flex align-items-center">
                                                     <button type="button" class="px-4 btn btn-outline-secondary"
                                                         onclick="handlePreviousStep()"><i
-                                                            class='bx bx-left-arrow-alt me-2'></i>Previous</button>
+                                                            class='bx bx-left-arrow-alt me-2'></i>{{ __('contract_views.previous') }}</button>
                                                     <button type="button" class="px-4 btn btn-primary"
-                                                        onclick="handleNextStep()">Next<i
+                                                        onclick="handleNextStep()">{{ __('contract_views.next') }}<i
                                                             class='bx bx-right-arrow-alt ms-2'></i></button>
                                                 </div>
                                             </div>
@@ -510,8 +501,8 @@
                                 @endif
                                 <div id="test-l-4" role="tabpanel" class="bs-stepper-pane"
                                     aria-labelledby="stepper1trigger4">
-                                    <h5 class="mb-1">Payment Information</h5>
-                                    <p class="mb-4">Enter payment information and the number of payments</p>
+                                    <h5 class="mb-1">{{ __('contract_views.payment_information') }}</h5>
+                                    <p class="mb-4">{{ __('contract_views.enter_payment_information') }}</p>
 
                                     <div class="row g-3" x-data="{
                                         contractAmount: 0,
@@ -559,75 +550,73 @@
                                     $watch('payment_schedule', value => initPaymentDates());
                                     $watch('payment_type', value => calculateAmounts());">
                                         <div class="col-12 col-lg-6">
-                                            <label for="Contractamount" class="form-label">Contract Amount (without VAT)
+                                            <label for="Contractamount" class="form-label">{{ __('contract_details_new.contract_info_amount_without_vat') }}
                                                 <span class="text-danger">*</span></label>
                                             <input type="number" class="form-control" name="contractamount"
                                                 id="Contractamount" x-model="contractAmount" required min="0"
                                                 step="0.01">
-                                            <div class="invalid-feedback">Please enter a valid contract amount</div>
+                                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_payment_amount') }}</div>
                                         </div>
 
                                         <div class="col-12 col-lg-6">
-                                            <label for="first_payment_date" class="form-label">First Payment Date <span
+                                            <label for="first_payment_date" class="form-label">{{ __('contract_views.first_payment_date') }} <span
                                                     class="text-danger">*</span></label>
                                             <input type="date" class="form-control" name="first_payment_date"
                                                 id="first_payment_date" x-model="first_payment_date" required
                                                 min="{{ date('Y-m-d') }}">
-                                            <div class="invalid-feedback">Please select a valid payment date</div>
+                                            <div class="invalid-feedback">{{ __('contract_views.select_payment_date') }}</div>
                                         </div>
 
                                         <div class="col-12 col-lg-6">
-                                            <label for="payment_type" class="form-label">Payment Type <span
+                                            <label for="payment_type" class="form-label">{{ __('contract_views.payment_type') }} <span
                                                     class="text-danger">*</span></label>
                                             <select class="form-select" name="payment_type" id="payment_type"
                                                 x-model="payment_type" required>
-                                                <option value="prepaid">Prepaid (Full Amount)</option>
-                                                <option value="postpaid">Postpaid (Installments)</option>
+                                                <option value="prepaid">{{ __('contract_views.prepaid') }}</option>
+                                                <option value="postpaid">{{ __('contract_views.postpaid') }}</option>
                                             </select>
-                                            <div class="invalid-feedback">Please select a payment type</div>
+                                            <div class="invalid-feedback">{{ __('contract_views.select_payment_type_error') }}</div>
                                         </div>
 
                                         <template x-if="payment_type === 'postpaid'">
                                             <div class="col-12 col-lg-6">
-                                                <label for="number_of_payments" class="form-label">Number of Payments
+                                                <label for="number_of_payments" class="form-label">{{ __('contract_views.number_of_payments') }}
                                                     <span class="text-danger">*</span></label>
                                                 <input type="number" class="form-control" name="number_of_payments"
                                                     id="number_of_payments" x-model="numberOfPayments" required
                                                     min="1" max="24">
-                                                <div class="invalid-feedback">Please enter a valid number of payments
-                                                    (1-24)</div>
+                                                <div class="invalid-feedback">{{ __('contract_views.provide_valid_number_of_payments') }}</div>
                                             </div>
                                         </template>
 
                                         <template x-if="payment_type === 'postpaid'">
                                             <div class="col-12 col-lg-6">
-                                                <label for="payment_schedule" class="form-label">Payment Schedule <span
+                                                <label for="payment_schedule" class="form-label">{{ __('contract_views.payment_schedule') }} <span
                                                         class="text-danger">*</span></label>
                                                 <select class="form-select" name="payment_schedule" id="payment_schedule"
                                                     x-model="payment_schedule" required>
-                                                    <option value="monthly">Monthly</option>
-                                                    <option value="custom">Custom Dates</option>
+                                                    <option value="monthly">{{ __('contract_views.monthly') }}</option>
+                                                    <option value="custom">{{ __('contract_views.custom_dates') }}</option>
                                                 </select>
-                                                <div class="invalid-feedback">Please select a payment schedule</div>
+                                                <div class="invalid-feedback">{{ __('contract_views.select_payment_schedule_error') }}</div>
                                             </div>
                                         </template>
 
                                         <template x-if="payment_type === 'postpaid'">
                                             <div class="col-12 col-lg-6">
-                                                <label for="first_payment_date" class="form-label">First Payment Date
+                                                <label for="first_payment_date" class="form-label">{{ __('contract_views.first_payment_date') }}
                                                     <span class="text-danger">*</span></label>
                                                 <input type="date" class="form-control" name="first_payment_date"
                                                     id="first_payment_date" x-model="first_payment_date" required
                                                     min="{{ date('Y-m-d') }}">
-                                                <div class="invalid-feedback">Please select a valid first payment date
-                                                </div>
+                                                <div class="invalid-feedback">{{ __('contract_views.select_payment_date') }}</div>
                                             </div>
                                         </template>
 
                                         <template x-if="payment_type === 'postpaid' && payment_schedule === 'custom'">
                                             <div class="col-12">
                                                 <div class="p-3 rounded border">
-                                                    <h6 class="mb-3">Custom Payment Dates</h6>
+                                                    <h6 class="mb-3">{{ __('contract_views.custom_dates') }}</h6>
                                                     <div id="custom-payment-dates">
                                                         <!-- Custom payment date fields will be generated here -->
                                                     </div>
@@ -637,16 +626,16 @@
 
                                         <div class="col-12">
                                             <div class="alert alert-info">
-                                                <strong>VAT (15%):</strong> <span x-text="vatAmount.toFixed(2)"></span>
-                                                SAR<br>
-                                                <strong>Total Amount:</strong> <span
+                                                <strong>{{ __('contract_details_new.vat_amount') }}:</strong> <span x-text="vatAmount.toFixed(2)"></span>
+                                                {{ __('contract_views.currency') }}<br>
+                                                <strong>{{ __('contract_views.total_amount') }}:</strong> <span
                                                     x-text="totalAmount.toFixed(2)"></span>
-                                                SAR
+                                                {{ __('contract_views.currency') }}
                                                 <template x-if="payment_type === 'postpaid'">
                                                     <div>
-                                                        <strong>Payment per Installment:</strong> <span
+                                                        <strong>{{ __('contract_views.payment_amount') }}:</strong> <span
                                                             x-text="installmentAmount.toFixed(2)"></span>
-                                                        SAR
+                                                        {{ __('contract_views.currency') }}
                                                     </div>
                                                 </template>
                                             </div>
@@ -656,79 +645,79 @@
                                         <div class="gap-3 d-flex align-items-center">
                                             <button type="button" class="px-4 btn btn-outline-secondary"
                                                 onclick="handlePreviousStep()">
-                                                <i class='bx bx-left-arrow-alt me-2'></i>Previous
+                                                <i class='bx bx-left-arrow-alt me-2'></i>{{ __('contract_views.previous') }}
                                             </button>
                                             <button type="button" class="px-4 btn btn-primary"
                                                 onclick="handleNextStep()">
-                                                Next<i class='bx bx-right-arrow-alt ms-2'></i>
+                                                {{ __('contract_views.next') }}<i class='bx bx-right-arrow-alt ms-2'></i>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                                 <div id="test-l-5" role="tabpanel" class="bs-stepper-pane"
                                     aria-labelledby="stepper1trigger5">
-                                    <h5 class="mb-1">Summary</h5>
-                                    <p class="mb-4">Review the information you entered</p>
+                                    <h5 class="mb-1">{{ __('contract_views.summary') }}</h5>
+                                    <p class="mb-4">{{ __('contract_views.review_information') }}</p>
 
                                     <div class="row g-3">
                                         <div class="col-12">
                                             <div class="card">
                                                 <div class="card-body">
-                                                    <h5 class="mb-4 card-title">Contract Summary</h5>
+                                                    <h5 class="mb-4 card-title">{{ __('contract_views.summary') }}</h5>
                                                     <div class="row">
                                                         <div class="col-md-6">
-                                                            <h6 class="mb-3">Client Information</h6>
+                                                            <h6 class="mb-3">{{ __('contract_views.client_information') }}</h6>
                                                             <table class="table table-borderless">
                                                                 <tbody>
                                                                     <tr>
-                                                                        <td><strong>Full Name:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.name') }}:</strong></td>
                                                                         <td id="summary-client-name"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>Mobile:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.mobile') }}:</strong></td>
                                                                         <td id="summary-client-mobile"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>Email:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.email') }}:</strong></td>
                                                                         <td id="summary-client-email"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>Tax Number:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.tax_number') }}:</strong></td>
                                                                         <td id="summary-tax-number"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>City:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.city') }}:</strong></td>
                                                                         <td id="summary-client-city"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>Address:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.address') }}:</strong></td>
                                                                         <td id="summary-client-address"></td>
                                                                     </tr>
                                                                 </tbody>
                                                             </table>
                                                         </div>
                                                         <div class="col-md-6">
-                                                            <h6 class="mb-3">Contract Details</h6>
+                                                            <h6 class="mb-3">{{ __('contract_views.contract_details') }}</h6>
                                                             <table class="table table-borderless">
                                                                 <tbody>
                                                                     <tr>
-                                                                        <td><strong>Contract Number:</strong></td>
+                                                                        <td><strong>{{ __('contract_details_new.contract_info_number') }}:</strong></td>
                                                                         <td id="summary-contract-number"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>Start Date:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.start_date') }}:</strong></td>
                                                                         <td id="summary-contract-date-start"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>End Date:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.end_date') }}:</strong></td>
                                                                         <td id="summary-contract-date-end"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>Visit Start Date:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.visit_start_date') }}:</strong></td>
                                                                         <td id="summary-contract-date-visit-start"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>Warranty Period:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.warranty') }}:</strong></td>
                                                                         <td id="summary-warranty"></td>
                                                                     </tr>
                                                                 </tbody>
@@ -737,41 +726,41 @@
                                                     </div>
                                                     <div class="mt-4 row">
                                                         <div class="col-md-6">
-                                                            <h6 class="mb-3">Payment Information</h6>
+                                                            <h6 class="mb-3">{{ __('contract_views.payment_information') }}</h6>
                                                             <table class="table table-borderless">
                                                                 <tbody>
                                                                     <tr>
-                                                                        <td><strong>Payment Type:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.payment_type') }}:</strong></td>
                                                                         <td id="summary-payment-type"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>Payment Schedule:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.payment_schedule') }}:</strong></td>
                                                                         <td id="summary-payment-schedule"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>Number of Payments:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.number_of_payments') }}:</strong></td>
                                                                         <td id="summary-number-payments"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>Contract Amount:</strong></td>
+                                                                        <td><strong>{{ __('contract_details_new.contract_info_amount_without_vat') }}:</strong></td>
                                                                         <td id="summary-contract-amount"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>VAT (15%):</strong></td>
+                                                                        <td><strong>{{ __('contract_details_new.vat_amount') }}:</strong></td>
                                                                         <td id="summary-vat-amount"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>Total Amount:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.total_amount') }}:</strong></td>
                                                                         <td id="summary-total-amount"></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td><strong>First Payment Date:</strong></td>
+                                                                        <td><strong>{{ __('contract_views.first_payment_date') }}:</strong></td>
                                                                         <td id="summary-first-payment-date"></td>
                                                                     </tr>
                                                                     <tr id="summary-payment-dates-row"
                                                                         style="display: none;">
                                                                         <td colspan="2">
-                                                                            <strong>Payment Schedule:</strong>
+                                                                            <strong>{{ __('contract_views.payment_schedule') }}:</strong>
                                                                             <div id="summary-payment-dates"
                                                                                 class="mt-2">
                                                                             </div>
@@ -781,7 +770,7 @@
                                                             </table>
                                                         </div>
                                                         <div class="col-md-6" id="summary-payment-dates">
-                                                            <h6 class="mb-3">Payment Schedule</h6>
+                                                            <h6 class="mb-3">{{ __('contract_views.payment_schedule') }}</h6>
                                                             <div id="payment-dates-list"></div>
                                                         </div>
                                                     </div>
@@ -791,10 +780,10 @@
                                         <div class="col-12">
                                             <div class="mt-4 d-flex justify-content-between">
                                                 <button type="button" class="btn btn-secondary"
-                                                    onclick="handlePreviousStep()">Edit</button>
+                                                    onclick="handlePreviousStep()">{{ __('contract_views.edit') }}</button>
                                                 <button type="button" class="btn btn-danger"
-                                                    onclick="cancelContract()">Cancel</button>
-                                                <button type="submit" class="btn btn-success">Save Contract</button>
+                                                    onclick="cancelContract()">{{ __('contract_views.cancel') }}</button>
+                                                <button type="submit" class="btn btn-success">{{ __('contract_views.save') }}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -900,8 +889,8 @@
                 console.error('Error checking duplicate:', error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error',
-                    text: 'There was an error checking for duplicate entries. Please try again.'
+                    title: '{{ __('contract_views.error') }}',
+                    text: '{{ __('contract_views.duplicate_check_error') }}'
                 });
                 return false;
             }
@@ -913,43 +902,43 @@
                     name: 'clientName',
                     id: 'FullName',
                     pattern: /.+/,
-                    message: 'Please enter client\'s full name'
+                    message: '{{ __('contract_views.provide_valid_name') }}'
                 },
                 {
                     name: 'clientPhone',
                     id: 'Phone',
                     pattern: /^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$/,
-                    message: 'Please enter a valid Saudi phone number'
+                    message: '{{ __('contract_views.provide_valid_phone') }}'
                 },
                 {
                     name: 'clientMobile',
                     id: 'Mobile',
                     pattern: /^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$/,
-                    message: 'Please enter a valid Saudi mobile number'
+                    message: '{{ __('contract_views.provide_valid_mobile') }}'
                 },
                 {
                     name: 'clientEmail',
                     id: 'Email',
                     pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: 'Please enter a valid email address'
+                    message: '{{ __('contract_views.provide_valid_email') }}'
                 },
                 {
                     name: 'clientCity',
                     id: 'City',
                     pattern: /.+/,
-                    message: 'Please enter client\'s city'
+                    message: '{{ __('contract_views.provide_valid_city') }}'
                 },
                 {
                     name: 'clientAddress',
                     id: 'Address',
                     pattern: /.+/,
-                    message: 'Please enter client\'s address'
+                    message: '{{ __('contract_views.provide_valid_address') }}'
                 },
                 {
                     name: 'client_tax_number',
                     id: 'taxNumber',
                     pattern: /^[0-9]{15}$/,
-                    message: 'Please enter a valid 15-digit tax number'
+                    message: '{{ __('contract_views.provide_valid_tax_number') }}'
                 }
             ];
 
@@ -991,7 +980,7 @@
             if (!isValid) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Validation Error',
+                    title: '{{ __('contract_views.validation_error') }}',
                     html: errorMessages.join('<br>')
                 });
                 return false;
@@ -1016,26 +1005,26 @@
 
                     if (emailExists) {
                         document.getElementById('Email').classList.add('is-invalid');
-                        duplicateErrors.push('This email is already registered');
+                        duplicateErrors.push('{{ __('contract_views.email_already_registered') }}');
                         isValid = false;
                     }
 
                     if (phoneExists) {
                         document.getElementById('Phone').classList.add('is-invalid');
-                        duplicateErrors.push('This phone number is already registered');
+                        duplicateErrors.push('{{ __('contract_views.phone_already_registered') }}');
                         isValid = false;
                     }
 
                     if (mobileExists) {
                         document.getElementById('Mobile').classList.add('is-invalid');
-                        duplicateErrors.push('This mobile number is already registered');
+                        duplicateErrors.push('{{ __('contract_views.mobile_already_registered') }}');
                         isValid = false;
                     }
 
                     if (duplicateErrors.length > 0) {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Duplicate Entry',
+                            title: '{{ __('contract_views.duplicate_entry') }}',
                             html: duplicateErrors.join('<br>')
                         });
                         return false;
@@ -1044,8 +1033,8 @@
                     console.error('Error in duplicate check:', error);
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error',
-                        text: 'There was an error validating the form. Please try again.'
+                        title: '{{ __('contract_views.error') }}',
+                        text: '{{ __('contract_views.validation_error_message') }}'
                     });
                     return false;
                 }
@@ -1155,8 +1144,7 @@
                 if (visitStartDate) {
                     visitStartDate.classList.add('is-invalid');
                     const feedback = visitStartDate.nextElementSibling;
-                    if (feedback) feedback.textContent =
-                        'Please select a visit start date between contract start and end dates';
+                    if (feedback) feedback.textContent = '{{ __('contract_views.select_valid_visit_start_date') }}';
                 }
                 isValid = false;
             } else {
@@ -1230,24 +1218,24 @@
             for (let i = 0; i < branchCount; i++) {
                 const fields = [{
                         id: `branchName${i}`,
-                        label: 'Branch Name'
+                        label: '{{ __('contract_views.branch_name') }}'
                     },
                     {
                         id: `branchmanager${i}`,
-                        label: 'Branch Manager'
+                        label: '{{ __('contract_views.branch_manager') }}'
                     },
                     {
                         id: `branchphone${i}`,
-                        label: 'Branch Phone',
+                        label: '{{ __('contract_views.branch_phone') }}',
                         pattern: /^(05|5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$/
                     },
                     {
                         id: `branchAddress${i}`,
-                        label: 'Branch Address'
+                        label: '{{ __('contract_views.branch_address') }}'
                     },
                     {
                         id: `branchcity${i}`,
-                        label: 'Branch City'
+                        label: '{{ __('contract_views.branch_city') }}'
                     }
                 ];
 
@@ -1279,7 +1267,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Validation Error',
-                    text: 'Please fill in all branch information correctly',
+                    text: '{{ __('contract_views.fill_in_all_branch_information_correctly') }}',
                     confirmButtonText: 'OK'
                 });
             }
@@ -1297,7 +1285,7 @@
             if (!contractAmount || contractAmount.value === '' || parseFloat(contractAmount.value) < 0) {
                 if (contractAmount) contractAmount.classList.add('is-invalid');
                 isValid = false;
-                errorMessage = 'Please enter a valid contract amount (0 or greater)';
+                errorMessage = '{{ __('contract_views.provide_valid_contract_amount') }}';
                 return false;
             }
             if (contractAmount) contractAmount.classList.remove('is-invalid');
@@ -1307,7 +1295,7 @@
             if (!paymentType || !paymentType.value || !['prepaid', 'postpaid'].includes(paymentType.value)) {
                 if (paymentType) paymentType.classList.add('is-invalid');
                 isValid = false;
-                errorMessage = 'Please select a valid payment type';
+                errorMessage = '{{ __('contract_views.provide_valid_payment_type') }}';
                 return false;
             }
             if (paymentType) paymentType.classList.remove('is-invalid');
@@ -1317,7 +1305,7 @@
             if (!firstPaymentDate || !firstPaymentDate.value) {
                 if (firstPaymentDate) firstPaymentDate.classList.add('is-invalid');
                 isValid = false;
-                errorMessage = 'Please select the payment date';
+                errorMessage = '{{ __('contract_views.provide_valid_payment_date') }}';
                 return false;
             }
             if (firstPaymentDate) firstPaymentDate.classList.remove('is-invalid');
@@ -1329,7 +1317,7 @@
                     parseInt(numberOfPayments.value) < 1 || parseInt(numberOfPayments.value) > 24) {
                     if (numberOfPayments) numberOfPayments.classList.add('is-invalid');
                     isValid = false;
-                    errorMessage = 'Please enter a valid number of payments (1-24)';
+                    errorMessage = '{{ __('contract_views.provide_valid_number_of_payments') }}';
                     return false;
                 }
                 if (numberOfPayments) numberOfPayments.classList.remove('is-invalid');
@@ -1339,7 +1327,7 @@
                 if (!paymentSchedule || !paymentSchedule.value) {
                     if (paymentSchedule) paymentSchedule.classList.add('is-invalid');
                     isValid = false;
-                    errorMessage = 'Please select a payment schedule';
+                    errorMessage = '{{ __('contract_views.provide_valid_payment_schedule') }}';
                     return false;
                 }
                 if (paymentSchedule) paymentSchedule.classList.remove('is-invalid');
@@ -1355,7 +1343,7 @@
                             if (!input.value) {
                                 input.classList.add('is-invalid');
                                 isValid = false;
-                                errorMessage = `Please select payment date ${i + 2}`;
+                                errorMessage = '{{ __('contract_views.provide_valid_payment_dates') }}';
                                 return false;
                             }
 
@@ -1363,7 +1351,7 @@
                             if (currentDate <= previousDate) {
                                 input.classList.add('is-invalid');
                                 isValid = false;
-                                errorMessage = `Payment date ${i + 2} must be after the previous payment date`;
+                                errorMessage = '{{ __('contract_views.provide_valid_payment_dates') }}';
                                 return false;
                             }
 
@@ -1378,7 +1366,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Validation Error',
-                    text: errorMessage || 'Please fill in all payment information correctly'
+                    text: errorMessage || '{{ __('contract_views.fill_in_all_payment_information_correctly') }}'
                 });
             }
 
@@ -1453,13 +1441,13 @@
 
                 // If all validations pass, show confirmation dialog
                 Swal.fire({
-                    title: 'Confirm Contract Submission',
-                    text: 'Are you sure you want to submit this contract?',
+                    title: '{{ __('contract_views.confirm_contract_submission') }}',
+                    text: '{{ __('contract_views.are_you_sure_you_want_to_submit_this_contract') }}',
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, submit it!',
+                    confirmButtonText: '{{ __('contract_views.yes_submit_it') }}',
                     cancelButtonText: 'No, review again'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -1471,8 +1459,8 @@
                 console.error('Validation error:', error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error',
-                    text: 'An error occurred during validation. Please try again.'
+                    title: '{{ __('contract_views.error') }}',
+                    text: '{{ __('contract_views.error_occurred_during_validation') }}'
                 });
                 return false;
             }
@@ -1482,14 +1470,14 @@
 
         function cancelContract() {
             Swal.fire({
-                title: 'Cancel Contract?',
-                text: 'Are you sure you want to cancel this contract? All entered data will be lost.',
+                title: '{{ __('contract_views.cancel_contract') }}',
+                text: '{{ __('contract_views.are_you_sure_you_want_to_cancel_this_contract') }}',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, cancel it!',
-                cancelButtonText: 'No, keep editing'
+                confirmButtonText: '{{ __('contract_views.yes_cancel_it') }}',
+                cancelButtonText: '{{ __('contract_views.no_keep_editing') }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Reset the form
@@ -1509,8 +1497,8 @@
                     }
 
                     Swal.fire(
-                        'Cancelled!',
-                        'Your contract has been cancelled.',
+                        '{{ __('contract_views.contract_cancelled') }}',
+                        '{{ __('contract_views.contract_has_been_cancelled') }}',
                         'success'
                     );
                 }
@@ -1544,8 +1532,8 @@
             if (!firstPaymentDate) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'First Payment Date Required',
-                    text: 'Please select the first payment date before setting custom dates'
+                    title: '{{ __('contract_views.first_payment_date_required') }}',
+                    text: '{{ __('contract_views.please_select_first_payment_date_before_setting_custom_dates') }}'
                 });
                 return;
             }
@@ -1559,7 +1547,7 @@
                 const label = document.createElement('label');
                 label.className = 'form-label';
                 label.htmlFor = `payment_date_${i + 1}`;
-                label.innerHTML = `Payment Date ${i + 1} <span class="text-danger">*</span>`;
+                label.innerHTML = `{{ __('contract_views.payment_date') }} ${i + 1} <span class="text-danger">*</span>`;
 
                 const input = document.createElement('input');
                 input.type = 'date';
@@ -1716,8 +1704,8 @@
                 console.error('Error updating summary:', error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error',
-                    text: 'There was an error updating the summary. Please try again.'
+                    title: '{{ __('contract_views.error') }}',
+                    text: '{{ __('contract_views.error_occurred_during_summary_update') }}'
                 });
             }
         }

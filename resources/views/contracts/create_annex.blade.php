@@ -18,15 +18,15 @@
                 </div>
             @endif
             <div class="mb-4 page-breadcrumb d-sm-flex align-items-center">
-                <div class="breadcrumb-title pe-3 fw-bold text-primary">Contract Management</div>
+                <div class="breadcrumb-title pe-3 fw-bold text-primary">{{ __('contract_views.contract_management') }}</div>
                 <div class="ps-3">
                     <nav aria-label="breadcrumb">
                         <ol class="p-0 mb-0 breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}" class="text-decoration-none"><i
                                         class="bx bx-home-alt"></i></a></li>
                             <li class="breadcrumb-item"><a href="{{ url('/contracts') }}"
-                                    class="text-decoration-none">Contracts</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Create Annex</li>
+                                    class="text-decoration-none">{{ __('contract_views.contracts') }}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ __('contract_views.create_annex') }}</li>
                         </ol>
                     </nav>
                 </div>
@@ -48,7 +48,7 @@
                         <div class="card-body">
                             <div class="mb-4 alert alert-info">
                                 <i class="bx bx-info-circle me-1"></i>
-                                Adding new branch and payment details to contract
+                                {{ __('contract_views.adding_branch_payment_to_contract') }}
                                 <strong>#{{ $contract->contract_number }}</strong>
                             </div>
 
@@ -63,22 +63,21 @@
                                                 <div class="border-0 shadow-sm card h-100">
                                                     <div
                                                         class="text-white card-header bg-primary bg-gradient d-flex justify-content-between align-items-center">
-                                                        <h6 class="mb-0"><i class="bx bx-building me-2"></i>Branch
-                                                            Information</h6>
+                                                        <h6 class="mb-0"><i class="bx bx-building me-2"></i>{{ __('contract_views.branch_information') }}</h6>
                                                         <button type="button"
                                                             class="btn btn-outline-light btn-sm remove-branch">
-                                                            <i class="bx bx-trash me-1"></i>Remove Branch
+                                                            <i class="bx bx-trash me-1"></i>{{ __('contract_views.remove_branch') }}
                                                         </button>
                                                     </div>
                                                     <div class="card-body">
                                                         <div class="row">
                                                             <div class="mb-3 col-md-6">
-                                                                <label class="form-label">Branch Name <span
+                                                                <label class="form-label">{{ __('contract_views.branch_name') }} <span
                                                                         class="text-danger">*</span></label>
                                                                 <input type="text"
                                                                     class="form-control @error('branches.0.branch_name') is-invalid @enderror"
                                                                     name="branches[0][branch_name]"
-                                                                    placeholder="Enter Branch Name" required
+                                                                    placeholder="{{ __('contract_views.enter_branch_name') }}" required
                                                                     value="{{ old('branches.0.branch_name') }}">
                                                                 @error('branches.0.branch_name')
                                                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -86,12 +85,12 @@
                                                             </div>
 
                                                             <div class="mb-3 col-md-6">
-                                                                <label class="form-label">Branch City <span
+                                                                <label class="form-label">{{ __('contract_views.branch_city') }} <span
                                                                         class="text-danger">*</span></label>
                                                                 <select
                                                                     class="form-select @error('branches.0.branch_city') is-invalid @enderror"
                                                                     name="branches[0][branch_city]" required>
-                                                                    <option value="">Select City</option>
+                                                                    <option value="">{{ __('contract_views.select_city') }}</option>
                                                                     @foreach ($saudiCities as $city)
                                                                         <option value="{{ $city }}"
                                                                             {{ old('branches.0.branch_city') == $city ? 'selected' : '' }}>
@@ -105,12 +104,12 @@
                                                             </div>
 
                                                             <div class="mb-3 col-md-6">
-                                                                <label class="form-label">Branch Manager Name <span
+                                                                <label class="form-label">{{ __('contract_views.branch_manager') }} <span
                                                                         class="text-danger">*</span></label>
                                                                 <input type="text"
                                                                     class="form-control @error('branches.0.branch_manager_name') is-invalid @enderror"
                                                                     name="branches[0][branch_manager_name]"
-                                                                    placeholder="Enter Branch Manager Name" required
+                                                                    placeholder="{{ __('contract_views.enter_branch_manager_name') }}" required
                                                                     value="{{ old('branches.0.branch_manager_name') }}">
                                                                 @error('branches.0.branch_manager_name')
                                                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -118,30 +117,29 @@
                                                             </div>
 
                                                             <div class="mb-3 col-md-6">
-                                                                <label class="form-label">Branch Manager Phone <span
+                                                                <label class="form-label">{{ __('contract_views.branch_phone') }} <span
                                                                         class="text-danger">*</span></label>
                                                                 <div class="input-group">
                                                                     <span class="input-group-text bg-light">+966</span>
                                                                     <input type="text"
                                                                         class="form-control @error('branches.0.branch_manager_phone') is-invalid @enderror"
                                                                         name="branches[0][branch_manager_phone]"
-                                                                        placeholder="5XXXXXXXX" required pattern="[0-9]{9}"
+                                                                        placeholder="{{ __('contract_views.phone_placeholder') }}" required pattern="[0-9]{9}"
                                                                         value="{{ old('branches.0.branch_manager_phone') }}">
                                                                     @error('branches.0.branch_manager_phone')
                                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                                     @enderror
                                                                 </div>
-                                                                <small class="text-muted">Enter 9 digits without the country
-                                                                    code</small>
+                                                                <small class="text-muted">{{ __('contract_views.enter_phone_digits') }}</small>
                                                             </div>
                                                             
                                                             <div class="mb-3 col-md-6">
-                                                                <label class="form-label">Number of Visits <span
+                                                                <label class="form-label">{{ __('contract_views.number_of_visits') }} <span
                                                                         class="text-danger">*</span></label>
                                                                 <input type="number"
                                                                     class="form-control @error('branches.0.number_of_visits') is-invalid @enderror"
                                                                     name="branches[0][number_of_visits]"
-                                                                    placeholder="Enter Number of Visits" required min="1"
+                                                                    placeholder="{{ __('contract_views.enter_number_of_visits') }}" required min="1"
                                                                     value="{{ old('branches.0.number_of_visits') }}">
                                                                 @error('branches.0.number_of_visits')
                                                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -149,10 +147,10 @@
                                                             </div>
 
                                                             <div class="mb-3 col-12">
-                                                                <label class="form-label">Branch Address <span
+                                                                <label class="form-label">{{ __('contract_views.branch_address') }} <span
                                                                         class="text-danger">*</span></label>
                                                                 <textarea class="form-control @error('branches.0.branch_address') is-invalid @enderror"
-                                                                    name="branches[0][branch_address]" placeholder="Enter complete branch address" required rows="2">{{ old('branches.0.branch_address') }}</textarea>
+                                                                    name="branches[0][branch_address]" placeholder="{{ __('contract_views.enter_branch_address') }}" required rows="2">{{ old('branches.0.branch_address') }}</textarea>
                                                                 @error('branches.0.branch_address')
                                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                                 @enderror
@@ -167,7 +165,7 @@
                                     <!-- Add Branch Button -->
                                     <div class="mb-4 text-center col-12">
                                         <button type="button" class="px-4 btn btn-success btn-lg" id="addBranch">
-                                            <i class="bx bx-plus-circle me-2"></i>Add Another Branch
+                                            <i class="bx bx-plus-circle me-2"></i>{{ __('contract_views.add_new_branch') }}
                                         </button>
                                     </div>
 
@@ -175,12 +173,12 @@
                                     <div class="col-md-12">
                                         <div class="border-0 shadow-sm card">
                                             <div class="text-white card-header bg-primary bg-gradient">
-                                                <h6 class="mb-0"><i class="bx bx-money me-2"></i>Payment Information
+                                                <h6 class="mb-0"><i class="bx bx-money me-2"></i>{{ __('contract_views.payment_information') }}
                                                 </h6>
                                             </div>
                                             <div class="card-body">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Additional Amount with out VAT <span
+                                                    <label class="form-label">{{ __('contract_views.additional_amount_without_vat') }} <span
                                                             class="text-danger">*</span></label>
                                                     <div class="input-group">
                                                         <input type="number"
@@ -196,7 +194,7 @@
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label class="form-label">Due Date <span
+                                                    <label class="form-label">{{ __('contract_views.due_date') }} <span
                                                             class="text-danger">*</span></label>
                                                     <input type="date"
                                                         class="form-control @error('due_date') is-invalid @enderror"
@@ -208,7 +206,7 @@
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label class="form-label">Description</label>
+                                                    <label class="form-label">{{ __('contract_views.contract_description') }}</label>
                                                     <textarea class="form-control @error('description') is-invalid @enderror" name="description"
                                                         placeholder="Enter any additional notes or description" rows="4">{{ old('description') }}</textarea>
                                                     @error('description')

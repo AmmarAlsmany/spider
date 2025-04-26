@@ -20,7 +20,7 @@
             <div class="card-header">
                 <div class="d-flex align-items-center">
                     <div>
-                        <h6 class="mb-0">Invoices List</h6>
+                        <h6 class="mb-0">{{ __('finance_views.invoices_list') }}</h6>
                     </div>
                 </div>
             </div>
@@ -29,14 +29,14 @@
                     <table class="table mb-0 align-middle">
                         <thead class="table-light">
                             <tr>
-                                <th>Invoice #</th>
-                                <th>Client</th>
-                                <th>Sales Agent</th>
-                                <th>Contract</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Due Date</th>
-                                <th>Actions</th>
+                                <th>{{ __('finance_views.invoice_number') }}</th>
+                                <th>{{ __('finance_views.client') }}</th>
+                                <th>{{ __('finance_views.sales_agent') }}</th>
+                                <th>{{ __('finance_views.contract') }}</th>
+                                <th>{{ __('finance_views.amount') }}</th>
+                                <th>{{ __('finance_views.status') }}</th>
+                                <th>{{ __('finance_views.due_date') }}</th>
+                                <th>{{ __('finance_views.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -46,17 +46,17 @@
                                     <td>{{ $invoice->customer->name }}</td>
                                     <td>{{ $invoice->contract->salesRepresentative->name }}</td>
                                     <td>{{ $invoice->contract->contract_number }}</td>
-                                    <td>{{ number_format($invoice->payment_amount, 2) }} SAR</td>
+                                    <td>{{ number_format($invoice->payment_amount, 2) }} {{ __('finance_views.currency_sar') }}</td>
                                     <td>
                                         <span
                                             class="badge bg-{{ $invoice->payment_status == 'paid' ? 'success' : ($invoice->payment_status == 'pending' ? 'warning' : 'danger') }}">
-                                            {{ ucfirst($invoice->payment_status) }}
+                                            {{ __('finance_views.' . $invoice->payment_status) }}
                                         </span>
                                     </td>
                                     <td>{{ $invoice->due_date }}</td>
                                     <td>
                                         <a href="{{ route('payment.show', $invoice->id) }}"
-                                            class="btn btn-primary btn-sm">View</a>
+                                            class="btn btn-primary btn-sm">{{ __('finance_views.view') }}</a>
                                     </td>
                                 </tr>
                             @endforeach

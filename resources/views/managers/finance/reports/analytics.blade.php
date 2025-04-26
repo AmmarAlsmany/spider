@@ -20,11 +20,11 @@
         
         // Write the HTML content to the iframe
         frameDoc.document.open();
-        frameDoc.document.write('<html><head><title>Financial Analytics Report</title>');
+        frameDoc.document.write('<html><head><title>{{ __('finance_views.advanced_financial_analytics') }}</title>');
         frameDoc.document.write('<link rel="stylesheet" href="{{ asset("assets/css/bootstrap.min.css") }}" type="text/css" />');
         frameDoc.document.write('<style>body { padding: 20px; } .actions-column { display: none; }</style>');
         frameDoc.document.write('</head><body>');
-        frameDoc.document.write('<h3 class="mb-4 text-center">Advanced Financial Analytics</h3>');
+        frameDoc.document.write('<h3 class="mb-4 text-center">{{ __('finance_views.advanced_financial_analytics') }}</h3>');
         
         // Get the content we want to print - all reports and charts
         var kpiSection = document.querySelector('.card-body .row:nth-child(2)').outerHTML;
@@ -74,11 +74,11 @@
         <div class="card-header">
             <div class="d-flex align-items-center">
                 <div>
-                    <h6 class="mb-0">Advanced Financial Analytics</h6>
+                    <h6 class="mb-0">{{ __('finance_views.advanced_financial_analytics') }}</h6>
                 </div>
                 <div class="ms-auto">
                     <button type="button" class="btn btn-sm btn-outline-secondary" onclick="printAnalyticsReport()">
-                        <i class='bx bx-printer'></i> Print Report
+                        <i class='bx bx-printer'></i> {{ __('finance_views.print_report') }}
                     </button>
                 </div>
             </div>
@@ -88,17 +88,17 @@
             <div class="mb-4">
                 <form action="{{ route('finance.reports.analytics') }}" method="GET" class="row g-3">
                     <div class="col-md-4">
-                        <label class="form-label">Start Date</label>
+                        <label class="form-label">{{ __('finance_views.start_date') }}</label>
                         <input type="date" name="start_date" class="form-control" value="{{ $startDate->format('Y-m-d') }}">
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">End Date</label>
+                        <label class="form-label">{{ __('finance_views.end_date') }}</label>
                         <input type="date" name="end_date" class="form-control" value="{{ $endDate->format('Y-m-d') }}">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">&nbsp;</label>
                         <div class="gap-2 d-flex">
-                            <button type="submit" class="btn btn-primary flex-grow-1">Update Analytics</button>
+                            <button type="submit" class="btn btn-primary flex-grow-1">{{ __('finance_views.update_analytics') }}</button>
                             <a href="{{ route('finance.reports.analytics') }}" class="btn btn-outline-secondary">
                                 <i class='bx bx-reset'></i>
                             </a>
@@ -114,9 +114,9 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div>
-                                    <p class="mb-0 text-secondary">Collection Rate</p>
+                                    <p class="mb-0 text-secondary">{{ __('finance_views.collection_rate') }}</p>
                                     <h4 class="my-1 text-success">{{ number_format($analytics['collection_rate'], 2) }}%</h4>
-                                    <p class="mb-0 font-13">For selected period</p>
+                                    <p class="mb-0 font-13">{{ __('finance_views.for_selected_period') }}</p>
                                 </div>
                                 <div class="text-success ms-auto font-35">
                                     <i class='bx bx-line-chart'></i>
@@ -128,7 +128,7 @@
                 <div class="col-md-8">
                     <div class="border card radius-10">
                         <div class="card-body">
-                            <h6 class="mb-3">Payment Status Distribution</h6>
+                            <h6 class="mb-3">{{ __('finance_views.payment_status_distribution') }}</h6>
                             <div class="row">
                                 @php
                                     $statuses = $analytics['payment_status_distribution'];
@@ -144,7 +144,7 @@
                                 @foreach($statuses as $status => $count)
                                     <div class="text-center col-md-3">
                                         <h4 class="text-{{ $colors[$status] ?? 'primary' }}">{{ $count }}</h4>
-                                        <p class="mb-0">{{ ucfirst($status) }}</p>
+                                        <p class="mb-0">{{ __('finance_views.' . $status) }}</p>
                                         <div class="mt-2 progress" style="height: 5px;">
                                             <div class="progress-bar bg-{{ $colors[$status] ?? 'primary' }}" role="progressbar" 
                                                 style="width: {{ $total > 0 ? ($count / $total * 100) : 0 }}%" 
@@ -164,12 +164,12 @@
                 <div class="col-md-6">
                     <div class="border card radius-10">
                         <div class="card-body">
-                            <h6 class="mb-3">Monthly Revenue Breakdown</h6>
+                            <h6 class="mb-3">{{ __('finance_views.monthly_revenue_breakdown') }}</h6>
                             <div id="monthlyRevenueChart" style="height: 300px;"></div>
                             <div id="monthlyRevenueChartFallback" class="d-none">
                                 <div class="alert alert-warning">
                                     <i class="bx bx-info-circle me-1"></i>
-                                    No data available for the selected period. Try adjusting your date range.
+                                    {{ __('finance_views.no_data_available') }}
                                 </div>
                             </div>
                         </div>
@@ -178,12 +178,12 @@
                 <div class="col-md-6">
                     <div class="border card radius-10">
                         <div class="card-body">
-                            <h6 class="mb-3">Cash Flow Projection</h6>
+                            <h6 class="mb-3">{{ __('finance_views.cash_flow_projection') }}</h6>
                             <div id="cashFlowProjectionChart" style="height: 300px;"></div>
                             <div id="cashFlowProjectionChartFallback" class="d-none">
                                 <div class="alert alert-warning">
                                     <i class="bx bx-info-circle me-1"></i>
-                                    No cash flow projection data available. Try adjusting your date range.
+                                    {{ __('finance_views.no_cash_flow_data') }}
                                 </div>
                             </div>
                         </div>
@@ -194,7 +194,7 @@
             <!-- Aging Analysis -->
             <div class="card radius-10">
                 <div class="card-header">
-                    <h6 class="mb-0">Aging Analysis</h6>
+                    <h6 class="mb-0">{{ __('finance_views.aging_analysis') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -206,8 +206,8 @@
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>Aging Bucket</th>
-                                            <th>Amount (SAR)</th>
+                                            <th>{{ __('finance_views.aging_buckets') }}</th>
+                                            <th>{{ __('finance_views.amount') }}</th>
                                             <th>% of Total</th>
                                         </tr>
                                     </thead>
@@ -217,33 +217,33 @@
                                             $totalAging = array_sum($aging);
                                         @endphp
                                         <tr>
-                                            <td>Current</td>
-                                            <td>{{ number_format($aging['current'], 2) }}</td>
+                                            <td>{{ __('finance_views.aging_current') }}</td>
+                                            <td>{{ number_format($aging['current'], 2) }} {{ __('finance_views.currency_sar') }}</td>
                                             <td>{{ $totalAging > 0 ? number_format(($aging['current'] / $totalAging) * 100, 1) : 0 }}%</td>
                                         </tr>
                                         <tr>
-                                            <td>1-30 Days</td>
-                                            <td>{{ number_format($aging['1_30'], 2) }}</td>
+                                            <td>{{ __('finance_views.aging_30_days') }}</td>
+                                            <td>{{ number_format($aging['1_30'], 2) }} {{ __('finance_views.currency_sar') }}</td>
                                             <td>{{ $totalAging > 0 ? number_format(($aging['1_30'] / $totalAging) * 100, 1) : 0 }}%</td>
                                         </tr>
                                         <tr>
-                                            <td>31-60 Days</td>
-                                            <td>{{ number_format($aging['31_60'], 2) }}</td>
+                                            <td>{{ __('finance_views.aging_60_days') }}</td>
+                                            <td>{{ number_format($aging['31_60'], 2) }} {{ __('finance_views.currency_sar') }}</td>
                                             <td>{{ $totalAging > 0 ? number_format(($aging['31_60'] / $totalAging) * 100, 1) : 0 }}%</td>
                                         </tr>
                                         <tr>
-                                            <td>61-90 Days</td>
-                                            <td>{{ number_format($aging['61_90'], 2) }}</td>
+                                            <td>{{ __('finance_views.aging_90_days') }}</td>
+                                            <td>{{ number_format($aging['61_90'], 2) }} {{ __('finance_views.currency_sar') }}</td>
                                             <td>{{ $totalAging > 0 ? number_format(($aging['61_90'] / $totalAging) * 100, 1) : 0 }}%</td>
                                         </tr>
                                         <tr>
-                                            <td>Over 90 Days</td>
-                                            <td>{{ number_format($aging['over_90'], 2) }}</td>
+                                            <td>{{ __('finance_views.aging_90_plus_days') }}</td>
+                                            <td>{{ number_format($aging['over_90'], 2) }} {{ __('finance_views.currency_sar') }}</td>
                                             <td>{{ $totalAging > 0 ? number_format(($aging['over_90'] / $totalAging) * 100, 1) : 0 }}%</td>
                                         </tr>
                                         <tr class="table-active">
-                                            <td><strong>Total</strong></td>
-                                            <td><strong>{{ number_format($totalAging, 2) }}</strong></td>
+                                            <td><strong>{{ __('finance_views.total') }}</strong></td>
+                                            <td><strong>{{ number_format($totalAging, 2) }} {{ __('finance_views.currency_sar') }}</strong></td>
                                             <td>100%</td>
                                         </tr>
                                     </tbody>
@@ -316,7 +316,7 @@
                     },
                     yaxis: {
                         title: {
-                            text: 'Amount (SAR)'
+                            text: '{{ __('finance_views.amount') }} ({{ __('finance_views.currency_sar') }})'
                         }
                     },
                     fill: {
@@ -325,7 +325,7 @@
                     tooltip: {
                         y: {
                             formatter: function (val) {
-                                return val.toLocaleString() + " SAR"
+                                return val.toLocaleString() + " {{ __('finance_views.currency_sar') }}"
                             }
                         }
                     },
@@ -375,13 +375,13 @@
                     },
                     yaxis: {
                         title: {
-                            text: 'Amount (SAR)'
+                            text: '{{ __('finance_views.amount') }} ({{ __('finance_views.currency_sar') }})'
                         }
                     },
                     tooltip: {
                         y: {
                             formatter: function (val) {
-                                return val.toLocaleString() + " SAR"
+                                return val.toLocaleString() + " {{ __('finance_views.currency_sar') }}"
                             }
                         }
                     },

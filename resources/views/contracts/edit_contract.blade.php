@@ -96,309 +96,334 @@
     </div>
     @endif
     <div class="mb-4 page-breadcrumb d-flex align-items-center">
-        <div class="breadcrumb-title pe-3 fw-bold">Sales Profile</div>
+        <div class="breadcrumb-title pe-3 fw-bold">{{ __('contract_views.sales_profile') }}</div>
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="p-0 mb-0 breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}" class="text-decoration-none"><i
                                 class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Edit Contract</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('contract_views.edit_contract') }}</li>
                 </ol>
             </nav>
         </div>
     </div>
     <div class="container mt-4">
-        <h2>Edit Contract</h2>
+        <h2>{{ __('contract_views.edit_contract') }}</h2>
         <form action="{{ route('contract.update', $contract->id) }}" method="POST" id="contract-form">
             @csrf
             @method('PATCH')
             <fieldset class="mb-4">
-                <legend>Contract Information</legend>
+                <legend>{{ __('contract_views.contract_information') }}</legend>
                 <div class="form-group">
-                    <label for="contract_number">Contract Number</label>
-                    <input type="text" class="form-control" id="contract_number" name="contract_number" 
+                    <label for="contract_number">{{ __('contract_views.contract_number') }}</label>
+                    <input type="text" class="form-control" id="contract_number" name="contract_number"
                         value="{{ $contract->contract_number }}" required readonly>
-                    <div class="invalid-feedback">Please provide a valid contract number.</div>
+                    <div class="invalid-feedback">{{ __('contract_views.provide_valid_contract_number') }}</div>
                 </div>
                 <div class="form-group">
-                    <label for="Property_type">Property Type <span data-toggle="tooltip"
-                            title="Select the type of property">(?)</span></label>
-                    <select class="form-select @error('Property_type') is-invalid @enderror" 
-                        name="Property_type" id="Property_type" required>
-                        <option value="" disabled {{ old('Property_type', $contract->Property_type) ? '' : 'selected' }}>Select One</option>
-                        <option value="Residential" {{ old('Property_type', $contract->Property_type) == 'Residential' ? 'selected' : '' }}>Residential</option>
-                        <option value="Commercial" {{ old('Property_type', $contract->Property_type) == 'Commercial' ? 'selected' : '' }}>Commercial</option>
+                    <label for="Property_type">{{ __('contract_views.property_type') }} <span data-toggle="tooltip"
+                            title="{{ __('contract_views.select_property_type_tooltip') }}">(?)</span></label>
+                    <select class="form-select @error('Property_type') is-invalid @enderror" name="Property_type"
+                        id="Property_type" required>
+                        <option value="" disabled {{ old('Property_type', $contract->Property_type) ? '' : 'selected'
+                            }}>{{ __('contract_views.select_one') }}</option>
+                        <option value="Residential" {{ old('Property_type', $contract->Property_type) == 'Residential' ?
+                            'selected' : '' }}>{{ __('contract_views.residential') }}</option>
+                        <option value="Commercial" {{ old('Property_type', $contract->Property_type) == 'Commercial' ?
+                            'selected' : '' }}>{{ __('contract_views.commercial') }}</option>
                     </select>
                     @error('Property_type')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 {{-- warranty --}}
                 <div class="form-group">
-                    <label for="warrantyperiod">Warranty Period (Months) <span data-toggle="tooltip"
-                            title="Enter the warranty period in months">(?)</span></label>
-                    <input type="number" class="form-control @error('warranty') is-invalid @enderror" 
-                        id="warrantyperiod" name="warranty" min="0"
-                        value="{{ old('warranty', $contract->warranty) }}" required>
+                    <label for="warrantyperiod">{{ __('contract_views.warranty_period_months') }} <span
+                            data-toggle="tooltip"
+                            title="{{ __('contract_views.enter_warranty_period_tooltip') }}">(?)</span></label>
+                    <input type="number" class="form-control @error('warranty') is-invalid @enderror"
+                        id="warrantyperiod" name="warranty" min="0" value="{{ old('warranty', $contract->warranty) }}"
+                        required>
                     @error('warranty')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 {{-- number of visits --}}
                 <div class="form-group">
-                    <label for="number_of_visits">Number of Visits <span data-toggle="tooltip"
-                            title="Enter the number of visits">(?)</span></label>
-                    <input type="number" class="form-control @error('number_of_visits') is-invalid @enderror" 
+                    <label for="number_of_visits">{{ __('contract_views.number_of_visits') }} <span
+                            data-toggle="tooltip"
+                            title="{{ __('contract_views.enter_number_of_visits_tooltip') }}">(?)</span></label>
+                    <input type="number" class="form-control @error('number_of_visits') is-invalid @enderror"
                         id="number_of_visits" name="number_of_visits" min="1"
                         value="{{ old('number_of_visits', $contract->number_of_visits) }}" required>
                     @error('number_of_visits')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="form-group">
-                    <label for="contract_type">Contract Type <span data-toggle="tooltip"
-                            title="Select the type of contract">(?)</span></label>
-                    <select class="form-select @error('contract_type') is-invalid @enderror" 
-                        id="contract_type" name="contract_type" required>
-                        <option value="" disabled {{ old('contract_type', $contract->contract_type) ? '' : 'selected' }}>Select One</option>
+                    <label for="contract_type">{{ __('contract_views.contract_type') }} <span data-toggle="tooltip"
+                            title="{{ __('contract_views.select_contract_type_tooltip') }}">(?)</span></label>
+                    <select class="form-select @error('contract_type') is-invalid @enderror" id="contract_type"
+                        name="contract_type" required>
+                        <option value="" disabled {{ old('contract_type', $contract->contract_type) ? '' : 'selected'
+                            }}>{{ __('contract_views.select_one') }}</option>
                         @foreach ($contract_type as $type)
-                        <option value="{{ $type->id }}" 
-                            {{ old('contract_type', $contract->contract_type) == $type->id ? 'selected' : '' }}>
+                        <option value="{{ $type->id }}" {{ old('contract_type', $contract->contract_type) == $type->id ?
+                            'selected' : '' }}>
                             {{ $type->name }} {{ $type->type }}
                         </option>
                         @endforeach
                     </select>
                     @error('contract_type')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="form-group">
-                    <label for="contract_description">Contract Description <span data-toggle="tooltip"
-                            title="Enter a brief description of the contract">(?)</span></label>
-                    <textarea class="form-control @error('contract_description') is-invalid @enderror" 
+                    <label for="contract_description">{{ __('contract_views.contract_description') }} <span
+                            data-toggle="tooltip"
+                            title="{{ __('contract_views.enter_contract_description_tooltip') }}">(?)</span></label>
+                    <textarea class="form-control @error('contract_description') is-invalid @enderror"
                         id="contract_description" name="contract_description" rows="3"
                         required>{{ old('contract_description', $contract->contract_description) }}</textarea>
                     @error('contract_description')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="form-group">
-                    <label for="contract_start_date">Start Date <span data-toggle="tooltip"
-                            title="Select the start date of the contract">(?)</span></label>
-                    <input type="date" class="form-control @error('contract_start_date') is-invalid @enderror" 
+                    <label for="contract_start_date">{{ __('contract_views.start_date') }} <span data-toggle="tooltip"
+                            title="{{ __('contract_views.select_start_date_tooltip') }}">(?)</span></label>
+                    <input type="date" class="form-control @error('contract_start_date') is-invalid @enderror"
                         id="contract_start_date" name="contract_start_date"
                         value="{{ old('contract_start_date', $contract->contract_start_date) }}" required>
                     @error('contract_start_date')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="form-group">
-                    <label for="visit_start_date">Visit Start Date <span data-toggle="tooltip"
-                            title="Select the date when visits should start">(?)</span></label>
-                    <input type="date" class="form-control @error('visit_start_date') is-invalid @enderror" 
+                    <label for="visit_start_date">{{ __('contract_views.visit_start_date') }} <span
+                            data-toggle="tooltip"
+                            title="{{ __('contract_views.select_visit_start_date_tooltip') }}">(?)</span></label>
+                    <input type="date" class="form-control @error('visit_start_date') is-invalid @enderror"
                         id="visit_start_date" name="visit_start_date"
                         value="{{ old('visit_start_date', $contract->visit_start_date) }}" required>
                     @error('visit_start_date')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="form-group">
-                    <label for="contract_end_date">End Date <span data-toggle="tooltip"
-                            title="Select the end date of the contract">(?)</span></label>
-                    <input type="date" class="form-control @error('contract_end_date') is-invalid @enderror" 
+                    <label for="contract_end_date">{{ __('contract_views.end_date') }} <span data-toggle="tooltip"
+                            title="{{ __('contract_views.select_end_date_tooltip') }}">(?)</span></label>
+                    <input type="date" class="form-control @error('contract_end_date') is-invalid @enderror"
                         id="contract_end_date" name="contract_end_date"
                         value="{{ old('contract_end_date', $contract->contract_end_date) }}" required>
                     @error('contract_end_date')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="form-group">
-                    <label for="contract_price">Contract Amount <span data-toggle="tooltip"
-                            title="Enter the total amount of the contract">(?)</span></label>
+                    <label for="contract_price">{{ __('contract_views.contract_amount') }} <span data-toggle="tooltip"
+                            title="{{ __('contract_views.enter_contract_amount_tooltip') }}">(?)</span></label>
                     <div class="input-group">
-                        <input type="number" class="form-control @error('contract_price') is-invalid @enderror" 
+                        <input type="number" class="form-control @error('contract_price') is-invalid @enderror"
                             id="contract_price" name="contract_price"
                             value="{{ old('contract_price', $contract->contract_price) }}" required>
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="includeTax" 
-                                        name="include_tax" {{ old('include_tax') ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="checkbox" id="includeTax" name="include_tax"
+                                        {{ old('include_tax') ? 'checked' : '' }}>
                                     <label class="form-check-label" for="includeTax">
-                                        Include Tax (15%)
+                                        {{ __('contract_views.include_tax') }}
                                     </label>
                                 </div>
                             </div>
                         </div>
                         @error('contract_price')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="payment_type">Payment Type</label>
+                    <label for="payment_type">{{ __('contract_views.payment_type') }}</label>
                     <select class="form-select" id="payment_type" name="payment_type" required>
                         <option value="prepaid" {{ $contract->payment_type == 'prepaid' ? 'selected' : '' }}>
-                            Prepaid</option>
+                            {{ __('contract_views.prepaid') }}</option>
                         <option value="postpaid" {{ $contract->payment_type == 'postpaid' ? 'selected' : '' }}>
-                            Postpaid</option>
+                            {{ __('contract_views.postpaid') }}</option>
                     </select>
-                    <div class="invalid-feedback">Please select a payment type.</div>
+                    <div class="invalid-feedback">{{ __('contract_views.select_payment_type_error') }}</div>
                 </div>
 
-                <div class="form-group" id="paymentScheduleSection" style="{{ $contract->payment_type == 'postpaid' ? '' : 'display: none;' }}">
-                    <label for="payment_schedule">Payment Schedule</label>
+                <div class="form-group" id="paymentScheduleSection"
+                    style="{{ $contract->payment_type == 'postpaid' ? '' : 'display: none;' }}">
+                    <label for="payment_schedule">{{ __('contract_views.payment_schedule') }}</label>
                     <select class="form-select" id="payment_schedule" name="payment_schedule">
-                        <option value="monthly" {{ $contract->payment_schedule == 'monthly' ? 'selected' : '' }}>Monthly (Automatic)</option>
-                        <option value="custom" {{ $contract->payment_schedule == 'custom' ? 'selected' : '' }}>Custom Dates</option>
+                        <option value="monthly" {{ $contract->payment_schedule == 'monthly' ? 'selected' : '' }}>{{
+                            __('contract_views.monthly_automatic') }}</option>
+                        <option value="custom" {{ $contract->payment_schedule == 'custom' ? 'selected' : '' }}>{{
+                            __('contract_views.custom_dates') }}</option>
                     </select>
-                    <div class="invalid-feedback">Please select a payment schedule.</div>
+                    <div class="invalid-feedback">{{ __('contract_views.select_payment_schedule_error') }}</div>
                 </div>
             </fieldset>
             <fieldset class="mb-4">
-                <legend>Client Information</legend>
+                <legend>{{ __('contract_views.client_information') }}</legend>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="client_name">Client Name</label>
+                            <label for="client_name">{{ __('contract_views.client_name') }}</label>
                             <input type="text" class="form-control" id="client_name" name="client_name"
                                 value="{{ $contract->customer->name }}" required>
-                            <div class="invalid-feedback">Please provide a valid client name.</div>
+                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_client_name') }}</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="client_email">Client Email</label>
+                            <label for="client_email">{{ __('contract_views.client_email') }}</label>
                             <input type="email" class="form-control" id="client_email" name="client_email"
                                 value="{{ $contract->customer->email }}" required>
-                            <div class="invalid-feedback">Please provide a valid client email.</div>
+                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_client_email') }}</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="client_phone">Phone</label>
+                            <label for="client_phone">{{ __('contract_views.phone') }}</label>
                             <input type="text" class="form-control" id="client_phone" name="client_phone"
                                 value="{{ $contract->customer->phone }}" required>
-                            <div class="invalid-feedback">Please provide a valid phone number.</div>
+                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_phone_number') }}</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="client_mobile">Mobile</label>
+                            <label for="client_mobile">{{ __('contract_views.mobile') }}</label>
                             <input type="text" class="form-control" id="client_mobile" name="client_mobile"
                                 value="{{ $contract->customer->mobile }}" required>
-                            <div class="invalid-feedback">Please provide a valid mobile number.</div>
+                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_mobile_number') }}</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="client_tax_number">Tax Number</label>
+                            <label for="client_tax_number">{{ __('contract_views.tax_number') }}</label>
                             <input type="number" class="form-control" id="client_tax_number" name="client_tax_number"
                                 value="{{ $contract->customer->tax_number }}" min="0">
-                            <div class="invalid-feedback">Please provide a valid tax number.</div>
+                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_tax_number') }}</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="client_zipcode">Zip Code</label>
+                            <label for="client_zipcode">{{ __('contract_views.postal_code') }}</label>
                             <input type="number" class="form-control" id="client_zipcode" name="client_zipcode"
                                 value="{{ $contract->customer->zip_code }}" min="0">
-                            <div class="invalid-feedback">Please provide a valid zip code.</div>
+                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_zipcode') }}</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="client_city">City</label>
+                            <label for="client_city">{{ __('contract_views.city') }}</label>
                             <select class="form-select" id="client_city" name="client_city" required>
-                                <option value="">Select City</option>
+                                <option value="">{{ __('contract_views.select_city') }}</option>
                                 @foreach($saudiCities as $city)
                                 <option value="{{ $city }}" {{ $contract->customer->city == $city ? 'selected' : '' }}>
                                     {{ $city }}</option>
                                 @endforeach
                             </select>
-                            <div class="invalid-feedback">Please select a city.</div>
+                            <div class="invalid-feedback">{{ __('contract_views.select_city_error') }}</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="client_address">Address</label>
+                            <label for="client_address">{{ __('contract_views.address') }}</label>
                             <input type="text" class="form-control" id="client_address" name="client_address"
                                 value="{{ $contract->customer->address }}" required>
-                            <div class="invalid-feedback">Please provide a valid address.</div>
+                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_address') }}</div>
                         </div>
                     </div>
                 </div>
             </fieldset>
             <fieldset class="mb-4">
-                <legend>Branch Information</legend>
+                <legend>{{ __('contract_views.branch_information') }}</legend>
                 @foreach ($contract->branchs as $index => $branch)
                 <div class="mb-3 card">
                     <div class="card-body">
-                        <h5>Branch {{ $index + 1 }}</h5>
+                        <h5>{{ __('contract_views.branch') }} {{ $index + 1 }}</h5>
                         <div class="row">
                             <div class="col-md-6">
                                 <input type="text" name="branch_id[]" value="{{ $branch->id }}" hidden readonly>
                                 <div class="form-group">
-                                    <label for="branch_name{{ $index }}">Branch Name <span data-toggle="tooltip"
-                                            title="Enter the name of the branch">(?)</span></label>
+                                    <label for="branch_name{{ $index }}">{{ __('contract_views.branch_name') }} <span
+                                            data-toggle="tooltip"
+                                            title="{{ __('contract_views.enter_branch_name_tooltip') }}">(?)</span></label>
                                     <input type="text" class="form-control" id="branch_name{{ $index }}"
                                         name="branch_name[]" value="{{ $branch->branch_name }}" required>
-                                    <div class="invalid-feedback">Please provide a valid branch name.</div>
+                                    <div class="invalid-feedback">{{ __('contract_views.provide_valid_branch_name') }}
+                                    </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="branch_manager_name{{ $index }}">Branch Manager <span data-toggle="tooltip"
-                                            title="Enter the name of the branch manager">(?)</span></label>
+                                    <label for="branch_manager_name{{ $index }}">{{ __('contract_views.branch_manager')
+                                        }} <span data-toggle="tooltip"
+                                            title="{{ __('contract_views.enter_branch_manager_tooltip') }}">(?)</span></label>
                                     <input type="text" class="form-control" id="branch_manager_name{{ $index }}"
                                         name="branch_manager_name[]" value="{{ $branch->branch_manager_name }}"
                                         required>
-                                    <div class="invalid-feedback">Please provide a valid branch manager.</div>
+                                    <div class="invalid-feedback">{{ __('contract_views.provide_valid_branch_manager')
+                                        }}</div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="branch_manager_phone{{ $index }}">Branch Phone <span data-toggle="tooltip"
-                                            title="Enter the phone number of the branch">(?)</span></label>
+                                    <label for="branch_manager_phone{{ $index }}">{{ __('contract_views.branch_phone')
+                                        }} <span data-toggle="tooltip"
+                                            title="{{ __('contract_views.enter_branch_phone_tooltip') }}">(?)</span></label>
                                     <input type="text" class="form-control" id="branch_manager_phone{{ $index }}"
                                         name="branch_manager_phone[]" value="{{ $branch->branch_manager_phone }}"
                                         required>
-                                    <div class="invalid-feedback">Please provide a valid branch phone.</div>
+                                    <div class="invalid-feedback">{{ __('contract_views.provide_valid_branch_phone') }}
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="branch_address{{ $index }}">Branch Address <span data-toggle="tooltip"
-                                            title="Enter the address of the branch">(?)</span></label>
+                                    <label for="branch_address{{ $index }}">{{ __('contract_views.branch_address') }}
+                                        <span data-toggle="tooltip"
+                                            title="{{ __('contract_views.enter_branch_address_tooltip') }}">(?)</span></label>
                                     <input type="text" class="form-control" id="branch_address{{ $index }}"
                                         name="branch_address[]" value="{{ $branch->branch_address }}" required>
-                                    <div class="invalid-feedback">Please provide a valid branch address.</div>
+                                    <div class="invalid-feedback">{{ __('contract_views.provide_valid_branch_address')
+                                        }}</div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="branch_city{{ $index }}">Branch City <span data-toggle="tooltip"
-                                            title="Enter the city of the branch">(?)</span></label>
+                                    <label for="branch_city{{ $index }}">{{ __('contract_views.branch_city') }} <span
+                                            data-toggle="tooltip"
+                                            title="{{ __('contract_views.enter_branch_city_tooltip') }}">(?)</span></label>
                                     <input type="text" class="form-control" id="branch_city{{ $index }}"
                                         name="branch_city[]" value="{{ $branch->branch_city }}" required>
-                                    <div class="invalid-feedback">Please provide a valid branch city.</div>
+                                    <div class="invalid-feedback">{{ __('contract_views.provide_valid_branch_city') }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 @endforeach
-                <button type="button" class="mt-2 btn btn-success" id="add-branch">Add New Branch</button>
+                <button type="button" class="mt-2 btn btn-success" id="add-branch">{{
+                    __('contract_views.add_new_branch') }}</button>
             </fieldset>
             <fieldset class="mb-4">
-                <legend>Payment Information</legend>
+                <legend>{{ __('contract_views.payment_information') }}</legend>
                 <div class="card">
                     <div class="card-body" id="payments-container">
                         <div class="mb-3 payment-summary">
                             <div class="alert alert-info payment-summary-alert">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <strong>Total Payments:</strong> <span id="payment-count">{{ count($contract->payments) }}</span>
+                                        <strong>{{ __('contract_views.total_payments') }}:</strong> <span id="payment-count">{{
+                                            count($contract->payments) }}</span>
                                     </div>
                                     <div>
-                                        <strong>Total Amount:</strong> <span id="total-contract-amount">{{ number_format($contract->contract_price, 2) }}</span> SAR
+                                        <strong>{{ __('contract_views.total_amount') }}:</strong> <span id="total-contract-amount">{{
+                                            number_format($contract->contract_price, 2) }}</span> SAR
                                     </div>
                                     <div>
-                                        <strong>Total Payment Amount:</strong> <span id="total-payment-amount">0.00</span> SAR
+                                        <strong>{{ __('contract_views.total_payment_amount') }}:</strong> <span
+                                            id="total-payment-amount">0.00</span> SAR
                                     </div>
                                     <div id="payment-validation-status">
                                         <span class="badge bg-warning">Validating...</span>
@@ -411,20 +436,20 @@
                             <input type="hidden" name="payment_id[]" value="{{ $payment->id }}">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="payment_amount{{ $index }}">Payment Amount <span data-toggle="tooltip"
-                                            title="Enter the amount of the payment">(?)</span></label>
+                                    <label for="payment_amount{{ $index }}">{{ __('contract_views.payment_amount') }} <span data-toggle="tooltip"
+                                            title="{{ __('contract_views.enter_payment_amount_tooltip') }}">(?)</span></label>
                                     <input type="number" class="form-control" id="payment_amount{{ $index }}"
                                         name="payment_amount[]" value="{{ $payment->payment_amount }}" required>
-                                    <div class="invalid-feedback">Please provide a valid payment amount.</div>
+                                    <div class="invalid-feedback">{{ __('contract_views.provide_valid_payment_amount') }}</div>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="payment_date{{ $index }}">Payment Date <span data-toggle="tooltip"
-                                            title="Select the date of the payment">(?)</span></label>
+                                    <label for="payment_date{{ $index }}">{{ __('contract_views.payment_date') }} <span data-toggle="tooltip"
+                                            title="{{ __('contract_views.select_payment_date_tooltip') }}">(?)</span></label>
                                     <input type="date" class="form-control" id="payment_date{{ $index }}"
                                         name="payment_date[]" value="{{ $payment->due_date }}" required>
-                                    <div class="invalid-feedback">Please select a payment date.</div>
+                                    <div class="invalid-feedback">{{ __('contract_views.select_payment_date') }}</div>
                                 </div>
                             </div>
                             <div class="col-md-1 d-flex align-items-end">
@@ -438,11 +463,11 @@
                         @endforeach
                     </div>
                 </div>
-                <button type="button" class="mt-2 btn btn-success" id="add-payment">Add New Payment</button>
+                <button type="button" class="mt-2 btn btn-success" id="add-payment">{{ __('contract_views.add_new_payment') }}</button>
             </fieldset>
             <div class="mt-4">
-                <button type="submit" class="btn btn-primary">Update Contract</button>
-                <a href="{{ route('contract.show.details', $contract->id) }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">{{ __('contract_views.update_contract') }}</button>
+                <a href="{{ route('contract.show.details', $contract->id) }}" class="btn btn-secondary">{{ __('contract_views.cancel') }}</a>
             </div>
         </form>
     </div>
@@ -493,15 +518,15 @@
                 // Compare and update validation status
                 if (Math.abs(totalPaymentAmount - contractTotal) < 0.01) {
                     // Amounts match (allowing for small floating point differences)
-                    paymentValidationStatusElement.innerHTML = '<span class="badge bg-success">Amounts Match ✓</span>';
+                    paymentValidationStatusElement.innerHTML = '<span class="badge bg-success">{{ __('contract_views.amounts_match') }} ✓</span>';
                 } else if (totalPaymentAmount > contractTotal) {
                     // Payment total exceeds contract amount
-                    paymentValidationStatusElement.innerHTML = '<span class="badge bg-danger">Payment Total Exceeds Contract Amount!</span>';
+                    paymentValidationStatusElement.innerHTML = '<span class="badge bg-danger">{{ __('contract_views.payment_total_exceeds_contract') }}</span>';
                 } else {
                     // Payment total is less than contract amount
                     const difference = (contractTotal - totalPaymentAmount).toFixed(2);
                     paymentValidationStatusElement.innerHTML = 
-                        `<span class="badge bg-warning">Payments Short by ${difference} SAR</span>`;
+                        `<span class="badge bg-warning">{{ __('contract_views.payments_short_by') }} ${difference} SAR</span>`;
                 }
             }
             
@@ -534,7 +559,7 @@
             // Add new payment row
             addPaymentBtn.addEventListener('click', function() {
                 if (paymentTypeSelect.value !== 'postpaid') {
-                    alert('New payments can only be added for postpaid contracts');
+                    alert('{{ __('contract_views.new_payments_postpaid_only') }}');
                     return;
                 }
 
@@ -545,16 +570,16 @@
             <div class="mb-3 row payment-row" data-payment-id="${newIndex + 1}">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="payment_amount${newIndex}">Payment Amount <span data-toggle="tooltip" title="Enter the amount of the payment">(?)</span></label>
+                        <label for="payment_amount${newIndex}">{{ __('contract_views.payment_amount') }} <span data-toggle="tooltip" title="{{ __('contract_views.enter_payment_amount_tooltip') }}">(?)</span></label>
                         <input type="number" class="form-control" id="payment_amount${newIndex}" name="payment_amount[]" required>
-                        <div class="invalid-feedback">Please provide a valid payment amount.</div>
+                        <div class="invalid-feedback">{{ __('contract_views.provide_valid_payment_amount') }}</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label for="payment_date${newIndex}">Payment Date <span data-toggle="tooltip" title="Select the date of the payment">(?)</span></label>
+                        <label for="payment_date${newIndex}">{{ __('contract_views.payment_date') }} <span data-toggle="tooltip" title="{{ __('contract_views.select_payment_date_tooltip') }}">(?)</span></label>
                         <input type="date" class="form-control" id="payment_date${newIndex}" name="payment_date[]" required>
-                        <div class="invalid-feedback">Please select a payment date.</div>
+                        <div class="invalid-feedback">{{ __('contract_views.select_payment_date') }}</div>
                     </div>
                 </div>
                 <div class="col-md-1 d-flex align-items-end">
@@ -583,7 +608,7 @@
                         // Update payment count and validation after removal
                         updatePaymentCount();
                     } else {
-                        alert('At least one payment record must exist');
+                        alert('{{ __('contract_views.at_least_one_payment') }}');
                     }
                 }
             });
@@ -603,7 +628,7 @@
         <div class="mb-3 card">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h5>Branch ${newIndex + 1}</h5>
+                    <h5>{{ __('contract_views.branch') }} ${newIndex + 1}</h5>
                     <button type="button" class="btn btn-danger remove-branch">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -612,31 +637,31 @@
                     <div class="col-md-6">
                         <input type="text" name="branch_id[]" value="" hidden readonly>
                         <div class="form-group">
-                            <label for="branch_name${newIndex}">Branch Name <span data-toggle="tooltip" title="Enter the name of the branch">(?)</span></label>
+                            <label for="branch_name${newIndex}">{{ __('contract_views.branch_name') }} <span data-toggle="tooltip" title="{{ __('contract_views.enter_branch_name_tooltip') }}">(?)</span></label>
                             <input type="text" class="form-control" id="branch_name${newIndex}" name="branch_name[]" required>
-                            <div class="invalid-feedback">Please provide a valid branch name.</div>
+                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_branch_name') }}</div>
                         </div>
                         <div class="form-group">
-                            <label for="branch_manager_name${newIndex}">Branch Manager <span data-toggle="tooltip" title="Enter the name of the branch manager">(?)</span></label>
+                            <label for="branch_manager_name${newIndex}">{{ __('contract_views.branch_manager') }} <span data-toggle="tooltip" title="{{ __('contract_views.enter_branch_manager_tooltip') }}">(?)</span></label>
                             <input type="text" class="form-control" id="branch_manager_name${newIndex}" name="branch_manager_name[]" required>
-                            <div class="invalid-feedback">Please provide a valid branch manager.</div>
+                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_branch_manager') }}</div>
                         </div>
                         <div class="form-group">
-                            <label for="branch_manager_phone${newIndex}">Branch Phone <span data-toggle="tooltip" title="Enter the phone number of the branch">(?)</span></label>
+                            <label for="branch_manager_phone${newIndex}">{{ __('contract_views.branch_phone') }} <span data-toggle="tooltip" title="{{ __('contract_views.enter_branch_phone_tooltip') }}">(?)</span></label>
                             <input type="text" class="form-control" id="branch_manager_phone${newIndex}" name="branch_manager_phone[]" required>
-                            <div class="invalid-feedback">Please provide a valid branch phone.</div>
+                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_branch_phone') }}</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="branch_address${newIndex}">Branch Address <span data-toggle="tooltip" title="Enter the address of the branch">(?)</span></label>
+                            <label for="branch_address${newIndex}">{{ __('contract_views.branch_address') }} <span data-toggle="tooltip" title="{{ __('contract_views.enter_branch_address_tooltip') }}">(?)</span></label>
                             <input type="text" class="form-control" id="branch_address${newIndex}" name="branch_address[]" required>
-                            <div class="invalid-feedback">Please provide a valid branch address.</div>
+                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_branch_address') }}</div>
                         </div>
                         <div class="form-group">
-                            <label for="branch_city${newIndex}">Branch City <span data-toggle="tooltip" title="Enter the city of the branch">(?)</span></label>
+                            <label for="branch_city${newIndex}">{{ __('contract_views.branch_city') }} <span data-toggle="tooltip" title="{{ __('contract_views.enter_branch_city_tooltip') }}">(?)</span></label>
                             <input type="text" class="form-control" id="branch_city${newIndex}" name="branch_city[]" required>
-                            <div class="invalid-feedback">Please provide a valid branch city.</div>
+                            <div class="invalid-feedback">{{ __('contract_views.provide_valid_branch_city') }}</div>
                         </div>
                     </div>
                 </div>
@@ -657,12 +682,12 @@
 
                         // Update branch numbers
                         document.querySelectorAll('.card h5').forEach((header, index) => {
-                            if (header.textContent.includes('Branch')) {
-                                header.textContent = `Branch ${index + 1}`;
+                            if (header.textContent.includes('{{ __('contract_views.branch') }}')) {
+                                header.textContent = `{{ __('contract_views.branch') }} ${index + 1}`;
                             }
                         });
                     } else {
-                        alert('At least one branch must exist');
+                        alert('{{ __('contract_views.at_least_one_branch') }}');
                     }
                 }
             });

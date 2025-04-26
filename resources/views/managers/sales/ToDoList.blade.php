@@ -20,7 +20,7 @@
         <div class="mb-4 page-breadcrumb d-flex align-items-center">
             <div class="pe-3 breadcrumb-title d-flex align-items-center">
                 <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
-                    <i class="bx bx-arrow-back"></i> Back
+                    <i class="bx bx-arrow-back"></i> {{ __('sales_views.back') }}
                 </a>
             </div>
             <div class="ps-3">
@@ -28,7 +28,7 @@
                     <ol class="p-0 mb-0 breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('sales.dashboard') }}" class="text-decoration-none"><i
                                     class="bx bx-home-alt"></i></a></li>
-                        <li class="breadcrumb-item active text-muted" aria-current="page">To Do List</li>
+                        <li class="breadcrumb-item active text-muted" aria-current="page">{{ __('sales_views.to_do_list') }}</li>
                     </ol>
                 </nav>
             </div>
@@ -36,7 +36,7 @@
 
         <div class="shadow-sm card">
             <div class="card-header">
-                <h4 class="mb-0 text-primary"><i class="bx bx-store-alt"></i> Sales Profile</h4>
+                <h4 class="mb-0 text-primary"><i class="bx bx-store-alt"></i> {{ __('sales_views.sales_profile') }}</h4>
             </div>
             <div class="card-body">
                 <div class="mb-4 row g-3">
@@ -44,14 +44,13 @@
                         <form method="GET" action="{{ route('sales.todo') }}" class="h-100">
                             @csrf
                             <div class="p-3 rounded h-100 bg-light">
-                                <label for="filter" class="form-label text-muted"><i class="bi bi-funnel"></i> Filter
-                                    by:</label>
+                                <label for="filter" class="form-label text-muted"><i class="bi bi-funnel"></i> {{ __('sales_views.filter_by') }}</label>
                                 <select name="filter" id="filter" class="border-0 shadow-sm form-select"
                                     onchange="this.form.submit()">
-                                    <option value="all" {{ $filter == 'all' ? 'selected' : '' }}>All Time</option>
-                                    <option value="today" {{ $filter == 'today' ? 'selected' : '' }}>Today</option>
-                                    <option value="month" {{ $filter == 'month' ? 'selected' : '' }}>This Month</option>
-                                    <option value="year" {{ $filter == 'year' ? 'selected' : '' }}>This Year</option>
+                                    <option value="all" {{ $filter == 'all' ? 'selected' : '' }}>{{ __('sales_views.all_time') }}</option>
+                                    <option value="today" {{ $filter == 'today' ? 'selected' : '' }}>{{ __('sales_views.today') }}</option>
+                                    <option value="month" {{ $filter == 'month' ? 'selected' : '' }}>{{ __('sales_views.this_month') }}</option>
+                                    <option value="year" {{ $filter == 'year' ? 'selected' : '' }}>{{ __('sales_views.this_year') }}</option>
                                 </select>
                             </div>
                         </form>
@@ -60,7 +59,7 @@
                     <div class="col-md-4">
                         <div class="p-3 rounded h-100 d-flex align-items-center justify-content-center bg-light">
                             <a href="{{ route('contract.index') }}" class="shadow-sm btn btn-primary btn-lg">
-                                <i class="bi bi-plus-circle me-2"></i> Create New Contract
+                                <i class="bi bi-plus-circle me-2"></i> {{ __('sales_views.create_new_contract') }}
                             </a>
                         </div>
                     </div>
@@ -69,7 +68,7 @@
                         <div class="p-3 rounded h-100 d-flex align-items-center justify-content-center bg-light">
                             <a href="#" class="shadow-sm btn btn-success btn-lg" data-bs-toggle="modal"
                                 data-bs-target="#salesReportModal">
-                                <i class="bi bi-graph-up me-2"></i> Sales Reports
+                                <i class="bi bi-graph-up me-2"></i> {{ __('sales_views.sales_reports') }}
                             </a>
                         </div>
                     </div>
@@ -80,14 +79,14 @@
                     <table class="table border table-hover">
                         <thead class="bg-light">
                             <tr>
-                                <th>Client Name</th>
-                                <th>Client Phone</th>
-                                <th>Contract Number</th>
-                                <th>Payment Date</th>
-                                <th>Amount</th>
-                                <th>Payment Status</th>
-                                <th>Payment Method</th>
-                                <th>Action</th>
+                                <th>{{ __('sales_views.client_name') }}</th>
+                                <th>{{ __('sales_views.client_phone') }}</th>
+                                <th>{{ __('sales_views.contract_number') }}</th>
+                                <th>{{ __('sales_views.payment_date') }}</th>
+                                <th>{{ __('sales_views.amount') }}</th>
+                                <th>{{ __('sales_views.payment_status') }}</th>
+                                <th>{{ __('sales_views.payment_method') }}</th>
+                                <th>{{ __('sales_views.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -113,8 +112,7 @@
                                             <!-- View Invoice Button -->
                                             <a href="{{ route('payment.show', $payment->id) }}"
                                                 class="btn btn-info btn-sm me-2 d-flex align-items-center">
-                                                <i class="bx bx-file"></i> <span class="d-none d-sm-inline">View
-                                                    Invoice</span>
+                                                <i class="bx bx-file"></i> <span class="d-none d-sm-inline">{{ __('sales_views.view_invoice') }}</span>
                                             </a>
 
                                             <!-- Mark as Paid Button -->
@@ -124,9 +122,7 @@
                                                 <button type="button"
                                                     class="btn btn-success btn-sm me-2 d-flex align-items-center"
                                                     onclick="markAsPaid({{ $payment->id }})">
-                                                    <i class="bx bx-check-circle"></i> <span class="d-none d-sm-inline">Mark
-                                                        as
-                                                        Paid</span>
+                                                    <i class="bx bx-check-circle"></i> <span class="d-none d-sm-inline">{{ __('sales_views.mark_as_paid') }}</span>
                                                 </button>
                                             @endif
                                             @if (Carbon\Carbon::parse($payment->due_date)->lte(now()) &&
@@ -135,8 +131,7 @@
                                                     $payment->contract->contract_status == 'pending')
                                                 <button type="button" onclick="stopContract({{ $payment->contract->id }})"
                                                     class="gap-2 btn btn-danger d-flex align-items-center">
-                                                    <i class="bx bx-stop-circle"></i> <span class="d-none d-sm-inline">Stop
-                                                        Contract</span>
+                                                    <i class="bx bx-stop-circle"></i> <span class="d-none d-sm-inline">{{ __('sales_views.stop_contract') }}</span>
                                                 </button>
                                             @endif
 
@@ -145,7 +140,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3">No payments available for the selected filter.</td>
+                                    <td colspan="3">{{ __('sales_views.no_payments_available') }}</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -163,7 +158,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Mark as Paid</h5>
+                    <h5 class="modal-title">{{ __('sales_views.mark_as_paid') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -172,18 +167,18 @@
                         @method('PATCH')
                         <input type="hidden" id="paymentId" name="paymentId">
                         <div class="mb-3">
-                            <label for="payment_method" class="form-label">Payment Method</label>
+                            <label for="payment_method" class="form-label">{{ __('sales_views.payment_method') }}</label>
                             <select class="form-control" id="payment_method" name="payment_method" required>
-                                <option value="bank transfer">Bank Transfer</option>
-                                <option value="cash">Cash</option>
+                                <option value="bank transfer">{{ __('sales_views.bank_transfer') }}</option>
+                                <option value="cash">{{ __('sales_views.cash') }}</option>
                             </select>
-                            <div class="invalid-feedback">Please select a payment method.</div>
+                            <div class="invalid-feedback">{{ __('sales_views.select_payment_method_error') }}</div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" form="markAsPaidForm" class="btn btn-success">Mark as Paid</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('sales_views.close') }}</button>
+                    <button type="submit" form="markAsPaidForm" class="btn btn-success">{{ __('sales_views.mark_as_paid') }}</button>
                 </div>
             </div>
         </div>
@@ -196,7 +191,7 @@
             <div class="modal-content">
                 <div class="text-white modal-header bg-success">
                     <h5 class="modal-title" id="salesReportModalLabel">
-                        <i class="bi bi-file-earmark-bar-graph me-2"></i>Generate Sales Report
+                        <i class="bi bi-file-earmark-bar-graph me-2"></i>{{ __('sales_views.generate_sales_report') }}
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>

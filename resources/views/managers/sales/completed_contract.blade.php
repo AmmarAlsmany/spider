@@ -59,7 +59,7 @@
     <div class="mb-4 page-breadcrumb d-flex align-items-center">
         <div class="pe-3 breadcrumb-title d-flex align-items-center">
             <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
-                <i class="bx bx-arrow-back"></i> Back
+                <i class="bx bx-arrow-back"></i> {{ __('sales_views.back') }}
             </a>
         </div>
         <div class="ps-3">
@@ -74,7 +74,7 @@
 
     <div class="shadow-sm card">
         <div class="card-header">
-            <h4 class="mb-0 text-success"><i class="bx bx-check-circle"></i> Completed Contracts</h4>
+            <h4 class="mb-0 text-success"><i class="bx bx-check-circle"></i> {{ __('sales_views.completed_contracts') }}</h4>
         </div>
         <div class="card-body">
             @include('shared.contract_search')
@@ -84,15 +84,15 @@
                     <thead class="bg-light">
                         <tr>
                             <th>Id</th>
-                            <th>Contract Number</th>
-                            <th>Client Name</th>
-                            <th>Client Email</th>
-                            <th>Client Phone</th>
-                            <th>Contract Type</th>
-                            <th>Contract amount</th>
-                            <th>Start Date</th>
-                            <th>Contract Status</th>
-                            <th>Actions</th>
+                            <th>{{ __('sales_views.contract_number') }}</th>
+                            <th>{{ __('sales_views.client_name') }}</th>
+                            <th>{{ __('sales_views.client_email') }}</th>
+                            <th>{{ __('sales_views.client_phone') }}</th>
+                            <th>{{ __('sales_views.contract_type') }}</th>
+                            <th>{{ __('sales_views.contract_amount') }}</th>
+                            <th>{{ __('sales_views.start_date') }}</th>
+                            <th>{{ __('sales_views.contract_status') }}</th>
+                            <th>{{ __('sales_views.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -124,12 +124,12 @@
                             <td>
                                 <i class="bi bi-currency-dollar me-2 text-muted"></i>{{
                                 number_format($contract->contract_price, 2) }}
-                                SAR
+                                {{ __('sales_views.sar') }}
                             </td>
                             <td>
                                 <i class="bi bi-calendar-event me-2 text-muted"></i>
                                 {{ $contract->contract_start_date ? date('M d, Y',
-                                strtotime($contract->contract_start_date)) : 'Not set' }}
+                                strtotime($contract->contract_start_date)) : '{{ __('sales_views.not_set') }}' }}
                             </td>
                             <td>
                                 @if ($contract->contract_status == 'pending')
@@ -150,7 +150,7 @@
                                 {{-- renew the contract --}}
                                 <a href="{{ route('contract.renewal.form', ['id' => $contract->id]) }}"
                                     class="shadow-sm btn btn-primary btn-sm">
-                                    <i class="bi bi-calendar-plus me-1"></i>Renew
+                                    <i class="bi bi-calendar-plus me-1"></i>{{ __('sales_views.renew') }}
                                 </a>
                             </td>
                         </tr>

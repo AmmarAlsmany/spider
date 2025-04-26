@@ -50,23 +50,23 @@
             <div class="col-12">
                 <div class="mb-4 d-flex align-items-center">
                     <a href="{{ url()->previous() }}" class="btn btn-secondary me-3">
-                        <i class="bx bx-arrow-back"></i> Back
+                        <i class="bx bx-arrow-back"></i> {{ __('sales_views.back') }}
                     </a>
-                    <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> Sales Report</h4>
+                    <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> {{ __('sales_views.sales_report') }}</h4>
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="mb-4 alert alert-info flex-grow-1 me-3">
                         <h5 class="mb-2"><i class="bi bi-calendar-check me-2"></i>{{ $periodInfo['period_label'] }}</h5>
                         <p class="mb-0">
                             <small>
-                                Report Period: {{ \Carbon\Carbon::parse($periodInfo['start_date'])->format('F d, Y') }} -
+                                {{ __('sales_views.report_period') }}: {{ \Carbon\Carbon::parse($periodInfo['start_date'])->format('F d, Y') }} -
                                 {{ \Carbon\Carbon::parse($periodInfo['end_date'])->format('F d, Y') }}
                             </small>
                         </p>
                     </div>
                     <div>
                         <button onclick="downloadPDF()" class="gap-2 btn btn-success d-flex align-items-center">
-                            <i class="bx bx-download"></i> Download PDF
+                            <i class="bx bx-download"></i> {{ __('sales_views.download_pdf') }}
                         </button>
                     </div>
                 </div>
@@ -78,7 +78,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> Contract Statistics</h4>
+                        <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> {{ __('sales_views.contract_statistics') }}</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -86,7 +86,7 @@
                                 <div class="small-box bg-info">
                                     <div class="inner">
                                         <h3>{{ $contractStats['total_contracts'] }}</h3>
-                                        <p>Total Contracts</p>
+                                        <p>{{ __('sales_views.total_contracts') }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -94,7 +94,7 @@
                                 <div class="small-box bg-success">
                                     <div class="inner">
                                         <h3>{{ $contractStats['active_contracts'] }}</h3>
-                                        <p>Active Contracts</p>
+                                        <p>{{ __('sales_views.active_contracts') }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -102,7 +102,7 @@
                                 <div class="small-box bg-warning">
                                     <div class="inner">
                                         <h3>{{ $contractStats['pending_contracts'] }}</h3>
-                                        <p>Pending Contracts</p>
+                                        <p>{{ __('sales_views.pending_contracts') }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -110,7 +110,7 @@
                                 <div class="small-box bg-primary">
                                     <div class="inner">
                                         <h3>{{ $contractStats['completed_contracts'] }}</h3>
-                                        <p>Completed Contracts</p>
+                                        <p>{{ __('sales_views.completed_contracts') }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -118,7 +118,7 @@
                                 <div class="small-box bg-danger">
                                     <div class="inner">
                                         <h3>{{ $contractStats['cancelled_contracts'] }}</h3>
-                                        <p>Cancelled Contracts</p>
+                                        <p>{{ __('sales_views.cancelled_contracts') }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -133,14 +133,14 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> Financial Summary</h4>
+                        <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> {{ __('sales_views.financial_summary') }}</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="info-box">
                                     <div class="info-box-content">
-                                        <span class="info-box-text">Total Contract Value</span>
+                                        <span class="info-box-text">{{ __('sales_views.total_contract_value') }}</span>
                                         <span
                                             class="info-box-number">{{ number_format($financialSummary['total_contract_value'], 2) }}</span>
                                     </div>
@@ -149,7 +149,7 @@
                             <div class="col-md-3">
                                 <div class="info-box">
                                     <div class="info-box-content">
-                                        <span class="info-box-text">Total Paid</span>
+                                        <span class="info-box-text">{{ __('sales_views.total_paid') }}</span>
                                         <span
                                             class="info-box-number text-success">{{ number_format($financialSummary['total_paid'], 2) }}</span>
                                     </div>
@@ -158,7 +158,7 @@
                             <div class="col-md-3">
                                 <div class="info-box">
                                     <div class="info-box-content">
-                                        <span class="info-box-text">Total Pending</span>
+                                        <span class="info-box-text">{{ __('sales_views.total_pending') }}</span>
                                         <span
                                             class="info-box-number text-warning">{{ number_format($financialSummary['total_pending'], 2) }}</span>
                                     </div>
@@ -167,7 +167,7 @@
                             <div class="col-md-3">
                                 <div class="info-box">
                                     <div class="info-box-content">
-                                        <span class="info-box-text">Total Overdue</span>
+                                        <span class="info-box-text">{{ __('sales_views.total_overdue') }}</span>
                                         <span
                                             class="info-box-number text-danger">{{ number_format($financialSummary['total_overdue'], 2) }}</span>
                                     </div>
@@ -184,21 +184,21 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> Contracts List</h4>
+                        <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> {{ __('sales_views.contracts_list') }}</h4>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Contract ID</th>
-                                        <th>Start Date</th>
-                                        <th>End Date</th>
-                                        <th>Client</th>
-                                        <th>Type</th>
-                                        <th>Value</th>
-                                        <th>Status</th>
-                                        <th>Created Date</th>
+                                        <th>{{ __('sales_views.contract_id') }}</th>
+                                        <th>{{ __('sales_views.start_date') }}</th>
+                                        <th>{{ __('sales_views.end_date') }}</th>
+                                        <th>{{ __('sales_views.client') }}</th>
+                                        <th>{{ __('sales_views.type') }}</th>
+                                        <th>{{ __('sales_views.value') }}</th>
+                                        <th>{{ __('sales_views.status') }}</th>
+                                        <th>{{ __('sales_views.created_date') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -246,20 +246,20 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> Payments List</h4>
+                        <h4 class="mb-0 text-primary"><i class="bx bx-bar-chart"></i> {{ __('sales_views.payments_list') }}</h4>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Payment ID</th>
-                                        <th>Contract</th>
-                                        <th>Amount With Out VAT</th>
-                                        <th>VAT</th>
-                                        <th>Amount With VAT</th>
-                                        <th>Status</th>
-                                        <th>Due Date</th>
+                                        <th>{{ __('sales_views.payment_id') }}</th>
+                                        <th>{{ __('sales_views.contract') }}</th>
+                                        <th>{{ __('sales_views.amount_without_vat') }}</th>
+                                        <th>{{ __('sales_views.vat') }}</th>
+                                        <th>{{ __('sales_views.amount_with_vat') }}</th>
+                                        <th>{{ __('sales_views.status') }}</th>
+                                        <th>{{ __('sales_views.due_date') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -308,7 +308,7 @@
             // Show loading indicator
             const btn = document.querySelector('button[onclick="downloadPDF()"]');
             const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Generating PDF...';
+            btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> {{ __('sales_views.generating_pdf') }}';
             btn.disabled = true;
 
             // Get the current URL parameters
@@ -344,7 +344,7 @@
                     console.error('PDF generation failed:', error);
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                    alert('Failed to generate PDF. Please try again.');
+                    alert('{{ __('sales_views.pdf_generation_failed') }}');
                 });
         }
     </script>

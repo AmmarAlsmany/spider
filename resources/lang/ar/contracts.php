@@ -58,7 +58,14 @@ return [
     'modals' => [
         'contract_history' => 'سجل العقد رقم :number',
         'update_history' => 'سجل طلبات التحديث',
-        'contract_details' => 'تفاصيل العقد رقم :number'
+        'contract_details' => 'تفاصيل العقد رقم :number',
+        'contract_created' => 'تم إنشاء العقد',
+        'contract_number' => 'رقم العقد: #:number',
+        'contract_type' => 'نوع العقد: :type',
+        'update_request_status' => 'الحالة: :status',
+        'update_request_details' => 'تفاصيل الطلب',
+        'update_request_response' => 'رد من المسؤول',
+        'contract_status' => 'حالة العقد'
     ],
     
     // Status labels

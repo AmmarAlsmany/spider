@@ -72,7 +72,7 @@ class ManagerController extends Controller
             return back()->with('error', 'Cannot delete admin users');
         }
 
-        $manager->delete();
+        $manager->forceDelete();
         return redirect()->route('admin.managers.index')
             ->with('success', 'Manager deleted successfully');
     }

@@ -185,7 +185,7 @@
         </div>
 
         <div class="invoice-header">
-            فاتورة ضريبية
+            Claim Financial - مطالبة مالية
         </div>
 
         <table class="info-table">
@@ -205,8 +205,8 @@
 
         <table class="info-table">
             <tr>
-                <td>تاريخ اصدار الفاتورة</td>
-                <td>رقم الفاتورة</td>
+                <td>تاريخ اصدار المطالبة</td>
+                <td>رقم المطالبة</td>
                 <td>تاريخ الاستحقاق</td>
                 <td>الرقم الضريبي</td>
             </tr>
@@ -236,7 +236,7 @@
         </table>
 
         <div class="invoice-details-header">
-            بيان الفاتورة
+            Claim Details - بيان المطالبة
         </div>
 
         <table class="details-table">

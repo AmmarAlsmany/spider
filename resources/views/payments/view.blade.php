@@ -267,7 +267,7 @@
                 </div>
 
                 <div class="invoice-header">
-                    مطالبة مالية
+                    Claim Financial - مطالبة مالية
                 </div>
 
                 <table class="info-table">
@@ -319,7 +319,7 @@
                 </table>
 
                 <div class="invoice-details-header">
-                    بيان المطالبة
+                    Claim Details - بيان المطالبة
                 </div>
 
                 <table class="details-table">

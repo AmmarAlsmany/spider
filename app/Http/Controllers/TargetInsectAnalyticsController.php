@@ -1088,8 +1088,9 @@ class TargetInsectAnalyticsController extends Controller
             // Configure Browsershot to use system Chromium for ARM64 compatibility
             $chromiumPath = env('CHROMIUM_PATH', '/usr/bin/chromium-browser');
             
-            // Use the application URL to access the file via HTTP instead of file://
-            $baseUrl = config('app.url');
+            // Use HTTP URL for local chart access to avoid SSL certificate issues
+            // Force HTTP regardless of APP_URL setting
+            $baseUrl = str_replace('https://', 'http://', config('app.url'));
             $chartUrl = $baseUrl . '/temp_charts/' . $tempFileName;
             
             try {

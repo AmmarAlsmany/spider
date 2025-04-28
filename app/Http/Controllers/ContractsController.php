@@ -1774,4 +1774,56 @@ class ContractsController extends Controller
                 ->with('info', 'You chose not to renew contract #' . $contract->contract_number);
         }
     }
+
+
+    public function branchVisits(contracts $contract, $branch = null)
+    {
+        // Get visits for this contract, filtered by branch if specified
+        $query = \App\Models\VisitSchedule::where('contract_id', $contract->id);
+
+        if ($branch && $branch !== 'main') {
+            // For specific branch
+            $branch = \App\Models\branchs::find($branch);
+            $query->where('branch_id', $branch->id);
+        } elseif ($branch === 'main') {
+            // For main location (null branch_id)
+            $query->whereNull('branch_id');
+            $branch = 'main';
+        }
+
+        // Apply filters if provided
+        if (request('start_date')) {
+            $query->whereDate('visit_date', '>=', request('start_date'));
+        }
+
+        if (request('end_date')) {
+            $query->whereDate('visit_date', '<=', request('end_date'));
+        }
+
+        if (request('status')) {
+            $query->where('status', request('status'));
+        }
+
+        // Order by visit date (newest first by default)
+        $query->orderBy('visit_date', request('sort_direction', 'desc'));
+
+        // Get paginated results
+        $visits = $query->paginate(16)->withQueryString();
+
+        // Calculate statistics
+        $totalVisits = $query->count();
+        $completedVisits = $query->clone()->where('status', 'completed')->count();
+        $pendingVisits = $query->clone()->where('status', 'scheduled')->count();
+        $cancelledVisits = $query->clone()->where('status', 'cancelled')->count();
+
+        return view('contracts.branch_visits', compact(
+            'contract',
+            'branch',
+            'visits',
+            'totalVisits',
+            'completedVisits',
+            'pendingVisits',
+            'cancelledVisits'
+        ));
+    }
 }

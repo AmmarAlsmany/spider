@@ -173,6 +173,8 @@ return [
     'contract_amount' => 'قيمة العقد',
     'contract_description' => 'وصف العقد',
     'insect_analytics' => 'تحليل العقد',
+    'unknown_branch' => 'فرع غير معروف',
+    'team' => 'الفريق',
 
     // Branch Information
     'branch_name' => 'اسم الفرع',

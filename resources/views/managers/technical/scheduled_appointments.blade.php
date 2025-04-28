@@ -1,1036 +1,1031 @@
 @extends('shared.dashboard')
 
 @section('content')
-    <div class="page-content">
-        @if (session('error'))
-            <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bx bx-error-circle me-1"></i>
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+<div class="page-content">
+    @if (session('error'))
+    <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bx bx-error-circle me-1"></i>
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
 
-        @if (session('success'))
-            <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bx bx-check-circle me-1"></i>
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+    @if (session('success'))
+    <div class="mb-3 alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bx bx-check-circle me-1"></i>
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
 
-        <div class="container-fluid">
-            <div class="mb-4 row">
-                <div class="col-md-4">
-                    <div class="border-0 shadow-sm card hover-shadow">
-                        <div class="p-4 card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0 me-3">
-                                    <div
-                                        class="avatar-md rounded-circle bg-soft-primary d-flex align-items-center justify-content-center">
-                                        <i class="bx bx-time-five text-primary font-size-24"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h4 class="mb-1">{{ $pendingVisits }}</h4>
-                                    <p class="mb-0 text-muted font-size-14">Pending Visits</p>
+    <div class="container-fluid">
+        <div class="mb-4 row">
+            <div class="col-md-4">
+                <div class="border-0 shadow-sm card hover-shadow">
+                    <div class="p-4 card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3">
+                                <div
+                                    class="avatar-md rounded-circle bg-soft-primary d-flex align-items-center justify-content-center">
+                                    <i class="bx bx-time-five text-primary font-size-24"></i>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="border-0 shadow-sm card hover-shadow">
-                        <div class="p-4 card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0 me-3">
-                                    <div
-                                        class="avatar-md rounded-circle bg-soft-success d-flex align-items-center justify-content-center">
-                                        <i class="bx bx-calendar-check text-success font-size-24"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h4 class="mb-1">{{ $todayVisits }}</h4>
-                                    <p class="mb-0 text-muted font-size-14">Today's Visits</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="border-0 shadow-sm card hover-shadow">
-                        <div class="p-4 card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0 me-3">
-                                    <div
-                                        class="avatar-md rounded-circle bg-soft-info d-flex align-items-center justify-content-center">
-                                        <i class="bx bx-check-circle text-info font-size-24"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h4 class="mb-1">{{ $todayCompletedVisits }}</h4>
-                                    <p class="mb-0 text-muted font-size-14">Completed Today</p>
-                                </div>
+                            <div class="flex-grow-1">
+                                <h4 class="mb-1">{{ $pendingVisits }}</h4>
+                                <p class="mb-0 text-muted font-size-14">Pending Visits</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h6 class="mb-0">Scheduled Appointments</h6>
-                                </div>
-                                <div class="gap-2 d-flex align-items-center">
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#createVisitModal">
-                                        <i class="bx bx-plus me-1"></i> Create New Visit
-                                    </button>
+            <div class="col-md-4">
+                <div class="border-0 shadow-sm card hover-shadow">
+                    <div class="p-4 card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3">
+                                <div
+                                    class="avatar-md rounded-circle bg-soft-success d-flex align-items-center justify-content-center">
+                                    <i class="bx bx-calendar-check text-success font-size-24"></i>
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-body">
-                            <!-- Filters -->
-                            <form method="GET" action="{{ route('technical.scheduled-appointments') }}" class="mb-4"
-                                id="filterForm">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="start_date">Start Date</label>
-                                            <input type="date" class="form-control" id="start_date" name="start_date"
-                                                value="{{ request('start_date') }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="end_date">End Date</label>
-                                            <input type="date" class="form-control" id="end_date" name="end_date"
-                                                value="{{ request('end_date') }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="team_id">Team</label>
-                                            <select class="form-control" id="team_id" name="team_id">
-                                                <option value="">All Teams</option>
-                                                @foreach ($teams as $team)
-                                                    <option value="{{ $team->id }}"
-                                                        {{ request('team_id') == $team->id ? 'selected' : '' }}>
-                                                        {{ $team->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="contract_number">Contract Number</label>
-                                            <input type="text" class="form-control" id="contract_number"
-                                                name="contract_number" value="{{ request('contract_number') }}"
-                                                placeholder="Enter contract #">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="sort_direction">Sort Order</label>
-                                            <select class="form-control" id="sort_direction" name="sort_direction">
-                                                <option value="desc"
-                                                    {{ isset($sortDirection) && $sortDirection == 'desc' ? 'selected' : '' }}>
-                                                    Newest First</option>
-                                                <option value="asc"
-                                                    {{ isset($sortDirection) && $sortDirection == 'asc' ? 'selected' : '' }}>
-                                                    Oldest First</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-end">
-                                        <div class="mb-0 form-group">
-                                            <button type="submit" class="btn btn-primary me-2">Filter</button>
-                                            <a href="{{ route('technical.scheduled-appointments') }}"
-                                                class="btn btn-secondary">Reset</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
+                            <div class="flex-grow-1">
+                                <h4 class="mb-1">{{ $todayVisits }}</h4>
+                                <p class="mb-0 text-muted font-size-14">Today's Visits</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="border-0 shadow-sm card">
-                        <div class="p-0 card-body">
-                            <div class="accordion custom-accordion" id="contractAccordion">
-                                @foreach ($contracts as $contract)
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header">
-                                            <button class="accordion-button collapsed" type="button"
-                                                data-bs-toggle="collapse" data-bs-target="#contract-{{ $contract->id }}">
-                                                <div class="contract-info w-100">
-                                                    <div
-                                                        class="flex-wrap d-flex justify-content-between align-items-start w-100">
-                                                        <div class="contract-main-info">
-                                                            <h5 class="gap-2 contract-title d-flex align-items-center">
-                                                                <i class="bx bx-buildings me-1 text-primary"></i>
-                                                                {{ $contract->customer->name }}
-                                                                <a href="{{ route('technical.contract.show', $contract->id) }}"
-                                                                    class="p-0 btn btn-link btn-sm text-muted view-contract-btn"
-                                                                    data-bs-toggle="tooltip"
-                                                                    title="View Contract Details">
-                                                                    <i class="bx bx-info-circle"></i>
-                                                                </a>
-                                                            </h5>
-                                                            <div class="contract-details">
-                                                                <span class="contract-detail-item">
-                                                                    <i class="bx bx-hash"></i>
-                                                                    {{ $contract->contract_number }}
-                                                                </span>
-                                                                <span class="contract-detail-item">
-                                                                    <i class="bx bx-git-branch"></i>
-                                                                    {{ $contract->branchs->count() }}
-                                                                    {{ Str::plural('Branch', $contract->branchs->count()) }}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="flex-wrap gap-2 visit-stats d-flex">
-                                                            @php
-                                                                $totalVisits = $contract->visitSchedules->count();
-                                                                $completedVisits = $contract->visitSchedules
-                                                                    ->where('status', 'completed')
-                                                                    ->count();
-                                                                $pendingVisits = $contract->visitSchedules
-                                                                    ->where('status', 'scheduled')
-                                                                    ->count();
-                                                                $cancelledVisits = $contract->visitSchedules
-                                                                    ->where('status', 'cancelled')
-                                                                    ->count();
-                                                            @endphp
-                                                            <div class="visit-stat-item">
-                                                                <span class="stat-label">Total Visits</span>
-                                                                <span
-                                                                    class="stat-value text-primary">{{ $totalVisits }}</span>
-                                                            </div>
-                                                            <div class="visit-stat-item">
-                                                                <span class="stat-label">Completed</span>
-                                                                <span
-                                                                    class="stat-value text-success">{{ $completedVisits }}</span>
-                                                            </div>
-                                                            <div class="visit-stat-item">
-                                                                <span class="stat-label">Pending</span>
-                                                                <span
-                                                                    class="stat-value text-warning">{{ $pendingVisits }}</span>
-                                                            </div>
-                                                            <div class="visit-stat-item">
-                                                                <span class="stat-label">Cancelled</span>
-                                                                <span
-                                                                    class="stat-value text-danger">{{ $cancelledVisits }}</span>
-                                                            </div>
-                                                        </div>
+            <div class="col-md-4">
+                <div class="border-0 shadow-sm card hover-shadow">
+                    <div class="p-4 card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3">
+                                <div
+                                    class="avatar-md rounded-circle bg-soft-info d-flex align-items-center justify-content-center">
+                                    <i class="bx bx-check-circle text-info font-size-24"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h4 class="mb-1">{{ $todayCompletedVisits }}</h4>
+                                <p class="mb-0 text-muted font-size-14">Completed Today</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="mb-0">Scheduled Appointments</h6>
+                            </div>
+                            <div class="gap-2 d-flex align-items-center">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#createVisitModal">
+                                    <i class="bx bx-plus me-1"></i> Create New Visit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Filters -->
+                        <form method="GET" action="{{ route('technical.scheduled-appointments') }}" class="mb-4"
+                            id="filterForm">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="start_date">Start Date</label>
+                                        <input type="date" class="form-control" id="start_date" name="start_date"
+                                            value="{{ request('start_date') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="end_date">End Date</label>
+                                        <input type="date" class="form-control" id="end_date" name="end_date"
+                                            value="{{ request('end_date') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="team_id">Team</label>
+                                        <select class="form-control" id="team_id" name="team_id">
+                                            <option value="">All Teams</option>
+                                            @foreach ($teams as $team)
+                                            <option value="{{ $team->id }}" {{ request('team_id')==$team->id ?
+                                                'selected' : '' }}>
+                                                {{ $team->name }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="contract_number">Contract Number</label>
+                                        <input type="text" class="form-control" id="contract_number"
+                                            name="contract_number" value="{{ request('contract_number') }}"
+                                            placeholder="Enter contract #">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="sort_direction">Sort Order</label>
+                                        <select class="form-control" id="sort_direction" name="sort_direction">
+                                            <option value="desc" {{ isset($sortDirection) && $sortDirection=='desc'
+                                                ? 'selected' : '' }}>
+                                                Newest First</option>
+                                            <option value="asc" {{ isset($sortDirection) && $sortDirection=='asc'
+                                                ? 'selected' : '' }}>
+                                                Oldest First</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <div class="mb-0 form-group">
+                                        <button type="submit" class="btn btn-primary me-2">Filter</button>
+                                        <a href="{{ route('technical.scheduled-appointments') }}"
+                                            class="btn btn-secondary">Reset</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="border-0 shadow-sm card">
+                    <div class="p-0 card-body">
+                        <div class="accordion custom-accordion" id="contractAccordion">
+                            @foreach ($contracts as $contract)
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#contract-{{ $contract->id }}">
+                                        <div class="contract-info w-100">
+                                            <div
+                                                class="flex-wrap d-flex justify-content-between align-items-start w-100">
+                                                <div class="contract-main-info">
+                                                    <h5 class="gap-2 contract-title d-flex align-items-center">
+                                                        <i class="bx bx-buildings me-1 text-primary"></i>
+                                                        {{ $contract->customer->name }}
+                                                        <a href="{{ route('technical.contract.show', $contract->id) }}"
+                                                            class="p-0 btn btn-link btn-sm text-muted view-contract-btn"
+                                                            data-bs-toggle="tooltip" title="View Contract Details">
+                                                            <i class="bx bx-info-circle"></i>
+                                                        </a>
+                                                    </h5>
+                                                    <div class="contract-details">
+                                                        <span class="contract-detail-item">
+                                                            <i class="bx bx-hash"></i>
+                                                            {{ $contract->contract_number }}
+                                                        </span>
+                                                        <span class="contract-detail-item">
+                                                            <i class="bx bx-git-branch"></i>
+                                                            {{ $contract->branchs->count() }}
+                                                            {{ Str::plural('Branch', $contract->branchs->count()) }}
+                                                        </span>
                                                     </div>
                                                 </div>
-                                            </button>
-                                        </h2>
-                                        <div id="contract-{{ $contract->id }}" class="accordion-collapse collapse"
-                                            aria-labelledby="heading{{ $contract->id }}"
-                                            data-bs-parent="#contractAccordion">
-                                            <div class="accordion-body">
-                                                <!-- Branch Links Instead of Tabs -->
-                                                <div class="mb-4">
-                                                    <div class="mb-3 d-flex justify-content-between align-items-center">
-                                                        <h6 class="mb-0 fw-semibold">
-                                                            <i class="bx bx-map-pin text-primary me-1"></i>
-                                                            Contract Locations
-                                                        </h6>
-                                                        <a href="{{ route('technical.contract.visits', $contract->id) }}"
-                                                            class="btn btn-sm btn-primary">
-                                                            <i class="bx bx-calendar me-1"></i> View All Visits
-                                                        </a>
+                                                <div class="flex-wrap gap-2 visit-stats d-flex">
+                                                    @php
+                                                    $totalVisits = $contract->visitSchedules->count();
+                                                    $completedVisits = $contract->visitSchedules
+                                                    ->where('status', 'completed')
+                                                    ->count();
+                                                    $pendingVisits = $contract->visitSchedules
+                                                    ->where('status', 'scheduled')
+                                                    ->count();
+                                                    $cancelledVisits = $contract->visitSchedules
+                                                    ->where('status', 'cancelled')
+                                                    ->count();
+                                                    @endphp
+                                                    <div class="visit-stat-item">
+                                                        <span class="stat-label">Total Visits</span>
+                                                        <span class="stat-value text-primary">{{ $totalVisits }}</span>
                                                     </div>
+                                                    <div class="visit-stat-item">
+                                                        <span class="stat-label">Completed</span>
+                                                        <span class="stat-value text-success">{{ $completedVisits
+                                                            }}</span>
+                                                    </div>
+                                                    <div class="visit-stat-item">
+                                                        <span class="stat-label">Pending</span>
+                                                        <span class="stat-value text-warning">{{ $pendingVisits
+                                                            }}</span>
+                                                    </div>
+                                                    <div class="visit-stat-item">
+                                                        <span class="stat-label">Cancelled</span>
+                                                        <span class="stat-value text-danger">{{ $cancelledVisits
+                                                            }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="contract-{{ $contract->id }}" class="accordion-collapse collapse"
+                                    aria-labelledby="heading{{ $contract->id }}" data-bs-parent="#contractAccordion">
+                                    <div class="accordion-body">
+                                        <!-- Branch Links Instead of Tabs -->
+                                        <div class="mb-4">
+                                            <div class="mb-3 d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0 fw-semibold">
+                                                    <i class="bx bx-map-pin text-primary me-1"></i>
+                                                    Contract Locations
+                                                </h6>
+                                                <a href="{{ route('technical.contract.visits', $contract->id) }}"
+                                                    class="btn btn-sm btn-primary">
+                                                    <i class="bx bx-calendar me-1"></i> View All Visits
+                                                </a>
+                                            </div>
 
-                                                    <div class="row g-3">
-                                                        <!-- Main Location -->
-                                                        @php
-                                                            $mainLocationVisits = $contract->visitSchedules
-                                                                ->whereNull('branch_id')
-                                                                ->count();
-                                                        @endphp
+                                            <div class="row g-3">
+                                                <!-- Main Location -->
+                                                @php
+                                                $mainLocationVisits = $contract->visitSchedules
+                                                ->whereNull('branch_id')
+                                                ->count();
+                                                @endphp
 
-                                                        @if ($mainLocationVisits > 0)
-                                                            <div class="col-md-6 col-lg-4">
-                                                                <a href="{{ route('technical.contract.branch.visits', [$contract->id, 'main']) }}"
-                                                                    class="text-decoration-none">
+                                                @if ($mainLocationVisits > 0)
+                                                <div class="col-md-6 col-lg-4">
+                                                    <a href="{{ route('technical.contract.branch.visits', [$contract->id, 'main']) }}"
+                                                        class="text-decoration-none">
+                                                        <div class="border branch-card card h-100 hover-shadow">
+                                                            <div class="p-3 card-body">
+                                                                <div class="d-flex align-items-center">
                                                                     <div
-                                                                        class="border branch-card card h-100 hover-shadow">
-                                                                        <div class="p-3 card-body">
-                                                                            <div class="d-flex align-items-center">
-                                                                                <div
-                                                                                    class="avatar-md rounded-circle bg-soft-primary me-3 d-flex align-items-center justify-content-center">
-                                                                                    <i
-                                                                                        class="bx bx-building text-primary font-size-20"></i>
-                                                                                </div>
-                                                                                <div>
-                                                                                    <h6 class="mb-1">Main Location</h6>
-                                                                                    <div
-                                                                                        class="text-muted small d-flex align-items-center">
-                                                                                        <i class="bx bx-calendar me-1"></i>
-                                                                                        {{ $mainLocationVisits }} Visits
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="mt-2 d-flex justify-content-end">
-                                                                                <span
-                                                                                    class="px-2 py-1 badge bg-soft-primary text-primary rounded-pill">
-                                                                                    <i class="bx bx-chevron-right"></i>
-                                                                                    View Visits
-                                                                                </span>
-                                                                            </div>
+                                                                        class="avatar-md rounded-circle bg-soft-primary me-3 d-flex align-items-center justify-content-center">
+                                                                        <i
+                                                                            class="bx bx-building text-primary font-size-20"></i>
+                                                                    </div>
+                                                                    <div>
+                                                                        <h6 class="mb-1">Main Location</h6>
+                                                                        <div
+                                                                            class="text-muted small d-flex align-items-center">
+                                                                            <i class="bx bx-calendar me-1"></i>
+                                                                            {{ $mainLocationVisits }} Visits
                                                                         </div>
                                                                     </div>
-                                                                </a>
-                                                            </div>
-                                                        @endif
-
-                                                        <!-- Contract Branches -->
-                                                        @foreach ($contract->branchs as $branch)
-                                                            <div class="col-md-6 col-lg-4">
-                                                                <a href="{{ route('technical.contract.branch.visits', [$contract->id, $branch->id]) }}"
-                                                                    class="text-decoration-none">
-                                                                    <div
-                                                                        class="border branch-card card h-100 hover-shadow">
-                                                                        <div class="p-3 card-body">
-                                                                            <div class="d-flex align-items-center">
-                                                                                <div
-                                                                                    class="avatar-md rounded-circle bg-soft-info me-3 d-flex align-items-center justify-content-center">
-                                                                                    <i
-                                                                                        class="bx bx-map-pin text-info font-size-20"></i>
-                                                                                </div>
-                                                                                <div>
-                                                                                    <h6 class="mb-1">
-                                                                                        {{ $branch->branch_name }}</h6>
-                                                                                    <div
-                                                                                        class="text-muted small d-flex align-items-center">
-                                                                                        <i class="bx bx-calendar me-1"></i>
-                                                                                        {{ $contract->visitSchedules->where('branch_id', $branch->id)->count() }}
-                                                                                        Visits
-                                                                                    </div>
-                                                                                    <small
-                                                                                        class="ms-1 badge rounded-pill bg-info">{{ $branch->branch_address }}</small>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="mt-2 d-flex justify-content-end">
-                                                                                <span
-                                                                                    class="px-2 py-1 badge bg-soft-info text-info rounded-pill">
-                                                                                    <i class="bx bx-chevron-right"></i>
-                                                                                    View Visits
-                                                                                </span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                            </div>
-                                                        @endforeach
-
-                                                        <!-- New Visit Button -->
-                                                        <div class="col-md-6 col-lg-4">
-                                                            <div class="border border-dashed new-visit-card card h-100">
-                                                                <div
-                                                                    class="p-3 card-body d-flex flex-column align-items-center justify-content-center">
-                                                                    <div class="mb-2 text-center">
-                                                                        <i class="bx bx-plus-circle text-primary"
-                                                                            style="font-size: 2rem;"></i>
-                                                                        <h6 class="mt-2 mb-1">Schedule New Visit</h6>
-                                                                        <p class="mb-0 text-muted small">Add a new
-                                                                            appointment for this contract</p>
-                                                                    </div>
-                                                                    <button type="button"
-                                                                        class="mt-2 btn btn-sm btn-primary"
-                                                                        data-bs-toggle="modal"
-                                                                        data-bs-target="#createVisitModal"
-                                                                        data-contract-id="{{ $contract->id }}">
-                                                                        <i class="bx bx-plus me-1"></i> Create Visit
-                                                                    </button>
+                                                                </div>
+                                                                <div class="mt-2 d-flex justify-content-end">
+                                                                    <span
+                                                                        class="px-2 py-1 badge bg-soft-primary text-primary rounded-pill">
+                                                                        <i class="bx bx-chevron-right"></i>
+                                                                        View Visits
+                                                                    </span>
                                                                 </div>
                                                             </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                                @endif
+
+                                                <!-- Contract Branches -->
+                                                @foreach ($contract->branchs as $branch)
+                                                <div class="col-md-6 col-lg-4">
+                                                    <a href="{{ route('technical.contract.branch.visits', [$contract->id, $branch->id]) }}"
+                                                        class="text-decoration-none">
+                                                        <div class="border branch-card card h-100 hover-shadow">
+                                                            <div class="p-3 card-body">
+                                                                <div class="d-flex align-items-center">
+                                                                    <div
+                                                                        class="avatar-md rounded-circle bg-soft-info me-3 d-flex align-items-center justify-content-center">
+                                                                        <i
+                                                                            class="bx bx-map-pin text-info font-size-20"></i>
+                                                                    </div>
+                                                                    <div>
+                                                                        <h6 class="mb-1">
+                                                                            {{ $branch->branch_name }}</h6>
+                                                                        <div
+                                                                            class="text-muted small d-flex align-items-center">
+                                                                            <i class="bx bx-calendar me-1"></i>
+                                                                            {{
+                                                                            $contract->visitSchedules->where('branch_id',
+                                                                            $branch->id)->count() }}
+                                                                            Visits
+                                                                        </div>
+                                                                        <small
+                                                                            class="ms-1 badge rounded-pill bg-info">{{
+                                                                            $branch->branch_address }}</small>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="mt-2 d-flex justify-content-end">
+                                                                    <span
+                                                                        class="px-2 py-1 badge bg-soft-info text-info rounded-pill">
+                                                                        <i class="bx bx-chevron-right"></i>
+                                                                        View Visits
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                                @endforeach
+
+                                                <!-- New Visit Button -->
+                                                <div class="col-md-6 col-lg-4">
+                                                    <div class="border border-dashed new-visit-card card h-100">
+                                                        <div
+                                                            class="p-3 card-body d-flex flex-column align-items-center justify-content-center">
+                                                            <div class="mb-2 text-center">
+                                                                <i class="bx bx-plus-circle text-primary"
+                                                                    style="font-size: 2rem;"></i>
+                                                                <h6 class="mt-2 mb-1">Schedule New Visit</h6>
+                                                                <p class="mb-0 text-muted small">Add a new
+                                                                    appointment for this contract</p>
+                                                            </div>
+                                                            <button type="button" class="mt-2 btn btn-sm btn-primary"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#createVisitModal"
+                                                                data-contract-id="{{ $contract->id }}">
+                                                                <i class="bx bx-plus me-1"></i> Create Visit
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                @endforeach
+                                </div>
                             </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Create Visit Modal -->
-        <div class="modal fade" id="createVisitModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="bx bx-calendar-plus me-1"></i>
-                            Create New Visit
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form action="{{ route('technical.schedule_visit') }}" method="POST">
-                        @csrf
-                        <div class="modal-body">
-                            <div class="row g-3">
-                                <!-- Client Selection -->
-                                <div class="col-md-6">
-                                    <label class="form-label">Client</label>
-                                    <select class="form-select" name="client_id" id="client_select" required>
-                                        <option value="">Select Client</option>
-                                        @foreach ($clients as $client)
-                                            <option value="{{ $client->id }}">{{ $client->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <!-- Contract Selection -->
-                                <div class="col-md-6">
-                                    <label class="form-label">Contract</label>
-                                    <select class="form-select" name="contract_id" id="contract_select" required
-                                        disabled>
-                                        <option value="">Select Contract</option>
-                                    </select>
-                                </div>
-
-                                <!-- Branch Selection (if applicable) -->
-                                <div class="col-md-6">
-                                    <label class="form-label">Branch (Optional)</label>
-                                    <select class="form-select" name="branch_id" id="branch_select" disabled>
-                                        <option value="">Select Branch</option>
-                                    </select>
-                                </div>
-
-                                <!-- Visit Type -->
-                                <div class="col-md-6">
-                                    <label class="form-label">Visit Type</label>
-                                    <select class="form-select" name="visit_type" required>
-                                        <option value="regular">Regular Visit</option>
-                                        <option value="regular">Regular</option>
-                                        <option value="complementary">Complementary</option>
-                                        <option value="free">Free</option>
-                                        <option value="emergency">Emergency</option>
-                                    </select>
-                                </div>
-
-                                <!-- Date Selection -->
-                                <div class="col-md-6">
-                                    <label class="form-label">Visit Date</label>
-                                    <input type="date" class="form-control" name="visit_date" required
-                                        min="{{ date('Y-m-d') }}">
-                                    <small class="text-muted">Select any date from today onwards</small>
-                                </div>
-
-                                <!-- Time Selection -->
-                                <div class="col-md-6">
-                                    <label class="form-label">Visit Time</label>
-                                    <input type="time" class="form-control" name="visit_time" required>
-                                    <small class="text-muted">Regular working hours are 8:00 AM to 2:00 PM</small>
-                                </div>
-
-                                <!-- Team Selection -->
-                                <div class="col-md-6">
-                                    <label class="form-label">Assign Team</label>
-                                    <select class="form-select" name="team_id" required>
-                                        <option value="">Select Team</option>
-                                        @foreach ($teams as $team)
-                                            <option value="{{ $team->id }}">{{ $team->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- Warning Messages -->
-                            <div id="schedule_warnings" class="mt-3 alert alert-warning d-none">
-                                <ul class="mb-0" id="warning_list"></ul>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                <i class="bx bx-x me-1"></i>Cancel
-                            </button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bx bx-check me-1"></i>Create Visit
-                            </button>
-                        </div>
-                    </form>
+    <!-- Create Visit Modal -->
+    <div class="modal fade" id="createVisitModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bx bx-calendar-plus me-1"></i>
+                        Create New Visit
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-            </div>
-        </div>
+                <form action="{{ route('technical.schedule_visit') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <!-- Client Selection -->
+                            <div class="col-md-6">
+                                <label class="form-label">Client</label>
+                                <select class="form-select" name="client_id" id="client_select" required>
+                                    <option value="">Select Client</option>
+                                    @foreach ($clients as $client)
+                                    <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-        <!-- Edit Appointment Modal -->
-        <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Edit Appointment</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form id="editForm" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="modal-body">
-                            <div class="mb-3 form-group">
-                                <label for="edit_visit_date">Visit Date</label>
-                                <input type="date" class="form-control" id="edit_visit_date" name="visit_date"
-                                    required min="{{ date('Y-m-d', strtotime('today')) }}">
+                            <!-- Contract Selection -->
+                            <div class="col-md-6">
+                                <label class="form-label">Contract</label>
+                                <select class="form-select" name="contract_id" id="contract_select" required disabled>
+                                    <option value="">Select Contract</option>
+                                </select>
                             </div>
-                            <div class="mb-3 form-group">
-                                <label for="edit_visit_time">Visit Time</label>
-                                <input type="time" class="form-control" id="edit_visit_time" name="visit_time"
-                                    required>
-                                <small class="form-text text-muted">Select a time between 8:00 AM and 4:00 PM (visits take
-                                    2
-                                    hours)</small>
+
+                            <!-- Branch Selection (if applicable) -->
+                            <div class="col-md-6">
+                                <label class="form-label">Branch (Optional)</label>
+                                <select class="form-select" name="branch_id" id="branch_select" disabled>
+                                    <option value="">Select Branch</option>
+                                </select>
                             </div>
-                            <div class="mb-3 form-group">
-                                <label for="edit_team_id">Assign Team</label>
-                                <select class="form-control" id="edit_team_id" name="team_id" required>
+
+                            <!-- Visit Type -->
+                            <div class="col-md-6">
+                                <label class="form-label">Visit Type</label>
+                                <select class="form-select" name="visit_type" required>
+                                    <option value="regular">Regular Visit</option>
+                                    <option value="regular">Regular</option>
+                                    <option value="complementary">Complementary</option>
+                                    <option value="free">Free</option>
+                                    <option value="emergency">Emergency</option>
+                                </select>
+                            </div>
+
+                            <!-- Date Selection -->
+                            <div class="col-md-6">
+                                <label class="form-label">Visit Date</label>
+                                <input type="date" class="form-control" name="visit_date" required
+                                    min="{{ date('Y-m-d') }}">
+                                <small class="text-muted">Select any date from today onwards</small>
+                            </div>
+
+                            <!-- Time Selection -->
+                            <div class="col-md-6">
+                                <label class="form-label">Visit Time</label>
+                                <input type="time" class="form-control" name="visit_time" required>
+                                <small class="text-muted">Regular working hours are 8:00 AM to 2:00 PM</small>
+                            </div>
+
+                            <!-- Team Selection -->
+                            <div class="col-md-6">
+                                <label class="form-label">Assign Team</label>
+                                <select class="form-select" name="team_id" required>
                                     <option value="">Select Team</option>
                                     @foreach ($teams as $team)
-                                        <option value="{{ $team->id }}">{{ $team->name }}</option>
+                                    <option value="{{ $team->id }}">{{ $team->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Update Appointment</button>
+
+                        <!-- Warning Messages -->
+                        <div id="schedule_warnings" class="mt-3 alert alert-warning d-none">
+                            <ul class="mb-0" id="warning_list"></ul>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bx bx-x me-1"></i>Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-check me-1"></i>Create Visit
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
 
-        @push('styles')
-            <style>
-                /* Mobile Responsiveness */
-                @media (max-width: 767.98px) {
+    <!-- Edit Appointment Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Appointment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editForm" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body">
+                        <div class="mb-3 form-group">
+                            <label for="edit_visit_date">Visit Date</label>
+                            <input type="date" class="form-control" id="edit_visit_date" name="visit_date" required
+                                min="{{ date('Y-m-d', strtotime('today')) }}">
+                        </div>
+                        <div class="mb-3 form-group">
+                            <label for="edit_visit_time">Visit Time</label>
+                            <input type="time" class="form-control" id="edit_visit_time" name="visit_time" required>
+                            <small class="form-text text-muted">Select a time between 8:00 AM and 4:00 PM (visits take
+                                2
+                                hours)</small>
+                        </div>
+                        <div class="mb-3 form-group">
+                            <label for="edit_team_id">Assign Team</label>
+                            <select class="form-control" id="edit_team_id" name="team_id" required>
+                                <option value="">Select Team</option>
+                                @foreach ($teams as $team)
+                                <option value="{{ $team->id }}">{{ $team->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Update Appointment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
-                    /* Table Adjustments */
-                    .table-responsive {
-                        margin: 0 -1rem;
-                    }
+    @push('styles')
+    <style>
+        /* Mobile Responsiveness */
+        @media (max-width: 767.98px) {
 
-                    .table td,
-                    .table th {
-                        padding: 0.75rem 0.5rem;
-                        white-space: normal;
-                    }
+            /* Table Adjustments */
+            .table-responsive {
+                margin: 0 -1rem;
+            }
 
-                    /* Status Badge Adjustments */
-                    .d-inline-flex {
-                        font-size: 0.75rem;
-                    }
+            .table td,
+            .table th {
+                padding: 0.75rem 0.5rem;
+                white-space: normal;
+            }
 
-                    /* Action Buttons */
-                    .btn-group {
-                        flex-direction: column;
-                        gap: 0.5rem;
-                    }
+            /* Status Badge Adjustments */
+            .d-inline-flex {
+                font-size: 0.75rem;
+            }
 
-                    .btn-group .btn {
-                        width: 100%;
-                        justify-content: center;
-                    }
+            /* Action Buttons */
+            .btn-group {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
 
-                    /* Accordion Header */
-                    .accordion-button {
-                        padding: 0.75rem;
-                    }
+            .btn-group .btn {
+                width: 100%;
+                justify-content: center;
+            }
 
-                    .accordion-button h5 {
-                        font-size: 0.9rem;
-                        margin-bottom: 0.25rem !important;
-                    }
+            /* Accordion Header */
+            .accordion-button {
+                padding: 0.75rem;
+            }
 
-                    .accordion-button .font-size-13 {
-                        font-size: 0.75rem;
-                    }
+            .accordion-button h5 {
+                font-size: 0.9rem;
+                margin-bottom: 0.25rem !important;
+            }
 
-                    .badge {
-                        font-size: 0.75rem;
-                    }
+            .accordion-button .font-size-13 {
+                font-size: 0.75rem;
+            }
 
-                    /* Visit Details */
-                    .d-flex.flex-column .text-dark {
-                        font-size: 0.875rem;
-                    }
+            .badge {
+                font-size: 0.75rem;
+            }
 
-                    .d-flex.flex-column .text-muted {
-                        font-size: 0.75rem;
-                    }
+            /* Visit Details */
+            .d-flex.flex-column .text-dark {
+                font-size: 0.875rem;
+            }
 
-                    /* Pagination */
-                    .pagination {
-                        flex-wrap: wrap;
-                        justify-content: center;
-                    }
+            .d-flex.flex-column .text-muted {
+                font-size: 0.75rem;
+            }
 
-                    .page-link {
-                        padding: 0.25rem 0.5rem;
-                        min-width: 24px;
-                        height: 24px;
-                        font-size: 0.75rem;
-                    }
+            /* Pagination */
+            .pagination {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
 
-                    /* Table Headers */
-                    thead th {
-                        font-size: 0.8rem;
-                    }
+            .page-link {
+                padding: 0.25rem 0.5rem;
+                min-width: 24px;
+                height: 24px;
+                font-size: 0.75rem;
+            }
 
-                    /* Hide Less Important Columns on Small Screens */
-                    @media (max-width: 575.98px) {
+            /* Table Headers */
+            thead th {
+                font-size: 0.8rem;
+            }
 
-                        .table td:nth-child(3),
-                        .table th:nth-child(3) {
-                            display: none;
-                        }
+            /* Hide Less Important Columns on Small Screens */
+            @media (max-width: 575.98px) {
 
-                        .accordion-button .d-flex.align-items-center>div:last-child {
-                            display: none;
-                        }
-                    }
+                .table td:nth-child(3),
+                .table th:nth-child(3) {
+                    display: none;
                 }
 
-                /* Existing Styles */
-                .accordion-button:not(.collapsed) .bx-chevron-down {
-                    transform: rotate(-180deg);
+                .accordion-button .d-flex.align-items-center>div:last-child {
+                    display: none;
                 }
+            }
+        }
 
-                .transition-transform {
-                    transition: transform 0.2s ease-in-out;
-                }
+        /* Existing Styles */
+        .accordion-button:not(.collapsed) .bx-chevron-down {
+            transform: rotate(-180deg);
+        }
 
-                .table> :not(caption)>*>* {
-                    background-color: transparent;
-                }
+        .transition-transform {
+            transition: transform 0.2s ease-in-out;
+        }
 
-                .pagination {
-                    margin: 0;
-                    gap: 4px;
-                }
+        .table> :not(caption)>*>* {
+            background-color: transparent;
+        }
 
-                .page-item {
-                    margin: 0;
-                }
+        .pagination {
+            margin: 0;
+            gap: 4px;
+        }
 
-                .page-item:first-child .page-link,
-                .page-item:last-child .page-link {
-                    border-radius: 4px;
-                }
+        .page-item {
+            margin: 0;
+        }
 
-                .page-link {
-                    padding: 0.3rem 0.6rem;
-                    font-size: 0.8125rem;
-                    min-width: 28px;
-                    height: 28px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: var(--bs-primary);
-                    border: 1px solid #dee2e6;
-                    margin: 0;
-                    border-radius: 4px;
-                    background-color: #fff;
-                }
+        .page-item:first-child .page-link,
+        .page-item:last-child .page-link {
+            border-radius: 4px;
+        }
 
-                .page-item.active .page-link {
-                    background-color: var(--bs-primary);
-                    border-color: var(--bs-primary);
-                    color: #fff;
-                    font-weight: 500;
-                }
+        .page-link {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8125rem;
+            min-width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bs-primary);
+            border: 1px solid #dee2e6;
+            margin: 0;
+            border-radius: 4px;
+            background-color: #fff;
+        }
 
-                .page-item.disabled .page-link {
-                    background-color: #f8f9fa;
-                    border-color: #dee2e6;
-                    color: #6c757d;
-                }
+        .page-item.active .page-link {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+            color: #fff;
+            font-weight: 500;
+        }
 
-                .page-link:hover {
-                    background-color: #e9ecef;
-                    border-color: #dee2e6;
-                    color: var(--bs-primary);
-                }
+        .page-item.disabled .page-link {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+            color: #6c757d;
+        }
 
-                .page-item.active .page-link:hover {
-                    background-color: var(--bs-primary);
-                    color: #fff;
-                }
+        .page-link:hover {
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+            color: var(--bs-primary);
+        }
 
-                .btn-soft-primary {
-                    color: var(--bs-primary);
-                    background-color: rgba(var(--bs-primary-rgb), 0.1);
-                    border-color: transparent;
-                }
+        .page-item.active .page-link:hover {
+            background-color: var(--bs-primary);
+            color: #fff;
+        }
 
-                .btn-soft-danger {
-                    color: var(--bs-danger);
-                    background-color: rgba(var(--bs-danger-rgb), 0.1);
-                    border-color: transparent;
-                }
+        .btn-soft-primary {
+            color: var(--bs-primary);
+            background-color: rgba(var(--bs-primary-rgb), 0.1);
+            border-color: transparent;
+        }
 
-                .btn-soft-info {
-                    color: var(--bs-info);
-                    background-color: rgba(var(--bs-info-rgb), 0.1);
-                    border-color: transparent;
-                }
+        .btn-soft-danger {
+            color: var(--bs-danger);
+            background-color: rgba(var(--bs-danger-rgb), 0.1);
+            border-color: transparent;
+        }
 
-                .btn-soft-primary:hover {
-                    color: #fff;
-                    background-color: var(--bs-primary);
-                }
+        .btn-soft-info {
+            color: var(--bs-info);
+            background-color: rgba(var(--bs-info-rgb), 0.1);
+            border-color: transparent;
+        }
 
-                .btn-soft-danger:hover {
-                    color: #fff;
-                    background-color: var(--bs-danger);
-                }
+        .btn-soft-primary:hover {
+            color: #fff;
+            background-color: var(--bs-primary);
+        }
 
-                .btn-soft-info:hover {
-                    color: #fff;
-                    background-color: var(--bs-info);
-                }
+        .btn-soft-danger:hover {
+            color: #fff;
+            background-color: var(--bs-danger);
+        }
 
-                /* Pagination Styles */
-                .pagination {
-                    display: flex;
-                    gap: 4px;
-                    align-items: center;
-                    margin: 0;
-                    padding: 0;
-                }
+        .btn-soft-info:hover {
+            color: #fff;
+            background-color: var(--bs-info);
+        }
 
-                .page-item {
-                    margin: 0;
-                    list-style: none;
-                }
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
 
-                .page-link {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    min-width: 32px;
-                    height: 32px;
-                    padding: 0.25rem;
-                    font-size: 0.875rem;
-                    font-weight: 500;
-                    line-height: 1.5;
-                    color: var(--bs-primary);
-                    background-color: #fff;
-                    border: 1px solid #e2e8f0;
-                    border-radius: 6px;
-                    transition: all 0.2s ease-in-out;
-                }
+        .page-item {
+            margin: 0;
+            list-style: none;
+        }
 
-                .page-link:hover {
-                    color: var(--bs-primary);
-                    background-color: #f8fafc;
-                    border-color: #e2e8f0;
-                    z-index: 2;
-                }
+        .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: var(--bs-primary);
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            transition: all 0.2s ease-in-out;
+        }
 
-                .page-item.active .page-link {
-                    color: #fff;
-                    background-color: var(--bs-primary);
-                    border-color: var(--bs-primary);
-                    box-shadow: 0 2px 4px rgba(var(--bs-primary-rgb), 0.15);
-                }
+        .page-link:hover {
+            color: var(--bs-primary);
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
+            z-index: 2;
+        }
 
-                .page-item.disabled .page-link {
-                    color: #94a3b8;
-                    background-color: #f8fafc;
-                    border-color: #e2e8f0;
-                    cursor: not-allowed;
-                }
+        .page-item.active .page-link {
+            color: #fff;
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+            box-shadow: 0 2px 4px rgba(var(--bs-primary-rgb), 0.15);
+        }
 
-                .page-link.dots {
-                    border: none;
-                    background: transparent;
-                    color: #64748b;
-                    pointer-events: none;
-                    padding: 0 4px;
-                    min-width: 24px;
-                }
+        .page-item.disabled .page-link {
+            color: #94a3b8;
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
+            cursor: not-allowed;
+        }
 
-                /* Mobile Responsiveness */
-                @media (max-width: 767.98px) {
-                    .pagination {
-                        flex-wrap: wrap;
-                        justify-content: center;
-                    }
+        .page-link.dots {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            pointer-events: none;
+            padding: 0 4px;
+            min-width: 24px;
+        }
 
-                    .page-link {
-                        min-width: 28px;
-                        height: 28px;
-                        font-size: 0.8125rem;
-                    }
+        /* Mobile Responsiveness */
+        @media (max-width: 767.98px) {
+            .pagination {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
 
-                    .page-link.dots {
-                        min-width: 20px;
-                    }
-                }
-            </style>
-            <style>
-                /* Contract Info Styles */
-                .contract-info {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1rem;
-                    width: 100%;
-                }
+            .page-link {
+                min-width: 28px;
+                height: 28px;
+                font-size: 0.8125rem;
+            }
 
-                .contract-main-info {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.5rem;
-                }
+            .page-link.dots {
+                min-width: 20px;
+            }
+        }
+    </style>
+    <style>
+        /* Contract Info Styles */
+        .contract-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+        }
 
-                .contract-title {
-                    font-size: 1.1rem;
-                    font-weight: 600;
-                    color: #1e293b;
-                    margin: 0;
-                    display: flex;
-                    align-items: center;
-                }
+        .contract-main-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
 
-                .contract-details {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 1rem;
-                    align-items: center;
-                }
+        .contract-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
 
-                .contract-detail-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    font-size: 0.875rem;
-                    color: #64748b;
-                }
+        .contract-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
 
-                /* Visit Stats Styles */
-                .visit-stats {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 1rem;
-                    padding: 0.5rem 0;
-                }
+        .contract-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
 
-                .visit-stat-item {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 0.25rem;
-                    padding: 0.5rem 1rem;
-                    background-color: #f8fafc;
-                    border-radius: 8px;
-                    min-width: 100px;
-                }
+        /* Visit Stats Styles */
+        .visit-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 0.5rem 0;
+        }
 
-                .stat-label {
-                    font-size: 0.75rem;
-                    color: #64748b;
-                    font-weight: 500;
-                }
+        .visit-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem 1rem;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            min-width: 100px;
+        }
 
-                .stat-value {
-                    font-size: 1.125rem;
-                    font-weight: 600;
-                }
+        .stat-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+        }
 
-                /* Mobile Responsiveness */
-                @media (max-width: 767.98px) {
-                    .contract-info {
-                        gap: 0.75rem;
-                    }
+        .stat-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
 
-                    .visit-stats {
-                        width: 100%;
-                        justify-content: space-between;
-                        gap: 0.5rem;
-                    }
+        /* Mobile Responsiveness */
+        @media (max-width: 767.98px) {
+            .contract-info {
+                gap: 0.75rem;
+            }
 
-                    .visit-stat-item {
-                        flex: 1;
-                        min-width: calc(50% - 0.5rem);
-                        padding: 0.375rem 0.5rem;
-                    }
+            .visit-stats {
+                width: 100%;
+                justify-content: space-between;
+                gap: 0.5rem;
+            }
 
-                    .stat-label {
-                        font-size: 0.7rem;
-                    }
+            .visit-stat-item {
+                flex: 1;
+                min-width: calc(50% - 0.5rem);
+                padding: 0.375rem 0.5rem;
+            }
 
-                    .stat-value {
-                        font-size: 1rem;
-                    }
-                }
+            .stat-label {
+                font-size: 0.7rem;
+            }
 
-                @media (max-width: 575.98px) {
-                    .visit-stat-item {
-                        min-width: calc(50% - 0.25rem);
-                    }
-                }
-            </style>
-            <style>
-                /* Contract Header Styles */
-                .view-contract-btn {
-                    font-size: 1.1rem;
-                    line-height: 1;
-                    transition: all 0.2s ease-in-out;
-                    display: inline-flex;
-                    align-items: center;
-                    text-decoration: none !important;
-                }
+            .stat-value {
+                font-size: 1rem;
+            }
+        }
 
-                .view-contract-btn:hover {
-                    color: var(--bs-primary) !important;
-                    transform: scale(1.1);
-                }
+        @media (max-width: 575.98px) {
+            .visit-stat-item {
+                min-width: calc(50% - 0.25rem);
+            }
+        }
+    </style>
+    <style>
+        /* Contract Header Styles */
+        .view-contract-btn {
+            font-size: 1.1rem;
+            line-height: 1;
+            transition: all 0.2s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none !important;
+        }
 
-                .contract-title {
-                    position: relative;
-                    padding-right: 2rem;
-                }
+        .view-contract-btn:hover {
+            color: var(--bs-primary) !important;
+            transform: scale(1.1);
+        }
 
-                /* Prevent button click from triggering accordion */
-                .view-contract-btn {
-                    position: relative;
-                    z-index: 2;
-                }
+        .contract-title {
+            position: relative;
+            padding-right: 2rem;
+        }
 
-                /* Mobile adjustments */
-                @media (max-width: 767.98px) {
-                    .view-contract-btn {
-                        font-size: 1rem;
-                    }
+        /* Prevent button click from triggering accordion */
+        .view-contract-btn {
+            position: relative;
+            z-index: 2;
+        }
 
-                    .contract-title {
-                        padding-right: 1.5rem;
-                    }
-                }
-            </style>
-            <style>
-                /* Visits Card Grid Styles */
-                .visits-card-grid {
-                    margin-top: 1rem;
-                }
+        /* Mobile adjustments */
+        @media (max-width: 767.98px) {
+            .view-contract-btn {
+                font-size: 1rem;
+            }
 
-                .visit-card {
-                    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-                    background-color: #fff;
-                }
+            .contract-title {
+                padding-right: 1.5rem;
+            }
+        }
+    </style>
+    <style>
+        /* Visits Card Grid Styles */
+        .visits-card-grid {
+            margin-top: 1rem;
+        }
 
-                .visit-card:hover {
-                    transform: translateY(-3px);
-                    box-shadow: 0 8px 24px rgba(149, 157, 165, 0.15) !important;
-                }
+        .visit-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            background-color: #fff;
+        }
 
-                .visit-card .btn {
-                    transition: all 0.2s ease-in-out;
-                }
+        .visit-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(149, 157, 165, 0.15) !important;
+        }
 
-                /* Status badges in cards */
-                .visit-card .rounded-pill {
-                    font-size: 0.75rem;
-                    white-space: nowrap;
-                    padding: 0.25rem 0.75rem;
-                }
+        .visit-card .btn {
+            transition: all 0.2s ease-in-out;
+        }
 
-                .visits-card-grid .empty-state {
-                    padding: 2rem;
-                    background-color: #f8f9fa;
-                    border-radius: 8px;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                }
+        /* Status badges in cards */
+        .visit-card .rounded-pill {
+            font-size: 0.75rem;
+            white-space: nowrap;
+            padding: 0.25rem 0.75rem;
+        }
 
-                /* Branch pagination styles */
-                .branch-pagination {
-                    padding: 0.5rem;
-                    background-color: #f8f9fa;
-                    border-radius: 0 0 8px 8px;
-                    border-top: 1px solid #e9ecef;
-                }
+        .visits-card-grid .empty-state {
+            padding: 2rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
 
-                .branch-pagination .pagination {
-                    margin: 0;
-                }
+        /* Branch pagination styles */
+        .branch-pagination {
+            padding: 0.5rem;
+            background-color: #f8f9fa;
+            border-radius: 0 0 8px 8px;
+            border-top: 1px solid #e9ecef;
+        }
 
-                .branch-pagination .page-item.active .page-link {
-                    background-color: var(--bs-primary);
-                    border-color: var(--bs-primary);
-                    color: #fff;
-                    font-weight: 500;
-                }
+        .branch-pagination .pagination {
+            margin: 0;
+        }
 
-                /* Responsive adjustments */
-                @media (max-width: 767.98px) {
-                    .visits-card-grid .row {
-                        margin-left: -0.5rem;
-                        margin-right: -0.5rem;
-                    }
+        .branch-pagination .page-item.active .page-link {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+            color: #fff;
+            font-weight: 500;
+        }
 
-                    .visits-card-grid .col-md-6 {
-                        padding-left: 0.5rem;
-                        padding-right: 0.5rem;
-                    }
+        /* Responsive adjustments */
+        @media (max-width: 767.98px) {
+            .visits-card-grid .row {
+                margin-left: -0.5rem;
+                margin-right: -0.5rem;
+            }
 
-                    .visit-card {
-                        margin-bottom: 1rem;
-                    }
+            .visits-card-grid .col-md-6 {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
 
-                    .branch-pagination {
-                        padding: 0.375rem;
-                    }
+            .visit-card {
+                margin-bottom: 1rem;
+            }
 
-                    .branch-pagination .pagination {
-                        justify-content: center;
-                    }
-                }
-            </style>
-            <style>
-                /* Visits Card Grid Styles */
-                .branch-card {
-                    transition: all 0.2s ease-in-out;
-                }
+            .branch-pagination {
+                padding: 0.375rem;
+            }
 
-                .branch-card:hover {
-                    transform: translateY(-3px);
-                    box-shadow: 0 8px 24px rgba(149, 157, 165, 0.15) !important;
-                    border-color: var(--bs-primary) !important;
-                }
+            .branch-pagination .pagination {
+                justify-content: center;
+            }
+        }
+    </style>
+    <style>
+        /* Visits Card Grid Styles */
+        .branch-card {
+            transition: all 0.2s ease-in-out;
+        }
 
-                .new-visit-card {
-                    transition: all 0.2s ease-in-out;
-                    border-style: dashed !important;
-                    border-width: 2px !important;
-                    border-color: #e2e8f0 !important;
-                }
+        .branch-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(149, 157, 165, 0.15) !important;
+            border-color: var(--bs-primary) !important;
+        }
 
-                .new-visit-card:hover {
-                    border-color: var(--bs-primary) !important;
-                    background-color: rgba(var(--bs-primary-rgb), 0.05);
-                }
-            </style>
-        @endpush
+        .new-visit-card {
+            transition: all 0.2s ease-in-out;
+            border-style: dashed !important;
+            border-width: 2px !important;
+            border-color: #e2e8f0 !important;
+        }
 
-        @push('scripts')
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
+        .new-visit-card:hover {
+            border-color: var(--bs-primary) !important;
+            background-color: rgba(var(--bs-primary-rgb), 0.05);
+        }
+    </style>
+    @endpush
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
                     // Initialize tooltips
                     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
                     var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
@@ -1356,7 +1351,7 @@
                         }
                     });
                 }
-            </script>
-        @endpush
-    </div>
+    </script>
+    @endpush
+</div>
 @endsection

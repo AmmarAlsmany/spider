@@ -60,7 +60,7 @@
             <!-- Visit Schedule Card -->
             <div class="col-12">
                 <div class="border-0 shadow-sm card">
-                    <div class="bg-transparent card-header">
+                    <div class="bg-transparent card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="bx bx-calendar me-2"></i>{{ __('contract_views.visit_schedule') }}
                         </h5>
                         <div>
@@ -69,236 +69,370 @@
                             </a>
                         </div>
                     </div>
-                    <div class="card-body">
-                        @php
-                            // Get all branches for this contract
-                            $contractBranches = App\Models\branchs::where('contracts_id', $contract->id)->get();
-                        @endphp
-
-                        @if ($contractBranches->count() > 0)
-                            <!-- Branch tabs navigation -->
-                            <ul class="mb-3 nav nav-tabs" id="branchTabs" role="tablist">
-                                @foreach ($contractBranches as $branch)
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link {{ $loop->first ? 'active' : '' }}"
-                                            id="branch-{{ $branch->id }}-tab" data-bs-toggle="tab"
-                                            data-bs-target="#branch-{{ $branch->id }}" type="button" role="tab"
-                                            aria-controls="branch-{{ $branch->id }}"
-                                            aria-selected="{{ $loop->first ? 'true' : 'false' }}">
-                                            <i class="bx bx-building-house me-1"></i>{{ $branch->branch_name }}
-                                        </button>
-                                    </li>
-                                @endforeach
-                            </ul>
-
-                            <!-- Branch tabs content -->
-                            <div class="tab-content" id="branchTabsContent">
-                                @foreach ($contractBranches as $branch)
-                                    <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
-                                        id="branch-{{ $branch->id }}" role="tabpanel"
-                                        aria-labelledby="branch-{{ $branch->id }}-tab">
-
-                                        <div class="mb-3">
-                                            <h6 class="text-muted">
-                                                <i class="bx bx-map-pin me-1"></i>{{ $branch->branch_address }}
-                                            </h6>
-                                            <p class="mb-0">
-                                                <span class="text-muted">{{ __('contract_views.manager') }}:</span>
-                                                {{ $branch->branch_manager_name }}
-                                                <span class="ms-2 text-muted">{{ __('contract_views.phone') }}:</span>
-                                                {{ $branch->branch_manager_phone }}
-                                            </p>
-                                        </div>
-
-                                        <div class="table-responsive">
-                                            <table class="table align-middle table-hover">
-                                                <thead class="bg-light">
-                                                    <tr>
-                                                        <th>#</th>
-                                                        <th>{{ __('contract_views.visit_date') }}</th>
-                                                        <th>{{ __('contract_views.visit_time') }}</th>
-                                                        <th>{{ __('contract_views.team') }}</th>
-                                                        <th>{{ __('contract_views.status') }}</th>
-                                                        <th>{{ __('contract_views.actions') }}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
+                    <div class="p-0 card-body">
+                        <div class="accordion custom-accordion" id="contractAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#contract-{{ $contract->id }}">
+                                        <div class="contract-info w-100">
+                                            <div class="flex-wrap d-flex justify-content-between align-items-start w-100">
+                                                <div class="contract-main-info">
+                                                    <h5 class="gap-2 contract-title d-flex align-items-center">
+                                                        <i class="bx bx-buildings me-1 text-primary"></i>
+                                                        {{ $contract->customer->name }}
+                                                    </h5>
+                                                    <div class="contract-details">
+                                                        <span class="contract-detail-item">
+                                                            <i class="bx bx-hash"></i>
+                                                            {{ $contract->contract_number }}
+                                                        </span>
+                                                        @php
+                                                            $branchCount = App\Models\branchs::where(
+                                                                'contracts_id',
+                                                                $contract->id,
+                                                            )->count();
+                                                        @endphp
+                                                        <span class="contract-detail-item">
+                                                            <i class="bx bx-git-branch"></i>
+                                                            {{ $branchCount }}
+                                                            {{ Str::plural('Branch', $branchCount) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-wrap gap-2 visit-stats d-flex">
                                                     @php
-                                                        // Filter visits for this branch
-                                                        $branchVisits = $visits->filter(function ($visit) use (
-                                                            $branch,
-                                                        ) {
-                                                            return $visit->branch_id == $branch->id;
-                                                        });
+                                                        $totalVisits = $contract->visitSchedules->count();
+                                                        $completedVisits = $contract->visitSchedules
+                                                            ->where('status', 'completed')
+                                                            ->count();
+                                                        $pendingVisits = $contract->visitSchedules
+                                                            ->where('status', 'scheduled')
+                                                            ->count();
+                                                        $cancelledVisits = $contract->visitSchedules
+                                                            ->where('status', 'cancelled')
+                                                            ->count();
                                                     @endphp
-
-                                                    @forelse($branchVisits as $visit)
-                                                        <tr>
-                                                            <td>{{ $visit->visit_number ?? $loop->iteration }}</td>
-                                                            <td>{{ \Carbon\Carbon::parse($visit->visit_date)->format('d M, Y') }}
-                                                            </td>
-                                                            <td>{{ \Carbon\Carbon::parse($visit->visit_time)->format('h:i A') }}
-                                                            </td>
-                                                            <td>{{ $visit->team->name ?? __('contract_views.not_assigned') }}
-                                                            </td>
-                                                            <td>
-                                                                @switch($visit->status)
-                                                                    @case('scheduled')
-                                                                        <span
-                                                                            class="badge bg-info">{{ __('contract_views.scheduled') }}</span>
-                                                                    @break
-
-                                                                    @case('completed')
-                                                                        <span
-                                                                            class="badge bg-success">{{ __('contract_views.completed') }}</span>
-                                                                    @break
-
-                                                                    @case('cancelled')
-                                                                        <span
-                                                                            class="badge bg-danger">{{ __('contract_views.cancelled') }}</span>
-                                                                    @break
-
-                                                                    @default
-                                                                        <span
-                                                                            class="badge bg-secondary">{{ $visit->status }}</span>
-                                                                @endswitch
-                                                            </td>
-                                                            <td>
-                                                                @if ($visit->status === 'completed')
-                                                                    <a href="{{ route('contract.visit.report', $visit->id) }}"
-                                                                        class="btn btn-sm btn-info">
-                                                                        <i class="bx bx-file"></i>
-                                                                        {{ __('contract_views.view_report') }}
-                                                                    </a>
-                                                                @endif
-                                                            </td>
-                                                        </tr>
-                                                        @empty
-                                                            <tr>
-                                                                <td colspan="6" class="text-center">
-                                                                    {{ __('contract_views.no_visits_scheduled_branch') }}</td>
-                                                            </tr>
-                                                        @endforelse
-                                                    </tbody>
-                                                </table>
+                                                    <div class="visit-stat-item">
+                                                        <span class="stat-label">Total Visits</span>
+                                                        <span class="stat-value text-primary">{{ $totalVisits }}</span>
+                                                    </div>
+                                                    <div class="visit-stat-item">
+                                                        <span class="stat-label">Completed</span>
+                                                        <span class="stat-value text-success">{{ $completedVisits }}</span>
+                                                    </div>
+                                                    <div class="visit-stat-item">
+                                                        <span class="stat-label">Pending</span>
+                                                        <span class="stat-value text-warning">{{ $pendingVisits }}</span>
+                                                    </div>
+                                                    <div class="visit-stat-item">
+                                                        <span class="stat-label">Cancelled</span>
+                                                        <span class="stat-value text-danger">{{ $cancelledVisits }}</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    @endforeach
-                                </div>
-                            @else
-                                <div class="alert alert-info">
-                                    <i class="bx bx-info-circle me-1"></i> {{ __('contract_views.no_branches_found') }}
-                                </div>
+                                    </button>
+                                </h2>
+                                <div id="contract-{{ $contract->id }}" class="accordion-collapse collapse show"
+                                    aria-labelledby="heading{{ $contract->id }}" data-bs-parent="#contractAccordion">
+                                    <div class="accordion-body">
+                                        <!-- Branch Links Instead of Tabs -->
+                                        <div class="mb-4">
+                                            <div class="mb-3 d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0 fw-semibold">
+                                                    <i class="bx bx-map-pin text-primary me-1"></i>
+                                                    {{ __('contract_views.contract_locations') }}
+                                                </h6>
+                                            </div>
 
-                                <!-- Show all visits if no branches are defined -->
-                                <div class="mt-3 table-responsive">
-                                    <table class="table align-middle table-hover">
-                                        <thead class="bg-light">
-                                            <tr>
-                                                <th>#</th>
-                                                <th>{{ __('contract_views.visit_date') }}</th>
-                                                <th>{{ __('contract_views.visit_time') }}</th>
-                                                <th>{{ __('contract_views.team') }}</th>
-                                                <th>{{ __('contract_views.status') }}</th>
-                                                <th>{{ __('contract_views.actions') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($visits as $visit)
-                                                <tr>
-                                                    <td>{{ $visit->visit_number ?? $loop->iteration }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($visit->visit_date)->format('d M, Y') }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($visit->visit_time)->format('h:i A') }}</td>
-                                                    <td>{{ $visit->team->name ?? __('contract_views.not_assigned') }}</td>
-                                                    <td>
-                                                        @switch($visit->status)
-                                                            @case('scheduled')
-                                                                <span class="badge bg-info">{{ __('contract_views.scheduled') }}</span>
-                                                            @break
+                                            <div class="row g-3">
+                                                @php
+                                                    // Get all branches for this contract
+                                                    $contractBranches = App\Models\branchs::where(
+                                                        'contracts_id',
+                                                        $contract->id,
+                                                    )->get();
 
-                                                            @case('completed')
-                                                                <span
-                                                                    class="badge bg-success">{{ __('contract_views.completed') }}</span>
-                                                            @break
+                                                    // Get all visits without a branch (main location)
+                                                    $mainLocationVisits = $contract->visitSchedules
+                                                        ->filter(function ($visit) {
+                                                            return $visit->branch_id == null;
+                                                        })
+                                                        ->count();
+                                                @endphp
 
-                                                            @case('cancelled')
-                                                                <span
-                                                                    class="badge bg-danger">{{ __('contract_views.cancelled') }}</span>
-                                                            @break
-
-                                                            @default
-                                                                <span class="badge bg-secondary">{{ $visit->status }}</span>
-                                                        @endswitch
-                                                    </td>
-                                                    <td>
-                                                        @if ($visit->status === 'completed')
-                                                            <a href="{{ route('contract.visit.report', $visit->id) }}"
-                                                                class="btn btn-sm btn-info">
-                                                                <i class="bx bx-file"></i>
-                                                                {{ __('contract_views.view_report') }}
-                                                            </a>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="6" class="text-center">
-                                                            {{ __('contract_views.no_visits_scheduled') }}</td>
-                                                    </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @endif
-
-                                @if ($visits->hasPages())
-                                    <div class="mt-4 d-flex justify-content-end">
-                                        <nav>
-                                            <ul class="mb-0 pagination pagination-sm">
-                                                {{-- Previous Page Link --}}
-                                                @if ($visits->onFirstPage())
-                                                    <li class="page-item disabled">
-                                                        <span class="page-link">{{ __('contract_views.previous') }}</span>
-                                                    </li>
-                                                @else
-                                                    <li class="page-item">
-                                                        <a class="page-link" href="{{ $visits->previousPageUrl() }}"
-                                                            rel="prev">{{ __('contract_views.previous') }}</a>
-                                                    </li>
+                                                <!-- Main Location -->
+                                                @if ($mainLocationVisits > 0)
+                                                    <div class="col-md-6 col-lg-4">
+                                                        <a href="{{ route('contract.branch.visits', [$contract->id, 'main']) }}"
+                                                            class="text-decoration-none">
+                                                            <div class="border branch-card card h-100 hover-shadow">
+                                                                <div class="p-3 card-body">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div
+                                                                            class="avatar-md rounded-circle bg-soft-primary me-3 d-flex align-items-center justify-content-center">
+                                                                            <i
+                                                                                class="bx bx-building text-primary font-size-20"></i>
+                                                                        </div>
+                                                                        <div>
+                                                                            <h6 class="mb-1">
+                                                                                {{ __('contract_views.main_location') }}
+                                                                            </h6>
+                                                                            <div
+                                                                                class="text-muted small d-flex align-items-center">
+                                                                                <i class="bx bx-calendar me-1"></i>
+                                                                                {{ $mainLocationVisits }}
+                                                                                {{ __('contract_views.visits') }}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="mt-2 d-flex justify-content-end">
+                                                                        <span
+                                                                            class="px-2 py-1 badge bg-soft-primary text-primary rounded-pill">
+                                                                            <i class="bx bx-chevron-right"></i>
+                                                                            {{ __('contract_views.view_visits') }}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </div>
                                                 @endif
 
-                                                {{-- Pagination Elements --}}
-                                                @foreach ($visits->getUrlRange(1, $visits->lastPage()) as $page => $url)
-                                                    @if ($page == $visits->currentPage())
-                                                        <li class="page-item active">
-                                                            <span class="page-link">{{ $page }}</span>
-                                                        </li>
-                                                    @else
-                                                        <li class="page-item">
-                                                            <a class="page-link"
-                                                                href="{{ $url }}">{{ $page }}</a>
-                                                        </li>
-                                                    @endif
+                                                <!-- Contract Branches -->
+                                                @foreach ($contractBranches as $branch)
+                                                    <div class="col-md-6 col-lg-4">
+                                                        <a href="{{ route('contract.branch.visits', [$contract->id, $branch->id]) }}"
+                                                            class="text-decoration-none">
+                                                            <div class="border branch-card card h-100 hover-shadow">
+                                                                <div class="p-3 card-body">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div
+                                                                            class="avatar-md rounded-circle bg-soft-info me-3 d-flex align-items-center justify-content-center">
+                                                                            <i
+                                                                                class="bx bx-map-pin text-info font-size-20"></i>
+                                                                        </div>
+                                                                        <div>
+                                                                            <h6 class="mb-1">{{ $branch->branch_name }}
+                                                                            </h6>
+                                                                            <div
+                                                                                class="text-muted small d-flex align-items-center">
+                                                                                <i class="bx bx-calendar me-1"></i>
+                                                                                {{ $contract->visitSchedules->where('branch_id', $branch->id)->count() }}
+                                                                                {{ __('contract_views.visits') }}
+                                                                            </div>
+                                                                            <small
+                                                                                class="ms-1 badge rounded-pill bg-info">{{ $branch->branch_address }}</small>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="mt-2 d-flex justify-content-end">
+                                                                        <span
+                                                                            class="px-2 py-1 badge bg-soft-info text-info rounded-pill">
+                                                                            <i class="bx bx-chevron-right"></i>
+                                                                            {{ __('contract_views.view_visits') }}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </div>
                                                 @endforeach
 
-                                                {{-- Next Page Link --}}
-                                                @if ($visits->hasMorePages())
-                                                    <li class="page-item">
-                                                        <a class="page-link" href="{{ $visits->nextPageUrl() }}"
-                                                            rel="next">{{ __('contract_views.next') }}</a>
-                                                    </li>
-                                                @else
-                                                    <li class="page-item disabled">
-                                                        <span class="page-link">{{ __('contract_views.next') }}</span>
-                                                    </li>
+                                                <!-- No Branches Message -->
+                                                @if ($contractBranches->count() == 0 && $mainLocationVisits == 0)
+                                                    <div class="col-12">
+                                                        <div class="alert alert-info">
+                                                            <i class="bx bx-info-circle me-1"></i>
+                                                            {{ __('contract_views.no_branches_found') }}
+                                                        </div>
+                                                    </div>
                                                 @endif
-                                            </ul>
-                                        </nav>
+                                            </div>
+                                        </div>
                                     </div>
-                                @endif
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        @endsection
+        </div>
+
+        @push('styles')
+            <style>
+                /* Contract Info Styles */
+                .contract-info {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1rem;
+                    width: 100%;
+                }
+
+                .contract-main-info {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+                }
+
+                .contract-title {
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    color: #1e293b;
+                    margin: 0;
+                    display: flex;
+                    align-items: center;
+                }
+
+                .contract-details {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 1rem;
+                    align-items: center;
+                }
+
+                .contract-detail-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    font-size: 0.875rem;
+                    color: #64748b;
+                }
+
+                /* Visit Stats Styles */
+                .visit-stats {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 1rem;
+                    padding: 0.5rem 0;
+                }
+
+                .visit-stat-item {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 0.25rem;
+                    padding: 0.5rem 1rem;
+                    background-color: #f8fafc;
+                    border-radius: 8px;
+                    min-width: 100px;
+                }
+
+                .stat-label {
+                    font-size: 0.75rem;
+                    color: #64748b;
+                    font-weight: 500;
+                }
+
+                .stat-value {
+                    font-size: 1.125rem;
+                    font-weight: 600;
+                }
+
+                /* Custom Accordion Styles */
+                .custom-accordion .accordion-item {
+                    border-left: 0;
+                    border-right: 0;
+                    border-radius: 0;
+                }
+
+                .custom-accordion .accordion-item:first-of-type {
+                    border-top: 0;
+                }
+
+                .custom-accordion .accordion-button {
+                    padding: 1rem 1.25rem;
+                    background-color: #fff;
+                    box-shadow: none;
+                }
+
+                .custom-accordion .accordion-button:not(.collapsed) {
+                    color: var(--bs-primary);
+                    background-color: rgba(var(--bs-primary-rgb), 0.05);
+                    box-shadow: none;
+                }
+
+                .custom-accordion .accordion-button:focus {
+                    box-shadow: none;
+                    border-color: rgba(var(--bs-primary-rgb), 0.1);
+                }
+
+                .custom-accordion .accordion-body {
+                    padding: 1rem;
+                }
+
+                /* Branch Card Styles */
+                .branch-card {
+                    transition: all 0.2s ease-in-out;
+                }
+
+                .branch-card:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 8px 24px rgba(149, 157, 165, 0.15) !important;
+                    border-color: var(--bs-primary) !important;
+                }
+
+                .avatar-md {
+                    width: 50px;
+                    height: 50px;
+                }
+
+                .font-size-20 {
+                    font-size: 20px;
+                }
+
+                .bg-soft-primary {
+                    background-color: rgba(var(--bs-primary-rgb), 0.1);
+                }
+
+                .bg-soft-info {
+                    background-color: rgba(var(--bs-info-rgb), 0.1);
+                }
+
+                .text-primary {
+                    color: var(--bs-primary) !important;
+                }
+
+                .text-info {
+                    color: var(--bs-info) !important;
+                }
+
+                .hover-shadow:hover {
+                    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+                }
+
+                /* Mobile Responsiveness */
+                @media (max-width: 767.98px) {
+                    .contract-info {
+                        gap: 0.75rem;
+                    }
+
+                    .visit-stats {
+                        width: 100%;
+                        justify-content: space-between;
+                        gap: 0.5rem;
+                    }
+
+                    .visit-stat-item {
+                        flex: 1;
+                        min-width: calc(50% - 0.5rem);
+                        padding: 0.375rem 0.5rem;
+                    }
+
+                    .stat-label {
+                        font-size: 0.7rem;
+                    }
+
+                    .stat-value {
+                        font-size: 1rem;
+                    }
+                }
+
+                @media (max-width: 575.98px) {
+                    .visit-stat-item {
+                        min-width: calc(50% - 0.25rem);
+                    }
+                }
+            </style>
+        @endpush
+    @endsection

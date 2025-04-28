@@ -186,6 +186,9 @@ Route::middleware(['auth', 'role:sales', 'prevent-back-history', 'custom-session
     Route::post('/contracts/{id}/renewal', [ContractsController::class, 'processRenewal'])->name('contract.renewal.process');
     Route::post('/contracts/{id}/renewal-response', [ContractsController::class, 'handleRenewalResponse'])->name('contract.renewal.response');
 
+    // Branch Visits Routes
+    Route::get('/contracts/{contract}/branch-visits/{branch?}', [ContractsController::class, 'branchVisits'])->name('contract.branch.visits');
+
     // Postponement Request Routes
     Route::get('/postponement-requests', [ContractsController::class, 'postponement_requests'])
         ->name('postponement.requests');

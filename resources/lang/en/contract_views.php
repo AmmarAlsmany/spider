@@ -99,6 +99,8 @@ return [
     'customer_information' => 'Customer Information',
     'select_customer' => 'Select Customer',
     'insect_analytics' => 'Contract Analysis',
+    'unknown_branch' => 'Unknown Branch',
+    'team' => 'Team',
 
     // Branch Information
     'branch_name' => 'Branch Name',

@@ -27,7 +27,7 @@ class Tiket extends Model
 
     public function customer(): BelongsTo
     {
-        return $this->belongsTo(Client::class, 'customer_id');
+        return $this->belongsTo(client::class, 'customer_id');
     }
 
     public function solver(): BelongsTo

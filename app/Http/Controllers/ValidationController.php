@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Client;
+use App\Models\client;
 use Illuminate\Http\Request;
 
 class ValidationController extends Controller
@@ -19,7 +19,7 @@ class ValidationController extends Controller
         // Check if a client_id is provided to exclude current client in edit mode
         $clientId = $request->query('client_id');
         
-        $query = Client::where($field, $value);
+        $query = client::where($field, $value);
         
         // If client_id is provided, exclude that client from the check
         if ($clientId) {

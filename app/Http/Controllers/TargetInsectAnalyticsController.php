@@ -1073,29 +1073,61 @@ class TargetInsectAnalyticsController extends Controller
             $quantityChartPath = storage_path('app/pdf_quantity_chart.png');
             $distributionChartPath = storage_path('app/pdf_distribution_chart.png');
 
-            // Capture Occurrence Chart
-            Browsershot::html($html) // Load HTML directly
-                ->select('#occurrence-chart')
-                ->waitUntilNetworkIdle() // Wait for chart rendering
-                ->deviceScaleFactor(2) // Improve resolution
-                ->windowSize(850, 450) // Ensure consistent size
-                ->save($occurrenceChartPath);
-
-            // Capture Quantity Chart
-            Browsershot::html($html) // Load HTML directly
-                ->select('#quantity-chart')
-                ->waitUntilNetworkIdle()
-                ->deviceScaleFactor(2)
-                ->windowSize(850, 450)
-                ->save($quantityChartPath);
-
-            // Capture Distribution Chart
-            Browsershot::html($html) // Load HTML directly
-                ->select('#distribution-chart')
-                ->waitUntilNetworkIdle()
-                ->deviceScaleFactor(2)
-                ->windowSize(850, 450)
-                ->save($distributionChartPath);
+            // Create a temporary HTML file in the public directory instead of /tmp
+            $tempDir = public_path('temp_charts');
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+            
+            // Generate a unique filename
+            $tempFileName = 'chart_' . time() . '_' . uniqid() . '.html';
+            $tempHtmlPath = $tempDir . '/' . $tempFileName;
+            file_put_contents($tempHtmlPath, $html);
+            chmod($tempHtmlPath, 0644);
+            
+            // Configure Browsershot to use system Chromium for ARM64 compatibility
+            $chromiumPath = env('CHROMIUM_PATH', '/usr/bin/chromium-browser');
+            
+            // Use the application URL to access the file via HTTP instead of file://
+            $baseUrl = config('app.url');
+            $chartUrl = $baseUrl . '/temp_charts/' . $tempFileName;
+            
+            try {
+                // Capture Occurrence Chart
+                Browsershot::url($chartUrl) // Use HTTP URL instead of file://
+                    ->setChromePath($chromiumPath)
+                    ->noSandbox()
+                    ->select('#occurrence-chart')
+                    ->waitUntilNetworkIdle() // Wait for chart rendering
+                    ->deviceScaleFactor(2) // Improve resolution
+                    ->windowSize(850, 450) // Ensure consistent size
+                    ->save($occurrenceChartPath);
+    
+                // Capture Quantity Chart
+                Browsershot::url($chartUrl) // Use HTTP URL instead of file://
+                    ->setChromePath($chromiumPath)
+                    ->noSandbox()
+                    ->select('#quantity-chart')
+                    ->waitUntilNetworkIdle()
+                    ->deviceScaleFactor(2)
+                    ->windowSize(850, 450)
+                    ->save($quantityChartPath);
+    
+                // Capture Distribution Chart
+                Browsershot::url($chartUrl) // Use HTTP URL instead of file://
+                    ->setChromePath($chromiumPath)
+                    ->noSandbox()
+                    ->select('#distribution-chart')
+                    ->waitUntilNetworkIdle()
+                    ->deviceScaleFactor(2)
+                    ->windowSize(850, 450)
+                    ->save($distributionChartPath);
+            } finally {
+                // Always clean up the temporary file
+                if (file_exists($tempHtmlPath)) {
+                    unlink($tempHtmlPath);
+                }
+            }
 
             // Convert images to base64 for embedding in PDF
             if (file_exists($occurrenceChartPath)) {

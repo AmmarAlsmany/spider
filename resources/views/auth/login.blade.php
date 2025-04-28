@@ -143,7 +143,7 @@
 <body class="flex justify-center items-center p-4 min-h-screen">
     <div class="login-container">
         <div class="mb-8 text-center">
-            <img src="{{ asset('backend/assets/images/logo-icon.png') }}" alt="Spider Web Logo" class="mx-auto spider-logo">
+            <img src="{{ asset('backend/assets/images/logo.png') }}" alt="Spider Web Logo" class="mx-auto spider-logo">
             <h1 class="mt-4 text-3xl font-bold sm:text-4xl text-highlight">Spider Web</h1>
             <p class="mt-2 text-lg">Pest Control Services</p>
         </div>

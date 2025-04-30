@@ -1,4 +1,4 @@
-@extends('managers.sales Manager.reports.base_report')
+@extends('managers.sales manager.reports.base_report')
 
 @section('report_title')
 Customer Contacts Report {{ request('start_date') && request('end_date') ? '(' . request('start_date') . ' to ' . request('end_date') . ')' : '' }}

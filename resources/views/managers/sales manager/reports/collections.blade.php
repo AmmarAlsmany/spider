@@ -1,4 +1,4 @@
-@extends('managers.sales Manager.reports.base_report')
+@extends('managers.sales manager.reports.base_report')
 
 @section('report_title')
 Collections Report {{ request('start_date') && request('end_date') ? '(' . request('start_date') . ' to ' . request('end_date') . ')' : '' }}
@@ -6,7 +6,7 @@ Collections Report {{ request('start_date') && request('end_date') ? '(' . reque
 
 @section('report_content')
 <div class="table-responsive">
-    <table class="table mb-0 align-middle">
+    <table class="table mb-0 align-middle"> 
         <thead class="table-light">
             <tr>
                 <th>Payment ID</th>

@@ -260,7 +260,7 @@
                                 <h6 class="mb-1">{{ $history->action }}</h6>
                                 <p class="mb-0">{{ $history->description }}</p>
                                 <small class="text-muted">
-                                    By {{ $history->user->name }} on {{ $history->created_at->format('M d, Y H:i') }}
+                                    By {{ $history->contract->salesRepresentative->name }} on {{ $history->created_at->format('M d, Y H:i') }}
                                 </small>
                             </div>
                         </div>

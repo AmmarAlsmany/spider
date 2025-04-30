@@ -487,7 +487,7 @@ class SalesManagerController extends Controller
 
     public function viewContract($id)
     {
-        $contract = contracts::with(['customer'])->findOrFail($id);
+        $contract = contracts::with(['customer', 'history'])->findOrFail($id);
         
         // Paginate the payments
         $payments = payments::where('contract_id', $id)

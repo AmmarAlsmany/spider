@@ -257,7 +257,7 @@ class DashboardController extends Controller
         $payment->load([
             'customer',
             'contract',
-            'postponementRequests.user'
+            'postponementRequests'
         ]);
 
         return view('admin.payments.show', compact('payment'));

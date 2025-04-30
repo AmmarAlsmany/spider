@@ -702,7 +702,7 @@ class SalesManagerController extends Controller
             // Different URLs for different roles
             $roleUrls = [
                 'client' => route('client.contract.visits', $postponementRequest->payment->contract_id),
-                'sales' => route('payments.show', $postponementRequest->payment->id),
+                'sales' => route('payment.show', $postponementRequest->payment->id),
                 'finance' => route('finance.payments.show', $postponementRequest->payment->id)
             ];
             $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $postponementRequest->payment->customer_id, $postponementRequest->payment->sales_id, $roleUrls);
@@ -737,7 +737,7 @@ class SalesManagerController extends Controller
             // Different URLs for different roles
             $roleUrls = [
                 'client' => route('client.contract.visits', $postponementRequest->payment->contract_id),
-                'sales' => route('payments.show', $postponementRequest->payment->id),
+                'sales' => route('payment.show', $postponementRequest->payment->id),
                 'finance' => route('finance.payments.show', $postponementRequest->payment->id)
             ];
             $this->notifyRoles(['client', 'sales', 'finance'], $notificationData, $postponementRequest->payment->customer_id, $postponementRequest->payment->sales_id, $roleUrls);

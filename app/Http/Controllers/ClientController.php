@@ -498,14 +498,13 @@ class ClientController extends Controller
             'message' => "Payment of {$payment->payment_amount} SAR requested to be postponed from " .
                 Carbon::parse($payment->due_date)->format('M d, Y') .
                 " to " . Carbon::parse($request->requested_date)->format('M d, Y'),
-            'url' => route('payments.show', $payment->id),
         ];
         
         // Different URLs for different roles
         $roleUrls = [
-            'sales' => route('payments.show', $payment->id),
-            'sales_manager' => route('payments.show', $payment->id),
-            'finance' => route('payments.show', $payment->id)
+            'sales' => route('payment.show', $payment->id),
+            'sales_manager' => route('sales_manager.postponement_requests'),
+            'finance' => route('finance.payments.show', $payment->id)
         ];
 
         $this->notifyRoles(['sales', 'sales_manager', 'finance'], $data, null, null, $roleUrls);

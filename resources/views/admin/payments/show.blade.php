@@ -172,10 +172,10 @@
                             <tbody>
                                 @foreach ($payment->postponementRequests as $request)
                                     <tr>
-                                        <td>{{ $request->user->name }}</td>
+                                        <td>{{ $request->payment->customer->name }}</td>
                                         <td>{{ $request->created_at instanceof \Carbon\Carbon ? $request->created_at->format('Y-m-d') : $request->created_at }}
                                         </td>
-                                        <td>{{ $request->new_due_date instanceof \Carbon\Carbon ? $request->new_due_date->format('Y-m-d') : $request->new_due_date }}
+                                        <td>{{ $request->payment->due_date instanceof \Carbon\Carbon ? $request->payment->due_date->format('Y-m-d') : $request->payment->due_date }}
                                         </td>
                                         <td>
                                             <span

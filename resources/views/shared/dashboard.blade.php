@@ -69,7 +69,7 @@ Session::forget('new_login');
             @elseif (Auth::user()->role == 'team_leader')
                 @include('managers.team-leader.sidebar')
             @elseif (Auth::user()->role == 'sales_manager')
-                @include('managers.sales Manager.sidebar')
+                @include('managers.sales manager.sidebar')
             @elseif (Auth::user()->role == 'finance')
                 @include('managers.finance.sidebar')
             @else

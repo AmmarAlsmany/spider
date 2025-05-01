@@ -242,6 +242,8 @@
                                         <span class="badge bg-success">Completed</span>
                                         @elseif($schedule->status == 'cancelled')
                                         <span class="badge bg-danger">Cancelled</span>
+                                        @elseif($schedule->status == 'in_progress')
+                                        <span class="badge bg-info">In Progress</span>
                                         @else
                                         <span class="badge bg-warning">Scheduled</span>
                                         @endif

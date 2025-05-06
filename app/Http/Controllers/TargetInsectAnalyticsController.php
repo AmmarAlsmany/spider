@@ -1098,6 +1098,12 @@ class TargetInsectAnalyticsController extends Controller
                 Browsershot::url($chartUrl) // Use HTTP URL instead of file://
                     ->setChromePath($chromiumPath)
                     ->noSandbox()
+                    ->addChromiumArguments([
+                        '--disable-dev-shm-usage',
+                        '--disable-gpu',
+                        '--disable-setuid-sandbox',
+                        '--no-zygote'
+                    ])
                     ->select('#occurrence-chart')
                     ->waitUntilNetworkIdle() // Wait for chart rendering
                     ->deviceScaleFactor(2) // Improve resolution
@@ -1108,6 +1114,12 @@ class TargetInsectAnalyticsController extends Controller
                 Browsershot::url($chartUrl) // Use HTTP URL instead of file://
                     ->setChromePath($chromiumPath)
                     ->noSandbox()
+                    ->addChromiumArguments([
+                        '--disable-dev-shm-usage',
+                        '--disable-gpu',
+                        '--disable-setuid-sandbox',
+                        '--no-zygote'
+                    ])
                     ->select('#quantity-chart')
                     ->waitUntilNetworkIdle()
                     ->deviceScaleFactor(2)
@@ -1118,6 +1130,12 @@ class TargetInsectAnalyticsController extends Controller
                 Browsershot::url($chartUrl) // Use HTTP URL instead of file://
                     ->setChromePath($chromiumPath)
                     ->noSandbox()
+                    ->addChromiumArguments([
+                        '--disable-dev-shm-usage',
+                        '--disable-gpu',
+                        '--disable-setuid-sandbox',
+                        '--no-zygote'
+                    ])
                     ->select('#distribution-chart')
                     ->waitUntilNetworkIdle()
                     ->deviceScaleFactor(2)

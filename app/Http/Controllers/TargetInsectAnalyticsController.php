@@ -1088,6 +1088,10 @@ class TargetInsectAnalyticsController extends Controller
             // Configure Browsershot to use system Chromium for ARM64 compatibility
             $chromiumPath = env('CHROMIUM_PATH', '/usr/bin/chromium-browser');
             
+            // Set environment variables for Puppeteer
+            putenv('PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true');
+            putenv('PUPPETEER_EXECUTABLE_PATH=' . $chromiumPath);
+            
             // Use HTTP URL for local chart access to avoid SSL certificate issues
             // Force HTTP regardless of APP_URL setting
             $baseUrl = str_replace('https://', 'http://', config('app.url'));
@@ -1098,11 +1102,16 @@ class TargetInsectAnalyticsController extends Controller
                 Browsershot::url($chartUrl) // Use HTTP URL instead of file://
                     ->setChromePath($chromiumPath)
                     ->noSandbox()
+                    ->ignoreHttpsErrors()
                     ->addChromiumArguments([
                         '--disable-dev-shm-usage',
                         '--disable-gpu',
                         '--disable-setuid-sandbox',
-                        '--no-zygote'
+                        '--no-zygote',
+                        '--no-sandbox',
+                        '--single-process',
+                        '--disable-extensions',
+                        '--disable-web-security'
                     ])
                     ->select('#occurrence-chart')
                     ->waitUntilNetworkIdle() // Wait for chart rendering
@@ -1114,11 +1123,16 @@ class TargetInsectAnalyticsController extends Controller
                 Browsershot::url($chartUrl) // Use HTTP URL instead of file://
                     ->setChromePath($chromiumPath)
                     ->noSandbox()
+                    ->ignoreHttpsErrors()
                     ->addChromiumArguments([
                         '--disable-dev-shm-usage',
                         '--disable-gpu',
                         '--disable-setuid-sandbox',
-                        '--no-zygote'
+                        '--no-zygote',
+                        '--no-sandbox',
+                        '--single-process',
+                        '--disable-extensions',
+                        '--disable-web-security'
                     ])
                     ->select('#quantity-chart')
                     ->waitUntilNetworkIdle()
@@ -1130,11 +1144,16 @@ class TargetInsectAnalyticsController extends Controller
                 Browsershot::url($chartUrl) // Use HTTP URL instead of file://
                     ->setChromePath($chromiumPath)
                     ->noSandbox()
+                    ->ignoreHttpsErrors()
                     ->addChromiumArguments([
                         '--disable-dev-shm-usage',
                         '--disable-gpu',
                         '--disable-setuid-sandbox',
-                        '--no-zygote'
+                        '--no-zygote',
+                        '--no-sandbox',
+                        '--single-process',
+                        '--disable-extensions',
+                        '--disable-web-security'
                     ])
                     ->select('#distribution-chart')
                     ->waitUntilNetworkIdle()
